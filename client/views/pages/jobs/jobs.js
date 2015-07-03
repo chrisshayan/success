@@ -2,7 +2,7 @@ Template.jobs.helpers({
     jobs: function(){
         var MOCK_JOBS = [];
         var job_status = ['Published', 'Closed', 'Draft'];
-        _.each( _.range(2000), function() {
+        _.each( _.range(25), function() {
             var job = {
                 title: Fake.sentence(),
                 status: _.sample(job_status),
