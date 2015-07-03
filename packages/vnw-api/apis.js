@@ -23,6 +23,10 @@ APIS = {}
  * @return async response: {Object}
  */
 APIS.login = function (username, password, callback) {
+    // validate input data
+    check(username, String);
+    check(password, String);
+
     // Hash password
     password = CryptoJS.MD5(password);
 
