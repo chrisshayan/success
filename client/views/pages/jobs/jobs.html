@@ -1,0 +1,63 @@
+<template name="jobs">
+
+    <!-- Page heading -->
+    {{> pageHeading title='Jobs' category='App' }}
+
+    <div class="wrapper wrapper-content animated fadeInUp">
+
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Jobs List</h5>
+                <div class="ibox-tools">
+                    <a href="" class="btn btn-primary btn-xs">Create new job</a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="row m-b-sm m-t-sm">
+                    <div class="col-md-1">
+                        <button type="button" id="loading-example-btn" class="btn btn-white btn-sm" ><i class="fa fa-refresh"></i> Refresh</button>
+                    </div>
+                    <div class="col-md-11">
+                        <div class="input-group"><input type="text" placeholder="Search" class="input-sm form-control"> <span class="input-group-btn">
+                                        <button type="button" class="btn btn-sm btn-primary"> Go!</button> </span></div>
+                    </div>
+                </div>
+
+                <div class="project-list">
+
+                    <table class="table table-hover">
+                        <tbody>
+                            {{#with jobs}}
+                                {{#each jobs}}
+                                    {{> jobItem}}
+                                {{/each}}
+                            {{/with}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<template name="jobItem">
+    <tr>
+        <td class="project-status">
+            <span class="label {{ jobStatusLabel }}">{{ status }}</span>
+        </td>
+        <td class="project-title">
+            <a href="{{pathFor 'jobTrackingBoard'}}">{{ title }}</a>
+            <br/>
+            <small>Created {{ createdAt }}</small>
+        </td>
+        <td class="project-completion">
+            <small>Applied: <b>{{ applied }}</b> </small>
+            &nbsp;<span class="job-applied-chart">5,3,9,6,5,9,7</span>
+        </td>
+        <td class="project-actions">
+            <a href="{{ pathFor "jobTrackingBoard" }}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View </a>
+            <a href="#" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i> Edit </a>
+        </td>
+    </tr>
+</template>
