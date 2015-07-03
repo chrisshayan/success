@@ -1,3 +1,4 @@
+
 Template.jobs.helpers({
     jobs: function(){
         var MOCK_JOBS = [];
