@@ -12,7 +12,9 @@ var syncData = function () {
             return parser.text(Meteor.settings.private.cronJobSchedule);
         },
         job: function () {
-            SYNC_VNW.run();
+            Meteor.defer(function() {
+                SYNC_VNW.run();
+            });
         }
     });
 };
