@@ -7,6 +7,8 @@
 meteor-platform
 underscore
 less
+reactive-var
+dburles:collection-helpers
 iron:router
 twbs:bootstrap
 fortawesome:fontawesome
@@ -17,5 +19,7 @@ anti:fake
 momentjs:moment
 pcel:mysql
 sgi:sprintfjs
-jparker:crypto-md5
 lab:vnw-apis
+lab:accounts-vnw
+meteorhacks:kadira
+meteorhacks:zones

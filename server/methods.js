@@ -1,16 +1,25 @@
+var defaultQueryOptions = {
+    limit: 10
+};
+
 Meteor.methods({
-    /**
-     * Login helper
-     * @param data {Object}
-     * @returns {Object}
-     * Object.success {Boolean}
-     * Object.msg {String}
-     * Object.data {Mixins}
-     */
-    login: function (data) {
-        check(data.username, String);
-        check(data.password, String);
-        var _func = Meteor.wrapAsync(APIS.login);
-        return _func(data.username, data.password);
-    }
+
+    jobs: function(options) {
+        //this.unblock();
+        //options = _.defaults(defaultQueryOptions, options);
+        //
+        //var _func = Meteor.wrapAsync(APIS.jobs);
+        //return _func(options);
+        return [];
+    },
+
+    jobApplications: function(options) {
+        //this.unblock();
+        //options = _.defaults(defaultQueryOptions, options);
+        //
+        //var _func = Meteor.wrapAsync(APIS.jobApplications);
+        //return _func(options);
+        return [];
+    },
+
 });

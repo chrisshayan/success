@@ -76,9 +76,9 @@
 
 <template name="Application">
     <li class="{{ stateLabel }}">
-        {{ fullname }}
+        {{ candidate.fullname }}
         <div class="agile-detail">
-            <i class="fa fa-clock-o"></i> {{ createdAt }}
+            Matching score: {{matchingScore}}
         </div>
     </li>
 </template>

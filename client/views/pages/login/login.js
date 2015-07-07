@@ -16,34 +16,31 @@ Template.login.helpers({
      */
     errorMsg: function() {
         return Session.get("loginErrorMsg");
-    }
+    },
 
 });
 
 Template.login.events({
     'submit #loginForm': function(e, tmpl) {
+        e.preventDefault();
+
         //change login btn state to loading
         var loginBtn = tmpl.$('#loginBtn');
         loginBtn.button('loading');
+
+        var username = e.target.email.value,
+            password = e.target.password.value;
         //
-        var account = {
-            username: e.target.email.value,
-            password: e.target.password.value
-        };
-
-        Meteor.call('login', account, function(err, result) {
-            //reset login button state
-            loginBtn.button('reset');
-
-            if(!err) {
+        Meteor.setTimeout(function() {
+            Meteor.loginAsEmployer(username, password, function(result) {
+                loginBtn.button('reset');
                 if( !result.success ) {
                     Session.set("loginErrorMsg", result.msg);
                 } else {
                     Session.set("loginErrorMsg", "");
-                    Router.go("dashboard");
                 }
-            }
-        });
+            });
+        }, 100);
         return false;
     }
 })
