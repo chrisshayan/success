@@ -1,26 +1,13 @@
 var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.queries;
-
 var fetchVNWData = Meteor.wrapAsync(function(sql, callback) {
-    var connection = mysql.createConnection(Meteor.settings.mysql);
-    // Open connection
-    connection.connect(function (err) {
-        if (err) {
-            console.error('error connecting: ' + err.stack);
-            return;
-        }
 
-        console.log('connected as id ' + connection.threadId);
-    });
 
     //execute
     connection.query(sql, function(err, rows, fields) {
         if( err ) throw err;
         callback(null, rows);
     });
-
-    // Close connection
-    connection.end();
 });
 
 //Namespace to share methods to manual sync data from Vietnamworks
@@ -185,8 +172,22 @@ SYNC_VNW.pullApplicationScores = function( entryIds ) {
 }
 
 SYNC_VNW.run = function() {
+    var connection = mysql.createConnection(Meteor.settings.mysql);
+    // Open connection
+    connection.connect(function (err) {
+        if (err) {
+            console.error('error connecting: ' + err.stack);
+            return;
+        }
+
+        console.log('connected as id ' + connection.threadId);
+    });
     var users = Collections.Users.find().fetch();
     _.each(users, function(user) {
         SYNC_VNW.pullJobs(user.userId);
     });
+
+
+    // Close connection
+    connection.end();
 };

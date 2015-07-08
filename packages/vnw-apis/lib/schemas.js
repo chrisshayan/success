@@ -52,3 +52,48 @@ Schemas.ApplicationScore = function() {
         lastSyncedAt: new Date()
     }
 };
+
+Schemas.MailTemplate = function() {
+    return {
+        name: "", // template name
+        fromStage: null,
+        toStage: null,
+        type: 2, // 1: system (default), 2: user mail template
+        emailFrom: "",
+        subject: "",
+        htmlBody: "",
+        replyTo: "",
+        createdAt: new Date(),
+        createdBy: null,
+        modifiedAt: new Date(),
+        modifiedBy: null
+    }
+};
+
+/**
+ * Company info configuration
+ * @returns Object
+ */
+Schemas.CompanySetting = function() {
+    return {
+        companyId: null,
+        companyName: "",
+        companyAddress: "",
+        contactName: "",
+        phone: "",
+        cell: "",
+        fax: "",
+        emailFrom: "",
+        emailReply: ""
+    }
+};
+
+Schemas.Activity = function() {
+    return {
+        jobId: null,
+        actionType: "",
+        data: {}, // mixins data
+        createdAt: new Date(),
+        createdBy: null
+    };
+};

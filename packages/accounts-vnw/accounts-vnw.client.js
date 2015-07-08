@@ -14,7 +14,7 @@ AccountsVNW.initUserLogin = function() {
     if( _user ) {
         AccountsVNW._connection.setUserId(_user.userid);
         AccountsVNW._connection.onReconnect = function() {
-            AccountsVNW.initUserLogin();
+            Meteor.call('onUserReconnect', _user.userid);
         };
     }
 };
@@ -56,7 +56,10 @@ AccountsVNW.loginAsEmployer = function (username, password, callback) {
 AccountsVNW.loginAsJobSeeker = function (username, password, callback) {
 
 }
-
+/**
+ * Get user logged in
+ * @returns {*}
+ */
 AccountsVNW.user = function() {
     var _user = AccountsVNW._store.get('user');
     return  _user ? EJSON.parse(_user) : undefined;

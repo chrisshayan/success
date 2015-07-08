@@ -1,38 +1,37 @@
 <template name="jobs">
 
-    <!-- Page heading -->
-    {{> pageHeading title='Jobs' category='App' }}
-
-    <div class="wrapper wrapper-content animated fadeInUp">
-
-        <div class="ibox">
-            <div class="ibox-title">
-                <h5>Jobs List</h5>
-                <div class="ibox-tools">
-                    <a href="" class="btn btn-primary btn-xs">Create new job</a>
-                </div>
-            </div>
-            <div class="ibox-content">
-                <div class="row m-b-sm m-t-sm">
-                    <div class="col-md-1">
-                        <button type="button" id="loading-example-btn" class="btn btn-white btn-sm" ><i class="fa fa-refresh"></i> Refresh</button>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>Jobs board</h5>
                     </div>
-                    <div class="col-md-11">
-                        <div class="input-group"><input type="text" placeholder="Search" class="input-sm form-control"> <span class="input-group-btn">
-                                        <button type="button" class="btn btn-sm btn-primary"> Go!</button> </span></div>
-                    </div>
-                </div>
+                    <div class="ibox-content">
 
-                <div class="project-list">
-                    <table class="table table-hover">
-                        <tbody>
-                        {{#with jobs}}
-                            {{#each jobs}}
-                                {{> jobItem}}
-                            {{/each}}
-                        {{/with}}
-                        </tbody>
-                    </table>
+                        <div class="table-responsive">
+                            <table class="table table-striped table-bordered table-hover dataTables" >
+                                <thead>
+                                <tr>
+                                    <th>JOB TITLE</th>
+                                    <th>JOB ID</th>
+                                    <th class="text-center">VIEWS</th>
+                                    <th>EXPIRY</th>
+                                    <th class="text-center">APPLICATIONS</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {{#with jobs}}
+                                    {{#each jobs}}
+                                        {{> jobItem}}
+                                    {{/each}}
+                                {{/with}}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -42,16 +41,14 @@
 
 <template name="jobItem">
     <tr>
-        <td class="project-title">
-            <a href="{{pathFor 'jobTrackingBoard'}}">{{ title }}</a>
-            <br/>
-            <small>Created:</small>
-        </td>
-        <td class="project-completion">
-            <small>Applied: <b>{{ applied }}</b> </small>
-        </td>
-        <td class="project-actions">
-            <a href="{{ pathFor "jobTrackingBoard" }}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View </a>
+        <td><a href="{{pathFor 'jobTrackingBoard'}}">{{ title }}</a></td>
+        <td>{{ jobId }}</td>
+        <td class="text-center">{{ views }}</td>
+        <td>{{ expiry }}</td>
+        <td class="text-center">{{ applied }}</td>
+        <td>
+            <a href="{{ pathFor "jobTrackingBoard" }}" class="btn btn-white btn-sm"><i class="fa fa-folder"></i> View
+            </a>
         </td>
     </tr>
 </template>

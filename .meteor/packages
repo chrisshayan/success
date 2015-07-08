@@ -7,6 +7,7 @@
 meteor-platform
 underscore
 less
+email
 reactive-var
 dburles:collection-helpers
 iron:router
@@ -21,5 +22,7 @@ pcel:mysql
 sgi:sprintfjs
 lab:vnw-apis
 lab:accounts-vnw
+lab:notifications
 meteorhacks:kadira
 meteorhacks:zones
+wylio:mandrill

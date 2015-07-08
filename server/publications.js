@@ -1,14 +1,8 @@
 Meteor.publish('jobs', function(options){
-    check(options, {
-        userId: Number
-    });
-
-    console.log(this.userId)
-
     var cond = {
-        userId: options.userId
+        userId: parseInt(this.userId)
     };
-    return Collections.Jobs.find(cond, {limit: 10});
+    return Collections.Jobs.find(cond);
 });
 
 Meteor.publish('jobDetails', function(options){
@@ -17,7 +11,8 @@ Meteor.publish('jobDetails', function(options){
     });
 
     var cond = {
-        jobId: options.jobId
+        jobId: options.jobId,
+        userId: parseInt(this.userId)
     };
     return Collections.Jobs.find(cond, {limit: 1});
 });
@@ -26,7 +21,6 @@ Meteor.publish('applications', function(options){
     check(options, {
         jobId: Number
     });
-
     return Collections.Applications.find(options);
 });
 
@@ -52,3 +46,41 @@ Meteor.publish('candidates', function(options){
     return Collections.Candidates.find({ userId: {$in: listCandidateIds} });
 });
 
+
+Meteor.publish('candidateInfo', function(options){
+    return Collections.Candidates.find();
+});
+
+
+
+Meteor.publish('activities', function() {
+    var cond = {
+        createdBy: parseInt(this.userId)
+    };
+    var options = {
+        sort: {createdAt: -1}
+    }
+    return Collections.Activities.find(cond, options);
+});
+
+
+Meteor.publish('mailTemplates', function() {
+    var cond = {
+        createdBy: parseInt(this.userId)
+    };
+    var options = {
+        sort: {createdAt: -1}
+    }
+    return Collections.MailTemplates.find(cond, options);
+});
+
+Meteor.publish('mailTemplateDetails', function(_id) {
+    check(_id, String);
+
+    var cond = {
+        _id: _id,
+        createdBy: parseInt(this.userId)
+    };
+
+    return Collections.MailTemplates.find(cond);
+});

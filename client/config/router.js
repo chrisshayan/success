@@ -88,3 +88,64 @@ Router.route('/jobtracking/:jobId', {
         this.render('jobTrackingBoard');
     }
 });
+
+/**
+ * Routes for settings
+ */
+Router.route('/settings/companyinfo', {
+    name: "companyInfo",
+    action: function() {
+        this.render('companyInfo');
+    }
+});
+
+
+Router.route('/settings/mailtemplates', {
+    name: "mailTemplates",
+    waitOn: function() {
+        return [
+            Meteor.subscribe('mailTemplates'),
+        ];
+    },
+    action: function() {
+        this.render('mailTemplates');
+    }
+});
+
+
+Router.route('/settings/mailtemplates/create', {
+    name: "createMailTemplate",
+    action: function() {
+        this.render('createMailTemplate');
+    }
+});
+
+Router.route('/settings/mailtemplates/update/:_id', {
+    name: "updateMailTemplate",
+    waitOn: function() {
+        return [
+            Meteor.subscribe('mailTemplateDetails', this.params._id)
+        ];
+    },
+    action: function() {
+        this.render('createMailTemplate');
+    },
+    data: function() {
+        return Collections.MailTemplates.findOne(this.params._id);
+    }
+});
+
+
+Router.route('/activites', {
+    name: "activities",
+    waitOn: function() {
+        return [
+            Meteor.subscribe('activities'),
+            Meteor.subscribe('candidateInfo'),
+            Meteor.subscribe('jobs')
+        ];
+    },
+    action: function() {
+        this.render('activities');
+    }
+});

@@ -1,30 +1,45 @@
 /**
  * Template jobTrackingBoard
  */
- Template.jobTrackingBoard.onRendered(function() {
-     // Initialize sortable
-     $(".sortable-list").sortable({
-         connectWith: ".connectList"
-     }).disableSelection();
+Template.jobTrackingBoard.onRendered(function () {
+    // Initialize sortable
+    $(".sortable-list").sortable({
+        connectWith: ".connectList",
+        receive: function (e, ui) {
+            var item = ui.item[0];
+            var applicationId = $(item).data('application-id');
+            var toStage = $(this).data('stage');
+
+            if (applicationId && toStage) {
+                Meteor.call('updateApplicationState', applicationId, toStage, function (err, result) {
+                    if (err) throw err;
+                    if( result.success ) {
+                        Notification.success(result.msg);
+                    } else {
+                        Notification.error(result.msg);
+                    }
+                });
+            }
+        }
+    }).disableSelection();
 
 
-
- });
+});
 
 Template.jobTrackingBoard.helpers({
-    appliedCan: function() {
+    appliedCan: function () {
         return Collections.Applications.find({stage: 1});
     },
-    testAssignCan: function() {
+    testAssignCan: function () {
         return Collections.Applications.find({stage: 2});
     },
-    interviewCan: function() {
+    interviewCan: function () {
         return Collections.Applications.find({stage: 3});
     },
-    rejectedCan: function() {
+    rejectedCan: function () {
         return Collections.Applications.find({stage: 5});
     },
-    offerCan: function() {
+    offerCan: function () {
         return Collections.Applications.find({stage: 4});
     },
 });
@@ -33,23 +48,21 @@ Template.jobTrackingBoard.helpers({
  * Template: Application
  */
 Template.Application.helpers({
-    stateLabel: function() {
-        switch (this.state) {
-            case 'applied':
+    stateLabel: function () {
+        switch (this.stage) {
+            case 1:
+            case 2:
                 return 'info-element';
-            break;
-            case 'test_assignment':
-                return 'info-element';
-            break;
-            case 'interview':
+                break;
+            case 3:
                 return 'warning-element';
-            break;
-            case 'rejected':
+                break;
+            case 5:
                 return 'danger-element';
-            break;
-            case 'offer':
+                break;
+            case 4:
                 return 'success-element';
-            break;
+                break;
             default:
                 return 'default-element'
         }
