@@ -13,6 +13,7 @@ AccountsVNW.initUserLogin = function() {
     var _user = AccountsVNW.user();
     if( _user ) {
         AccountsVNW._connection.setUserId(_user.userid);
+        Meteor.call('onUserReconnect', _user.userid);
         AccountsVNW._connection.onReconnect = function() {
             Meteor.call('onUserReconnect', _user.userid);
         };

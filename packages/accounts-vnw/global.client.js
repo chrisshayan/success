@@ -17,9 +17,13 @@ Meteor.loginAsJobSeeker = AccountsVNW.loginAsJobSeeker;
  */
 UI.registerHelper('username', function() {
     var user = Meteor.user();
-    if( user.lastname && user.firsttname )
-        return user.lastname + " " + user.firstname;
-    return user.username;
+    if( user ) {
+        if ( user.lastname && user.firstname ) {
+            return user.lastname + " " + user.firstname;
+        }
+        return user.username;
+    }
+    return "";
 });
 
 Meteor.startup(function() {
