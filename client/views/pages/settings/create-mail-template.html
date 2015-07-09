@@ -4,7 +4,7 @@
             <div class="ibox">
                 <div class="ibox-title clearfix">
                     <h5 class="pull-left">{{#if isNew}}Create{{else}}Update{{/if}} <small>mail template</small></h5>
-                    <a href="{{pathFor 'mailTemplates'}}" class="btn btn-white pull-right"><i class="fa fa-undo"></i>&nbsp;back</a>
+                    <button onclick="window.history.back()" class="btn btn-white pull-right"><i class="fa fa-undo"></i>&nbsp;back</button>
                 </div>
                 <div class="ibox-content">
                         {{#autoForm collection="Collections.MailTemplates" id="mailTemplateForm" type=type doc=this.doc class="form-horizontal"}}
@@ -91,7 +91,7 @@
 
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-2">
-                                <button class="btn btn-white" type="submit">Cancel</button>
+                                <button class="btn btn-white" onclick="window.history.back()">Cancel</button>
                                 <button class="btn btn-primary" type="submit">Save changes</button>
                             </div>
                         </div>

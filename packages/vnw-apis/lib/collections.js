@@ -66,7 +66,6 @@ Collections.Candidates.helpers({
  * Collection Activities
  */
 Collections.Activities = new Mongo.Collection("vnw_activities");
-
 // Activity helpers
 Collections.Activities.helpers({
     actionIcon: function () {
@@ -97,6 +96,7 @@ Collections.Activities.helpers({
     },
 
     actionTimeAgo: function () {
+        var liveupdate = Session.get('now');
         return moment(this.createdAt).fromNow();
     }
 

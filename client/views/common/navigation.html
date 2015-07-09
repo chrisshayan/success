@@ -45,38 +45,33 @@
                         IN+
                     </div>
                 </li>
-                <li class="{{isActiveRoute regex='dashboard|jobTracking'}}">
-                    <a href="{{ pathFor 'dashboard' }}">
-                        <i class="fa fa-dashboard"></i>
-                        <span class="nav-label">Dashboard</span>
-                    </a>
-                </li>
 
-                <li class="{{isActiveRoute regex='activities'}}">
-                    <a href="{{ pathFor 'activities' }}">
-                        <i class="fa fa-heartbeat"></i>
-                        <span class="nav-label">Activities</span>
-                    </a>
-                </li>
-
-                <li class="{{isActiveRoute regex='settings'}}">
-                    <a href="#">
-                        <i class="fa fa-cogs"></i>
-                        <span class="nav-label">Settings</span>
-                        <span class="fa arrow"></span>
-                    </a>
-                    <ul class="nav nav-second-level {{isActiveRoute regex='companyInfo|mailTemplates|createMailTemplate|updateMailTemplate' className='in'}}">
-                        <li class="{{isActiveRoute regex='companyInfo'}}">
-                            <a href="{{pathFor 'companyInfo' }}">Company info</a>
-                        </li>
-                        <li class="{{isActiveRoute regex='mailTemplates|createMailTemplate|updateMailTemplate'}}">
-                            <a href="{{pathFor 'mailTemplates' }}">Mail templates</a>
-                        </li>
-                    </ul>
-                </li>
+                {{#each leftNavItems}}
+                    {{> menuItem}}
+                {{/each}}
 
             </ul>
 
         </div>
     </nav>
+</template>
+
+<template name="menuItem">
+    <li class="menu-item {{class}}">
+        <a href="{{pathFor route}}">
+            <i class="fa {{icon}}"></i>
+            <span class="nav-label">{{label}}</span>
+            {{#with childrens}}
+            <span class="fa arrow"></span>
+            {{/with}}
+        </a>
+        {{#if childrens}}
+            <ul class="nav nav-second-level collapse">
+                {{#each childrens}}
+                    {{> menuItem }}
+                {{/each}}
+            </ul>
+        {{/if}}
+    </li>
+
 </template>

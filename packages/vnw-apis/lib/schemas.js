@@ -167,6 +167,7 @@ Schemas.Template = new SimpleSchema({
                 if (this.value == this.field('fromStage').value) {
                     return "movedStageNotAllowTheSame";
                 }
+
                 // Validate a pair fromStage and toStage is unique
                 checkExist = Collections.MailTemplates.findOne({
                     fromStage: this.field('fromStage').value,

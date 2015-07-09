@@ -129,6 +129,7 @@ Router.route('/settings/mailtemplates/update/:_id', {
     name: "updateMailTemplate",
     waitOn: function() {
         return [
+            Meteor.subscribe('mailTemplates'),
             Meteor.subscribe('mailTemplateDetails', this.params._id)
         ];
     },
