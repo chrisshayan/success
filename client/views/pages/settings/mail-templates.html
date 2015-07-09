@@ -49,6 +49,9 @@
         <td>{{ subject }}</td>
         <td>
             <a href="{{pathFor 'updateMailTemplate'}}" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>&nbsp;edit</a>
+            {{#if isAllowRemove}}
+                <button class="btn btn-white btn-sm remove"><i class="fa fa-trash"></i>&nbsp;remove</button>
+            {{/if}}
         </td>
     </tr>
 </template>

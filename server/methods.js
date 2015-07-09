@@ -8,10 +8,10 @@ Meteor.methods({
      * @param toStage {Number} in range 1,2,3,4,5
      * @returns {Boolean} the update result
      */
-    updateApplicationState: function(entryId, toStage) {
+    updateApplicationState: function (entryId, toStage) {
         check(entryId, Number);
         check(toStage, Number);
-        check(toStage, Match.OneOf(1,2,3,4,5));
+        check(toStage, Match.OneOf(1, 2, 3, 4, 5));
 
         var result = {
             success: false,
@@ -19,7 +19,7 @@ Meteor.methods({
         };
         //check application is exists
         var application = Collections.Applications.findOne({entryId: entryId});
-        if( !application ) {
+        if (!application) {
             result.msg = "Application not found";
             return result;
         }
@@ -30,7 +30,7 @@ Meteor.methods({
             }
         }
         result.success = Collections.Applications.update(application._id, data);
-        if( result.success ) {
+        if (result.success) {
             var stages = {
                 1: "Applied",
                 2: "Test assign",
@@ -38,7 +38,7 @@ Meteor.methods({
                 4: "Offer letter",
                 5: "Rejected"
             };
-            result.msg = "Moved to "+ stages[toStage] +"  successfully";
+            result.msg = "Moved to " + stages[toStage] + "  successfully";
 
             // Log activities
             var activity = new Activity();
@@ -53,5 +53,13 @@ Meteor.methods({
             activity.updateApplicationStage();
         }
         return result;
+    },
+    /**
+     * Delete mail template
+     * @param _id {String} Mongo id
+     */
+    deleteMailTemplate: function (_id) {
+        check(_id, String);
+        return Collections.MailTemplates.remove(_id);
     }
 });

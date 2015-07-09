@@ -16,7 +16,7 @@ VNW_QUERIES = Meteor.settings.queries;
 /**
  * Vietnamworks APIs
  */
-APIS = {}
+APIS = {};
 
 /**
  * check login

@@ -9,14 +9,25 @@ Package.onUse(function (api) {
     /**
      * Packages depends
      */
-    api.use(['mongo', 'accounts-base'], both);
-    api.imply('accounts-base')
+    api.use([
+        'mongo',
+        'accounts-base',
+        'aldeed:collection2',
+        'matb33:collection-hooks',
+        'aldeed:simple-schema',
+        'aldeed:autoform'
+    ], both);
+
+    api.imply('accounts-base');
     api.use([
         "pcel:mysql",
         "sgi:sprintfjs",
         "jparker:crypto-md5",
         "percolatestudio:synced-cron"
     ], 'server');
+
+    api.addFiles('namespace.js');
+    api.export('Recruit');
 
     api.addFiles([
         'lib/collections.js',

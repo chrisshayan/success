@@ -115,6 +115,11 @@ Router.route('/settings/mailtemplates', {
 
 Router.route('/settings/mailtemplates/create', {
     name: "createMailTemplate",
+    waitOn: function() {
+        return [
+            Meteor.subscribe('mailTemplates'),
+        ];
+    },
     action: function() {
         this.render('createMailTemplate');
     }
@@ -131,7 +136,9 @@ Router.route('/settings/mailtemplates/update/:_id', {
         this.render('createMailTemplate');
     },
     data: function() {
-        return Collections.MailTemplates.findOne(this.params._id);
+        return {
+            doc: Collections.MailTemplates.findOne(this.params._id)
+        };
     }
 });
 

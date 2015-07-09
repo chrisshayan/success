@@ -45,7 +45,7 @@
                         IN+
                     </div>
                 </li>
-                <li class="{{isActiveRoute regex='dashboard'}}">
+                <li class="{{isActiveRoute regex='dashboard|jobTracking'}}">
                     <a href="{{ pathFor 'dashboard' }}">
                         <i class="fa fa-dashboard"></i>
                         <span class="nav-label">Dashboard</span>
@@ -65,11 +65,11 @@
                         <span class="nav-label">Settings</span>
                         <span class="fa arrow"></span>
                     </a>
-                    <ul class="nav nav-second-level {{isActiveRoute regex='companyInfo|mailTemplates' className='in'}}">
+                    <ul class="nav nav-second-level {{isActiveRoute regex='companyInfo|mailTemplates|createMailTemplate|updateMailTemplate' className='in'}}">
                         <li class="{{isActiveRoute regex='companyInfo'}}">
                             <a href="{{pathFor 'companyInfo' }}">Company info</a>
                         </li>
-                        <li class="{{isActiveRoute regex='mailTemplates'}}">
+                        <li class="{{isActiveRoute regex='mailTemplates|createMailTemplate|updateMailTemplate'}}">
                             <a href="{{pathFor 'mailTemplates' }}">Mail templates</a>
                         </li>
                     </ul>

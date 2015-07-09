@@ -1,80 +1,89 @@
 <template name="createMailTemplate">
     <div class="row">
         <div class="col-lg-12">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5>Create <small>mail template</small></h5>
-                    <div class="ibox-tools">
-
-                    </div>
+            <div class="ibox">
+                <div class="ibox-title clearfix">
+                    <h5 class="pull-left">{{#if isNew}}Create{{else}}Update{{/if}} <small>mail template</small></h5>
+                    <a href="{{pathFor 'mailTemplates'}}" class="btn btn-white pull-right"><i class="fa fa-undo"></i>&nbsp;back</a>
                 </div>
                 <div class="ibox-content">
-                    <form method="get" class="form-horizontal">
-                        <div class="form-group">
+                        {{#autoForm collection="Collections.MailTemplates" id="mailTemplateForm" type=type doc=this.doc class="form-horizontal"}}
+                        <div class="form-group {{#if afFieldIsInvalid name='name'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">Name</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="name" value="{{ this.name }}">
+                                {{> afFieldInput name='name'}}
+                                {{#if afFieldIsInvalid name='name'}}
+                                    <span class="help-block">{{afFieldMessage name='name'}}</span>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        <div class="form-group">
+                        <div class="form-group {{#if afFieldIsInvalid name='fromStage'}} has-error{{/if}} {{#if afFieldIsInvalid name='toStage'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">When update from</label>
                             <div class="col-sm-10">
                                 <div class="row">
                                     <div class="col-sm-5 text-right">
-                                        <select class="form-control m-b" name="fromStage">
-                                            <option>Applied</option>
-                                            <option>Test assign</option>
-                                            <option>Interview</option>
-                                            <option>Offer letter</option>
-                                            <option>Rejected</option>
-                                        </select>
+                                        {{> afFieldInput name='fromStage' disabled=isSystem}}
                                     </div>
                                     <div class="col-sm-1" style="text-align: center;font-size: 25px">
                                         <i class="fa fa-long-arrow-right"></i>
                                     </div>
                                     <div class="col-sm-5">
-                                        <select class="form-control m-b" name="toStage">
-                                            <option>Applied</option>
-                                            <option>Test assign</option>
-                                            <option>Interview</option>
-                                            <option>Offer letter</option>
-                                            <option>Rejected</option>
-                                        </select>
+                                        {{> afFieldInput name='toStage' disabled=isSystem}}
                                     </div>
                                 </div>
+                                {{#if afFieldIsInvalid name='fromStage'}}
+                                    <span class="help-block">{{afFieldMessage name='fromStage'}}</span>
+                                {{/if}}
+                                {{#if afFieldIsInvalid name='toStage'}}
+                                    <span class="help-block">{{afFieldMessage name='toStage'}}</span>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        <div class="form-group">
+                        <div class="form-group {{#if afFieldIsInvalid name='emailFrom'}} has-error{{/if}}" >
                             <label class="col-sm-2 control-label">From</label>
-                            <div class="col-sm-10"><input type="text" class="form-control"  id="from"></div>
+                            <div class="col-sm-10">
+                                {{> afFieldInput name='emailFrom'}}
+                                {{#if afFieldIsInvalid name='emailFrom'}}
+                                    <span class="help-block">{{afFieldMessage name='emailFrom'}}</span>
+                                {{/if}}
+                            </div>
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        <div class="form-group">
+                        <div class="form-group {{#if afFieldIsInvalid name='replyTo'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">Reply to</label>
-                            <div class="col-sm-10"><input type="text" class="form-control" id="replyTo"></div>
+                            <div class="col-sm-10">
+                                {{> afFieldInput name='replyTo'}}
+                                {{#if afFieldIsInvalid name='replyTo'}}
+                                    <span class="help-block">{{afFieldMessage name='replyTo'}}</span>
+                                {{/if}}
+                            </div>
                         </div>
                         <div class="hr-line-dashed"></div>
 
 
-                        <div class="form-group">
+                        <div class="form-group {{#if afFieldIsInvalid name='subject'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">Subject</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" id="subject" value="{{ this.subject }}">
+                                {{> afFieldInput name='subject'}}
+                                {{#if afFieldIsInvalid name='subject'}}
+                                    <span class="help-block">{{afFieldMessage name='subject'}}</span>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        <div class="form-group">
+                        <div class="form-group {{#if afFieldIsInvalid name='htmlBody'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">Content</label>
                             <div class="col-sm-10">
-                                <textarea class="form-control summernote" rows="20" id="htmlBody">
-                                    {{ this.htmlBody }}
-                                </textarea>
+                                {{> afFieldInput name='htmlBody'}}
+                                {{#if afFieldIsInvalid name='htmlBody'}}
+                                    <span class="help-block">{{afFieldMessage name='htmlBody'}}</span>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
@@ -86,7 +95,7 @@
                                 <button class="btn btn-primary" type="submit">Save changes</button>
                             </div>
                         </div>
-                    </form>
+                    {{/autoForm}}
                 </div>
             </div>
         </div>
