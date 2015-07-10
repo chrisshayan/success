@@ -14,6 +14,39 @@ var fetchVNWData = Meteor.wrapAsync(function(sql, callback) {
 SYNC_VNW = {};
 
 /**
+ * Pull company info
+ */
+SYNC_VNW.pullCompanyInfo = function(companyId) {
+    check(companyId, Number);
+    var pullCompanyInfoSql = sprintf(VNW_QUERIES.pullCompanyInfo, companyId);
+    try {
+        var rows = fetchVNWData(pullCompanyInfoSql);
+        _.each(rows, function (row) {
+            var company = Collections.Companies.findOne({companyId: row.companyid});
+
+            if (!company) {
+                company = new Schemas.CompanyInfo();
+                company.companyId = row.companyid;
+                company.data = row;
+                Collections.Companies.insert(company);
+            } else {
+                if (company.data != row) {
+                    Collections.Companies.update(company._id, {
+                        $set: {
+                            data: row,
+                            lastSyncedAt: new Date()
+                        }
+                    });
+                }
+            }
+        });
+
+    } catch (e) {
+        debuger(e);
+    }
+}
+
+/**
  * Pull new jobs and sync db
  * @param userId {Number} (Optional) Vietnamworks user id
  */
@@ -45,7 +78,7 @@ SYNC_VNW.pullJobs = function(userId) {
         });
 
     } catch (e) {
-        console.log(e)
+        debuger(e)
     }
 }
 
@@ -138,7 +171,7 @@ SYNC_VNW.pullCandidates = function(candidates) {
         });
 
     } catch (e) {
-        console.log(e)
+        debuger(e)
     }
 }
 
@@ -167,7 +200,7 @@ SYNC_VNW.pullApplicationScores = function( entryIds ) {
         });
 
     } catch (e) {
-        console.log(e)
+        debuger(e)
     }
 }
 
@@ -180,11 +213,16 @@ SYNC_VNW.run = function() {
             return;
         }
 
-        console.log('connected as id ' + connection.threadId);
+        debuger('connected as id ' + connection.threadId);
     });
     var users = Collections.Users.find().fetch();
     _.each(users, function(user) {
-        SYNC_VNW.pullJobs(user.userId);
+        Meteor.defer(function() {
+            SYNC_VNW.pullCompanyInfo(user.data.companyid);
+        });
+        Meteor.defer(function() {
+            SYNC_VNW.pullJobs(user.userId);
+        });
     });
 
 

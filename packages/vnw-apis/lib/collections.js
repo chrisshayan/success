@@ -5,6 +5,39 @@ Collections = {};
  * Users is Employer
  */
 Collections.Users = new Mongo.Collection("vnw_users");
+
+/**
+ * Collection Companies
+ */
+Collections.Companies = new Mongo.Collection("vnw_company_info");
+// Company helpers
+Collections.Companies.helpers({
+    companyLogo: function() {
+        return this.logo;
+    },
+    name: function() {
+        return this.data.companyname;
+    },
+    address: function() {
+        return this.data.address;
+    },
+    phone: function() {
+        return this.data.telephone;
+    },
+    cell: function() {
+        return this.data.cellphone;
+    },
+    fax: function() {
+        return this.data.faxnumber;
+    },
+    contact: function() {
+        return {
+            name: this.data.contactname || "",
+            email: this.data.contactemail || ""
+        }
+    }
+});
+
 Collections.ApplicationScores = new Mongo.Collection("vnw_application_scores");
 Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 

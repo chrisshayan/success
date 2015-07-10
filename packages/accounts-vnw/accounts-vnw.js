@@ -27,13 +27,13 @@ Meteor.methods({
                 if( !_user ) {
                     var _user = new Schemas.User();
                     _user.data = data;
-                    _user.userId = _user.data.userid;
-                    _user.username = _user.data.username;
+                    _user.userId = data.userid;
+                    _user.username = data.username;
                     Collections.Users.insert(_user);
 
                     //Intitial user data
                     Meteor.defer(function() {
-                        Recruit.initialEmployerData(data.userid);
+                        Recruit.initialEmployerData(data.userid, data.username);
                     });
                 } else {
                     if( _user.data != data ) {

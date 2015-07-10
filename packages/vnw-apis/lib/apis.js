@@ -7,7 +7,7 @@ connection.connect(function (err) {
         return;
     }
 
-    console.log('connected as id ' + connection.threadId);
+    debuger('connected as id ' + connection.threadId);
 });
 
 VNW_TABLES = Meteor.settings.tables;

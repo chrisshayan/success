@@ -5,12 +5,15 @@
             <div class="col-lg-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-content" id="ibox-content">
-
+                        {{#if isData}}
                         <div id="vertical-timeline" class="vertical-container dark-timeline">
                             {{#each data}}
                                 {{> activity}}
                             {{/each}}
                         </div>
+                        {{else}}
+                            <h5>There is no activity now.</h5>
+                        {{/if}}
 
                     </div>
                 </div>

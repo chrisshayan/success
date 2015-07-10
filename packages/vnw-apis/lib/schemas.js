@@ -53,6 +53,17 @@ Schemas.User = function () {
     }
 };
 
+
+Schemas.CompanyInfo = function () {
+    return {
+        companyId: null,
+        logo: null,
+        data: {},
+        createdAt: new Date(),
+        lastSyncedAt: new Date()
+    }
+};
+
 Schemas.Job = function () {
     return {
         userId: null,

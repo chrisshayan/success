@@ -94,6 +94,11 @@ Router.route('/jobtracking/:jobId', {
  */
 Router.route('/settings/companyinfo', {
     name: "companyInfo",
+    waitOn: function(){
+        return [
+            Meteor.subscribe('companyInfo')
+        ];
+    },
     action: function() {
         this.render('companyInfo');
     }
@@ -143,6 +148,12 @@ Router.route('/settings/mailtemplates/update/:_id', {
     }
 });
 
+Router.route('/settings/mailsignature', {
+    name: "mailSignature",
+    action: function() {
+        this.render('mailSignature');
+    }
+})
 
 Router.route('/activites', {
     name: "activities",

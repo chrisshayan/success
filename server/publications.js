@@ -51,6 +51,15 @@ Meteor.publish('candidateInfo', function(options){
     return Collections.Candidates.find();
 });
 
+Meteor.publish('companyInfo', function(){
+    var user = Collections.Users.findOne({userId: parseInt(this.userId)});
+    if(user) {
+        return Collections.Companies.find({companyId: user.data.companyid}, {limit: 1});
+    }
+    return null;
+
+});
+
 
 
 Meteor.publish('activities', function() {

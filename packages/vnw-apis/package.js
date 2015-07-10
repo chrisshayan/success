@@ -10,6 +10,7 @@ Package.onUse(function (api) {
      * Packages depends
      */
     api.use([
+        'check',
         'mongo',
         'accounts-base',
         'aldeed:collection2',
@@ -17,8 +18,7 @@ Package.onUse(function (api) {
         'aldeed:simple-schema',
         'aldeed:autoform'
     ], both);
-
-    api.imply('accounts-base');
+    api.imply(['accounts-base']);
     api.use([
         "pcel:mysql",
         "sgi:sprintfjs",
@@ -30,8 +30,9 @@ Package.onUse(function (api) {
     api.export('Recruit');
 
     api.addFiles([
+        'lib/debuger.js',
         'lib/collections.js',
-        'lib/schemas.js'
+        'lib/schemas.js',
     ], both);
 
     api.addFiles([
@@ -43,6 +44,6 @@ Package.onUse(function (api) {
     /**
      * Export namespace
      */
-    api.export(['Collections', 'Schemas'], both);
+    api.export(['Collections', 'Schemas','debuger'], both);
     api.export(['APIS', 'SYNC_VNW'], 'server');
 });

@@ -25,6 +25,7 @@ Meteor.startup(function () {
                     route: "mailTemplates",
                     dependencies: ['createMailTemplate', 'updateMailTemplate']
                 },
+                {label: "Mail Signature", icon: "fa-at", route: "mailSignature"},
             ]
         }
     ];

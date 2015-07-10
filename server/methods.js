@@ -61,5 +61,12 @@ Meteor.methods({
     deleteMailTemplate: function (_id) {
         check(_id, String);
         return Collections.MailTemplates.remove(_id);
+    },
+
+    uploadCompanyLogo: function(file) {
+        var user = Collections.Users.findOne({userId: parseInt(this.userId)});
+        if(user) {
+            Collections.Companies.update({companyId: user.data.companyid}, {$set: {logo: file}});
+        }
     }
 });
