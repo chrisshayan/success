@@ -147,6 +147,7 @@ SYNC_VNW.pullApplications = function(jobId) {
 
 SYNC_VNW.pullCandidates = function(candidates) {
     check(candidates, Array);
+    if(candidates.length < 1) return;
 
     var pullCandidatesSql = sprintf(VNW_QUERIES.pullCandidates, candidates.join(","));
 
@@ -178,6 +179,7 @@ SYNC_VNW.pullCandidates = function(candidates) {
 
 SYNC_VNW.pullApplicationScores = function( entryIds ) {
     check(entryIds, Array);
+    if(entryIds.length < 1) return;
 
     var pullApplicationScoreSql = sprintf(VNW_QUERIES.pullApplicationScores, entryIds.join(","));
     try {
