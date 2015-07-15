@@ -17,19 +17,15 @@ Meteor.publish('jobDetails', function(options){
     return Collections.Jobs.find(cond, {limit: 1});
 });
 
-Meteor.publish('applications', function(options){
-    check(options, {
-        jobId: Number
-    });
-    return Collections.Applications.find(options);
+Meteor.publish('applications', function(conditions, options){
+    //check(options, {
+    //    jobId: Number
+    //});
+    return Collections.Applications.find(conditions, options);
 });
 
 Meteor.publish('applicationCount', function(options){
-    return Collections.Applications.find({}, {fields: {_id: 1, jobId: 1}});
-});
-
-Meteor.publish('applicationScores', function(options){
-    return Collections.ApplicationScores.find({});
+    return Collections.Applications.find({}, {fields: {_id: 1, jobId: 1, stage: 1}});
 });
 
 Meteor.publish('candidates', function(options){
@@ -92,4 +88,78 @@ Meteor.publish('mailTemplateDetails', function(_id) {
     };
 
     return Collections.MailTemplates.find(cond);
+});
+
+
+/*************************************
+ * Publications for job details page *
+ *************************************/
+
+/**
+ * Get applications in job details page
+ * @param clientOptions {Object}
+ * @param clientOptions.jobId {Number}
+ * @param clientOptions.page {Number} (optional)
+ */
+Meteor.publish('JobApplications', function(opt) {
+    // validate client request
+    check(opt, {
+        jobId: Number,
+        stage: Number,
+        page: Number
+    });
+
+    var DEFAULT_LIMIT = 20;
+    var conditions = {
+        jobId: opt.jobId,
+        stage: opt.stage
+    };
+    var options = {
+        skip: 0,
+        limit: opt.page * DEFAULT_LIMIT,
+        sort: {
+            matchingScore: -1
+        },
+        fields: {
+            entryId: 1,
+            userId: 1,
+            jobId: 1,
+            source: 1,
+            stage: 1,
+            matchingScore: 1,
+            "data.createddate": 1,
+            "data.appSubject": 1,
+            "data.coverletter": 1
+        }
+    };
+    return Collections.Applications.find(conditions, options);
+});
+
+/**
+ * Get candidate info in job details page
+ */
+Meteor.publish('jobCandidateInfo' , function(userId) {
+    check(userId, Number);
+    var conditions = {
+        userId: parseInt(userId)
+    };
+    var options = {
+        fields: {
+            _id: 1,
+            userId: 1,
+            "data.city": 1,
+            "data.username": 1,
+            "data.firstname": 1,
+            "data.lastname": 1,
+            "data.genderid": 1,
+            "data.birthday": 1,
+            "data.address": 1,
+            "data.district": 1,
+            "data.email1": 1,
+            "data.homephone": 1,
+            "data.cellphone": 1,
+            "data.createddate": 1
+        }
+    };
+    return Collections.Candidates.find(conditions, options);
 });

@@ -6,11 +6,15 @@ Template.jobs.onRendered(function(){
 });
 
 Template.jobs.helpers({
-    jobs: function () {
-        return Collections.Jobs.find();
+    publishedJobs: function () {
+        var jobs = Collections.Jobs.find();
+        return !!jobs.count() ? jobs : [];
     },
+    closedJobs: function() {
+        return [];
+    }
 });
 
 Template.jobItem.helpers({
 
-})
+});

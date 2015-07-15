@@ -50,14 +50,33 @@ Collections.Jobs.helpers({
     title: function () {
         return this.data.jobtitle;
     },
-    applied: function () {
-        return Collections.Applications.find({jobId: this.jobId}).count();
+    appliedCount: function () {
+        return Collections.Applications.find({jobId: this.jobId, stage: 1}).count() || "-";
+    },
+    phoneScreenCount: function () {
+        return Collections.Applications.find({jobId: this.jobId, stage: 2}).count() || "-";
+    },
+    interviewCount: function () {
+        return Collections.Applications.find({jobId: this.jobId, stage: 3}).count() || "-";
+    },
+    offerCount: function () {
+        return Collections.Applications.find({jobId: this.jobId, stage: 4}).count() || "-";
+    },
+    hiredCount: function () {
+        return Collections.Applications.find({jobId: this.jobId, stage: 5}).count() || "-";
     },
     views: function () {
         return this.data.noofviewed;
     },
     expiry: function () {
         return moment(this.data.expireddate).format('DD MMM YYYY');
+    },
+    createdTimeago: function() {
+        var distance = (new Date() - new Date(this.data.createddate)) / (24 * 60 * 60 * 1000);
+        distance = Math.ceil(distance);
+        if( distance > 7)
+            return moment(this.data.createddate).format('DD MMM YYYY');
+        return moment(this.data.createddate).fromNow();
     },
     link: function () {
         return '/jobtracking/' + this.jobId;
@@ -68,16 +87,10 @@ Collections.Jobs.helpers({
  * Collection Applications
  */
 Collections.Applications = new Mongo.Collection("vnw_applications");
-// Application Helpers
-Collections.Applications.helpers({
-    candidate: function () {
-        return Collections.Candidates.findOne({userId: this.userId});
-    },
-    matchingScore: function () {
-        var score = Collections.ApplicationScores.findOne({entryId: this.entryId});
-        if (!score)
-            return "0%";
-        return score.data.matchingScore + "%";
+
+Collections.Applications.allow({
+    update: function(userId, doc) {
+        return !!userId;
     }
 });
 
@@ -86,13 +99,6 @@ Collections.Applications.helpers({
  * Candidate is job seeker who applied job
  */
 Collections.Candidates = new Mongo.Collection("vnw_candidates");
-
-// Candidate Helpers
-Collections.Candidates.helpers({
-    fullname: function () {
-        return this.data.lastname + " " + this.data.firstname;
-    }
-});
 
 
 /**

@@ -1,0 +1,26 @@
+<template name="HiringProcess">
+    <nav class="navbar" role="navigation" id="job-details-nav">
+        <div class="navbar-header">
+            <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse"
+                    class="navbar-toggle collapsed" type="button">
+                <i class="fa fa-reorder"></i>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse" id="navbar">
+            <ul class="nav navbar-nav row">
+
+                {{#each stages}}
+                    {{> jobStageNav}}
+                {{/each}}
+            </ul>
+
+        </div>
+
+    </nav>
+</template>
+
+<template name="jobStageNav">
+    <li class="{{ activeClass }}">
+        <a aria-expanded="false" role="button" href="{{pathFor 'jobDetails' stage=alias}}">{{ label }}</a>
+    </li>
+</template>

@@ -8,6 +8,8 @@ Template.navigation.events({
 });
 
 Template.menuItem.onRendered(function() {
+    if(!Router.current().route) return;
+
     var currentRoute = Router.current().route.getName();
     var route = this.data.route;
 
@@ -27,6 +29,8 @@ Template.menuItem.onRendered(function() {
 
 Template.menuItem.helpers({
     class: function() {
+        if(!Router.current().route) return;
+
         var currentRoute = Router.current().route.getName();
         var route = this.route;
         if( currentRoute == route ) {

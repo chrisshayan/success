@@ -8,51 +8,22 @@ Meteor.methods({
      * @param toStage {Number} in range 1,2,3,4,5
      * @returns {Boolean} the update result
      */
-    updateApplicationState: function (entryId, toStage) {
-        check(entryId, Number);
-        check(toStage, Number);
-        check(toStage, Match.OneOf(1, 2, 3, 4, 5));
+    updateApplicationStage: function (option) {
+        check(option, {
+            application: Number,
+            stage: Number
+        });
+        check(option.stage, Match.OneOf(1, 2, 3, 4, 5));
 
-        var result = {
-            success: false,
-            msg: "Update unsuccessful"
+        var cond = {
+            entryId: option.application
         };
-        //check application is exists
-        var application = Collections.Applications.findOne({entryId: entryId});
-        if (!application) {
-            result.msg = "Application not found";
-            return result;
-        }
-
         var data = {
             $set: {
-                stage: toStage
+                stage: option.stage
             }
         }
-        result.success = Collections.Applications.update(application._id, data);
-        if (result.success) {
-            var stages = {
-                1: "Applied",
-                2: "Test assign",
-                3: "Interview",
-                4: "Offer letter",
-                5: "Rejected"
-            };
-            result.msg = "Moved to " + stages[toStage] + "  successfully";
-
-            // Log activities
-            var activity = new Activity();
-            activity.data = {
-                jobId: application.jobId,
-                applicationId: application.entryId,
-                candidateId: application.userId,
-                fromStage: application.stage,
-                toStage: toStage
-            };
-            activity.createdBy = Meteor.userId();
-            activity.updateApplicationStage();
-        }
-        return result;
+        return Collections.Applications.update(cond, data);
     },
     /**
      * Delete mail template
@@ -68,5 +39,151 @@ Meteor.methods({
         if(user) {
             Collections.Companies.update({companyId: user.data.companyid}, {$set: {logo: file}});
         }
-    }
+    },
+
+    /**
+     * Get job applications
+     * @param req
+     */
+    getApplications: function(opt) {
+        // validate client request
+        check(opt, {
+            jobId: Number,
+            stage: Number,
+            page: Number
+        });
+
+        var DEFAULT_LIMIT = 20;
+        var skip = 0;
+        if(opt.page > 0) {
+            skip = (opt.page - 1) * DEFAULT_LIMIT;
+        }
+        var total = opt.page * DEFAULT_LIMIT;
+
+        var conditions = {
+            jobId: opt.jobId,
+            stage: opt.stage
+        };
+        var options = {
+            skip: skip,
+            limit: DEFAULT_LIMIT,
+            sort: {
+                matchingScore: -1
+            },
+            fields: {
+                entryId: 1,
+                userId: 1,
+                jobId: 1,
+                source: 1,
+                stage: 1,
+                matchingScore: 1,
+                "data.createddate": 1,
+                "data.appSubject": 1,
+                "data.coverletter": 1
+            }
+        };
+        var items = Collections.Applications.find(conditions, options);
+        var count = Collections.Applications.find(conditions).count();
+        return {
+            items: items.fetch(),
+            loadMoreAbility: (count - total) > 0
+        };
+    },
+
+    /**
+     * Get candidate info
+     * @param candidateId {Number}
+     */
+    getCandidateInfo: function(candidateId) {
+        check(candidateId, Number);
+        var conditions = {
+            userId: candidateId
+        };
+        var options = {
+            fields: {
+                _id: 1,
+                userId: 1,
+                "data.city": 1,
+                "data.username": 1,
+                "data.firstname": 1,
+                "data.lastname": 1,
+                "data.genderid": 1,
+                "data.birthday": 1,
+                "data.address": 1,
+                "data.district": 1,
+                "data.email1": 1,
+                "data.homephone": 1,
+                "data.cellphone": 1,
+                "data.createddate": 1
+            }
+        };
+        return Collections.Candidates.findOne(conditions, options);
+    },
+
+    /**
+     * Get application details
+     * @param opt {Object}
+     */
+    getApplicationDetails: function(applicationId) {
+        // validate client request
+        check(applicationId, Number);
+
+        var conditions = {
+            entryId: applicationId
+        };
+        var options = {
+            fields: {
+                entryId: 1,
+                userId: 1,
+                jobId: 1,
+                source: 1,
+                stage: 1,
+                matchingScore: 1,
+                "data.createddate": 1,
+                "data.appSubject": 1,
+                "data.coverletter": 1
+            }
+        };
+        var canOptions = {
+            fields: {
+                _id: 1,
+                userId: 1,
+                "data.city": 1,
+                "data.username": 1,
+                "data.firstname": 1,
+                "data.lastname": 1,
+                "data.genderid": 1,
+                "data.birthday": 1,
+                "data.address": 1,
+                "data.district": 1,
+                "data.email1": 1,
+                "data.homephone": 1,
+                "data.cellphone": 1,
+                "data.createddate": 1
+            }
+        };
+        var application = Collections.Applications.findOne(conditions, options);
+        var candidate = Collections.Candidates.findOne({userId: application.userId}, canOptions);
+        return {
+            application: application,
+            candidate: candidate
+        };
+    },
+
+    getFirstJobApplication: function(opt) {
+        check(opt, {
+            jobId: Number,
+            stage: Number
+        });
+
+        var application = Collections.Applications.findOne({
+            jobId: opt.jobId,
+            stage: opt.stage
+        }, {sort: {matchingScore: -1}});
+
+        if(application) {
+            return application.entryId;
+        }
+        return null;
+    },
 });

@@ -1,6 +1,7 @@
 Router.configure({
     layoutTemplate: 'mainLayout',
-    notFoundTemplate: 'notFound'
+    notFoundTemplate: 'notFound',
+    loadingTemplate: 'waveLoading'
 });
 /**
  * Check user login
@@ -89,11 +90,57 @@ Router.route('/jobtracking/:jobId', {
     }
 });
 
+Router.route('/job/:jobId/stage/:stage', {
+    name: "jobDetails",
+    fastRender: true,
+    waitOn: function() {
+        if( !this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage') )
+            throw Meteor.Error(404);
+        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
+        return [
+            Meteor.subscribe('jobs')
+        ];
+    },
+    action: function() {
+        if(!this.params.query.hasOwnProperty('application')) {
+            var self = this;
+            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
+            var options = {
+                jobId: parseInt(this.params.jobId),
+                stage: stage.id
+            };
+            Meteor.call('getFirstJobApplication', options, function(err, applicationId) {
+                if(err) throw err;
+                if(applicationId) {
+                    Router.go('jobDetails', {
+                        jobId: self.params.jobId,
+                        stage: self.params.stage
+                    }, {
+                        query: {
+                            application: applicationId
+                        }
+                    });
+                }
+
+            });
+        }
+        this.render("jobDetails");
+    },
+    data: function() {
+        var jobId = parseInt(this.params.jobId);
+        return {
+            jobs: Collections.Jobs.find({jobId: {$ne: jobId}}),
+            job: Collections.Jobs.findOne({jobId: jobId})
+        }
+    }
+});
+
 /**
  * Routes for settings
  */
 Router.route('/settings/companyinfo', {
     name: "companyInfo",
+    fastRender: true,
     waitOn: function(){
         return [
             Meteor.subscribe('companyInfo')
@@ -107,6 +154,7 @@ Router.route('/settings/companyinfo', {
 
 Router.route('/settings/mailtemplates', {
     name: "mailTemplates",
+    fastRender: true,
     waitOn: function() {
         return [
             Meteor.subscribe('mailTemplates'),

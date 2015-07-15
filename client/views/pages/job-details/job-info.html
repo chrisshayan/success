@@ -1,0 +1,20 @@
+<template name="JobInfo">
+    <div class="row wrapper border-bottom" id="job-info">
+        <div class="dropdown">
+            <a id="drop3" href="javascript:void(0)" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style="font-size: 22px; color: #666">
+                <i class="fa fa-cloud" style="color: #1ab394"></i>&nbsp;{{job.title}}
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="drop3">
+                {{#each jobs}}
+                    <li>
+                        <a href="{{pathFor 'jobDetails' stage='applied'}}" class="clearfix" style="font-size: 15px;">
+                            <span class="pull-left" style="margin-right: 15px">{{ title }}</span>
+                            <span class="label label-primary pull-right" style="margin-top: 5px">published</span>
+                        </a>
+                    </li>
+                {{/each}}
+            </ul>
+        </div>
+    </div>
+</template>

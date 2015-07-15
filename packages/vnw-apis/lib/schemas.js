@@ -81,8 +81,11 @@ Schemas.Application = function () {
         jobId: null,
         source: 1, // 1: is online, 2: sent directly
         stage: 1, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
+        matchingScore: 0,
         data: {},
         createdAt: new Date(),
+        modifiedAt: null,
+        modifiedBy: null,
         lastSyncedAt: new Date()
     }
 };

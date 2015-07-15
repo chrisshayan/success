@@ -19,13 +19,14 @@ okgrow:iron-router-autoscroll
 momentjs:moment
 pcel:mysql
 sgi:sprintfjs
-meteorhacks:kadira
-meteorhacks:zones
 wylio:mandrill
 aldeed:collection2
 aldeed:simple-schema
 aldeed:autoform
+steeve:reactive-cookie
+meteorhacks:fast-render
+peerlibrary:blaze-components
+raix:eventemitter
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications
-steeve:reactive-cookie

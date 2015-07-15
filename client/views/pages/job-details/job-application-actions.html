@@ -1,0 +1,20 @@
+<template name="JobApplicationActions">
+    <button class="btn btn-sm btn-default btn-outline" data-toggle="tooltip" data-placement="bottom" title="Add comment"><i class="fa fa-comment"></i></button>
+    &nbsp;
+    <button class="btn btn-sm btn-default btn-outline"  data-toggle="tooltip" data-placement="bottom" title="Send email to candidate"><i class="fa fa-envelope-o"></i></button>
+    &nbsp;
+    <button class="btn btn-sm btn-default btn-outline" data-toggle="tooltip" data-placement="bottom" title="Disqualify candidate"><i class="fa fa-thumbs-down"></i></button>
+    &nbsp;
+    <div class="btn-group">
+        <button type="button" class="btn  btn-sm btn-primary" {{ nextStageAbility }} data-move-stage="{{nextStage.id}}"><i class="fa fa-arrow-right"></i>&nbsp;{{nextStage.label}}</button>
+        <button id="stage-menu" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="stage-menu">
+            {{#each stages}}
+                {{{ this.html }}}
+            {{/each}}
+        </ul>
+    </div>
+</template>

@@ -1,0 +1,52 @@
+<template name="JobApplicationProfile">
+    {{#if application.get}}
+        <div class="job-application-actions clearfix ">
+            <div class="pull-right">
+                {{> JobApplicationActions}}
+            </div>
+        </div>
+
+        <div class="job-application-content">
+                <div class="job-application-profile clearfix">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <div class="clearfix">
+                                <div class="job-candidate-pic">
+                                    <img src="http://placehold.it/80x80" class="img-thumbnail">
+                                </div>
+                                <div class="job-candidate-info">
+                                    <h2>{{fullname}}</h2>
+                                    <h3>Meteor Developer</h3>
+                                    <a href=""><img src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate profile</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-7" style="padding-top: 25px;">
+                            <table width="100%">
+                                <tr>
+                                    <td width="20px"><i class="fa fa-phone"></i></td>
+                                    <td width="110px">{{phone}}</td>
+                                    <td width="20px"><i class="fa fa-facebook"></i></td>
+                                    <td width="*"><a href="https://www.facebook.com/">https://www.facebook.com</a></td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fa fa-map-marker"></i></td>
+                                    <td>{{city}}</td>
+                                    <td><i class="fa fa-linkedin"></i></td>
+                                    <td><a href="https://www.linkedin.com">https://www.linkedin.com</a></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BEGIN: Application timeline -->
+                {{> JobApplicationTimeline}}
+                <!-- END: Application timeline -->
+        </div>
+    {{else}}
+        <div class="job-application-content-blank">
+
+        </div>
+    {{/if}}
+</template>
