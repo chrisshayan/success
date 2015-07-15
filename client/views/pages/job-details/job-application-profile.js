@@ -29,6 +29,12 @@ JobApplicationProfile = BlazeComponent.extendComponent({
                 self.candidate.set(null);
             }
         });
+
+        // Bind empty event
+        Event.on('emptyProfile', function() {
+            self.application.set(null);
+            self.candidate.set(null);
+        });
     },
 
     onRendered: function () {

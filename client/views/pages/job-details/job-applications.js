@@ -68,6 +68,8 @@ JobApplications = BlazeComponent.extendComponent({
                             application: current[0].entryId
                         }
                     });
+                } else {
+                    Event.emit('emptyProfile');
                 }
             }
         });
