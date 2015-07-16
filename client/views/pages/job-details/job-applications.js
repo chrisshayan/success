@@ -70,6 +70,10 @@ JobApplications = BlazeComponent.extendComponent({
                     });
                 } else {
                     Event.emit('emptyProfile');
+                    Router.go('jobDetails', {
+                        jobId: self.jobId.get(),
+                        stage: self.stage.get().alias
+                    });
                 }
             }
         });

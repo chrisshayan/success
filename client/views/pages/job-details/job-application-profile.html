@@ -16,7 +16,9 @@
                                 </div>
                                 <div class="job-candidate-info">
                                     <h2>{{fullname}}</h2>
-                                    <h3>Meteor Developer</h3>
+                                    {{#with jobTitle}}
+                                        <h3>{{jobTitle}}</h3>
+                                    {{/with}}
                                     <a href=""><img src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate profile</a>
                                 </div>
                             </div>

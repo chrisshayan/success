@@ -102,9 +102,10 @@ Router.route('/job/:jobId/stage/:stage', {
         ];
     },
     action: function() {
+        var self = this;
+        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
         if(!this.params.query.hasOwnProperty('application')) {
-            var self = this;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
+
             var options = {
                 jobId: parseInt(this.params.jobId),
                 stage: stage.id
@@ -123,6 +124,21 @@ Router.route('/job/:jobId/stage/:stage', {
                 }
 
             });
+        } else {
+            var options = {
+                jobId: parseInt(self.params.jobId),
+                stage: stage.id,
+                application: parseInt(self.params.query.application)
+            };
+            Meteor.call('checkApplicationInStage', options, function(err, isExists) {
+                if(err) throw err;
+                if(!isExists) {
+                    Router.go('jobDetails', {
+                        jobId: self.params.jobId,
+                        stage: self.params.stage
+                    });
+                }
+            });
         }
         this.render("jobDetails");
     },
@@ -130,7 +146,8 @@ Router.route('/job/:jobId/stage/:stage', {
         var jobId = parseInt(this.params.jobId);
         return {
             jobs: Collections.Jobs.find({jobId: {$ne: jobId}}),
-            job: Collections.Jobs.findOne({jobId: jobId})
+            job: Collections.Jobs.findOne({jobId: jobId}),
+            isEmpty: !this.params.query.hasOwnProperty('application')
         }
     }
 });

@@ -170,6 +170,13 @@ Meteor.methods({
         };
     },
 
+    /**
+     * Get first application of job stage
+     * @param opt {Object}
+     * opt.jobId {Number}
+     * opt.stage {Number}
+     * @returns { Number|null}
+     */
     getFirstJobApplication: function(opt) {
         check(opt, {
             jobId: Number,
@@ -186,4 +193,26 @@ Meteor.methods({
         }
         return null;
     },
+
+    /**
+     * check application exists in job stage
+     * @param opt {Object}
+     * opt.jobId: Number,
+     * opt.stage: Number,
+     * opt.application: Number
+     * @returns {boolean}
+     */
+    checkApplicationInStage: function(opt) {
+        check(opt, {
+            jobId: Number,
+            stage: Number,
+            application: Number
+        });
+        var conditions = {
+            jobId: opt.jobId,
+            stage: opt.stage,
+            entryId: opt.application
+        };
+        return !!Collections.Applications.find(conditions).count();
+    }
 });

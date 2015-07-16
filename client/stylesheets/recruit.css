@@ -243,3 +243,16 @@
 .list-group-item.loading:hover {
     background: #fff;
 }
+
+.empty-applications {
+    width: 90%;
+    margin: 30px auto;
+    text-align: center;
+    border: 2px dashed #aaa;
+    color: #aaa;
+    padding: 15% 0;
+}
+
+.empty-applications .fa {
+    font-size: 45px;
+}

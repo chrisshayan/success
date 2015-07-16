@@ -25,7 +25,17 @@ Meteor.publish('applications', function(conditions, options){
 });
 
 Meteor.publish('applicationCount', function(options){
-    return Collections.Applications.find({}, {fields: {_id: 1, jobId: 1, stage: 1}});
+    var conditions = {};
+    if(typeof options == "object") {
+        if(options.hasOwnProperty('jobId')) {
+            conditions.jobId = options.jobId;
+        }
+        if(options.hasOwnProperty('stage')) {
+            conditions.stage = options.stage;
+        }
+    }
+    console.log(options)
+    return Collections.Applications.find(conditions, {fields: {_id: 1, jobId: 1, stage: 1}});
 });
 
 Meteor.publish('candidates', function(options){

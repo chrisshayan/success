@@ -3,22 +3,28 @@
     {{> JobDetailsHeader}}
 
     <div class="fh-breadcrumb" id="job-details-content">
-
-        <div class="fh-column">
-            <div class="full-height-scroll">
-                <!--BEGIN: JobApplications-->
-                {{> JobApplications}}
-                <!--END: JobApplications-->
+        {{#if isEmpty}}
+            <div class="empty-applications">
+                <span class="fa fa-inbox"></span>
+                <h2>No applications received yet</h2>
             </div>
-        </div>
-
-        <div class="full-height">
-            <div class="full-height-scroll white-bg border-left">
-                <!--BEGIN: JobApplicationProfile-->
-                {{> JobApplicationProfile}}
-                <!--END: JobApplicationProfile-->
+        {{else}}
+            <div class="fh-column">
+                <div class="full-height-scroll">
+                    <!--BEGIN: JobApplications-->
+                    {{> JobApplications}}
+                    <!--END: JobApplications-->
+                </div>
             </div>
-        </div>
+
+            <div class="full-height">
+                <div class="full-height-scroll white-bg border-left">
+                    <!--BEGIN: JobApplicationProfile-->
+                    {{> JobApplicationProfile}}
+                    <!--END: JobApplicationProfile-->
+                </div>
+            </div>
+        {{/if}}
     </div>
 </template>
 

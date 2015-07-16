@@ -40,6 +40,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
     moveStage: function(e, tmpl) {
         var toStage = $(e.target).data("move-stage");
         toStage = parseInt(toStage);
+        var stage = Recruit.APPLICATION_STAGES[toStage];
         if(toStage) {
             //call update stage request
             var data = {
@@ -53,6 +54,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
                     // remove application from list
                     // change current application
                     Event.emit('movedApplicationStage', data.application);
+                    Notification.success(sprintf('Moved to %s successfully', stage.label));
                 }
             });
         }

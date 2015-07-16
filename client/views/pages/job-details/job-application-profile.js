@@ -38,6 +38,10 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     },
 
     onRendered: function () {
+        // Add slimScroll to element
+        $('.full-height-scroll').slimscroll({
+            height: '100%'
+        })
     },
     onDestroyed: function () {
     },
@@ -66,6 +70,16 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     },
 
     /**
+     * get candidate job title
+     * @returns {String}
+     */
+    jobTitle: function(){
+        var can = this.candidate.get();
+        if (!can) return "";
+        return can.data.jobtitle;
+    },
+
+    /**
      * get candidate city location
      * @returns {String}
      */
@@ -82,5 +96,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         var can = this.candidate.get();
         if (!can) return "";
         return can.data.cellphone || can.data.homephone || "";
-    },
+    }
+
+
 }).register('JobApplicationProfile');
