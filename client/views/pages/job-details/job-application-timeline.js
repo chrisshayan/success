@@ -55,7 +55,14 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
     },
 
     events: function () {
-        return [{}];
+        return [{
+            'click .loadmore': this.loadMore
+        }];
+    },
+
+    loadMore: function() {
+        var currentPage = this.page.get();
+        this.page.set(currentPage+1);
     },
 
     /**
@@ -99,9 +106,9 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
                 this.title = sprintf("Moved candidate to <strong>%s</strong>", stage.label);
             break;
 
-            case 2:// email
-                this.title = "New email";
-                this.icon = " fa-envelope-o ";
+            case 2:// Applied date
+                this.title = "Applied for this position";
+                this.icon = " fa-briefcase ";
             break;
 
             default:

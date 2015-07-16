@@ -98,7 +98,8 @@ Router.route('/job/:jobId/stage/:stage', {
             throw Meteor.Error(404);
         var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
         return [
-            Meteor.subscribe('jobs')
+            Meteor.subscribe('jobs'),
+            Meteor.subscribe('applicationCount', {jobId: this.params.jobId})
         ];
     },
     action: function() {

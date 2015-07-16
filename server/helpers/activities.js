@@ -1,18 +1,19 @@
 Activity = function Activity() {
     this.actionType = "";
-    this.application = {};
+    this.data= {};
     this.createdAt = new Date();
     this.createdBy = null;
 };
 
+/**
+ * ENUM ACTION TYPE
+ * @type {{UPDATE_APPLICATION_STAGE: number, APPLIED_JOB: number}}
+ */
 Activity.prototype.ACTION_TYPE = {
-    UPDATE_APPLICATION_STAGE: 1
+    UPDATE_APPLICATION_STAGE: 1,
+    APPLIED_JOB: 2
 };
 
-Activity.prototype.updateApplicationStage = function() {
-    this.actionType = this.ACTION_TYPE.UPDATE_APPLICATION_STAGE;
-    this.save();
-};
 
 Activity.prototype.save = function() {
     this.createdBy = parseInt(this.createdBy);
@@ -26,29 +27,12 @@ Activity.prototype.save = function() {
     return result;
 }
 
-Activity.prototype.noty = function(data) {
-    var self = this;
-    Meteor.defer(function() {
-        if( data.actionType == self.ACTION_TYPE.UPDATE_APPLICATION_STAGE ) {
-            self.notyMovedStage(data);
-        }
-    });
+Activity.prototype.updateApplicationStage = function() {
+    this.actionType = this.ACTION_TYPE.UPDATE_APPLICATION_STAGE;
+    this.save();
+};
+
+Activity.prototype.appliedJob = function() {
+    this.actionType = this.ACTION_TYPE.APPLIED_JOB;
+    this.save();
 }
-//
-//Activity.prototype.notyMovedStage = function(data) {
-//    var mailTemplate = Collections.MailTemplates.findOne({fromStage: data.data.fromStage, toStage: data.data.toStage});
-//    if(!mailTemplate || !mailTemplate.emailFrom)
-//        return;
-//    var job = Collections.Candidates.findOne({userId: data.data.jobId});
-//    var application = Collections.Candidates.findOne({entryId: data.data.applicationId});
-//    var candidate = Collections.Candidates.findOne({userId: data.data.candidateId});
-//
-//    var from = mailTemplate.emailFrom;
-//    var to = candidate.data.username;
-//    Meteor.Mandrill.send({
-//        from: from,
-//        to: to,
-//        subject: mailTemplate.subject,
-//        html: mailTemplate.htmlBody
-//    });
-//}

@@ -28,7 +28,7 @@ Meteor.publish('applicationCount', function(options){
     var conditions = {};
     if(typeof options == "object") {
         if(options.hasOwnProperty('jobId')) {
-            conditions.jobId = options.jobId;
+            conditions.jobId = parseInt(options.jobId);
         }
         if(options.hasOwnProperty('stage')) {
             conditions.stage = options.stage;

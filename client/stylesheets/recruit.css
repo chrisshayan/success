@@ -256,3 +256,47 @@
 .empty-applications .fa {
     font-size: 45px;
 }
+
+.job-application-timeline .timeline-item {
+    border-bottom: 1px solid #e7eaec !important;
+}
+
+.timeline-item:last-child {
+    border-bottom: none !important;
+}
+
+
+.job-application-timeline .timeline-item .content{
+    min-height: 55px !important;
+
+}
+
+.job-application-timeline .timeline-item .date{
+    top: 5px !important;
+}
+
+.cover-letter {
+    margin: 20px auto;
+    width: 90%;
+}
+.cover-letter p{
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #f2f2f2;
+    line-height: 28px;
+    text-align: justify;
+    font-family: "Helvetica Neue", "Helvetica", Helvetica, sans-serif;
+    font-size: 14px;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+}
+
+.cover-letter .more {
+    height: auto;
+    overflow: auto;
+}
+
+.cover-letter .more-coverletter {
+
+}

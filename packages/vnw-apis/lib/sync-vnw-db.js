@@ -102,6 +102,16 @@ SYNC_VNW.pullApplications = function (jobId) {
             can.source = 1;
             can.data = row;
             Collections.Applications.insert(can);
+
+            // Log applied activity
+            var activity = new Activity();
+            activity.data = {
+                applicationId: can.entryId,
+                source: 1,
+                userId: row.userid
+            };
+            activity.createdAt = new Date(row.createddate);
+            activity.appliedJob();
         } else {
             if (!_.isEqual(can.data, row)) {
                 Collections.Applications.update(can._id, {
@@ -131,6 +141,16 @@ SYNC_VNW.pullApplications = function (jobId) {
             can.source = 2;
             can.data = row;
             Collections.Applications.insert(can);
+
+            // Log applied activity
+            var activity = new Activity();
+            activity.data = {
+                applicationId: can.entryId,
+                source: 2,
+                userId: row.userid
+            };
+            activity.createdAt = new Date(row.createddate);
+            activity.appliedJob();
         } else {
             if (!_.isEqual(can.data, row)) {
                 Collections.Applications.update(can._id, {

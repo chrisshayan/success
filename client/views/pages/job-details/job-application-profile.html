@@ -19,7 +19,7 @@
                                     {{#with jobTitle}}
                                         <h3>{{jobTitle}}</h3>
                                     {{/with}}
-                                    <a href=""><img src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate profile</a>
+                                    <a href="{{ profileUrl }}" target="_blank"><img src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate profile</a>
                                 </div>
                             </div>
                         </div>
@@ -39,6 +39,16 @@
                                 </tr>
                             </table>
                         </div>
+                    </div>
+                    <div class="row">
+                        <!--COVER LETTER-->
+                            <div class="cover-letter">
+                                <p>{{{coverLetter}}}</p>
+
+                                <div class="text-right">
+                                    <a href="javascript:void(0)" class="more-coverletter">{{{ coverLetterToggle.get }}}</a>
+                                </div>
+                            </div>
                     </div>
                 </div>
 

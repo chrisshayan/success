@@ -254,7 +254,6 @@ Meteor.methods({
         var total = opt.page * DEFAULT_LIMIT;
 
         var conditions = {
-            createdBy: parseInt(this.userId),
             "data.applicationId": opt.application
         };
 
