@@ -9,11 +9,6 @@ Meteor.startup(function () {
             dependencies: ['jobTrackingBoard']
         },
         {
-            label: "Activities",
-            icon: "fa-heartbeat",
-            route: "activities", childrens: []
-        },
-        {
             label: "Settings",
             icon: "fa-cogs",
             route: "#",
