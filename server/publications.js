@@ -34,7 +34,6 @@ Meteor.publish('applicationCount', function(options){
             conditions.stage = options.stage;
         }
     }
-    console.log(options)
     return Collections.Applications.find(conditions, {fields: {_id: 1, jobId: 1, stage: 1}});
 });
 

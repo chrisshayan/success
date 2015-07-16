@@ -14,17 +14,36 @@ Meteor.methods({
             stage: Number
         });
         check(option.stage, Match.OneOf(1, 2, 3, 4, 5));
-
         var cond = {
             entryId: option.application
         };
+
+        var application = Collections.Applications.findOne(cond);
+        if(!application) return false;
+
         var data = {
             $set: {
                 stage: option.stage
             }
         }
-        return Collections.Applications.update(cond, data);
+
+        var result = Collections.Applications.update(application._id, data);
+        if(result) {
+            // log to activities
+            var activity = new Activity();
+            activity.data = {
+                jobId: application.jobId,
+                applicationId: option.application,
+                candidateId: application.userId,
+                fromStage: application.stage,
+                toStage: option.stage
+            };
+            activity.createdBy = this.userId;
+            activity.updateApplicationStage();
+        }
+        return result;
     },
+
     /**
      * Delete mail template
      * @param _id {String} Mongo id
@@ -214,5 +233,43 @@ Meteor.methods({
             entryId: opt.application
         };
         return !!Collections.Applications.find(conditions).count();
-    }
+    },
+
+    /**
+     * Get activities
+     * @param opt {Object}
+     */
+    getActivities: function(opt) {
+        // validate client request
+        check(opt, {
+            application: Number,
+            page: Number
+        });
+
+        var DEFAULT_LIMIT = 10;
+        var skip = 0;
+        if(opt.page > 0) {
+            skip = (opt.page - 1) * DEFAULT_LIMIT;
+        }
+        var total = opt.page * DEFAULT_LIMIT;
+
+        var conditions = {
+            createdBy: parseInt(this.userId),
+            "data.applicationId": opt.application
+        };
+
+        var options = {
+            skip: skip,
+            limit: DEFAULT_LIMIT,
+            sort: {
+                createdAt: -1
+            }
+        };
+        var items = Collections.Activities.find(conditions, options);
+        var count = Collections.Activities.find(conditions).count();
+        return {
+            items: items.fetch(),
+            loadMoreAbility: (count - total) > 0
+        };
+    },
 });

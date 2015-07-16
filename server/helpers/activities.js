@@ -1,6 +1,6 @@
 Activity = function Activity() {
     this.actionType = "";
-    this.data = {};
+    this.application = {};
     this.createdAt = new Date();
     this.createdBy = null;
 };
@@ -23,11 +23,6 @@ Activity.prototype.save = function() {
     });
     var result = Collections.Activities.insert(data);
 
-    //Send notification
-    if(result) {
-        this.noty(data);
-    }
-
     return result;
 }
 
@@ -39,21 +34,21 @@ Activity.prototype.noty = function(data) {
         }
     });
 }
-
-Activity.prototype.notyMovedStage = function(data) {
-    var mailTemplate = Collections.MailTemplates.findOne({fromStage: data.data.fromStage, toStage: data.data.toStage});
-    if(!mailTemplate || !mailTemplate.emailFrom)
-        return;
-    var job = Collections.Candidates.findOne({userId: data.data.jobId});
-    var application = Collections.Candidates.findOne({entryId: data.data.applicationId});
-    var candidate = Collections.Candidates.findOne({userId: data.data.candidateId});
-
-    var from = mailTemplate.emailFrom;
-    var to = candidate.data.username;
-    Meteor.Mandrill.send({
-        from: from,
-        to: to,
-        subject: mailTemplate.subject,
-        html: mailTemplate.htmlBody
-    });
-}
+//
+//Activity.prototype.notyMovedStage = function(data) {
+//    var mailTemplate = Collections.MailTemplates.findOne({fromStage: data.data.fromStage, toStage: data.data.toStage});
+//    if(!mailTemplate || !mailTemplate.emailFrom)
+//        return;
+//    var job = Collections.Candidates.findOne({userId: data.data.jobId});
+//    var application = Collections.Candidates.findOne({entryId: data.data.applicationId});
+//    var candidate = Collections.Candidates.findOne({userId: data.data.candidateId});
+//
+//    var from = mailTemplate.emailFrom;
+//    var to = candidate.data.username;
+//    Meteor.Mandrill.send({
+//        from: from,
+//        to: to,
+//        subject: mailTemplate.subject,
+//        html: mailTemplate.htmlBody
+//    });
+//}
