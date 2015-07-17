@@ -15,6 +15,11 @@ Template.mailTemplates.helpers({
 });
 
 
+Template.mailTemplate.helpers({
+    isAllowRemove: function() {
+        return this.type == 2;
+    }
+});
 Template.mailTemplate.events({
 
     'click .remove': function (e, tmpl) {

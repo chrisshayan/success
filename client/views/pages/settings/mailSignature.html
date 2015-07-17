@@ -1,15 +1,20 @@
 <template name="mailSignature">
     <div class="row">
         <div class="col-sm-12">
-            <div class="ibox">
-                <div class="ibox-title">
-                    Mail Signature
-                </div>
+            <form action="" id="mail-signature-form">
+                <div class="ibox">
+                    <div class="ibox-title">
+                        Mail Signature
+                    </div>
 
-                <div class="ibox-content">
-                    <textarea id="mail-signature-editor" rows="10"></textarea>
+                    <div class="ibox-content">
+                        <textarea id="mail-signature-editor" rows="10">{{mailSignature}}</textarea>
+                        <div>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </template>

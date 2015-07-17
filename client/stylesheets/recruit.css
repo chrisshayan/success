@@ -300,3 +300,13 @@
 .cover-letter .more-coverletter {
 
 }
+
+.application-timeline-content > p{
+    height: 50px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.application-timeline-content > p.more {
+    height: auto;
+    overflow: auto;
+}

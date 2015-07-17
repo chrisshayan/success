@@ -8,6 +8,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         this.applicationId = new ReactiveVar(null);
         this.application = new ReactiveVar(null);
         this.candidate = new ReactiveVar(null);
+        this.disqualified = new ReactiveVar(false);
         this.lastApplicaton = null;
         this.defaultToggle = 'More cover letter <i class="fa fa-angle-down"></i>';
         this.coverLetterToggle = new ReactiveVar(this.defaultToggle);
@@ -23,6 +24,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
                     if (err) throw err;
                     self.isLoading.set(false);
                     self.application.set(result.application);
+                    self.disqualified.set(result.application.disqualified);
                     self.candidate.set(result.candidate);
                     self.coverLetterToggle.set(self.defaultToggle);
                     $('.cover-letter p').removeClass("more");
@@ -39,6 +41,12 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         Event.on('emptyProfile', function () {
             self.application.set(null);
             self.candidate.set(null);
+        });
+
+
+        Event.on('disqualifiedApplication', function(applicationId, status){
+            check(status, Boolean);
+            self.disqualified.set(status);
         });
     },
 

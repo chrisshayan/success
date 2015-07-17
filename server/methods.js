@@ -96,6 +96,7 @@ Meteor.methods({
                 source: 1,
                 stage: 1,
                 matchingScore: 1,
+                disqualified: 1,
                 "data.createddate": 1,
                 "data.appSubject": 1,
                 "data.coverletter": 1
@@ -158,6 +159,7 @@ Meteor.methods({
                 source: 1,
                 stage: 1,
                 matchingScore: 1,
+                disqualified: 1,
                 "data.createddate": 1,
                 "data.appSubject": 1,
                 "data.coverletter": 1
@@ -271,4 +273,136 @@ Meteor.methods({
             loadMoreAbility: (count - total) > 0
         };
     },
+
+    /**
+     * Update application qualify
+     * @param applicationId {Number}
+     */
+    disqualifyApplication: function(applicationId) {
+        check(applicationId, Number);
+        var conditions = {
+            entryId: applicationId
+        };
+        var modifier = {
+            $set: {
+                disqualified: true
+            }
+        }
+        var result = Collections.Applications.update(conditions, modifier);
+        if(result) {
+            // Log activity
+            var activity = new Activity();
+            activity.createdBy = this.userId;
+            activity.data = {
+                applicationId: applicationId
+            };
+            activity.disqualifiedApplication();
+        }
+        return result;
+    },
+    /**
+     * Update application qualify
+     * @param applicationId {Number}
+     */
+    revertApplication: function(applicationId) {
+        check(applicationId, Number);
+        var conditions = {
+            entryId: applicationId
+        };
+        var modifier = {
+            $set: {
+                disqualified: false
+            }
+        }
+        var result = Collections.Applications.update(conditions, modifier);
+        if(result) {
+            // Log activity
+            var activity = new Activity();
+            activity.createdBy = this.userId;
+            activity.data = {
+                applicationId: applicationId
+            };
+            activity.revertApplication();
+        }
+        return result;
+    },
+
+    /**
+     * Update company mail signature
+     * @param signature {String} weak - html content
+     */
+    updateMailSignature: function(signature) {
+        check(signature, String);
+        var user = Collections.Users.findOne({userId: parseInt(this.userId)});
+        var cond = {
+            companyId: user.data.companyid
+        };
+        var modifier = {
+            $set: {
+                mailSignature: signature
+            }
+        };
+        return Collections.CompanySettings.update(cond, modifier);
+    },
+
+    /**
+     * Send email to candidate
+     * @param data {Object}
+     * @param data.application {Number}
+     * @param data.subject {String}
+     * @param data.content {String}
+     */
+    sendMailToCandidate: function(data) {
+        check(data, {
+            application: Number,
+            mailTemplate: String,
+            subject: String,
+            content: String
+        });
+        this.unblock();
+        var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
+        if(!mailTemplate) return false;
+
+        var application = Collections.Applications.findOne({entryId: data.application});
+        if(!application) return false;
+        var candidate = Collections.Candidates.findOne({userId: application.userId});
+
+        var mail = {
+            to: candidate.data.username,
+            from: mailTemplate.emailFrom,
+            subject: data.subject,
+            html: data.content
+        };
+
+        Meteor.Mandrill.send(mail);
+        var activity = new Activity();
+
+        mail.applicationId = data.application;
+        activity.data = mail;
+        activity.sendMailToCandidate();
+        return true;
+    },
+
+    /**
+     * Add comment to application
+     * @param data {Object}
+     * @param data.application {Number}
+     * @param data.content {String}
+     */
+    addCommentApplication: function(data) {
+        check(data, {
+            application: Number,
+            content: String
+        });
+        this.unblock();
+        var application = Collections.Applications.findOne({entryId: data.application});
+        if(!application) return false;
+        var activity = new Activity();
+        activity.data = {
+            applicationId: data.application,
+            content: data.content
+        };
+        activity.addCommentApplication();
+        return true;
+    }
 });

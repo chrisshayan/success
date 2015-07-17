@@ -1,5 +1,5 @@
 <template name="JobApplicationTimeline">
-    <div class="job-application-timeline">
+    <div class="job-application-timeline" id="timeline">
         <div class="ibox-title">
             <h5>Timeline</h5>
         </div>
@@ -7,6 +7,8 @@
             {{#if isEmpty}}
                 <h2>No activity yet</h2>
             {{else}}
+                {{> SendEmailCandidateForm}}
+                {{> AddCommentCandidateForm}}
                 {{#each activities.get}}
                     {{> JobApplicationTimelineItem}}
                 {{/each}}
@@ -30,10 +32,109 @@
             <div class="col-xs-10 content no-top-border">
                 <p class="m-b-xs">{{{ title }}}</p>
                 {{#with content}}
-                <p>{{ content }}</p>
+                <p class="application-timeline-content">
+                    <p>{{{ content }}}</p>
+                    <a href="javascript:void(0)" class="application-timeline-content-more">{{showMoreLabel.get}}</a>
+                </p>
                 {{/with}}
                 <small class="text-navy">{{ timeago }}</small>
             </div>
         </div>
     </div>
+</template>
+
+<template name="SendEmailCandidateForm">
+    {{#if show.get}}
+    <div class="timeline-item border-bottom">
+        <div class="row">
+            <div class="col-xs-2 date text-warning" style="top:5px">
+                <i class="fa fa-envelope-o"></i>
+            </div>
+            <div class="col-xs-10 content no-top-border">
+                <div class="mail-box">
+                    {{#autoForm schema="Schemas.sendEmailCandidateForm" id="sendEmailCandidateForm" type=type doc=this.doc class="form-horizontal"}}
+                        <div class="mail-body">
+
+                            <form class="form-horizontal" method="get">
+                                <div class="form-group {{#if afFieldIsInvalid name='to'}} has-error{{/if}}">
+                                    <label class="col-sm-2 control-label">To:</label>
+                                    <div class="col-sm-10">
+                                        {{> afFieldInput name='to'}}
+                                        {{#if afFieldIsInvalid name='to'}}
+                                            <span class="help-block">{{afFieldMessage name='to'}}</span>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                                <div class="form-group {{#if afFieldIsInvalid name='template'}} has-error{{/if}}">
+                                    <label class="col-sm-2 control-label">Template:</label>
+                                    <div class="col-sm-10">
+                                        {{> afFieldInput name='template'}}
+                                        {{#if afFieldIsInvalid name='template'}}
+                                            <span class="help-block">{{afFieldMessage name='template' options=templateOptions}}</span>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                                <div class="form-group {{#if afFieldIsInvalid name='subject'}} has-error{{/if}}">
+                                    <label class="col-sm-2 control-label">Subject:</label>
+                                    <div class="col-sm-10">
+                                        {{> afFieldInput name='subject'}}
+                                        {{#if afFieldIsInvalid name='subject'}}
+                                            <span class="help-block">{{afFieldMessage name='subject'}}</span>
+                                        {{/if}}
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                        <div class="h-200">
+                            {{> afFieldInput name='content'}}
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="mail-body text-right tooltip-demo">
+                            {{#if isLoading.get}}
+                                <div class="pull-right" style="margin: 0 5px;">{{> spinLoading}}</div>
+                            {{/if}}
+                            <a class="btn btn-sm btn-primary mail-send-action" data-toggle="tooltip" data-placement="top" title="Send"><i class="fa fa-reply"></i> Send</a>
+                            <a class="btn btn-white btn-sm mail-cancel-action" data-toggle="tooltip" data-placement="top" title="Discard email"><i class="fa fa-times"></i> Discard</a>
+                        </div>
+
+                    {{/autoForm}}
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
+</template>
+
+<template name="AddCommentCandidateForm">
+    {{#if show.get}}
+    <div class="timeline-item border-bottom">
+        <div class="row">
+            <div class="col-xs-2 date text-warning" style="top:5px">
+                <i class="fa fa-comment"></i>
+            </div>
+            <div class="col-xs-10 content no-top-border">
+                <div class="mail-box">
+                    <form id="addCommentForm">
+                        <div class="h-100">
+                            <textarea rows="3" class="form-control comment-candidate"></textarea>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div class="mail-body text-right tooltip-demo">
+                            {{#if isLoading.get}}
+                                <div class="pull-right" style="margin: 0 5px;">{{> spinLoading}}</div>
+                            {{/if}}
+                            <a class="btn btn-sm btn-primary mail-send-action" data-toggle="tooltip" data-placement="top" title="Send"><i class="fa fa-reply"></i> Send</a>
+                            <a class="btn btn-white btn-sm mail-cancel-action" data-toggle="tooltip" data-placement="top" title="Discard"><i class="fa fa-times"></i> Discard</a>
+                        </div>
+
+                    </form>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/if}}
 </template>

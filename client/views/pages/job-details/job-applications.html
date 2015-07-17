@@ -28,6 +28,9 @@
                 <div class="small m-t-xs">
                     <p style="height: 32px;overflow: hidden;">{{ shortCoverLetter }}</p>
                     <p class="m-b-none">
+                        {{#if disqualified}}
+                        <span class="label label-danger pull-right" style="margin-left:2px;"><i class="fa fa-thumbs-down"></i></span>
+                        {{/if}}
                         <span class="label pull-right {{matchingScoreLabel}}"  data-toggle="tooltip" data-placement="bottom" title="MatchingScore {{matchingScore}}%">{{ matchingScore }}%</span>
                         <i class="fa fa-map-marker"></i>&nbsp;{{ city }}
                     </p>

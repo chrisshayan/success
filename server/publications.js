@@ -172,3 +172,8 @@ Meteor.publish('jobCandidateInfo' , function(userId) {
     };
     return Collections.Candidates.find(conditions, options);
 });
+
+Meteor.publish('companySettings', function() {
+    var user = Collections.Users.findOne({userId: parseInt(this.userId)});
+    return Collections.CompanySettings.find({companyId: user.data.companyid}, {limit: 1});
+});

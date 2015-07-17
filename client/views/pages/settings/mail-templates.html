@@ -20,8 +20,6 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Move from</th>
-                                        <th>Move To</th>
                                         <th>Subject</th>
                                         <th></th>
                                     </tr>
@@ -44,8 +42,6 @@
 <template name="mailTemplate">
     <tr>
         <td>{{ name }}</td>
-        <td>{{ fromStageTitle }}</td>
-        <td>{{ toStageTitle }}</td>
         <td>{{ subject }}</td>
         <td>
             <a href="{{pathFor 'updateMailTemplate'}}" class="btn btn-white btn-sm"><i class="fa fa-pencil"></i>&nbsp;edit</a>

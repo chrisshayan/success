@@ -12,7 +12,6 @@ callback-hook@1.0.3
 check@1.0.5
 chuangbo:cookie@1.1.0
 coffeescript@1.0.6
-dburles:collection-helpers@1.0.3
 ddp@1.1.0
 deps@1.0.7
 ejson@1.0.6
@@ -55,8 +54,8 @@ minimongo@1.0.8
 mobile-status-bar@1.0.3
 momentjs:moment@2.10.3
 mongo@1.1.0
+mpowaga:autoform-summernote@0.4.1
 observe-sequence@1.0.6
-okgrow:iron-router-autoscroll@0.0.8
 ordered-dict@1.0.3
 pcel:mysql@0.1.0
 peerlibrary:assert@0.2.5
@@ -76,14 +75,13 @@ sgi:sprintfjs@0.0.2
 spacebars@1.0.6
 spacebars-compiler@1.0.6
 steeve:reactive-cookie@0.0.8
+summernote:standalone@0.6.10
 templating@1.1.1
 tracker@1.0.7
-twbs:bootstrap@3.3.4
+twbs:bootstrap@3.3.5
 ui@1.0.6
 underscore@1.0.3
-underscorestring:underscore.string@3.0.3
 url@1.0.4
 webapp@1.2.0
 webapp-hashing@1.0.3
 wylio:mandrill@0.2.1
-zimme:iron-router-active@1.0.4

@@ -22,18 +22,30 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     try {
         var rows = fetchVNWData(pullCompanyInfoSql);
         _.each(rows, function (row) {
-            var company = Collections.Companies.findOne({companyId: row.companyid});
+            var company = Collections.CompanySettings.findOne({companyId: row.companyid});
 
             if (!company) {
-                company = new Schemas.CompanyInfo();
+                company = new Schemas.CompanySetting();
                 company.companyId = row.companyid;
                 company.data = row;
-                Collections.Companies.insert(company);
+                company.companyName = row.companyname;
+                company.companyAddress = row.address;
+                company.contactName = row.contactname;
+                company.phone = row.telephone;
+                company.cell = row.cellphone;
+                company.fax = row.faxnumber;
+                Collections.CompanySettings.insert(company);
             } else {
                 if (company.data != row) {
-                    Collections.Companies.update(company._id, {
+                    Collections.CompanySettings.update(company._id, {
                         $set: {
                             data: row,
+                            companyName: row.companyname,
+                            companyAddress: row.address,
+                            contactName: row.contactname,
+                            phone: row.telephone,
+                            cell: row.cellphone,
+                            fax: row.faxnumber,
                             lastSyncedAt: new Date()
                         }
                     });

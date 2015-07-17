@@ -2,7 +2,7 @@
     {{#if application.get}}
         <div class="job-application-actions clearfix ">
             <div class="pull-right">
-                {{> JobApplicationActions}}
+                {{> JobApplicationActions isDisqualified=disqualified.get}}
             </div>
         </div>
 
@@ -20,6 +20,9 @@
                                         <h3>{{jobTitle}}</h3>
                                     {{/with}}
                                     <a href="{{ profileUrl }}" target="_blank"><img src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate profile</a>
+                                    {{#if disqualified.get}}
+                                        <span class="text-danger">Disqualified</span>
+                                    {{/if}}
                                 </div>
                             </div>
                         </div>

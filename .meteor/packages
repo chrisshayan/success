@@ -10,12 +10,9 @@ less
 email
 jquery
 reactive-var
-dburles:collection-helpers
 iron:router
 twbs:bootstrap
 fortawesome:fontawesome
-zimme:iron-router-active
-okgrow:iron-router-autoscroll
 momentjs:moment
 pcel:mysql
 sgi:sprintfjs
@@ -27,6 +24,7 @@ steeve:reactive-cookie
 meteorhacks:fast-render
 peerlibrary:blaze-components
 raix:eventemitter
+mpowaga:autoform-summernote
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications

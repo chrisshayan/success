@@ -52,6 +52,34 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
             }
         });
 
+        Event.on("fetchActivities", function() {
+            var params = Router.current().params;
+            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            self.jobId.set(parseInt(params.jobId));
+            self.applicationId.set(parseInt(params.query.application));
+            self.stage.set(stage);
+
+            // get job applications
+            var options = {
+                application: self.applicationId.get(),
+                page: self.page.get()
+            };
+
+            self.isLoading.set(true);
+
+            Meteor.call("getActivities", options, function (err, result) {
+                if (err) throw err;
+                self.isLoading.set(false);
+                var currentItems = [];
+                _.each(result.items, function (item) {
+                    currentItems.push(item);
+                });
+                self.activities.set(currentItems);
+
+                self.loadMoreAbility.set(result.loadMoreAbility);
+            });
+
+        });
     },
 
     events: function () {
@@ -83,6 +111,7 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
         this.icon = "";
         this.title = "";
         this.content = "";
+        this.showMoreLabel = new ReactiveVar("show more");
 
         /**
          * info handle
@@ -111,6 +140,30 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
                 this.icon = " fa-briefcase ";
             break;
 
+
+            case 3:// Disqualified application
+                this.title = "Disqualified";
+                this.icon = " fa-thumbs-down ";
+                break;
+
+            case 4:// Disqualified application
+                this.title = "Revert qualify";
+                this.icon = " fa-life-saver ";
+                break;
+
+            case 5:// Mail sent
+                var mail = this.data().data;
+                this.title = mail.subject;
+                this.icon = " fa-envelope-o ";
+                this.content = mail.html;
+                break;
+
+            case 6:// Comment
+                var comment = this.data().data;
+                this.title = comment.content;
+                this.icon = " fa-comment ";
+                break;
+
             default:
                 this.icon = " fa-heart-o ";
             break;
@@ -118,7 +171,24 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
     },
 
     events: function () {
-        return [{}];
+        return [{
+            'click .application-timeline-content-more': this.showMoreContent
+        }];
+    },
+
+    /**
+     * Event show more content
+     */
+    showMoreContent: function(e) {
+        var content = Template.instance().find(".application-timeline-content p");
+        if($(content).hasClass("more")) {
+            $(content).removeClass("more");
+            this.showMoreLabel.set("show more");
+        } else {
+            this.showMoreLabel.set("show less");
+            $(content).addClass("more");
+        }
+
     },
 
     /**
@@ -147,3 +217,162 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
     }
 
 }).register('JobApplicationTimelineItem');
+
+
+SendEmailCandidateForm = BlazeComponent.extendComponent({
+    onCreated: function () {
+        var self = this;
+        this.show = new ReactiveVar(false);
+        this.isLoading = new ReactiveVar(false);
+
+        this.candidate = new ReactiveVar(null);
+        this.application = new ReactiveVar(null);
+
+        Template.instance().autorun(function() {
+
+        });
+
+        Event.on('toggleSendEmailCandidateForm', function() {
+            if(self.show.get()) {
+                self.show.set(false);
+            } else {
+                self.isLoading.set(true);
+                $(".mail-subject").val("");
+                $(".mail-content").code("");
+                $(".mail-template-options").val(-1);
+                var params = Router.current().params;
+                if(params.query.hasOwnProperty("application")) {
+                    Meteor.call('getApplicationDetails', parseInt(params.query.application), function(err, result) {
+                        if(err) throw err;
+                        if(result) {
+                            self.application.set(result.application);
+                            self.candidate.set(result.candidate);
+                            $(".mail-to").val(result.candidate.data.username);
+                            self.isLoading.set(false);
+                        }
+                    });
+                }
+                self.show.set(true);
+            }
+
+        });
+
+    },
+
+    events: function () {
+        return [{
+            'change .mail-template-options': this.selectTemplate,
+            'click .mail-send-action': this.send,
+            'click .mail-cancel-action': this.cancel,
+        }];
+    },
+
+    /**
+     * Event select mail template options
+     */
+    selectTemplate: function(e, tmpl) {
+        var template = Collections.MailTemplates.findOne(e.target.value);
+        if(template) {
+            $(".mail-subject").val(template.subject);
+            $('.editor.mail-content').code(template.htmlBody);
+        }
+    },
+
+    /**
+     * EVent to request send email
+     */
+    send: function(){
+        var self = this;
+        self.isLoading.set(true);
+        var data = {
+            subject: $(".mail-subject").val() || "",
+            content: $(".mail-content").code()|| "",
+            mailTemplate: $(".mail-template-options").val() || "",
+            application: this.application.get().entryId
+        };
+
+        Meteor.call('sendMailToCandidate', data, function(err, result) {
+            if(err) throw err;
+            if(result) {
+                Notification.success("Mail sent");
+                self.show.set(false);
+                self.isLoading.set(false);
+                Event.emit('fetchActivities');
+            }
+        });
+    },
+
+    cancel: function() {
+        this.show.set(false);
+    }
+
+}).register('SendEmailCandidateForm')
+
+AddCommentCandidateForm = BlazeComponent.extendComponent({
+    onCreated: function () {
+        var self = this;
+        this.show = new ReactiveVar(false);
+        this.isLoading = new ReactiveVar(false);
+
+        Template.instance().autorun(function() {
+
+        });
+
+        Event.on('toggleCommentCandidateForm', function() {
+            if(self.show.get()) {
+                self.show.set(false);
+            } else {
+                $(".comment-candidate").val("");
+                self.show.set(true);
+            }
+        });
+
+    },
+
+    events: function () {
+        return [{
+            'click .mail-send-action': this.send,
+            'click .mail-cancel-action': this.cancel,
+        }];
+    },
+
+    /**
+     * Event select mail template options
+     */
+    selectTemplate: function(e, tmpl) {
+        var template = Collections.MailTemplates.findOne(e.target.value);
+        if(template) {
+            $(".mail-subject").val(template.subject);
+            $('.editor.mail-content').code(template.htmlBody);
+        }
+    },
+
+    /**
+     * EVent to request send email
+     */
+    send: function(){
+        var self = this;
+        var params = Router.current().params;
+        if(!params.query.hasOwnProperty("application")) return;
+
+        self.isLoading.set(true);
+        var data = {
+            content: $(".comment-candidate").val(),
+            application: parseInt(params.query.application)
+        };
+
+        Meteor.call('addCommentApplication', data, function(err, result) {
+            if(err) throw err;
+            if(result) {
+                self.show.set(false);
+                self.isLoading.set(false);
+                Event.emit('fetchActivities');
+            }
+        });
+    },
+
+    cancel: function() {
+        this.show.set(false);
+    }
+
+}).register('AddCommentCandidateForm');

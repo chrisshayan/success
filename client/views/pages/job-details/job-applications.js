@@ -77,6 +77,17 @@ JobApplications = BlazeComponent.extendComponent({
                 }
             }
         });
+
+        Event.on('disqualifiedApplication', function(applicationId, status){
+            check(status, Boolean);
+            var current = self.applications.get();
+            for(var i=0; i < current.length; i++) {
+                if(current[i].entryId == applicationId) {
+                    current[i].disqualified = status;
+                }
+            }
+            self.applications.set(current);
+        });
     },
 
     onRendered: function () {

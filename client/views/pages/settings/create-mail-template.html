@@ -19,30 +19,6 @@
                         </div>
                         <div class="hr-line-dashed"></div>
 
-                        <div class="form-group {{#if afFieldIsInvalid name='fromStage'}} has-error{{/if}} {{#if afFieldIsInvalid name='toStage'}} has-error{{/if}}">
-                            <label class="col-sm-2 control-label">When update from</label>
-                            <div class="col-sm-10">
-                                <div class="row">
-                                    <div class="col-sm-5 text-right">
-                                        {{> afFieldInput name='fromStage' disabled=isSystem}}
-                                    </div>
-                                    <div class="col-sm-1" style="text-align: center;font-size: 25px">
-                                        <i class="fa fa-long-arrow-right"></i>
-                                    </div>
-                                    <div class="col-sm-5">
-                                        {{> afFieldInput name='toStage' disabled=isSystem}}
-                                    </div>
-                                </div>
-                                {{#if afFieldIsInvalid name='fromStage'}}
-                                    <span class="help-block">{{afFieldMessage name='fromStage'}}</span>
-                                {{/if}}
-                                {{#if afFieldIsInvalid name='toStage'}}
-                                    <span class="help-block">{{afFieldMessage name='toStage'}}</span>
-                                {{/if}}
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-
                         <div class="form-group {{#if afFieldIsInvalid name='emailFrom'}} has-error{{/if}}" >
                             <label class="col-sm-2 control-label">From</label>
                             <div class="col-sm-10">
@@ -53,18 +29,6 @@
                             </div>
                         </div>
                         <div class="hr-line-dashed"></div>
-
-                        <div class="form-group {{#if afFieldIsInvalid name='replyTo'}} has-error{{/if}}">
-                            <label class="col-sm-2 control-label">Reply to</label>
-                            <div class="col-sm-10">
-                                {{> afFieldInput name='replyTo'}}
-                                {{#if afFieldIsInvalid name='replyTo'}}
-                                    <span class="help-block">{{afFieldMessage name='replyTo'}}</span>
-                                {{/if}}
-                            </div>
-                        </div>
-                        <div class="hr-line-dashed"></div>
-
 
                         <div class="form-group {{#if afFieldIsInvalid name='subject'}} has-error{{/if}}">
                             <label class="col-sm-2 control-label">Subject</label>

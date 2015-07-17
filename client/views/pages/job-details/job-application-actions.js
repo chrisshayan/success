@@ -6,6 +6,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var self = this;
         this.applicationId = new ReactiveVar(null);
         this.stage = new ReactiveVar(null);
+        this.disqualified = new ReactiveVar(false)
 
         Template.instance().autorun(function() {
             var params = Router.current().params;
@@ -13,6 +14,12 @@ JobApplicationActions = BlazeComponent.extendComponent({
             self.stage.set(_currentStage);
             if(params.query.hasOwnProperty('application')) {
                 self.applicationId.set(parseInt(params.query.application));
+                Meteor.call('getApplicationDetails', parseInt(params.query.application),  function(err, result) {
+                    if(err) throw err;
+                    if(result) {
+                        self.disqualified.set(result.application.disqualified);
+                    }
+                })
             } else {
                 self.applicationId.set(null);
             }
@@ -26,7 +33,11 @@ JobApplicationActions = BlazeComponent.extendComponent({
 
     events: function () {
         return [{
-            'click [data-move-stage]': this.moveStage
+            'click [data-move-stage]': this.moveStage,
+            'click .disqualify-application': this.disqualifyApplication,
+            'click .revert-application': this.revertApplication,
+            'click .toggle-email-candidate-form': this.toggleSendEmailForm,
+            'click .toggle-comment-form': this.toggleCommentForm
         }];
     },
 
@@ -59,6 +70,49 @@ JobApplicationActions = BlazeComponent.extendComponent({
             });
         }
     },
+
+    /**
+     * Disqualify application
+     */
+    disqualifyApplication: function() {
+        var self = this;
+        Meteor.call('disqualifyApplication', this.applicationId.get(), function(err, result) {
+            if(err) throw err;
+            if(result) {
+                Event.emit('disqualifiedApplication', self.applicationId.get(), true);
+                self.disqualified.set(true);
+            }
+        });
+    },
+
+    /**
+     * Revert application
+     */
+    revertApplication: function() {
+        var self = this;
+        Meteor.call('revertApplication', this.applicationId.get(), function(err, result) {
+            if(err) throw err;
+            if(result) {
+                Event.emit('disqualifiedApplication', self.applicationId.get(), false);
+                self.disqualified.set(false);
+            }
+        });
+    },
+
+    /**
+     * Send email to candidate
+     */
+    toggleSendEmailForm: function() {
+        Event.emit('toggleSendEmailCandidateForm');
+    },
+
+    /**
+     * add comment to candidate
+     */
+    toggleCommentForm: function() {
+        Event.emit('toggleCommentCandidateForm');
+    },
+
 
 
     /**

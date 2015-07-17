@@ -71,24 +71,6 @@ Router.route('/dashboard', {
     }
 });
 
-/**
- * Applicants tracking
- */
-Router.route('/jobtracking/:jobId', {
-    name: "jobTrackingBoard",
-    waitOn: function() {
-        var options = {jobId: parseInt(this.params.jobId)};
-        return [
-            Meteor.subscribe('jobDetails', options),
-            Meteor.subscribe('applications', options),
-            Meteor.subscribe('applicationScores'),
-            Meteor.subscribe('candidates', options),
-        ];
-    },
-    action: function () {
-        this.render('jobTrackingBoard');
-    }
-});
 
 Router.route('/job/:jobId/stage/:stage', {
     name: "jobDetails",
@@ -99,6 +81,7 @@ Router.route('/job/:jobId/stage/:stage', {
         var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
         return [
             Meteor.subscribe('jobs'),
+            Meteor.subscribe('mailTemplates'),
             Meteor.subscribe('applicationCount', {jobId: this.params.jobId})
         ];
     },
@@ -216,8 +199,14 @@ Router.route('/settings/mailtemplates/update/:_id', {
 
 Router.route('/settings/mailsignature', {
     name: "mailSignature",
+    waitOn: function() {
+        return Meteor.subscribe('companySettings')
+    },
     action: function() {
         this.render('mailSignature');
+    },
+    data: function() {
+        return Collections.CompanySettings.findOne();
     }
 })
 

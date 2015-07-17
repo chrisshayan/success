@@ -1,7 +1,31 @@
 Template.companyInfoForm.helpers({
    data: function() {
        return Collections.Companies.findOne();
-   }
+   },
+    companyLogo: function() {
+        return this.logo;
+    },
+    name: function() {
+        return this.data.companyname;
+    },
+    address: function() {
+        return this.data.address;
+    },
+    phone: function() {
+        return this.data.telephone;
+    },
+    cell: function() {
+        return this.data.cellphone;
+    },
+    fax: function() {
+        return this.data.faxnumber;
+    },
+    contact: function() {
+        return {
+            name: this.data.contactname || "",
+            email: this.data.contactemail || ""
+        }
+    }
 });
 
 Template.companyInfoForm.events({

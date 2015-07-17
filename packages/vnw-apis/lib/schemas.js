@@ -83,6 +83,7 @@ Schemas.Application = function () {
         stage: 1, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
         matchingScore: 0,
         data: {},
+        disqualified: false,
         createdAt: new Date(),
         modifiedAt: null,
         modifiedBy: null,
@@ -112,13 +113,10 @@ Schemas.ApplicationScore = function () {
 Schemas.MailTemplate = function () {
     return {
         name: "", // template name
-        fromStage: null,
-        toStage: null,
         type: 2, // 1: system (default), 2: user mail template
         emailFrom: "",
         subject: "",
         htmlBody: "",
-        replyTo: "",
         createdAt: new Date(),
         createdBy: null,
         modifiedAt: new Date(),
@@ -133,6 +131,7 @@ Schemas.MailTemplate = function () {
 Schemas.CompanySetting = function () {
     return {
         companyId: null,
+        data: null,
         companyName: "",
         companyAddress: "",
         contactName: "",
@@ -140,7 +139,7 @@ Schemas.CompanySetting = function () {
         cell: "",
         fax: "",
         emailFrom: "",
-        emailReply: ""
+        mailSignature: ""
     }
 };
 
@@ -154,53 +153,12 @@ Schemas.Activity = function () {
     };
 };
 
+
 Schemas.Template = new SimpleSchema({
     name: {
         type: String,
         label: "Name",
         max: 200
-    },
-    fromStage: {
-        type: Number,
-        label: "From stage ",
-        defaultValue: 1,
-        autoform: {
-            options: Recruit.APPLICATION_STAGES,
-            afFieldInput: {
-                type: "select",
-                firstOption: false,
-                class: ""
-            }
-        }
-    },
-    toStage: {
-        type: Number,
-        custom: function () {
-            if (Meteor.isClient && this.isSet) {
-                // Validate fromStage and toStage cannot the same
-                if (this.value == this.field('fromStage').value) {
-                    return "movedStageNotAllowTheSame";
-                }
-
-                // Validate a pair fromStage and toStage is unique
-                checkExist = Collections.MailTemplates.findOne({
-                    fromStage: this.field('fromStage').value,
-                    toStage: this.value
-                });
-                if (checkExist) {
-                    return "mailTemplateAlreadyExists";
-                }
-            }
-        },
-        defaultValue: 2,
-        autoform: {
-            options: Recruit.APPLICATION_STAGES,
-            afFieldInput: {
-                type: "select",
-                firstOption: false,
-                class: ""
-            }
-        }
     },
     type: {
         type: Number,
@@ -215,12 +173,6 @@ Schemas.Template = new SimpleSchema({
         optional: true,
         regEx: SimpleSchema.RegEx.Email
     },
-    replyTo: {
-        type: String,
-        label: "Reply to",
-        optional: true,
-        regEx: SimpleSchema.RegEx.Email
-    },
     subject: {
         type: String,
         label: "Subject",
@@ -231,9 +183,9 @@ Schemas.Template = new SimpleSchema({
         label: "Content",
         autoform: {
             afFieldInput: {
-                type: "textarea",
-                rows: 20,
-                class: "summernote"
+                type: "summernote",
+                height: "250px",
+                class: "editor"
             }
         }
     },
@@ -268,3 +220,60 @@ Schemas.Template = new SimpleSchema({
 });
 
 Collections.MailTemplates.attachSchema(Schemas.Template);
+
+Schemas.sendEmailCandidateForm = new SimpleSchema({
+    to: {
+        type: String,
+        label: "To",
+        autoform: {
+            class: "mail-to",
+            disabled: true
+        }
+    },
+    template: {
+        type: String,
+        label: "Mail template",
+        autoform: {
+            type: "select",
+            class: "mail-template-options",
+            options: function() {
+                return Collections.MailTemplates.find().map(function(r) {
+                    return {
+                        label: r.name,
+                        value: r._id
+                    };
+                });
+            }
+        }
+    },
+    subject: {
+        type: String,
+        label: "Subject",
+        autoform: {
+            class: "mail-subject"
+        }
+    },
+    content: {
+        type: String,
+        label: "",
+        autoform: {
+            afFieldInput: {
+                type: "summernote",
+                height: "200px",
+                class: "editor mail-content",
+            }
+        }
+    }
+
+});
+
+Schemas.addCommentCandidateForm = new SimpleSchema({
+   content: {
+       type: String,
+       label: "",
+       autoform: {
+           type: "textarea",
+           class: "form-control"
+       }
+   }
+});
