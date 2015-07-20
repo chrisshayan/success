@@ -255,14 +255,7 @@ Schemas.sendEmailCandidateForm = new SimpleSchema({
     },
     content: {
         type: String,
-        label: "",
-        autoform: {
-            afFieldInput: {
-                type: "summernote",
-                height: "200px",
-                class: "editor mail-content",
-            }
-        }
+        label: ""
     }
 
 });

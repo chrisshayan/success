@@ -310,3 +310,11 @@
     height: auto;
     overflow: auto;
 }
+
+.note-editor {
+    border: none;
+}
+
+.note-editor .note-toolbar {
+    border-bottom: none;
+}

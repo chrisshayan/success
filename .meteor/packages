@@ -24,7 +24,7 @@ steeve:reactive-cookie
 meteorhacks:fast-render
 peerlibrary:blaze-components
 raix:eventemitter
-mpowaga:autoform-summernote
+summernote:summernote
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications

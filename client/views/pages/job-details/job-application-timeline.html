@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="h-200">
-                            {{> afFieldInput name='content'}}
+                            {{> mailContentEditor }}
                             <div class="clearfix"></div>
                         </div>
                         <div class="mail-body text-right tooltip-demo">
@@ -106,6 +106,10 @@
         </div>
     </div>
     {{/if}}
+</template>
+
+<template name="mailContentEditor">
+    <textarea class="editor summernote mail-content"></textarea>
 </template>
 
 <template name="AddCommentCandidateForm">

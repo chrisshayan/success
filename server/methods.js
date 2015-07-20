@@ -1,3 +1,48 @@
+function replacePlaceholder(userId, application, candidate, mail) {
+    var valid = ["candidate_first_name", "position", "company", "mail_signature"];
+
+    var replaces = {};
+    var placeholders = mail.html.match(/\[\[(\w+)\]\]/gi);
+    _.each(placeholders, function(p) {
+        p1 = p.replace(/\[\[|\]\]/g, "");
+        if(_.indexOf(valid, p1) >= 0) {
+            if(replaces.hasOwnProperty(p)) return;
+            switch (p1) {
+                case "candidate_first_name":
+                    replaces[p1] = candidate.data.firstname;
+                    break;
+
+                case "position":
+                    var job = Collections.Jobs.findOne({jobId: application.jobId});
+                    replaces[p1] = job.data.jobtitle;
+                    break;
+
+                case "company":
+                case "mail_signature":
+                    var user = Collections.Users.findOne({userId: parseInt(userId)});
+                    var company = Collections.CompanySettings.findOne({companyId: user.data.companyid});
+                    if(p1 == "company") {
+                        replaces[p1] = company.companyName;
+                    }else {
+                        replaces[p1] = company.mailSignature;
+                        console.log(replaces);
+                    }
+
+                    break;
+            }
+        }
+    });
+
+    _.templateSettings = {
+        interpolate: /\[\[(.+?)\]\]/g
+    };
+
+    var template = _.template(mail.html);
+    mail.html = template(replaces);
+
+    return mail;
+}
+
 /**
  * Recruit methods
  */
@@ -359,7 +404,8 @@ Meteor.methods({
             subject: String,
             content: String
         });
-        this.unblock();
+        var self = this;
+
         var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
         if(!mailTemplate) return false;
 
@@ -374,12 +420,16 @@ Meteor.methods({
             html: data.content
         };
 
-        Meteor.Mandrill.send(mail);
-        var activity = new Activity();
+        Meteor.defer(function() {
+            mail = replacePlaceholder(self.userId, application, candidate, mail);
+            Meteor.Mandrill.send(mail);
+            var activity = new Activity();
 
-        mail.applicationId = data.application;
-        activity.data = mail;
-        activity.sendMailToCandidate();
+            mail.applicationId = data.application;
+            activity.data = mail;
+            activity.sendMailToCandidate();
+        });
+
         return true;
     },
 

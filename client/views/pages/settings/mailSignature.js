@@ -5,7 +5,7 @@ Template.mailSignature.onRendered(function() {
 Template.mailSignature.events({
     'submit #mail-signature-form': function() {
         var signature = $("#mail-signature-editor");
-        if(!_.isEmpty(signature.text())) {
+        if(!_.isEmpty(signature.code())) {
             Meteor.call("updateMailSignature", signature.code(), function(err, result) {
                 if(err) throw err;
                 if(result) {
