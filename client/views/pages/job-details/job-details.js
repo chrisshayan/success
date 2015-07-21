@@ -32,7 +32,7 @@ Template.jobDetails.rendered = function () {
             slimClass: '',
             slimScrollClass: '.slimScrollBar'
         }
-    }
+    };
 
     Event.on('slideToForm', function (form, isShow) {
         var $details = $(selectors.details);

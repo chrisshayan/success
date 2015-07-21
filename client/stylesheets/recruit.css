@@ -81,7 +81,6 @@
     color: #fff !important;
 }
 
-
 .stage-offer:hover {
     background-color: #21b9bb;
 }
@@ -90,7 +89,6 @@
     color: #fff !important;
 }
 
-
 .stage-hired:hover {
     background-color: rgb(26, 179, 148);
 }
@@ -98,7 +96,6 @@
 .stage-hired:hover .stage-number, .stage-hired:hover .stage-label {
     color: #fff !important;
 }
-
 
 .jobs-list .job .job-title {
     margin: 0;
@@ -127,6 +124,7 @@
 #job-details-content {
     height: calc(100% - 190px) !important;
 }
+
 #job-candidates .list-group-item.active, #job-candidates .list-group-item:hover {
     background-color: #fff !important;
     -moz-box-shadow: inset 0px 0px 24px rgba(163, 161, 161, 0.4);
@@ -265,13 +263,12 @@
     border-bottom: none !important;
 }
 
-
-.job-application-timeline .timeline-item .content{
+.job-application-timeline .timeline-item .content {
     min-height: 55px !important;
 
 }
 
-.job-application-timeline .timeline-item .date{
+.job-application-timeline .timeline-item .date {
     top: 5px !important;
 }
 
@@ -279,7 +276,8 @@
     margin: 20px auto;
     width: 90%;
 }
-.cover-letter p{
+
+.cover-letter p {
     padding: 15px;
     background-color: #fff;
     border: 1px solid #f2f2f2;
@@ -301,11 +299,12 @@
 
 }
 
-.application-timeline-content > p{
+.application-timeline-content > p {
     height: 50px;
     overflow: hidden;
     margin-bottom: 10px;
 }
+
 .application-timeline-content > p.more {
     height: auto;
     overflow: auto;
@@ -317,4 +316,8 @@
 
 .note-editor .note-toolbar {
     border-bottom: none;
+}
+
+.note-editor .note-editable {
+    min-height: 240px;
 }
