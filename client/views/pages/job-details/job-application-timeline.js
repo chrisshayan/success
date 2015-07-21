@@ -257,12 +257,13 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
 
                 var $details = $('.full-height-scroll.white-bg');
                 var $mailContainer = $('.mail-container');
+                var height = $mailContainer.offset().top - $details.offset().top;
 
                 $details.animate({
-                    scrollTop: $mailContainer.offset().top - $details.offset().top
+                    scrollTop: height
                 }, 'slow', function () {
                     $details.siblings('.slimScrollBar')
-                        .css({'top': h / 2 + 'px'});
+                        .css({'top': height / 2 + 'px'});
                 });
 
             }
