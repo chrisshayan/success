@@ -230,7 +230,8 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
 
 
         Event.on('toggleSendEmailCandidateForm', function () {
-            if (self.show.get()) {
+            var isShow = self.show.get();
+            if (isShow) {
                 self.show.set(false);
             } else {
                 self.isLoading.set(true);
@@ -250,25 +251,12 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                     });
                 }
                 self.show.set(true);
-
-                /*
-                 * - Add slide effect and fix issue when slide
-                 */
-
-                var $details = $('.full-height-scroll.white-bg');
-                var $mailContainer = $('.mail-container');
-                var height = $mailContainer.offset().top - $details.offset().top;
-
-                $details.animate({
-                    scrollTop: height
-                }, 'slow', function () {
-                    $details.siblings('.slimScrollBar')
-                        .css({'top': height / 2 + 'px'});
-                });
-
             }
 
+            Event.emit('slideToForm', 'email', !isShow);
+
         });
+
 
         this.editor = undefined;
     },
@@ -392,12 +380,15 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
         this.isLoading = new ReactiveVar(false);
 
         Event.on('toggleCommentCandidateForm', function () {
-            if (self.show.get()) {
+            var isShow = self.show.get();
+            if (isShow) {
                 self.show.set(false);
             } else {
                 $(".comment-candidate").val("");
                 self.show.set(true);
             }
+
+            Event.emit('slideToForm', 'comment', !isShow);
         });
 
     },

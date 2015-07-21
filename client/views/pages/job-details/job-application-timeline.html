@@ -7,10 +7,12 @@
             {{#if isEmpty}}
                 <h2>No activity yet</h2>
             {{else}}
-                <div class="mail-container">
+                <div id="email-container">
                     {{> SendEmailCandidateForm}}
                 </div>
-                {{> AddCommentCandidateForm}}
+                <div id="comment-container">
+                    {{> AddCommentCandidateForm}}
+                </div>
                 {{#each activities.get}}
                     {{> JobApplicationTimelineItem}}
                 {{/each}}
@@ -48,7 +50,7 @@
 
 <template name="SendEmailCandidateForm">
     {{#if show.get}}
-        <div class="timeline-item border-bottom">
+        <div id="email-container" class="timeline-item border-bottom">
             <div class="row">
                 <div class="col-xs-2 date text-warning" style="top:5px">
                     <i class="fa fa-envelope-o"></i>
@@ -121,7 +123,7 @@
 
 <template name="AddCommentCandidateForm">
     {{#if show.get}}
-        <div class="timeline-item border-bottom">
+        <div id="comment-container" class="timeline-item border-bottom">
             <div class="row">
                 <div class="col-xs-2 date text-warning" style="top:5px">
                     <i class="fa fa-comment"></i>

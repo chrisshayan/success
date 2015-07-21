@@ -8,15 +8,15 @@ JobApplicationActions = BlazeComponent.extendComponent({
         this.stage = new ReactiveVar(null);
         this.disqualified = new ReactiveVar(false)
 
-        Template.instance().autorun(function() {
+        Template.instance().autorun(function () {
             var params = Router.current().params;
             var _currentStage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
             self.stage.set(_currentStage);
-            if(params.query.hasOwnProperty('application')) {
+            if (params.query.hasOwnProperty('application')) {
                 self.applicationId.set(parseInt(params.query.application));
-                Meteor.call('getApplicationDetails', parseInt(params.query.application),  function(err, result) {
-                    if(err) throw err;
-                    if(result) {
+                Meteor.call('getApplicationDetails', parseInt(params.query.application), function (err, result) {
+                    if (err) throw err;
+                    if (result) {
                         self.disqualified.set(result.application.disqualified);
                     }
                 })
@@ -48,19 +48,19 @@ JobApplicationActions = BlazeComponent.extendComponent({
     /**
      * Update application stage
      */
-    moveStage: function(e, tmpl) {
+    moveStage: function (e, tmpl) {
         var toStage = $(e.target).data("move-stage");
         toStage = parseInt(toStage);
         var stage = Recruit.APPLICATION_STAGES[toStage];
-        if(toStage) {
+        if (toStage) {
             //call update stage request
             var data = {
                 application: this.applicationId.get(),
                 stage: toStage
             };
-            Meteor.call('updateApplicationStage', data, function(err, result) {
-                if(err) throw err;
-                if(result) {
+            Meteor.call('updateApplicationStage', data, function (err, result) {
+                if (err) throw err;
+                if (result) {
                     // When update stage success
                     // remove application from list
                     // change current application
@@ -74,11 +74,11 @@ JobApplicationActions = BlazeComponent.extendComponent({
     /**
      * Disqualify application
      */
-    disqualifyApplication: function() {
+    disqualifyApplication: function () {
         var self = this;
-        Meteor.call('disqualifyApplication', this.applicationId.get(), function(err, result) {
-            if(err) throw err;
-            if(result) {
+        Meteor.call('disqualifyApplication', this.applicationId.get(), function (err, result) {
+            if (err) throw err;
+            if (result) {
                 Event.emit('disqualifiedApplication', self.applicationId.get(), true);
                 self.disqualified.set(true);
             }
@@ -88,11 +88,11 @@ JobApplicationActions = BlazeComponent.extendComponent({
     /**
      * Revert application
      */
-    revertApplication: function() {
+    revertApplication: function () {
         var self = this;
-        Meteor.call('revertApplication', this.applicationId.get(), function(err, result) {
-            if(err) throw err;
-            if(result) {
+        Meteor.call('revertApplication', this.applicationId.get(), function (err, result) {
+            if (err) throw err;
+            if (result) {
                 Event.emit('disqualifiedApplication', self.applicationId.get(), false);
                 self.disqualified.set(false);
             }
@@ -102,48 +102,46 @@ JobApplicationActions = BlazeComponent.extendComponent({
     /**
      * Send email to candidate
      */
-    toggleSendEmailForm: function() {
+    toggleSendEmailForm: function () {
         Event.emit('toggleSendEmailCandidateForm');
-
     },
 
     /**
      * add comment to candidate
      */
-    toggleCommentForm: function() {
+    toggleCommentForm: function () {
         Event.emit('toggleCommentCandidateForm');
     },
-
 
 
     /**
      * HELPERS
      */
 
-    nextStage: function() {
-        if(this.stage.get().id == 5)
+    nextStage: function () {
+        if (this.stage.get().id == 5)
             return this.stage.get();
-        var nextStage = Recruit.APPLICATION_STAGES[this.stage.get().id+1];
+        var nextStage = Recruit.APPLICATION_STAGES[this.stage.get().id + 1];
         return nextStage;
     },
-    nextStageAbility: function() {
-        if(this.stage.get().id == 5)
+    nextStageAbility: function () {
+        if (this.stage.get().id == 5)
             return "disabled";
         return "";
     },
-    stages: function() {
+    stages: function () {
         var self = this;
         var items = [];
-        _.each(Recruit.APPLICATION_STAGES, function(stage) {
+        _.each(Recruit.APPLICATION_STAGES, function (stage) {
             var html = "";
-            if(stage.id > self.stage.get().id) {
+            if (stage.id > self.stage.get().id) {
                 html = '<li><a href="#"  data-move-stage="%s"><i class="fa fa-long-arrow-right"></i>&nbsp;%s</a></li>';
-            } else if(stage.id < self.stage.get().id) {
+            } else if (stage.id < self.stage.get().id) {
                 html = '<li><a href="#" data-move-stage="%s"><i class="fa fa-long-arrow-left"></i>&nbsp;%s</a></li>';
-            } else if(stage.id == self.stage.get().id) {
+            } else if (stage.id == self.stage.get().id) {
                 html = '<li><a href="#" data-move-stage="%s"><i class="fa fa-circle-o"></i>&nbsp;%s</a></li>';
             }
-            if(!_.isEmpty(html)) {
+            if (!_.isEmpty(html)) {
                 html = sprintf(html, stage.id, stage.label);
             }
             items.push({html: html});
