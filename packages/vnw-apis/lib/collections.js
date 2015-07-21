@@ -6,6 +6,7 @@ Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 Collections.Jobs = new Mongo.Collection("vnw_jobs");
 
 Collections.Applications = new Mongo.Collection("vnw_applications");
+
 Collections.Applications.allow({
     update: function(userId, doc) {
         return !!userId;

@@ -8,11 +8,22 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
 
         this.page = new ReactiveVar(1);
         this.isLoading = new ReactiveVar(false);
-        this.loadMoreAbility = new ReactiveVar(false);
+
         this.latestOptions = new ReactiveVar({});
 
         // store activities
-        this.activities = new ReactiveVar([]);
+        this.activities = function () {
+            return Collections.Activities.find({}, {
+                sort: {
+                    createdAt: -1
+                }
+            });
+        }
+
+        this.loadMoreAbility = function () {
+            var total = Counts.get('totalActivities');
+            return total - self.activities().count() > 0;
+        }
 
         Template.instance().autorun(function () {
             var params = Router.current().params;
@@ -26,60 +37,11 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
                 application: self.applicationId.get(),
                 page: self.page.get()
             };
-
-            // Component only request when options change
-            var latestOptions = self.latestOptions.get();
-            if (!_.isEqual(latestOptions, options)) {
-                if (latestOptions.jobId != options.jobId
-                    || latestOptions.stage != options.stage
-                    || latestOptions.application != options.application) {
-                    self.activities.set([]);
-                }
-                self.isLoading.set(true);
-
-                Meteor.call("getActivities", options, function (err, result) {
-                    if (err) throw err;
-                    self.isLoading.set(false);
-                    var currentItems = self.activities.get();
-                    _.each(result.items, function (item) {
-                        currentItems.push(item);
-                    });
-                    self.activities.set(currentItems);
-
-                    self.loadMoreAbility.set(result.loadMoreAbility);
-                    self.latestOptions.set(options);
-                });
-            }
+            // Send subscribe request
+            Meteor.subscribe('totalActivities', options);
+            Meteor.subscribe('applicationActivities', options);
         });
 
-        Event.on("fetchActivities", function () {
-            var params = Router.current().params;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            self.jobId.set(parseInt(params.jobId));
-            self.applicationId.set(parseInt(params.query.application));
-            self.stage.set(stage);
-
-            // get job applications
-            var options = {
-                application: self.applicationId.get(),
-                page: self.page.get()
-            };
-
-            self.isLoading.set(true);
-
-            Meteor.call("getActivities", options, function (err, result) {
-                if (err) throw err;
-                self.isLoading.set(false);
-                var currentItems = [];
-                _.each(result.items, function (item) {
-                    currentItems.push(item);
-                });
-                self.activities.set(currentItems);
-
-                self.loadMoreAbility.set(result.loadMoreAbility);
-            });
-
-        });
     },
 
     events: function () {
@@ -97,7 +59,7 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
      * HELPERS
      */
     isEmpty: function () {
-        return this.activities.get().length < 1;
+        return this.activities().count() < 1;
     }
 
 }).register('JobApplicationTimeline');
@@ -303,7 +265,6 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                 Notification.success("Mail sent");
                 self.show.set(false);
                 self.isLoading.set(false);
-                Event.emit('fetchActivities');
             }
         });
     },
@@ -430,7 +391,6 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
             if (result) {
                 self.show.set(false);
                 self.isLoading.set(false);
-                Event.emit('fetchActivities');
             }
         });
     },

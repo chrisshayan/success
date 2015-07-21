@@ -25,6 +25,8 @@ meteorhacks:fast-render
 peerlibrary:blaze-components
 raix:eventemitter
 summernote:summernote
+tmeasday:publish-counts
+cottz:publish-relations
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications

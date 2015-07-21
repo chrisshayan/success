@@ -11,20 +11,6 @@ Template.HiringProcess.helpers({
 
 
 jobStageNav = BlazeComponent.extendComponent({
-    onCreated: function () {
-        var self = this;
-        this.jobId = new ReactiveVar(null);
-        Template.instance().autorun(function () {
-            var params = Router.current().params;
-            self.jobId.set(params.jobId);
-        });
-    },
-
-    events: function () {
-        return [{
-
-        }];
-    },
 
     /**
      * Helpers
@@ -34,14 +20,33 @@ jobStageNav = BlazeComponent.extendComponent({
         return currentStage == this.data().alias ? "active" : "";
     },
 
+    /**
+     * return application count
+     */
     applicationCount: function () {
-        var cond = {
-            jobId: parseInt(this.jobId.get()),
-            stage: parseInt(this.data().id),
-        };
-        var applicationCount = Collections.Applications.find(cond).count();
-        if (!applicationCount)
+        switch (this.data().id) {
+            case 1:
+                applicationCount = Counts.get("stageAppliedCount");
+                break;
+            case 2:
+                applicationCount = Counts.get("stagePhoneCount");
+                break;
+            case 3:
+                applicationCount = Counts.get("stageInterviewCount");
+                break;
+            case 4:
+                applicationCount = Counts.get("stageOfferCount");
+                break;
+            case 5:
+                applicationCount = Counts.get("stageHiredCount");
+                break;
+            default:
+                applicationCount = 0;
+        }
+        if(applicationCount < 1)
             return "";
         return sprintf("<strong>%s</strong>", applicationCount);
     }
+
+
 }).register('jobStageNav');

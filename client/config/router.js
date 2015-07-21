@@ -80,9 +80,13 @@ Router.route('/job/:jobId/stage/:stage', {
             throw Meteor.Error(404);
         var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
         return [
+            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 1}),
+            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 2}),
+            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 3}),
+            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 4}),
+            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 5}),
             Meteor.subscribe('jobs'),
-            Meteor.subscribe('mailTemplates'),
-            Meteor.subscribe('applicationCount', {jobId: this.params.jobId})
+            Meteor.subscribe('mailTemplates')
         ];
     },
     action: function() {

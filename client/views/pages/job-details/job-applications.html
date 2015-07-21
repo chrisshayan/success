@@ -1,19 +1,20 @@
 <template name="JobApplications">
-    {{#if isLoading.get}}
-        {{> waveLoading}}
-    {{else}}
+    {{#if Template.subscriptionsReady}}
         <ul class="list-group elements-list" id="job-candidates">
             {{#each items}}
                 {{> JobApplication}}
             {{/each}}
         </ul>
-        {{#if loadMoreAbility.get}}
+        {{#if loadMoreAbility}}
             <div class="row">
                 <div class="col-sm-10 col-sm-offset-1" style="padding-bottom: 20px;">
                     <button class="btn btn-block btn-primary btn-outline loadmore">Load more</button>
                 </div>
             </div>
         {{/if}}
+
+    {{else}}
+        {{> waveLoading}}
     {{/if}}
 </template>
 

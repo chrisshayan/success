@@ -110,7 +110,7 @@ Meteor.publish('mailTemplateDetails', function(_id) {
  * @param clientOptions.jobId {Number}
  * @param clientOptions.page {Number} (optional)
  */
-Meteor.publish('JobApplications', function(opt) {
+Meteor.publishRelations('JobApplications', function (opt) {
     // validate client request
     check(opt, {
         jobId: Number,
@@ -136,23 +136,14 @@ Meteor.publish('JobApplications', function(opt) {
             source: 1,
             stage: 1,
             matchingScore: 1,
+            disqualified: 1,
             "data.createddate": 1,
             "data.appSubject": 1,
             "data.coverletter": 1
         }
     };
-    return Collections.Applications.find(conditions, options);
-});
 
-/**
- * Get candidate info in job details page
- */
-Meteor.publish('jobCandidateInfo' , function(userId) {
-    check(userId, Number);
-    var conditions = {
-        userId: parseInt(userId)
-    };
-    var options = {
+    var candidateOptions = {
         fields: {
             _id: 1,
             userId: 1,
@@ -170,10 +161,101 @@ Meteor.publish('jobCandidateInfo' , function(userId) {
             "data.createddate": 1
         }
     };
-    return Collections.Candidates.find(conditions, options);
+
+    this.cursor(Collections.Applications.find(conditions, options), function (id, doc) {
+        this.cursor(Collections.Candidates.find({userId: doc.userId}, candidateOptions));
+    });
+
+    return this.ready();
 });
+
+Meteor.publish('applicationActivities', function(opt) {
+    // validate client request
+    check(opt, {
+        application: Number,
+        page: Number
+    });
+
+    var DEFAULT_LIMIT = 10;
+    var skip = 0;
+    if(opt.page > 0) {
+        skip = (opt.page - 1) * DEFAULT_LIMIT;
+    }
+    var total = opt.page * DEFAULT_LIMIT;
+
+    var conditions = {
+        "data.applicationId": opt.application
+    };
+
+    var options = {
+        skip: 0,
+        limit: opt.page * DEFAULT_LIMIT,
+        sort: {
+            createdAt: -1
+        }
+    };
+    return Collections.Activities.find(conditions, options);
+});
+
+Meteor.publish('totalActivities', function(opt) {
+    // validate client request
+    check(opt, {
+        application: Number,
+        page: Number
+    });
+    var conditions = {
+        "data.applicationId": opt.application
+    };
+
+    var options = {
+        fields: {
+            _id: 1
+        }
+    };
+    var cursor = Collections.Activities.find(conditions, options);
+    Counts.publish(this, 'totalActivities', cursor);
+});
+
+
 
 Meteor.publish('companySettings', function() {
     var user = Collections.Users.findOne({userId: parseInt(this.userId)});
     return Collections.CompanySettings.find({companyId: user.data.companyid}, {limit: 1});
+});
+
+/**
+ * count applications
+ * using package publish count
+ * use Counts in client side
+ */
+Meteor.publish('applicationsCounter', function(options){
+    var conditions = {};
+    if(typeof options == "object") {
+        if(options.hasOwnProperty('jobId')) {
+            conditions.jobId = parseInt(options.jobId);
+        }
+        if(options.hasOwnProperty('stage')) {
+            conditions.stage = options.stage;
+        }
+    }
+
+    var cursor = Collections.Applications.find(conditions, {fields: {_id: 1}});
+    switch (options.stage) {
+        case 1:
+            Counts.publish(this, 'stageAppliedCount', cursor);
+        break;
+        case 2:
+            Counts.publish(this, 'stagePhoneCount', cursor);
+            break;
+        case 3:
+            Counts.publish(this, 'stageInterviewCount', cursor);
+            break;
+        case 4:
+            Counts.publish(this, 'stageOfferCount', cursor);
+            break;
+        case 5:
+            Counts.publish(this, 'stageHiredCount', cursor);
+            break;
+    }
+
 });
