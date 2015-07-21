@@ -1,5 +1,7 @@
 .idea
 .meteor/local
-settings/*
+settings/
 
 .settings/settings.json
+
+packages/vnw-apis/.npm/*
