@@ -3,6 +3,7 @@ Meteor.publish('jobs', function (filters) {
         status: Number,
         limit: Number,
         except: Match.Optional([Number]), // filter except job id
+
     });
 
     if (filters.limit < 0)
@@ -83,11 +84,11 @@ Meteor.publish('applicationCount', function (filters) {
     return Collections.Applications.find(cond2, opt2);
 });
 
+
 Meteor.publish('jobDetails', function (options) {
     check(options, {
         jobId: Number
     });
-
     var cond = {
         jobId: options.jobId,
         userId: parseInt(this.userId)
@@ -97,6 +98,7 @@ Meteor.publish('jobDetails', function (options) {
 
 
 Meteor.publish('companyInfo', function () {
+
     var user = Collections.Users.findOne({userId: parseInt(this.userId)});
     if (user) {
         return Collections.Companies.find({companyId: user.data.companyid}, {limit: 1});
@@ -258,7 +260,7 @@ Meteor.publish('applicationsCounter', function (options) {
     var conditions = {};
     if (typeof options == "object") {
         if (options.hasOwnProperty('jobId')) {
-            conditions.jobId = parseInt(options.jobId);
+            conditions.jobId = +options.jobId;
         }
         if (options.hasOwnProperty('stage')) {
             conditions.stage = options.stage;
@@ -286,6 +288,7 @@ Meteor.publish('applicationsCounter', function (options) {
 
 });
 
+
 /**
  * Shared publications
  */
@@ -295,27 +298,30 @@ DEFAULT_JOB_OPTIONS = {
     fields: {
         jobId: 1,
         userId: 1,
+        companyId: 1,
+        createdAt: 1,
         "data.jobtitle": 1,
         "data.iscompleted": 1,
-        "data.createddate": 1,
         "data.expireddate": 1
     }
 },
     DEFAULT_APPLICATION_OPTIONS = {
         entryId: 1,
-        userId: 1,
+        candidateId: 1,
+        companyId: 1,
         jobId: 1,
         source: 1,
         stage: 1,
         matchingScore: 1,
         disqualified: 1,
-        "data.createddate": 1,
+        createdAt: 1,
         "data.appSubject": 1,
         "data.coverletter": 1
     },
     DEFAULT_CANDIDATE_OPTIONS = {
         _id: 1,
-        userId: 1,
+        candidateId: 1,
+        createdAt: 1,
         "data.city": 1,
         "data.username": 1,
         "data.firstname": 1,
@@ -327,7 +333,6 @@ DEFAULT_JOB_OPTIONS = {
         "data.email1": 1,
         "data.homephone": 1,
         "data.cellphone": 1,
-        "data.createddate": 1
     };
 
 Meteor.publish('getJobs', function (filters, options) {

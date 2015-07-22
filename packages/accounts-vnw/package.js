@@ -31,15 +31,9 @@ function configure(api) {
     // Package dependencies
     api.use([
         'underscore',
-        'check',
-        'email',
         'ejson',
         'reactive-var',
-        'accounts-base',
-        'ddp'
     ], both);
-
-    api.imply(['accounts-base', 'ddp'], both);
 
     api.use('ui', 'client');
     api.use('steeve:reactive-cookie', 'client');

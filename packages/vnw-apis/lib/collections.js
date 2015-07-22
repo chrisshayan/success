@@ -1,6 +1,7 @@
 //Namespace Collections
 Collections = {};
 Collections.Users = new Mongo.Collection("vnw_users");
+
 Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 
 Collections.Jobs = new Mongo.Collection("vnw_jobs", {

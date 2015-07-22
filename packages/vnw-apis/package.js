@@ -12,13 +12,12 @@ Package.onUse(function (api) {
     api.use([
         'check',
         'mongo',
-        'accounts-base',
         'aldeed:collection2',
         'matb33:collection-hooks',
         'aldeed:simple-schema',
         'aldeed:autoform'
     ], both);
-    api.imply(['accounts-base']);
+
     api.use([
         "pcel:mysql",
         "sgi:sprintfjs",

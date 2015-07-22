@@ -1,8 +1,6 @@
 var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.queries;
 var fetchVNWData = Meteor.wrapAsync(function (sql, callback) {
-
-
     //execute
     connection.query(sql, function (err, rows, fields) {
         if (err) throw err;
@@ -26,6 +24,7 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
 
             if (!company) {
                 company = new Schemas.CompanySetting();
+                company.logo = row.logo;
                 company.companyId = row.companyid;
                 company.data = row;
                 company.companyName = row.companyname;
@@ -39,6 +38,7 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
                 if (company.data != row) {
                     Collections.CompanySettings.update(company._id, {
                         $set: {
+                            logo: row.logo,
                             data: row,
                             companyName: row.companyname,
                             companyAddress: row.address,
@@ -62,8 +62,9 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
  * Pull new jobs and sync db
  * @param userId {Number} (Optional) Vietnamworks user id
  */
-SYNC_VNW.pullJobs = function (userId) {
+SYNC_VNW.pullJobs = function (userId, companyId) {
     check(userId, Number);
+    check(companyId, Number);
 
     var pullJobSql = sprintf(VNW_QUERIES.pullJobs, userId);
     try {
@@ -74,8 +75,10 @@ SYNC_VNW.pullJobs = function (userId) {
             if (!job) {
                 var job = new Schemas.Job();
                 job.jobId = row.jobid;
+                job.companyId = companyId;
                 job.userId = userId;
                 job.data = row;
+                job.createdAt = row.createddate;
                 Collections.Jobs.insert(job);
             } else {
                 if (!_.isEqual(job.data, row)) {
@@ -88,7 +91,7 @@ SYNC_VNW.pullJobs = function (userId) {
                 }
             }
 
-            SYNC_VNW.pullApplications(row.jobid);
+            SYNC_VNW.pullApplications(row.jobid, companyId);
         });
 
     } catch (e) {
@@ -96,8 +99,9 @@ SYNC_VNW.pullJobs = function (userId) {
     }
 }
 
-SYNC_VNW.pullApplications = function (jobId) {
+SYNC_VNW.pullApplications = function (jobId, companyId) {
     check(jobId, Number);
+    check(companyId, Number);
 
     var candidates = [];
     var entryIds = [];
@@ -109,14 +113,17 @@ SYNC_VNW.pullApplications = function (jobId) {
         if (!can) {
             var can = new Schemas.Application();
             can.entryId = row.entryid;
+            can.companyId = companyId;
             can.jobId = row.jobid;
-            can.userId = row.userid;
+            can.candidateId = row.userid;
             can.source = 1;
             can.data = row;
+            can.createdAt = row.createddate;
             Collections.Applications.insert(can);
 
             // Log applied activity
             var activity = new Activity();
+            activity.companyId = companyId;
             activity.data = {
                 applicationId: can.entryId,
                 source: 1,
@@ -149,13 +156,16 @@ SYNC_VNW.pullApplications = function (jobId) {
             var can = new Schemas.Application();
             can.entryId = row.sdid;
             can.jobId = row.jobid;
-            can.userId = row.userid;
+            can.companyId = companyId;
+            can.candidateId = row.userid;
             can.source = 2;
             can.data = row;
+            can.createdAt = row.createddate;
             Collections.Applications.insert(can);
 
             // Log applied activity
             var activity = new Activity();
+            activity.companyId = companyId;
             activity.data = {
                 applicationId: can.entryId,
                 source: 2,
@@ -196,8 +206,9 @@ SYNC_VNW.pullCandidates = function (candidates) {
 
             if (!can) {
                 var can = new Schemas.Candidate();
-                can.userId = row.userid;
+                can.candidateId = row.userid;
                 can.data = row;
+                can.createdAt = row.createddate;
                 Collections.Candidates.insert(can);
             } else {
                 if (!_.isEqual(can.data, row)) {
@@ -259,7 +270,7 @@ SYNC_VNW.run = function () {
             SYNC_VNW.pullCompanyInfo(user.data.companyid);
         });
         Meteor.defer(function () {
-            SYNC_VNW.pullJobs(user.userId);
+            SYNC_VNW.pullJobs(user.userId, user.companyId);
         });
     });
 

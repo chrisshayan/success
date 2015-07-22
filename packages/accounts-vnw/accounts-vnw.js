@@ -27,8 +27,10 @@ Meteor.methods({
                 if( !_user ) {
                     var _user = new Schemas.User();
                     _user.data = data;
+                    _user.companyId = data.companyid;
                     _user.userId = data.userid;
                     _user.username = data.username;
+                    _user.createdAt = data.createddate;
                     Collections.Users.insert(_user);
 
                     //Intitial user data
@@ -42,7 +44,7 @@ Meteor.methods({
                 }
 
                 //Sync data first time
-                SYNC_VNW.pullJobs(_user.userId);
+                SYNC_VNW.pullJobs(_user.userId, _user.companyId);
             });
         }
         return result;

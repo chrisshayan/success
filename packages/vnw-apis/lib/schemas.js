@@ -44,7 +44,8 @@ Schemas = {};
 
 Schemas.User = function () {
     return {
-        userId: null,
+        userId: null, //
+        companyId: null, //
         username: "",
         data: {},
         createdAt: new Date(),
@@ -66,7 +67,7 @@ Schemas.CompanyInfo = function () {
 
 Schemas.Job = function () {
     return {
-        userId: null,
+        companyId: null,
         jobId: null,
         data: {},
         createdAt: new Date(),
@@ -77,7 +78,8 @@ Schemas.Job = function () {
 Schemas.Application = function () {
     return {
         entryId: null,
-        userId: null,
+        candidateId: null,
+        companyId: null,
         jobId: null,
         source: 1, // 1: is online, 2: sent directly
         stage: 1, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
@@ -94,7 +96,7 @@ Schemas.Application = function () {
 
 Schemas.Candidate = function () {
     return {
-        userId: null,
+        candidateId: null,
         data: {},
         createdAt: new Date(),
         lastSyncedAt: new Date()
