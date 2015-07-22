@@ -24,14 +24,13 @@
                     {{#if isLoading.get}}
                         {{> waveLoading}}
                     {{else}}
-                        {{#if items}}
+                        {{#if items.count}}
                             {{#each items}}
                                 {{> jobItem}}
                             {{/each}}
                         {{else}}
                             {{> emptyJobs message=this.emptyMessage}}
                         {{/if}}
-
                     {{/if}}
                 </div>
                 {{#unless isLoading.get}}

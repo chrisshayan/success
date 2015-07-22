@@ -53,6 +53,7 @@ JobInfo = BlazeComponent.extendComponent({
 
     otherJobs: function() {
         return this.fetchOtherJobs();
+
     }
 
 

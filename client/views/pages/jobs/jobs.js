@@ -84,7 +84,7 @@ Jobs = BlazeComponent.extendComponent({
      * Helpers
      */
     items: function() {
-        return this.fetch();
+        return this.fetch() ;
     },
 
     total: function() {
