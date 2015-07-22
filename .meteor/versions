@@ -55,6 +55,7 @@ minimongo@1.0.8
 mobile-status-bar@1.0.3
 momentjs:moment@2.10.3
 mongo@1.1.0
+mpowaga:autoform-summernote@0.4.2
 observe-sequence@1.0.6
 ordered-dict@1.0.3
 pcel:mysql@0.1.0
@@ -75,6 +76,7 @@ sgi:sprintfjs@0.0.2
 spacebars@1.0.6
 spacebars-compiler@1.0.6
 steeve:reactive-cookie@0.0.8
+summernote:standalone@0.6.10
 summernote:summernote@0.6.10
 templating@1.1.1
 tmeasday:publish-counts@0.4.0

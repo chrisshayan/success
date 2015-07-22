@@ -1,8 +1,8 @@
 Template.createMailTemplate.onRendered(function () {
-    $('.summernote').summernote();
     // Reset error
     AutoForm.resetForm('mailTemplateForm');
 });
+
 Template.createMailTemplate.helpers({
     type: function () {
         if (this.doc)

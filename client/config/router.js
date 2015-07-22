@@ -60,14 +60,8 @@ Router.route('/logout', {
  */
 Router.route('/dashboard', {
     name: "dashboard",
-    waitOn: function() {
-        return [
-            Meteor.subscribe('jobs', {userId: Meteor.userId()}),
-            Meteor.subscribe('applicationCount')
-        ];
-    },
     action: function () {
-        this.render('jobs');
+        this.render('Dashboard');
     }
 });
 
@@ -85,7 +79,7 @@ Router.route('/job/:jobId/stage/:stage', {
             Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 3}),
             Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 4}),
             Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 5}),
-            Meteor.subscribe('jobs'),
+            Meteor.subscribe('jobDetails', {jobId: parseInt(this.params.jobId)}),
             Meteor.subscribe('mailTemplates')
         ];
     },
@@ -133,7 +127,6 @@ Router.route('/job/:jobId/stage/:stage', {
     data: function() {
         var jobId = parseInt(this.params.jobId);
         return {
-            jobs: Collections.Jobs.find({jobId: {$ne: jobId}}),
             job: Collections.Jobs.findOne({jobId: jobId}),
             isEmpty: !this.params.query.hasOwnProperty('application')
         }

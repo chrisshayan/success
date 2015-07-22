@@ -27,6 +27,7 @@ raix:eventemitter
 summernote:summernote
 tmeasday:publish-counts
 cottz:publish-relations
+mpowaga:autoform-summernote
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications

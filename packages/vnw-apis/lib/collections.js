@@ -3,7 +3,20 @@ Collections = {};
 Collections.Users = new Mongo.Collection("vnw_users");
 Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 
-Collections.Jobs = new Mongo.Collection("vnw_jobs");
+Collections.Jobs = new Mongo.Collection("vnw_jobs", {
+    transform: function(doc) {
+        if(!doc.hasOwnProperty("data") || !doc.data.hasOwnProperty("expireddate")) return doc;
+
+        var today = new Date(moment().format("YYYY-MM-DD 00:00:00")).getTime();
+        var expired = new Date(doc.data.expireddate).getTime();
+        if(expired >= today) {
+            doc.status = 1;
+        } else {
+            doc.status = 0;
+        }
+        return doc;
+    }
+});
 
 Collections.Applications = new Mongo.Collection("vnw_applications");
 

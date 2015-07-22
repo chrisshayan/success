@@ -1,8 +1,86 @@
-Meteor.publish('jobs', function(options){
+Meteor.publish('jobs', function(filters){
+    check(filters, {
+        status: Number,
+        limit: Number,
+        except: Match.Optional([Number]), // filter except job id
+    });
+
+    if(filters.limit < 0)
+        filters.limit = 10;
+
     var cond = {
         userId: parseInt(this.userId)
     };
-    return Collections.Jobs.find(cond);
+    var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
+    if(filters.status == 1) {
+        cond['data.expireddate'] = {
+            $gte: today
+        }
+    } else {
+        cond['data.expireddate'] = {
+            $lt: today
+        }
+    }
+
+    // filter by except
+    if( filters.hasOwnProperty('except') ) {
+        cond['jobId'] = {
+            $nin: filters.except
+        }
+    }
+
+    var options = {
+        limit: filters.limit,
+        sort: {
+            "data.createddate": -1
+        },
+        fields: {
+            jobId: 1,
+            userId: 1,
+            "data.jobtitle": 1,
+            "data.iscompleted": 1,
+            "data.createddate": 1,
+            "data.expireddate": 1
+        }
+    };
+    var cursor = Collections.Jobs.find(cond, {fields: {_id: 1}});
+    Counts.publish(this, 'jobsStatusCount_' + filters.status, cursor);
+    return Collections.Jobs.find(cond, options);
+});
+
+Meteor.publish('applicationCount', function(filters){
+    check(filters, {
+        status: Number,
+        limit: Number
+    });
+    // Get all job ids
+    var cond1 = {
+        userId: parseInt(this.userId)
+    };
+    var opt1 = {
+        limit: 10,
+        sort: {
+            "data.createddate": -1
+        },
+        fields: {
+            jobId: 1
+        }
+    };
+    var jobIds = Collections.Jobs.find(cond1, opt1).map(function(r) {
+       return r.jobId;
+    });
+
+    // return all applications of jobs
+    var cond2 = {
+        jobId: {$in: jobIds}
+    };
+    var opt2 = {
+        fields: {
+            jobId: 1,
+            stage: 1
+        }
+    };
+    return Collections.Applications.find(cond2, opt2);
 });
 
 Meteor.publish('jobDetails', function(options){
@@ -17,44 +95,6 @@ Meteor.publish('jobDetails', function(options){
     return Collections.Jobs.find(cond, {limit: 1});
 });
 
-Meteor.publish('applications', function(conditions, options){
-    //check(options, {
-    //    jobId: Number
-    //});
-    return Collections.Applications.find(conditions, options);
-});
-
-Meteor.publish('applicationCount', function(options){
-    var conditions = {};
-    if(typeof options == "object") {
-        if(options.hasOwnProperty('jobId')) {
-            conditions.jobId = parseInt(options.jobId);
-        }
-        if(options.hasOwnProperty('stage')) {
-            conditions.stage = options.stage;
-        }
-    }
-    return Collections.Applications.find(conditions, {fields: {_id: 1, jobId: 1, stage: 1}});
-});
-
-Meteor.publish('candidates', function(options){
-    check(options, {
-        jobId: Number
-    });
-
-    var listCandidateIds = [];
-    var jobApplications = Collections.Applications.find({jobId: options.jobId}, {fields: {userId: 1} }).fetch();
-    _.each(jobApplications, function(r){
-        listCandidateIds.push( r.userId );
-    });
-
-    return Collections.Candidates.find({ userId: {$in: listCandidateIds} });
-});
-
-
-Meteor.publish('candidateInfo', function(options){
-    return Collections.Candidates.find();
-});
 
 Meteor.publish('companyInfo', function(){
     var user = Collections.Users.findOne({userId: parseInt(this.userId)});
@@ -64,19 +104,6 @@ Meteor.publish('companyInfo', function(){
     return null;
 
 });
-
-
-
-Meteor.publish('activities', function() {
-    var cond = {
-        createdBy: parseInt(this.userId)
-    };
-    var options = {
-        sort: {createdAt: -1}
-    }
-    return Collections.Activities.find(cond, options);
-});
-
 
 Meteor.publish('mailTemplates', function() {
     var cond = {

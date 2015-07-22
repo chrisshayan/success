@@ -1,35 +1,50 @@
-<template name="jobs">
+<template name="Dashboard">
     <div class="wrapper wrapper-content" style="padding-bottom: 60px;">
+        {{> Jobs
+            status="1"
+            title="PUBLISHED POSITIONS"
+            icon="fa-cloud"
+            emptyMessage="There is no position here."}}
+
+        {{> Jobs
+            status="0"
+            title="CLOSED POSITIONS"
+            icon="fa-archive"
+            emptyMessage="Positions that no longer accepting new applicants will appear here."}}
+    </div>
+</template>
+
+<template name="Jobs">
+
         <div class="row" style="margin-bottom: 20px">
             <div class="col-sm-12">
-                <h3><i class="fa fa-cloud"></i>&nbsp;PUBLISHED POSITIONS</h3>
-                <div class="jobs-list">
-                    {{#if publishedJobs}}
-                        {{#each publishedJobs}}
-                            {{> jobItem}}
-                        {{/each}}
-                    {{else}}
-                        {{> emptyJobs message="There is no position here."}}
-                    {{/if}}
-                </div>
-            </div>
-        </div>
+                <h3><i class="fa {{this.icon}}"></i>&nbsp;{{this.title}} ({{total}})</h3>
 
-        <div class="row">
-            <div class="col-sm-12">
-                <h3><i class="fa fa-archive"></i>&nbsp;CLOSED POSITIONS</h3>
                 <div class="jobs-list">
-                    {{#if closedJobs}}
-                        {{#each closedJobs}}
-                            {{> jobItem}}
-                        {{/each}}
+                    {{#if isLoading.get}}
+                        {{> waveLoading}}
                     {{else}}
-                        {{> emptyJobs message="Positions that no longer accepting new applicants will appear here."}}
+                        {{#if items}}
+                            {{#each items}}
+                                {{> jobItem}}
+                            {{/each}}
+                        {{else}}
+                            {{> emptyJobs message=this.emptyMessage}}
+                        {{/if}}
+
                     {{/if}}
                 </div>
+                {{#unless isLoading.get}}
+                    {{#if isLoadingMore.get}}
+                        {{> spinLoading}}
+                    {{else}}
+                        {{#if loadMoreAbility}}
+                            <button class="btn btn-small btn-block" data-load-more="true">Load more</button>
+                        {{/if}}
+                    {{/if}}
+                {{/unless}}
             </div>
         </div>
-    </div>
 </template>
 
 <template name="emptyJobs">
