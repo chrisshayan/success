@@ -26,7 +26,7 @@
                     {{else}}
                         {{#if items.count}}
                             {{#each items}}
-                                {{> jobItem}}
+                                {{> JobItem}}
                             {{/each}}
                         {{else}}
                             {{> emptyJobs message=this.emptyMessage}}
@@ -53,39 +53,43 @@
 </template>
 
 
-<template name="jobItem">
+<template name="JobItem">
     <div class="job">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <div class="panel-title clearfix">
-                    <h3 class="pull-left job-title"><a href="{{pathFor 'jobDetails' stage='applied'}}">{{ title }}</a></h3>
-                    <span class="pull-right job-posted-timeago">Job posted {{ createdTimeago }}</span>
+                    <h3 class="pull-left job-title">
+                        <a href="{{pathFor 'jobDetails' stage='applied'}}">
+                            {{ title }}
+                        </a>
+                    </h3>
+                    <span class="pull-right job-posted-timeago">From {{ createdAt }} to {{ expiredAt }}</span>
                 </div>
             </div>
             <div class="job-stages">
                 <div class="row">
                     <div class="stage stage-applied">
-                        <a href="{{pathFor 'jobDetails' stage='applied'}}" class="stage-number">{{ appliedCount }}</a>
+                        <a href="{{pathFor 'jobDetails' stage='applied'}}" class="stage-number">{{ counter 1 }}</a>
                         <a href="{{pathFor 'jobDetails' stage='applied'}}" class="stage-label">Applied</a>
                     </div>
 
                     <div class="stage stage-phone">
-                        <a href="{{pathFor 'jobDetails' stage='phone'}}" class="stage-number">{{ phoneScreenCount }}</a>
+                        <a href="{{pathFor 'jobDetails' stage='phone'}}" class="stage-number">{{ counter 2 }}</a>
                         <a href="{{pathFor 'jobDetails' stage='phone'}}" class="stage-label">Phone Screen</a>
                     </div>
 
                     <div class="stage stage-interview">
-                        <a href="{{pathFor 'jobDetails' stage='interview'}}" class="stage-number">{{ interviewCount }}</a>
+                        <a href="{{pathFor 'jobDetails' stage='interview'}}" class="stage-number">{{ counter 3 }}</a>
                         <a href="{{pathFor 'jobDetails' stage='interview'}}" class="stage-label">Interview</a>
                     </div>
 
                     <div class="stage stage-offer">
-                        <a href="{{pathFor 'jobDetails' stage='offer'}}" class="stage-number">{{ offerCount }}</a>
+                        <a href="{{pathFor 'jobDetails' stage='offer'}}" class="stage-number">{{ counter 4 }}</a>
                         <a href="{{pathFor 'jobDetails' stage='offer'}}" class="stage-label">Offer</a>
                     </div>
 
                     <div class="stage stage-hired">
-                        <a href="{{pathFor 'jobDetails' stage='hired'}}" class="stage-number">{{ hiredCount }}</a>
+                        <a href="{{pathFor 'jobDetails' stage='hired'}}" class="stage-number">{{ counter 5 }}</a>
                         <a href="{{pathFor 'jobDetails' stage='hired'}}" class="stage-label">Hired</a>
                     </div>
                 </div>

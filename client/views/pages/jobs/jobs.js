@@ -1,7 +1,7 @@
 Jobs = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        if(!this.data().hasOwnProperty("status")) return;
+        if (!this.data().hasOwnProperty("status")) return;
 
         var instance = Template.instance();
         var data = this.data();
@@ -10,36 +10,33 @@ Jobs = BlazeComponent.extendComponent({
         this.status = parseInt(data.status);
         this.inc = 5;
         this.page = new ReactiveVar(1);
+        this.maxLimit = new ReactiveVar(0);
 
         this.isLoading = new ReactiveVar(false);
         this.isLoadingMore = new ReactiveVar(false);
 
         this.isLoading.set(true);
-        instance.autorun(function() {
-            var filters = {
-                status: self.status,
-                limit: self.page.get() * self.inc
-            };
-            instance.subscribe('jobs', filters);
-            instance.subscribe('applicationCount', filters, {
-                onReady: function() {
+        instance.autorun(function () {
+            instance.subscribe('getJobs', self.filters(), self.options(), {
+                onReady: function () {
+                    Meteor.call("jobCounter", self.filters(), function (err, total) {
+                        if (err) throw err;
+                        if (total) {
+                            self.maxLimit.set(total);
+                        }
+                    });
                     self.isLoading.set(false);
-
-                    //if is loading more jobs
-                    if(self.isLoadingMore.get()) {
-                        self.isLoadingMore.set(false);
-                    }
-
+                    self.isLoadingMore.set(false);
                 }
             });
         });
 
     },
 
-    filters: function() {
+    filters: function () {
         var filters = {};
         var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
-        if(this.status == 1) {
+        if (this.status == 1) {
             filters['data.expireddate'] = {
                 $gte: today
             }
@@ -51,7 +48,7 @@ Jobs = BlazeComponent.extendComponent({
         return filters;
     },
 
-    options: function() {
+    options: function () {
         return {
             limit: this.limit(),
             sort: {
@@ -60,11 +57,11 @@ Jobs = BlazeComponent.extendComponent({
         };
     },
 
-    limit: function() {
+    limit: function () {
         return this.page.get() * this.inc;
     },
 
-    fetch: function() {
+    fetch: function () {
         return Collections.Jobs.find(this.filters(), this.options());
     },
 
@@ -74,54 +71,72 @@ Jobs = BlazeComponent.extendComponent({
         }];
     },
 
-    loadMore: function() {
+    loadMore: function () {
         this.isLoadingMore.set(true);
         var currentPage = this.page.get();
-        this.page.set(currentPage+1);
+        this.page.set(currentPage + 1);
     },
 
     /**
      * Helpers
      */
-    items: function() {
-        return this.fetch() ;
+    items: function () {
+        return this.fetch();
     },
 
-    total: function() {
-        return Counts.get('jobsStatusCount_' + this.status);
+    total: function () {
+        return this.maxLimit.get();
     },
 
-    loadMoreAbility: function() {
+    loadMoreAbility: function () {
         return this.total() - this.limit() > 0;
     }
 
 }).register('Jobs');
 
+JobItem = BlazeComponent.extendComponent({
+    onCreated: function () {
+        var job = this.data();
+        this.jobId = job.jobId;
+        this.title = job.data.jobtitle;
+        this.createdAt = moment(job.createdAt).format("DD-MM-YYYY");
+        this.expiredAt = moment(job.data.expireddate).format("DD-MM-YYYY");
 
-Template.jobItem.helpers({
-    title: function () {
-        return this.data.jobtitle;
+        this.stages = new ReactiveDict;
+        this.counting = new ReactiveVar(false);
+
+        // store all trackers involve in component
+        this.trackers = [];
     },
-    appliedCount: function () {
-        return Collections.Applications.find({jobId: this.jobId, stage: 1}).count() || "-";
+
+    onRendered: function () {
+        var self = this;
+        this.trackers.push(Template.instance().autorun(function () {
+            Meteor.defer(function() {
+                self.counting.set(true);
+                Meteor.call('getJobStagesCount', self.jobId, function (err, stages) {
+                    if (err) throw err;
+                    self.counting.set(false);
+                    _.each(stages, function (count, id) {
+                        self.stages.set(id, count);
+                    });
+                });
+            });
+        }));
     },
-    phoneScreenCount: function () {
-        return Collections.Applications.find({jobId: this.jobId, stage: 2}).count() || "-";
+
+    onDestroyed: function () {
+        _.each(this.trackers, function (tracker) {
+            tracker.stop();
+        });
     },
-    interviewCount: function () {
-        return Collections.Applications.find({jobId: this.jobId, stage: 3}).count() || "-";
-    },
-    offerCount: function () {
-        return Collections.Applications.find({jobId: this.jobId, stage: 4}).count() || "-";
-    },
-    hiredCount: function () {
-        return Collections.Applications.find({jobId: this.jobId, stage: 5}).count() || "-";
-    },
-    createdTimeago: function() {
-        var distance = (new Date() - new Date(this.data.createddate)) / (24 * 60 * 60 * 1000);
-        distance = Math.ceil(distance);
-        if( distance > 7)
-            return moment(this.data.createddate).format('DD MMM YYYY');
-        return moment(this.data.createddate).fromNow();
+
+    /**
+     * Helpers
+     */
+    // Get number of application in job's stage
+    counter: function (id) {
+        if(this.counting.get()) return "...";
+        return this.stages.get(id) || "-";
     }
-});
+}).register('JobItem');

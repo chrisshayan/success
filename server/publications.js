@@ -293,18 +293,18 @@ Meteor.publish('applicationsCounter', function (options) {
  * Shared publications
  */
 var DEFAULT_OPTIONS_VALUES = {limit: 10},
-    DEFAULT_COUNTER_FIELDS = {fields: {_id: 1}};
-DEFAULT_JOB_OPTIONS = {
-    fields: {
-        jobId: 1,
-        userId: 1,
-        companyId: 1,
-        createdAt: 1,
-        "data.jobtitle": 1,
-        "data.iscompleted": 1,
-        "data.expireddate": 1
-    }
-},
+    DEFAULT_COUNTER_FIELDS = {fields: {_id: 1}},
+    DEFAULT_JOB_OPTIONS = {
+        fields: {
+            jobId: 1,
+            userId: 1,
+            companyId: 1,
+            createdAt: 1,
+            "data.jobtitle": 1,
+            "data.iscompleted": 1,
+            "data.expireddate": 1
+        }
+    },
     DEFAULT_APPLICATION_OPTIONS = {
         entryId: 1,
         candidateId: 1,
@@ -338,28 +338,19 @@ DEFAULT_JOB_OPTIONS = {
 Meteor.publish('getJobs', function (filters, options) {
     check(filters, Object);
     check(options, Match.Optional(Object));
+
     var DEFAULT_FILTERS = {
         userId: parseInt(this.userId)
     };
 
-    filters = _.defaults(DEFAULT_FILTERS, filters);
-    options = _.extend(DEFAULT_OPTIONS_VALUES, options);
-    options = _.defaults(DEFAULT_JOB_OPTIONS, options);
+    filters = _.defaults(filters, DEFAULT_FILTERS);
+    options = _.defaults(options, DEFAULT_JOB_OPTIONS);
+    if(!options.hasOwnProperty("limit")) {
+        options['limit'] = 10;
+    }
+
     return Collections.Jobs.find(filters, options);
 });
-
-Meteor.publish('jobCounter', function (counterName, filters) {
-    check(counterName, String);
-    check(filters, Object);
-
-    var DEFAULT_FILTERS = {
-        userId: parseInt(this.userId)
-    };
-    filters = _.defaults(DEFAULT_FILTERS, filters);
-    var cursor = Collections.Jobs.find(filters, DEFAULT_COUNTER_FIELDS);
-    Counts.publish(this, counterName, cursor);
-});
-
 
 Meteor.publishRelations('getApplications', function (filters, options) {
     check(filters, Object);
@@ -412,54 +403,4 @@ Meteor.publishRelations('getApplications', function (filters, options) {
         this.cursor(Collections.Candidates.find({userId: doc.userId}, DEFAULT_APPLICATION_OPTIONS));
     });
     this.ready();
-});
-
-Meteor.publish('applicationCounter', function (counterName, filters) {
-    check(counterName, String);
-    check(filters, Object);
-
-    var self = this;
-
-    if (filters.hasOwnProperty('jobId')) {
-        if (_.isObject(filters.jobId)) {
-            if (filters.jobId.hasOwnProperty('$in')) {
-                check(filters.jobId, {
-                    "$in": [Number]
-                });
-                var isJobsOwner = Match.Where(function (jobIds) {
-                    return Collections.Jobs.find({
-                            userId: +self.userId,
-                            jobId: {$in: jobIds}
-                        }).count() === jobIds.length;
-                });
-                check(filters.jobId['$in'], isJobsOwner);
-            }
-            if (filters.jobId.hasOwnProperty('$nin')) {
-                check(filters.jobId, {
-                    "$nin": [Number]
-                });
-                var jobsOwned = Collections.Jobs.find({userId: +this.userId}).map(function (doc) {
-                    return doc.jobId
-                });
-                filters.jobId["$in"] = _.difference(jobsOwned, _.intersection(jobsOwned, filters.jobId['$nin']));
-                delete filters.jobId["$nin"];
-            }
-        } else {
-            var isJobOwner = Match.Where(function (jobId) {
-                check(jobId, Number);
-                return Collections.Jobs.find({userId: +self.userId, jobId: jobId}).count() === 1;
-            });
-            check(filters.jobId, isJobOwner);
-        }
-    } else {
-        var jobsOwned = Collections.Jobs.find({userId: +this.userId}).map(function (doc) {
-            return doc.jobId
-        });
-        filters['jobId'] = {
-            $in: jobsOwned
-        };
-    }
-
-    var cursor = Collections.Applications.find(filters, DEFAULT_COUNTER_FIELDS);
-    Counts.publish(this, counterName, cursor);
 });

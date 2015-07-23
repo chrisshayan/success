@@ -44,10 +44,12 @@ function replacePlaceholder(userId, application, candidate, mail) {
 }
 
 function getUserInfo(userId) {
-    return Collections.Users.findOne({userId: userId}, {fields: {
-        userId: 1,
-        companyId: 1
-    }});
+    return Collections.Users.findOne({userId: userId}, {
+        fields: {
+            userId: 1,
+            companyId: 1
+        }
+    });
 }
 
 var DEFAULT_OPTIONS_VALUES = {limit: 10},
@@ -461,12 +463,22 @@ Meteor.methods({
      * REFACTOR NEW METHODS
      */
 
+    jobCounter: function (filters) {
+        this.unblock();
+        check(filters, Object);
+        var user = getUserInfo(+this.userId);
+        var DEFAULT_FILTERS = {
+            companyId: user.companyId
+        };
+        filters = _.defaults(DEFAULT_FILTERS, filters);
+        return Collections.Jobs.find(filters).count();
+    },
+
     getJobs: function (filters, options) {
         check(filters, Object);
         check(options, Match.Optional(Object));
         var user = getUserInfo(+this.userId);
         var DEFAULT_FILTERS = {
-            userId: user.userId,
             companyId: user.companyId
         };
 
@@ -475,6 +487,23 @@ Meteor.methods({
         options = _.defaults(DEFAULT_JOB_OPTIONS, options);
         return Collections.Jobs.find(filters, options).fetch();
     },
+
+    getJobStagesCount: function(jobId) {
+        this.unblock();
+        check(jobId, Number);
+        var user = getUserInfo(+this.userId);
+        var stages = {};
+        _.each(Recruit.APPLICATION_STAGES, function (stage) {
+            var cond = {
+                jobId: jobId,
+                stage: stage.id,
+                companyId: user.companyId
+            };
+            stages[stage.id] = Collections.Applications.find(cond, {fields: {_id: 1}}).count();
+        });
+        return stages;
+    },
+
 
     getJobsWithStats: function (filters, options) {
         check(filters, Object);
@@ -490,13 +519,13 @@ Meteor.methods({
         options = _.defaults(DEFAULT_JOB_OPTIONS, options);
 
         // get the number of application
-        var jobStats = function(job) {
+        var jobStats = function (job) {
             job.stats = {
                 views: job.data.noofviewed,
                 stages: {}
             };
 
-            _.each(Recruit.APPLICATION_STAGES, function(stage) {
+            _.each(Recruit.APPLICATION_STAGES, function (stage) {
                 var cond = {
                     jobId: job.jobId,
                     stage: stage.id
@@ -506,7 +535,10 @@ Meteor.methods({
 
             return job;
         }
-        return Collections.Jobs.find(filters, options).map(jobStats)
+        return {
+            jobs: Collections.Jobs.find(filters, options).map(jobStats),
+            total: Collections.Jobs.find(filters, DEFAULT_COUNTER_FIELDS).count()
+        };
     },
 
     getApplications: function (filters, options) {
@@ -525,7 +557,7 @@ Meteor.methods({
         options = _.extend(DEFAULT_OPTIONS_VALUES, options);
         options = _.defaults(DEFAULT_APPLICATION_OPTIONS, options);
 
-        return Collections.Applications.find(filters, options).map(function(doc) {
+        return Collections.Applications.find(filters, options).map(function (doc) {
             doc.candidate = Collections.Candidates.findOne({candidateId: doc.candidateId}, DEFAULT_APPLICATION_OPTIONS);
             return doc;
         });
