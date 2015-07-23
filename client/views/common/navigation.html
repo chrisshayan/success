@@ -2,44 +2,25 @@
     <nav class="navbar-default navbar-static-side" role="navigation">
         <div class="sidebar-collapse">
 
-<!-- Close canvas menu used only on OffCanvas page -->
-<!-- You can remove this tag if you dont use offCanvas menu -->
+            <!-- Close canvas menu used only on OffCanvas page -->
+            <!-- You can remove this tag if you dont use offCanvas menu -->
             <a class="close-canvas-menu">
                 <i class="fa fa-times"></i>
             </a>
-<!-- End offCanvas menu toggle -->
+            <!-- End offCanvas menu toggle -->
 
             <ul class="nav metismenu" id="side-menu">
                 <li class="nav-header">
-                    <div class="dropdown profile-element">
+                    <div class="profile-element">
                         <span>
                             <img alt="image" class="img-circle" src="/img/profile_small.jpg"/>
                         </span>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <span class="clear">
-                                <span class="block m-t-xs">
-                                    <strong class="font-bold">{{username}}</strong>
-                                </span>
-                                <span class="text-muted text-xs block">Art Director
-                                    <b class="caret"></b>
-                                </span>
+
+                        <span class="clear">
+                            <span class="block m-t-xs">
+                                <strong class="font-bold nav-username">{{username}}</strong>
                             </span>
-                        </a>
-                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                            <li>
-                                <a href="#">Profile</a>
-                            </li>
-                            <li>
-                                <a href="#">Contacts</a>
-                            </li>
-                            <li>
-                                <a href="#">Mailbox</a>
-                            </li>
-                            <li class="divider"></li>
-                            <li>
-                                <a href="{{pathFor 'logout'}}">Logout</a>
-                            </li>
-                        </ul>
+                        </span>
                     </div>
                     <div class="logo-element">
                         IN+
@@ -62,7 +43,7 @@
             <i class="fa {{icon}}"></i>
             <span class="nav-label">{{label}}</span>
             {{#with childrens}}
-            <span class="fa arrow"></span>
+                <span class="fa arrow"></span>
             {{/with}}
         </a>
         {{#if childrens}}
