@@ -12,10 +12,11 @@
             <ul class="nav metismenu" id="side-menu">
                 <li class="nav-header">
                     <div class="profile-element">
-                        <span>
-                            <img alt="image" class="img-circle" src="/img/profile_small.jpg"/>
-                        </span>
-
+                        {{#if company_logo}}
+                            <span>
+                                <img id="company-logo" alt="image" class="img-circle" src="{{company_logo}}"/>
+                            </span>
+                        {{/if}}
                         <span class="clear">
                             <span class="block m-t-xs">
                                 <strong class="font-bold nav-username">{{username}}</strong>

@@ -338,7 +338,7 @@ Meteor.methods({
             entryId: applicationId
         };
         var application = Collections.Applications.findOne(conditions, {fields: {_id: 1, disqualified: 1}});
-        if(!application || application.disqualified == true) return;
+        if (!application || application.disqualified == true) return;
 
         var modifier = {
             $set: {
@@ -517,11 +517,11 @@ Meteor.methods({
         filters = _.defaults(DEFAULT_FILTERS, filters);
         options = _.defaults(options, DEFAULT_JOB_OPTIONS);
 
-        if(!options.hasOwnProperty('limit')) {
+        if (!options.hasOwnProperty('limit')) {
             options.limit = 5;
         }
 
-        var mapStats = function(doc) {
+        var mapStats = function (doc) {
             doc.stages = {};
             _.each(Recruit.APPLICATION_STAGES, function (stage) {
                 var cond = {
@@ -539,7 +539,7 @@ Meteor.methods({
         };
     },
 
-    getJobStagesCount: function(jobId) {
+    getJobStagesCount: function (jobId) {
         this.unblock();
         check(jobId, Number);
         var user = getUserInfo(+this.userId);
@@ -555,7 +555,7 @@ Meteor.methods({
         return stages;
     },
 
-    getJobStageCount: function(filters) {
+    getJobStageCount: function (filters) {
         this.unblock();
         check(filters, {
             jobId: Number,
@@ -570,7 +570,7 @@ Meteor.methods({
         return Collections.Applications.find(cond, {fields: {_id: 1}}).count();
     },
 
-    activityCount: function(filters) {
+    activityCount: function (filters) {
         this.unblock();
         check(filters, Object);
         var user = getUserInfo(+this.userId);
@@ -599,7 +599,9 @@ Meteor.methods({
             doc.candidate = Collections.Candidates.findOne({candidateId: doc.candidateId}, DEFAULT_APPLICATION_OPTIONS);
             return doc;
         });
+    },
+    getCompanyInfo: function (companyId) {
+        return Collections.CompanySettings.findOne({companyId: companyId});
     }
 
-})
-;
+});

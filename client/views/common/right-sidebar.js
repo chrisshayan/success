@@ -16,17 +16,18 @@ Template.rightSidebar.onCreated(function () {
 Template.rightSidebar.helpers({
     latestApplications: function () {
         return [];
-        //var data = Collections.Applications.find({}, {limit: 10}).fetch();
-        //
-        //data = data.map(function (datum) {
-        //    console.log(datum.createddate);
-        //    if (datum.createddate)
-        //        datum['_createddate'] = moment(datum.createddate).calendar();
-        //    return datum;
-        //});
-        //
-        //console.log(data);
-        //return data;
+
+/*
+        var data = Collections.Applications.find({}, {limit: 10}).fetch();
+
+        data = data.map(function (datum) {
+            if (datum.createddate)
+                datum['_createddate'] = moment(datum.createddate).calendar();
+            return datum;
+        });
+
+        return data;*/
+
     }
 });
 
