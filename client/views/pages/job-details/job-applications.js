@@ -4,44 +4,55 @@
 JobApplications = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
+        var instance = Template.instance();
 
         // check is loading data
-        this.jobId = new ReactiveVar(null);
-        this.stage = new ReactiveVar(null);
+        var params = Router.current().params;
+        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+        this.jobId = new ReactiveVar(parseInt(params.jobId));
+        this.stage = new ReactiveVar(stage);
+        this.inc = 20;
         this.page = new ReactiveVar(1);
         this.isLoading = new ReactiveVar(false);
-        this.latestOptions = new ReactiveVar({});
+        this.isLoadingMore = new ReactiveVar(false);
 
-        // items
-        this.applications = function() {
-            return Collections.Applications.find();
+        // store all trackers involve in component
+        this.trackers = [];
+
+        if (Collections.Applications.find(self.filters()).count() <= 0) {
+            this.isLoading.set(true);
         }
 
-        Template.instance().autorun(function () {
-            var params = Router.current().params;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            self.jobId.set(parseInt(params.jobId));
-            self.stage.set(stage);
 
-            // get job applications
-            var options = {
-                jobId: self.jobId.get(),
-                stage: self.stage.get().id,
-                page: self.page.get()
-            };
-            // Send subscribe request
-            Meteor.subscribe('JobApplications', options);
+        Meteor.defer(function () {
+            var tracker = instance.autorun(function () {
+                var params = Router.current().params;
+                var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+                self.jobId.set(parseInt(params.jobId));
+                self.stage.set(stage);
+                // Send subscribe request
+                JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
+
+                var trackSub = JobDetailsSubs.subscribe('getApplications', self.filters(), self.options());
+
+                if (trackSub.ready()) {
+                    self.isLoading.set(false);
+                    self.isLoadingMore.set(false);
+                }
+
+            });
+            self.trackers.push(tracker);
         });
 
         // Bind listener
-        Event.on('movedApplicationStage', function(applicationId) {
-            if(self.applications().count() > 0) {
+        Event.on('movedApplicationStage', function () {
+            if (self.fetch().count() > 0) {
                 Router.go('jobDetails', {
                     jobId: self.jobId.get(),
                     stage: self.stage.get().alias
                 }, {
                     query: {
-                        application: Collections.Applications.findOne().entryId
+                        application: Collections.Applications.findOne(self.filters(), self.options()).entryId
                     }
                 });
             } else {
@@ -54,11 +65,43 @@ JobApplications = BlazeComponent.extendComponent({
         });
     },
 
-    onRendered: function () {
+    onDestroyed: function () {
+        _.each(this.trackers, function (tracker) {
+            tracker.stop();
+        });
     },
 
-    onDestroyed: function () {
+    counterName: function () {
+        return "job_application_" + this.jobId.get() + "_" + this.stage.get().id;
+    },
 
+    filters: function () {
+        return {
+            jobId: this.jobId.get(),
+            stage: this.stage.get().id
+        };
+    },
+
+    total: function () {
+        return this.inc * this.page.get();
+    },
+    maxLimit: function () {
+        var counter = Collections.Counts.findOne(this.counterName());
+        if (!counter) return 0;
+        return counter.count;
+    },
+
+    options: function () {
+        return {
+            sort: {
+                matchingScore: -1
+            },
+            limit: this.total()
+        }
+    },
+
+    fetch: function () {
+        return Collections.Applications.find(this.filters(), this.options());
     },
 
     events: function () {
@@ -70,9 +113,10 @@ JobApplications = BlazeComponent.extendComponent({
     /**
      * EVENTS
      */
-    loadMore: function() {
+    loadMore: function () {
+        this.isLoadingMore.set(true);
         var currentPage = this.page.get();
-        var nextPage = currentPage+1;
+        var nextPage = currentPage + 1;
         this.page.set(nextPage);
     },
 
@@ -80,28 +124,12 @@ JobApplications = BlazeComponent.extendComponent({
     /**
      * HELPERS
      */
-    loadMoreAbility: function() {
-        if(!this.stage.get()) return false;
-        var stage = this.stage.get();
-        switch (stage.id) {
-            case 1:
-                return Counts.get('stageAppliedCount') - this.applications().count() > 0;
-
-            case 2:
-                return Counts.get('stagePhoneCount') - this.applications().count() > 0;
-            case 3:
-                return Counts.get('stageInterviewCount') - this.applications().count() > 0;
-            case 4:
-                return Counts.get('stageOfferCount') - this.applications().count() > 0;
-            case 5:
-                return Counts.get('stageHiredCount') - this.applications().count() > 0;
-            default:
-                return false;
-        }
+    loadMoreAbility: function () {
+        return this.maxLimit() - this.total() > 0;
     },
 
     items: function () {
-        return this.applications();
+        return this.fetch();
     }
 }).register('JobApplications');
 
@@ -112,24 +140,25 @@ JobApplications = BlazeComponent.extendComponent({
 JobApplication = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        var params = Router.current().params;
-        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+        this.props = new ReactiveDict;
 
-        this.jobId = params.jobId;
-        this.stage = stage;
-        this.userId = this.data().userId;
-        this.isLoading = new ReactiveVar(false);
-        this.application = this.data().data;
-        this.candidate = Collections.Candidates.findOne({userId: this.userId});
-        this.applicationId = this.data().entryId;
-        this.currentApplication = new ReactiveVar("");
-        this.matchingScore = this.data().matchingScore;
         // Track when current application change
-        Template.instance().autorun(function() {
-            var params = Router.current().params;
-            if(params.query.hasOwnProperty('application')) {
-                self.currentApplication.set(params.query.application);
-            }
+        Template.instance().autorun(function () {
+            self.props.set("stage", Session.get("currentStage"));
+            self.props.set("jobId", Session.get("currentJobId"));
+            self.props.set("applicationId", self.data().entryId);
+            self.props.set("candidateId", self.data().candidateId);
+            self.props.set("application", self.data());
+            self.props.set("matchingScore", self.data().matchingScore);
+
+            var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
+            self.props.set("candidate", candidate);
+            self.props.set("currentApplication", Session.get("currentApplicationId"));
+
+            if (candidate)
+                self.props.set("isLoading", false);
+            else
+                self.props.set("isLoading", true);
         });
     },
 
@@ -143,7 +172,7 @@ JobApplication = BlazeComponent.extendComponent({
      * @returns {string}
      */
     activeClass: function () {
-        return this.currentApplication.get() == this.applicationId ? "active" : "";
+        return this.props.get('currentApplication') == this.props.get('applicationId') ? "active" : "";
     },
 
     /**
@@ -151,8 +180,11 @@ JobApplication = BlazeComponent.extendComponent({
      * @returns {String}
      */
     applicationUrl: function () {
-        var params = {jobId: this.jobId, stage: this.stage.alias};
-        var query = {query: {application: this.applicationId}};
+        var params = {
+            jobId: this.props.get("jobId"),
+            stage: this.props.get("stage").alias
+        };
+        var query = {query: {application: this.props.get("applicationId")}};
         return Router.routes['jobDetails'].url(params, query);
     },
 
@@ -160,28 +192,30 @@ JobApplication = BlazeComponent.extendComponent({
      * Get 2 lines of cover letter
      * @returns {String}
      */
-    shortCoverLetter: function() {
-        if(!this.application.coverletter) return "";
-        return this.application.coverletter.split(/\s+/).splice(0, 14).join(" ") + "...";
+    shortCoverLetter: function () {
+        var application = this.props.get("application");
+        if (!application.data.coverletter) return "";
+        return application.data.coverletter.split(/\s+/).splice(0, 14).join(" ") + "...";
     },
 
     /**
      * Get matching score label
      * @returns {String}
      */
-    matchingScoreLabel: function() {
-        if( this.matchingScore >= 90 )
+    matchingScoreLabel: function () {
+        var matchingScore = this.props.get("matchingScore");
+        if (matchingScore >= 90)
             return " label-success ";
-        if( this.matchingScore >= 70 )
+        if (matchingScore >= 70)
             return " label-primary ";
-        if( this.matchingScore >= 50 )
+        if (matchingScore >= 50)
             return " label-warning ";
 
         return " label-default ";
     },
 
-    timeago: function() {
-        var latestDate = this.application.createddate;
+    timeago: function () {
+        var latestDate = this.props.get("application").createdAt;
         return moment(latestDate).fromNow();
     },
 
@@ -190,7 +224,7 @@ JobApplication = BlazeComponent.extendComponent({
      * @returns {string}
      */
     fullname: function () {
-        var can = this.candidate;
+        var can = this.props.get("candidate");
         if (!can) return "";
         return can.data.lastname + " " + can.data.firstname;
     },
@@ -200,7 +234,7 @@ JobApplication = BlazeComponent.extendComponent({
      * @returns {String}
      */
     city: function () {
-        var can = this.candidate;
+        var can = this.props.get("candidate");
         if (!can) return "";
         return can.data.city;
     },
@@ -209,7 +243,7 @@ JobApplication = BlazeComponent.extendComponent({
      * @returns {String}
      */
     phone: function () {
-        var can = this.candidate;
+        var can = this.props.get("candidate");
         if (!can) return "";
         return can.data.cellphone || can.data.homephone || "";
     },

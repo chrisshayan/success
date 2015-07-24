@@ -25,7 +25,6 @@ function replacePlaceholder(userId, application, candidate, mail) {
                         replaces[p1] = company.companyName;
                     } else {
                         replaces[p1] = company.mailSignature;
-                        console.log(replaces);
                     }
 
                     break;
@@ -112,7 +111,9 @@ Meteor.methods({
             stage: Number
         });
         check(option.stage, Match.OneOf(1, 2, 3, 4, 5));
+        var user = getUserInfo(+this.userId);
         var cond = {
+            companyId: user.companyId,
             entryId: option.application
         };
 
@@ -136,6 +137,7 @@ Meteor.methods({
                 fromStage: application.stage,
                 toStage: option.stage
             };
+            activity.companyId = user.companyId;
             activity.createdBy = this.userId;
             activity.updateApplicationStage();
         }
@@ -168,6 +170,7 @@ Meteor.methods({
             userId: candidateId
         };
         var options = {
+            limit: 1,
             fields: {
                 _id: 1,
                 userId: 1,
@@ -327,26 +330,32 @@ Meteor.methods({
      * @param applicationId {Number}
      */
     disqualifyApplication: function (applicationId) {
+        this.unblock();
         check(applicationId, Number);
+        var user = getUserInfo(+this.userId);
         var conditions = {
+            companyId: user.companyId,
             entryId: applicationId
         };
+        var application = Collections.Applications.findOne(conditions, {fields: {_id: 1, disqualified: 1}});
+        if(!application || application.disqualified == true) return;
+
         var modifier = {
             $set: {
                 disqualified: true
             }
         }
-        var result = Collections.Applications.update(conditions, modifier);
+        var result = Collections.Applications.update(application._id, modifier);
         if (result) {
             // Log activity
             var activity = new Activity();
-            activity.createdBy = this.userId;
+            activity.companyId = user.companyId;
+            activity.createdBy = user.userId;
             activity.data = {
                 applicationId: applicationId
             };
             activity.disqualifiedApplication();
         }
-        return result;
     },
     /**
      * Update application qualify
@@ -354,7 +363,9 @@ Meteor.methods({
      */
     revertApplication: function (applicationId) {
         check(applicationId, Number);
+        var user = getUserInfo(+this.userId);
         var conditions = {
+            companyId: user.companyId,
             entryId: applicationId
         };
         var modifier = {
@@ -366,7 +377,8 @@ Meteor.methods({
         if (result) {
             // Log activity
             var activity = new Activity();
-            activity.createdBy = this.userId;
+            activity.companyId = user.companyId;
+            activity.createdBy = user.userId;
             activity.data = {
                 applicationId: applicationId
             };
@@ -408,11 +420,12 @@ Meteor.methods({
             content: String
         });
         var self = this;
+        var user = getUserInfo(+this.userId);
 
         var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
         if (!mailTemplate) return false;
 
-        var application = Collections.Applications.findOne({entryId: data.application});
+        var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
         if (!application) return false;
         var candidate = Collections.Candidates.findOne({userId: application.userId});
 
@@ -429,6 +442,8 @@ Meteor.methods({
             var activity = new Activity();
 
             mail.applicationId = data.application;
+            activity.companyId = user.companyId;
+            activity.createdBy = user.userId;
             activity.data = mail;
             activity.sendMailToCandidate();
         });
@@ -448,9 +463,12 @@ Meteor.methods({
             content: String
         });
         this.unblock();
-        var application = Collections.Applications.findOne({entryId: data.application});
+        var user = getUserInfo(+this.userId);
+        var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
         if (!application) return false;
         var activity = new Activity();
+        activity.companyId = user.companyId;
+        activity.createdBy = user.userId;
         activity.data = {
             applicationId: data.application,
             content: data.content
@@ -488,6 +506,39 @@ Meteor.methods({
         return Collections.Jobs.find(filters, options).fetch();
     },
 
+
+    getJobsWithStats: function (filters, options) {
+        check(filters, Object);
+        check(options, Match.Optional(Object));
+        var user = getUserInfo(+this.userId);
+        var DEFAULT_FILTERS = {
+            companyId: user.companyId
+        };
+        filters = _.defaults(DEFAULT_FILTERS, filters);
+        options = _.defaults(options, DEFAULT_JOB_OPTIONS);
+
+        if(!options.hasOwnProperty('limit')) {
+            options.limit = 5;
+        }
+
+        var mapStats = function(doc) {
+            doc.stages = {};
+            _.each(Recruit.APPLICATION_STAGES, function (stage) {
+                var cond = {
+                    jobId: doc.jobId,
+                    stage: stage.id,
+                    companyId: user.companyId
+                };
+                doc.stages[stage.id] = Collections.Applications.find(cond, {fields: {_id: 1}}).count();
+            });
+            return doc;
+        }
+        return {
+            jobs: Collections.Jobs.find(filters, options).map(mapStats),
+            total: Collections.Jobs.find(filters).count()
+        };
+    },
+
     getJobStagesCount: function(jobId) {
         this.unblock();
         check(jobId, Number);
@@ -504,42 +555,29 @@ Meteor.methods({
         return stages;
     },
 
-
-    getJobsWithStats: function (filters, options) {
-        check(filters, Object);
-        check(options, Match.Optional(Object));
+    getJobStageCount: function(filters) {
+        this.unblock();
+        check(filters, {
+            jobId: Number,
+            stage: Number
+        });
         var user = getUserInfo(+this.userId);
-        var DEFAULT_FILTERS = {
-            userId: user.userId,
-            companyId: user.companyId
+        var cond = {
+            companyId: user.companyId,
+            jobId: filters.jobId,
+            stage: filters.stage
         };
-
-        filters = _.defaults(DEFAULT_FILTERS, filters);
-        options = _.extend(DEFAULT_OPTIONS_VALUES, options);
-        options = _.defaults(DEFAULT_JOB_OPTIONS, options);
-
-        // get the number of application
-        var jobStats = function (job) {
-            job.stats = {
-                views: job.data.noofviewed,
-                stages: {}
-            };
-
-            _.each(Recruit.APPLICATION_STAGES, function (stage) {
-                var cond = {
-                    jobId: job.jobId,
-                    stage: stage.id
-                };
-                job.stats.stages[stage.id] = Collections.Applications.find(cond, {fields: {_id: 1}}).count();
-            });
-
-            return job;
-        }
-        return {
-            jobs: Collections.Jobs.find(filters, options).map(jobStats),
-            total: Collections.Jobs.find(filters, DEFAULT_COUNTER_FIELDS).count()
-        };
+        return Collections.Applications.find(cond, {fields: {_id: 1}}).count();
     },
+
+    activityCount: function(filters) {
+        this.unblock();
+        check(filters, Object);
+        var user = getUserInfo(+this.userId);
+        filters["companyId"] = user.companyId;
+        return Collections.Activities.find(filters, {fields: {_id: 1}}).count();
+    },
+
 
     getApplications: function (filters, options) {
         check(filters, Object);

@@ -1,18 +1,33 @@
-Template.jobDetails.rendered = function () {
+Template.jobDetails.onCreated(function () {
+    Template.instance().autorun(function () {
+        var params = Router.current().params;
+        var jobId = parseInt(params.jobId);
+        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+        Session.set("currentJobId", jobId);
+        Session.set("currentStage", stage);
+        if (params.query.hasOwnProperty('application')) {
+            applicationId = parseInt(params.query.application);
+            Session.set("currentApplicationId", applicationId);
+        }
+    });
+});
+
+Template.jobDetails.onRendered(function () {
+
     $('[data-toggle="tooltip"]').tooltip();
-    // Add special class for full height
+// Add special class for full height
     $('body').addClass('fixed-sidebar');
     $('body').addClass('full-height-layout');
 
-    // Set the height of the wrapper
+// Set the height of the wrapper
     $('#page-wrapper').css("min-height", $(window).height() + "px");
 
-    // Add slimScroll to element
+// Add slimScroll to element
     $('.full-height-scroll').slimscroll({
         height: '100%'
     });
 
-    // Add slimScroll to left navigation
+// Add slimScroll to left navigation
     $('.sidebar-collapse').slimScroll({
         height: '100%',
         railOpacity: 0.9
@@ -47,10 +62,22 @@ Template.jobDetails.rendered = function () {
                 .css({'top': height / 2 + 'px'});
         });
     });
+})
+;
 
-};
+Template.jobDetails.onDestroyed(function () {
+    var jobDetailsSessions = [
+        "currentApplicationId",
+        "currentApplication",
+        "currentJob",
+        "currentCandidate",
+        "currentJobId",
+        "currentStage"
+    ];
+    _.each(jobDetailsSessions, function (session) {
+        delete Session.keys[session];
+    });
 
-Template.jobDetails.destroyed = function () {
 
     // Remove special class for full height
     $('body').removeClass('fixed-sidebar');
@@ -63,6 +90,6 @@ Template.jobDetails.destroyed = function () {
 
     // Remove inline style form slimScroll
     $('.sidebar-collapse').removeAttr("style");
-};
+});
 
 

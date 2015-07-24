@@ -13,12 +13,16 @@
                 <div id="comment-container">
                     {{> AddCommentCandidateForm}}
                 </div>
-                {{#each activities}}
+                {{#each items}}
                     {{> JobApplicationTimelineItem}}
                 {{/each}}
                 <div style="padding: 50px;">
-                    {{#if loadMoreAbility}}
-                        <button class="btn btn-block btn-outline btn-default loadmore">More timeline</button>
+                    {{#if props.get "isLoadingMore"}}
+                        {{> spinLoading}}
+                    {{else}}
+                        {{#if loadMoreAbility}}
+                            <button class="btn btn-block btn-outline btn-default loadmore">More timeline</button>
+                        {{/if}}
                     {{/if}}
                 </div>
             {{/if}}

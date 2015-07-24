@@ -90,13 +90,16 @@ SYNC_VNW.pullJobs = function (userId, companyId) {
                     });
                 }
             }
-
-            SYNC_VNW.pullApplications(row.jobid, companyId);
+            Meteor.defer(function () {
+                SYNC_VNW.pullApplications(row.jobid, companyId);
+            });
         });
 
     } catch (e) {
         debuger(e)
     }
+
+    Collections.Users.update({userId: userId}, {$set: {isSynchronizing: false}});
 }
 
 SYNC_VNW.pullApplications = function (jobId, companyId) {
@@ -188,8 +191,12 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
         entryIds.push(row.sdid);
     });
 
-    SYNC_VNW.pullCandidates(candidates);
-    SYNC_VNW.pullApplicationScores(entryIds);
+    Meteor.defer(function () {
+        SYNC_VNW.pullCandidates(candidates);
+    });
+    Meteor.defer(function () {
+        SYNC_VNW.pullApplicationScores(entryIds);
+    });
 };
 
 
@@ -265,12 +272,17 @@ SYNC_VNW.run = function () {
         debuger('connected as id ' + connection.threadId);
     });
     var users = Collections.Users.find().fetch();
+
     _.each(users, function (user) {
+        if(user.isSynchronizing) return;
+        Collections.Users.update(users._id, {$set: {isSynchronizing: true}});
         Meteor.defer(function () {
-            SYNC_VNW.pullCompanyInfo(user.data.companyid);
-        });
-        Meteor.defer(function () {
-            SYNC_VNW.pullJobs(user.userId, user.companyId);
+            Meteor.defer(function () {
+                SYNC_VNW.pullCompanyInfo(user.data.companyid);
+            });
+            Meteor.defer(function () {
+                SYNC_VNW.pullJobs(user.userId, user.companyId);
+            });
         });
     });
 

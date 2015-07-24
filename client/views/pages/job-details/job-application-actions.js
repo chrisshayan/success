@@ -4,31 +4,30 @@
 JobApplicationActions = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        this.applicationId = new ReactiveVar(null);
-        this.stage = new ReactiveVar(null);
-        this.disqualified = new ReactiveVar(false)
+        this.trackers = [];
+        this.props = new ReactiveDict;
+        this.props.set("jobId", Session.get("currentJobId"));
+        this.props.set("stage", Session.get("currentStage"));
+        this.props.set("applicationId", Session.get("currentApplicationId"));
 
-        Template.instance().autorun(function () {
+        this.trackers.push(Template.instance().autorun(function () {
             var params = Router.current().params;
-            var _currentStage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            self.stage.set(_currentStage);
-            if (params.query.hasOwnProperty('application')) {
-                self.applicationId.set(parseInt(params.query.application));
-                Meteor.call('getApplicationDetails', parseInt(params.query.application), function (err, result) {
-                    if (err) throw err;
-                    if (result) {
-                        self.disqualified.set(result.application.disqualified);
-                    }
-                })
-            } else {
-                self.applicationId.set(null);
-            }
-        });
+            var jobId = parseInt(params.jobId);
+            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            var applicationId = parseInt(params.query.application);
+            self.props.set('applicationId', applicationId);
+            var application = Collections.Applications.findOne({entryId: applicationId});
+            self.props.set('application', application);
+
+        }));
     },
 
     onRendered: function () {
     },
     onDestroyed: function () {
+        _.each(this.tracker, function(tracker) {
+            tracker.stop();
+        });
     },
 
     events: function () {
@@ -55,7 +54,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         if (toStage) {
             //call update stage request
             var data = {
-                application: this.applicationId.get(),
+                application: this.props.get("applicationId"),
                 stage: toStage
             };
             Meteor.call('updateApplicationStage', data, function (err, result) {
@@ -64,8 +63,8 @@ JobApplicationActions = BlazeComponent.extendComponent({
                     // When update stage success
                     // remove application from list
                     // change current application
-                    Event.emit('movedApplicationStage', data.application);
                     Notification.success(sprintf('Moved to %s successfully', stage.label));
+                    Event.emit('movedApplicationStage');
                 }
             });
         }
@@ -76,12 +75,9 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     disqualifyApplication: function () {
         var self = this;
-        Meteor.call('disqualifyApplication', this.applicationId.get(), function (err, result) {
-            if (err) throw err;
-            if (result) {
-                Event.emit('disqualifiedApplication', self.applicationId.get(), true);
-                self.disqualified.set(true);
-            }
+        Meteor.call('disqualifyApplication', this.props.get("applicationId"), function(err, result){
+            if(err) throw err;
+            self.props.set('disqualified', true);
         });
     },
 
@@ -90,12 +86,9 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     revertApplication: function () {
         var self = this;
-        Meteor.call('revertApplication', this.applicationId.get(), function (err, result) {
-            if (err) throw err;
-            if (result) {
-                Event.emit('disqualifiedApplication', self.applicationId.get(), false);
-                self.disqualified.set(false);
-            }
+        Meteor.call('revertApplication', this.props.get("applicationId"), function(err, result){
+            if(err) throw err;
+            self.props.set('disqualified', false);
         });
     },
 
@@ -119,13 +112,14 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
 
     nextStage: function () {
-        if (this.stage.get().id == 5)
-            return this.stage.get();
-        var nextStage = Recruit.APPLICATION_STAGES[this.stage.get().id + 1];
+        var stage = this.props.get("stage");
+        if (stage.id == 5)
+            return stage;
+        var nextStage = Recruit.APPLICATION_STAGES[stage.id + 1];
         return nextStage;
     },
     nextStageAbility: function () {
-        if (this.stage.get().id == 5)
+        if (this.props.get("stage").id == 5)
             return "disabled";
         return "";
     },
@@ -133,12 +127,13 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var self = this;
         var items = [];
         _.each(Recruit.APPLICATION_STAGES, function (stage) {
+            var currentStage = self.props.get("stage");
             var html = "";
-            if (stage.id > self.stage.get().id) {
+            if (stage.id > currentStage.id) {
                 html = '<li><a href="#"  data-move-stage="%s"><i class="fa fa-long-arrow-right"></i>&nbsp;%s</a></li>';
-            } else if (stage.id < self.stage.get().id) {
+            } else if (stage.id < currentStage.id) {
                 html = '<li><a href="#" data-move-stage="%s"><i class="fa fa-long-arrow-left"></i>&nbsp;%s</a></li>';
-            } else if (stage.id == self.stage.get().id) {
+            } else if (stage.id == currentStage.id) {
                 html = '<li><a href="#" data-move-stage="%s"><i class="fa fa-circle-o"></i>&nbsp;%s</a></li>';
             }
             if (!_.isEmpty(html)) {
@@ -147,5 +142,11 @@ JobApplicationActions = BlazeComponent.extendComponent({
             items.push({html: html});
         });
         return items;
+    },
+
+    isDisqualified: function() {
+        var application = this.props.get('application');
+        if(!application) return false;
+        return application.disqualified;
     }
 }).register('JobApplicationActions');

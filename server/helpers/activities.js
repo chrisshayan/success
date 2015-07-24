@@ -1,5 +1,6 @@
 Activity = function Activity() {
     this.actionType = "";
+    this.companyId = null;
     this.data= {};
     this.createdAt = new Date();
     this.createdBy = null;
@@ -20,7 +21,11 @@ Activity.prototype.ACTION_TYPE = {
 
 
 Activity.prototype.save = function() {
+    if(!this.companyId) {
+        return false;
+    }
     this.createdBy = parseInt(this.createdBy);
+
     var data = {};
     var self = this;
     _.each(Object.keys(self), function(k) {

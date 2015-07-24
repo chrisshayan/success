@@ -10,27 +10,21 @@ Jobs = BlazeComponent.extendComponent({
         this.status = parseInt(data.status);
         this.inc = 5;
         this.page = new ReactiveVar(1);
-        this.maxLimit = new ReactiveVar(0);
 
         this.isLoading = new ReactiveVar(false);
         this.isLoadingMore = new ReactiveVar(false);
 
-        this.isLoading.set(true);
-        instance.autorun(function () {
-            instance.subscribe('getJobs', self.filters(), self.options(), {
-                onReady: function () {
-                    Meteor.call("jobCounter", self.filters(), function (err, total) {
-                        if (err) throw err;
-                        if (total) {
-                            self.maxLimit.set(total);
-                        }
-                    });
-                    self.isLoading.set(false);
-                    self.isLoadingMore.set(false);
-                }
-            });
-        });
+        if(Collections.Jobs.find({}, {limit: 1}).count() !== 1 )
+            this.isLoading.set(true);
 
+        instance.autorun(function () {
+            DashboardSubs.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters());
+            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options());
+            if(trackSub.ready()) {
+                self.isLoading.set(false);
+                self.isLoadingMore.set(false);
+            }
+        });
     },
 
     filters: function () {
@@ -72,9 +66,9 @@ Jobs = BlazeComponent.extendComponent({
     },
 
     loadMore: function () {
-        this.isLoadingMore.set(true);
         var currentPage = this.page.get();
         this.page.set(currentPage + 1);
+        this.isLoadingMore.set(true);
     },
 
     /**
@@ -85,7 +79,9 @@ Jobs = BlazeComponent.extendComponent({
     },
 
     total: function () {
-        return this.maxLimit.get();
+        var counter = Collections.Counts.findOne("jobs_status_" + this.status);
+        if(!counter) return 0;
+        return counter.count;
     },
 
     loadMoreAbility: function () {
@@ -93,6 +89,8 @@ Jobs = BlazeComponent.extendComponent({
     }
 
 }).register('Jobs');
+
+
 
 JobItem = BlazeComponent.extendComponent({
     onCreated: function () {
@@ -112,16 +110,7 @@ JobItem = BlazeComponent.extendComponent({
     onRendered: function () {
         var self = this;
         this.trackers.push(Template.instance().autorun(function () {
-            Meteor.defer(function() {
-                self.counting.set(true);
-                Meteor.call('getJobStagesCount', self.jobId, function (err, stages) {
-                    if (err) throw err;
-                    self.counting.set(false);
-                    _.each(stages, function (count, id) {
-                        self.stages.set(id, count);
-                    });
-                });
-            });
+            DashboardSubs.subscribe("jobStagesCounter", "job_stages_" + self.jobId, self.jobId);
         }));
     },
 
@@ -136,7 +125,8 @@ JobItem = BlazeComponent.extendComponent({
      */
     // Get number of application in job's stage
     counter: function (id) {
-        if(this.counting.get()) return "...";
-        return this.stages.get(id) || "-";
+        var counter = Collections.Counts.findOne("job_stages_" + this.jobId);
+        if(!counter) return "-";
+        return counter.count[id] || "-";
     }
 }).register('JobItem');

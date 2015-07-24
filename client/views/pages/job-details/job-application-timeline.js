@@ -1,47 +1,62 @@
 JobApplicationTimeline = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
+        this.props = new ReactiveDict;
 
-        this.jobId = new ReactiveVar(null);
-        this.stage = new ReactiveVar(null);
-        this.applicationId = new ReactiveVar(null);
+        this.props.set("jobId", Session.get("currentJobId"));
+        this.props.set("stage", Session.get("stage"));
+        this.props.set("page", 1);
+        this.props.set("inc", 5);
+        this.props.set("isLoading", false);
+        this.props.set("isLoadingMore", false);
 
-        this.page = new ReactiveVar(1);
-        this.isLoading = new ReactiveVar(false);
-
-        this.latestOptions = new ReactiveVar({});
-
-        // store activities
-        this.activities = function () {
-            return Collections.Activities.find({}, {
-                sort: {
-                    createdAt: -1
-                }
-            });
-        }
-
-        this.loadMoreAbility = function () {
-            var total = Counts.get('totalActivities');
-            return total - self.activities().count() > 0;
-        }
-
+        this.props.set("isLoading", true);
         Template.instance().autorun(function () {
-            var params = Router.current().params;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            self.jobId.set(parseInt(params.jobId));
-            self.applicationId.set(parseInt(params.query.application));
-            self.stage.set(stage);
+             //get job applications
+            self.props.set("applicationId", Session.get("currentApplicationId"));
 
-            // get job applications
-            var options = {
-                application: self.applicationId.get(),
-                page: self.page.get()
-            };
-            // Send subscribe request
-            Meteor.subscribe('totalActivities', options);
-            Meteor.subscribe('applicationActivities', options);
+            JobDetailsSubs.subscribe('activityCounter', self.counterName() , self.filters());
+
+            var trackSub = JobDetailsSubs.subscribe('applicationActivities', self.filters(), self.options());
+            if(trackSub.ready()) {
+                self.props.set("isLoading", false);
+                self.props.set("isLoadingMore", false);
+            }
         });
 
+    },
+
+    counterName: function() {
+        return  "application_activity_" + this.props.get("applicationId");
+    },
+
+    filters: function() {
+        return {
+            "data.applicationId": this.props.get("applicationId")
+        };
+    },
+
+    options: function() {
+        return {
+            sort: {
+                createdAt: -1
+            },
+            limit: this.total()
+        };
+    },
+
+    total: function() {
+        return this.props.get("page") * this.props.get("inc");
+    },
+
+    maxLimit: function() {
+        var counter = Collections.Counts.findOne(this.counterName());
+        if (!counter) return 0;
+        return counter.count;
+    },
+
+    fetch: function() {
+        return Collections.Activities.find(this.filters(), this.options());
     },
 
     events: function () {
@@ -51,15 +66,20 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
     },
 
     loadMore: function () {
-        var currentPage = this.page.get();
-        this.page.set(currentPage + 1);
+        var currentPage = this.props.get("page");
+        this.props.set("page", currentPage + 1);
+        this.props.set("isLoadingMore", true);
     },
 
     /**
      * HELPERS
      */
-    isEmpty: function () {
-        return this.activities().count() < 1;
+    items: function() {
+        return this.fetch();
+    },
+
+    loadMoreAbility: function() {
+        return this.maxLimit() - this.total() > 0;
     }
 
 }).register('JobApplicationTimeline');
@@ -352,6 +372,10 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
             Event.emit('slideToForm', 'comment', !isShow);
         });
 
+    },
+
+    onDestroyed: function() {
+        Event.removeListener("toggleCommentCandidateForm");
     },
 
     events: function () {

@@ -4,49 +4,33 @@
 JobApplicationProfile = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        this.isLoading = new ReactiveVar(false);
-        this.applicationId = new ReactiveVar(null);
-        this.application = new ReactiveVar(null);
-        this.candidate = new ReactiveVar(null);
-        this.disqualified = new ReactiveVar(false);
-        this.lastApplicaton = null;
+        this.props = new ReactiveDict;
+        this.props.setDefault('isLoading', false);
+
         this.defaultToggle = 'More cover letter <i class="fa fa-angle-down"></i>';
         this.coverLetterToggle = new ReactiveVar(this.defaultToggle);
 
         // Track when current application change
         Template.instance().autorun(function () {
-            var query = Router.current().params.query;
-            if (query.hasOwnProperty('application')) {
-                var applicationId = parseInt(query.application);
-                self.isLoading.set(true);
-                self.applicationId.set(applicationId);
-                Meteor.call('getApplicationDetails', applicationId, function (err, result) {
-                    if (err) throw err;
-                    self.isLoading.set(false);
-                    self.application.set(result.application);
-                    self.disqualified.set(result.application.disqualified);
-                    self.candidate.set(result.candidate);
-                    self.coverLetterToggle.set(self.defaultToggle);
-                    $('.cover-letter p').removeClass("more");
-                });
-            } else {
-                self.application.set(null);
-                self.candidate.set(null);
-                self.coverLetterToggle.set(self.defaultToggle);
-                $('.cover-letter p').removeClass("more");
+            var params = Router.current().params;
+            var jobId = parseInt(params.jobId);
+            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            var applicationId = parseInt(params.query.application);
+            self.props.set('applicationId', applicationId);
+
+            var application = Collections.Applications.findOne({entryId: applicationId});
+            self.props.set('application', application);
+
+            if(application) {
+                var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+                self.props.set('candidate', candidate);
             }
         });
 
         // Bind empty event
         Event.on('emptyProfile', function () {
-            self.application.set(null);
-            self.candidate.set(null);
-        });
-
-
-        Event.on('disqualifiedApplication', function(applicationId, status){
-            check(status, Boolean);
-            self.disqualified.set(status);
+            self.props.set('application', null);
+            self.props.set('candidate', null);
         });
     },
 
@@ -54,7 +38,9 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         // Add slimScroll to element
         $('.full-height-scroll').slimscroll({
             height: '100%'
-        })
+        });
+
+
     },
     onDestroyed: function () {
     },
@@ -89,7 +75,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
      * @returns {string}
      */
     fullname: function () {
-        var can = this.candidate.get();
+        var can = this.props.get('candidate');
         if (!can) return "";
         return can.data.lastname + " " + can.data.firstname;
     },
@@ -99,7 +85,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
      * @returns {String}
      */
     jobTitle: function () {
-        var can = this.candidate.get();
+        var can = this.props.get('candidate');
         if (!can) return "";
         return can.data.jobtitle;
     },
@@ -108,14 +94,15 @@ JobApplicationProfile = BlazeComponent.extendComponent({
      * Cover letter
      */
     coverLetter: function () {
-        if (!this.application.get())
+        var app = this.props.get('application');
+        if (!app)
             return "";
         var nl2br = function (str, is_xhtml) {
             var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>'; // Adjust comment to avoid issue on phpjs.org display
 
             return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
         };
-        return nl2br(this.application.get().data.coverletter);
+        return nl2br(app.data.coverletter);
     },
 
     /**
@@ -123,7 +110,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
      * @returns {String}
      */
     city: function () {
-        var can = this.candidate.get();
+        var can = this.props.get('candidate');
         if (!can) return "";
         return can.data.city;
     },
@@ -132,14 +119,18 @@ JobApplicationProfile = BlazeComponent.extendComponent({
      * @returns {String}
      */
     phone: function () {
-        var can = this.candidate.get();
+        var can = this.props.get('candidate');
         if (!can) return "";
         return can.data.cellphone || can.data.homephone || "";
     },
 
     profileUrl: function () {
         var url = Meteor.settings.public.applicationUrl;
-        return sprintf(url, this.applicationId.get());
+        return sprintf(url, this.props.get('applicationId'));
+    },
+
+    isDisqualified: function() {
+        return this.props.get('application').disqualified;
     }
 
 }).register('JobApplicationProfile');

@@ -1,3 +1,13 @@
+DashboardSubs = new SubsManager({
+    cacheLimit: 100,
+    expireIn: 2
+});
+
+JobDetailsSubs = new SubsManager({
+    cacheLimit: 1000,
+    expireIn: 2
+});
+
 Router.configure({
     layoutTemplate: 'mainLayout',
     notFoundTemplate: 'notFound',
@@ -50,7 +60,9 @@ Router.route('/login', {
 
 Router.route('/logout', {
     name: "logout",
-    action: function () {
+    action: function (){
+        DashboardSubs.clear();
+        JobDetailsSubs.clear();
         Meteor.logout();
     }
 });
@@ -60,6 +72,7 @@ Router.route('/logout', {
  */
 Router.route('/dashboard', {
     name: "dashboard",
+    fastRender: true,
     action: function () {
         this.render('Dashboard');
     }
@@ -72,13 +85,7 @@ Router.route('/job/:jobId/stage/:stage', {
     waitOn: function() {
         if( !this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage') )
             throw Meteor.Error(404);
-        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
         return [
-            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 1}),
-            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 2}),
-            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 3}),
-            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 4}),
-            Meteor.subscribe('applicationsCounter', {jobId: this.params.jobId, stage: 5}),
             Meteor.subscribe('jobDetails', {jobId: parseInt(this.params.jobId)}),
             Meteor.subscribe('mailTemplates')
         ];
@@ -141,11 +148,14 @@ Router.route('/settings/companyinfo', {
     fastRender: true,
     waitOn: function(){
         return [
-            Meteor.subscribe('companyInfo')
+            DashboardSubs.subscribe('companyInfo')
         ];
     },
     action: function() {
         this.render('companyInfo');
+    },
+    data: function() {
+        return Collections.CompanySettings.findOne();
     }
 });
 

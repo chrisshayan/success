@@ -10,6 +10,7 @@ less
 email
 jquery
 reactive-var
+reactive-dict
 iron:router
 twbs:bootstrap
 fortawesome:fontawesome
@@ -21,13 +22,16 @@ aldeed:collection2
 aldeed:simple-schema
 aldeed:autoform
 steeve:reactive-cookie
-meteorhacks:fast-render
 peerlibrary:blaze-components
 raix:eventemitter
 summernote:summernote
-tmeasday:publish-counts
-cottz:publish-relations
 mpowaga:autoform-summernote
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications
+meteorhacks:fast-render
+meteorhacks:subs-manager
+meteorhacks:kadira
+meteorhacks:kadira-profiler
+kadira:debug
+

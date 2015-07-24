@@ -64,3 +64,8 @@ if (Meteor.isServer) {
         doc.modifiedBy = parseInt(userId);
     });
 }
+
+if(Meteor.isClient) {
+    // virtual collection for counter
+    Collections.Counts = new Mongo.Collection("vnw_counts");
+}
