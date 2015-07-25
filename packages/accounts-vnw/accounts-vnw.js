@@ -10,47 +10,30 @@ Meteor.methods({
     loginAsEmployer: function (data) {
         check(data.username, String);
         check(data.password, String);
+        console.log('startLogin');
         var _func = Meteor.wrapAsync(APIS.login);
         var result = _func(data.username, data.password, 1);
-
+        console.log('endAPI Login');
         /**
          * Sync data the first time
          */
-        if( result && result.success ) {
-            var data = result.data;
 
+        if (result && result.success) {
+            var data = result.data;
             // Set subscribe userId
             this.setUserId(data.userid + "");
 
-            Meteor.defer(function() {
-                var _user = Collections.Users.findOne({userId: data.userid});
-                if( !_user ) {
-                    var _user = new Schemas.User();
-                    _user.data = data;
-                    _user.companyId = data.companyid;
-                    _user.userId = data.userid;
-                    _user.username = data.username;
-                    _user.createdAt = data.createddate;
-                    Collections.Users.insert(_user);
+            var user = SYNC_VNW.syncUser(data);
+            console.log('new', user.isNew);
+            //if (data.isNew)
+            SYNC_VNW.syncNewLogin(user);
 
-                    //Intitial user data
-                    Meteor.defer(function() {
-                        Recruit.initialEmployerData(data.userid, data.username);
-                    });
-                } else {
-                    if( _user.data != data ) {
-                        Collections.Users.update(_user._id, {$set: {data: data, lastSyncedAt: new Date()}});
-                    }
-                }
-
-                //Sync data first time
-                SYNC_VNW.pullJobs(_user.userId, _user.companyId);
-            });
         }
+        console.log('out of loginasEmployer');
         return result;
     },
 
-    onUserReconnect: function(userId) {
+    onUserReconnect: function (userId) {
         this.setUserId(userId + '');
     }
 });

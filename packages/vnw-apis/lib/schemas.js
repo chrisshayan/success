@@ -238,8 +238,8 @@ Schemas.sendEmailCandidateForm = new SimpleSchema({
         autoform: {
             type: "select",
             class: "mail-template-options",
-            options: function() {
-                return Collections.MailTemplates.find().map(function(r) {
+            options: function () {
+                return Collections.MailTemplates.find().map(function (r) {
                     return {
                         label: r.name,
                         value: r._id
@@ -263,12 +263,12 @@ Schemas.sendEmailCandidateForm = new SimpleSchema({
 });
 
 Schemas.addCommentCandidateForm = new SimpleSchema({
-   content: {
-       type: String,
-       label: "",
-       autoform: {
-           type: "textarea",
-           class: "form-control"
-       }
-   }
+    content: {
+        type: String,
+        label: "",
+        autoform: {
+            type: "textarea",
+            class: "form-control"
+        }
+    }
 });

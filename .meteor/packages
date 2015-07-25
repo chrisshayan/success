@@ -34,4 +34,7 @@ meteorhacks:subs-manager
 meteorhacks:kadira
 meteorhacks:kadira-profiler
 kadira:debug
+vsivsi:queue-async
+cfs:reactive-list
+cfs:power-queue
 

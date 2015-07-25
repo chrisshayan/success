@@ -171,6 +171,7 @@ Meteor.publish("jobCounter", function (counterName, filters) {
     var count = 0;
     var initializing = true;
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if (!user) return;
 
     filters['companyId'] = user.companyId;
     var handle = Collections.Jobs.find(filters).observeChanges({
@@ -208,6 +209,7 @@ Meteor.publish("jobStagesCounter", function (counterName, jobId) {
     };
     var initializing = true;
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if (!user) return;
     var filters = {
         companyId: user.companyId,
         jobId: jobId
