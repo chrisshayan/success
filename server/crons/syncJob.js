@@ -24,12 +24,11 @@ var queueJob = new PowerQueue({
 });
 
 queueJob.onEnded = function () {
-    console.log('job queue done!');
+    console.log('sync job finished!');
 };
 
 
 SYNC_VNW.syncJob = function (companyId, userId, status) {
-    console.log('start Sync job');
     var query = VNW_QUERIES.pullJobs;
     if (status == 'open')
         query = VNW_QUERIES.pullOpenJobs;
@@ -37,13 +36,10 @@ SYNC_VNW.syncJob = function (companyId, userId, status) {
         query = VNW_QUERIES.pullClosedJobs;
 
     var pullJobSql = sprintf(query, userId);
-    console.log(pullJobSql);
 
-    console.log('id:', userId);
     var connection = getPoolConnection();
     var rows = fetchVNWData(connection, pullJobSql);
-    connection.release();
-    console.log(rows.length);
+    //console.log(rows.length);
     var jobIds = _.pluck(rows, 'jobid');
     //console.log(jobIds.join(','));
     try {
@@ -71,17 +67,16 @@ SYNC_VNW.syncJob = function (companyId, userId, status) {
                     }
                 }
                 //SYNC_VNW.pullApplications(row.jobid, companyId);
-                Meteor.defer(function () {
-                    SYNC_VNW.syncApplication(job.jobId, companyId);
-                });
+                /*    Meteor.defer(function () {
+                 SYNC_VNW.syncApplication(job.jobId, companyId);
+                 });*/
                 done();
             });
         });
 
-        /*Meteor.defer(function () {
-         console.log('syncApplication');
-         SYNC_VNW.syncApplication(jobIds.join(','), companyId);
-         });*/
+        connection.release();
+
+        SYNC_VNW.syncApplication(jobIds.join(','), companyId);
         queueJob.run();
     }
     catch

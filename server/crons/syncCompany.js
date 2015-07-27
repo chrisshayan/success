@@ -22,7 +22,7 @@ var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
 
 SYNC_VNW.syncCompany = function (companyId, callback) {
     var isNew = false;
-    console.log('id', companyId);
+    console.log('cid', companyId);
     if (companyId) {
         check(companyId, Number);
         var hasCompany = Collections.CompanySettings.findOne({companyId: companyId});

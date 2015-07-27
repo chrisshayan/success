@@ -1,21 +1,9 @@
 pool = (function () {
     var options = Meteor.settings.mysql;
-    options.connectionLimit = undefined;
+    options.connectionLimit = 100;
 
     return mysql.createPool(options);
 })();
-
-poolCount = 0;
-
-pool.on('connection', function (connection) {
-    poolCount++;
-    console.log('connecting:', poolCount);
-});
-
-pool.on('enqueue', function () {
-    poolCount--;
-    console.log('connecting:', poolCount);
-});
 
 
 Meteor.startup(function () {

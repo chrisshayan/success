@@ -21,8 +21,8 @@ SYNC_VNW.syncNewLogin = function (user, callback) { // (userId, companyId) {
     var syncCompany = Meteor.wrapAsync(SYNC_VNW.syncCompany);
 
     var isNew = syncCompany(companyId);
-    console.log('company', isNew);
-    console.log(isNew);
+    console.log('new company: ', isNew);
+
     if (isNew) {
         SYNC_VNW.syncJob(companyId, userId);
     }
