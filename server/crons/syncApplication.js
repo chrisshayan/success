@@ -30,20 +30,46 @@ queueApplication.onEnded = function () {
 };
 
 
-SYNC_VNW.syncApplication = function (jobIds, companyId) {
+SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
     console.log('startSync application');
     //check(jobIds, Number);
+
     check(companyId, Number);
 
-    /*    var candidates = [];
-     var entryIds = [];*/
+    var pullOnlineQuery = (isCron) ? VNW_QUERIES.cronNewResumeOnline : VNW_QUERIES.pullAllResumeOnline;
+    var pullDirectQuery = (isCron) ? VNW_QUERIES.cronNewResumeDirect : VNW_QUERIES.pullAllResumeDirectly;
 
     //PULL Application that sent online
-    var pullResumeOnlineSql = sprintf(VNW_QUERIES.pullAllResumeOnline, jobIds);
-//    console.log(pullResumeOnlineSql);
+    var pullResumeOnlineSql = sprintf(pullOnlineQuery, jobIds);
 
     var conn1 = getPoolConnection();
     var resumeOnlineData = fetchVNWData(conn1, pullResumeOnlineSql);
+
+
+    // PULL applications that sent directly
+    var pullResumeDirectlySql = sprintf(pullDirectQuery, jobIds);
+
+    var conn2 = getPoolConnection();
+    var resultDirectData = fetchVNWData(conn2, pullResumeDirectlySql);
+
+
+    var allList = resultDirectData.concat(resumeOnlineData);
+    if (allList.length == 0) return;
+
+    Meteor.defer(function () {
+        var syncInfo = {
+            candidates: [],
+            entryIds: []
+        };
+
+        _.each(allList, function (item) {
+            if (item.userid) syncInfo.candidates.push(item.userid);
+            if (item.sdid) syncInfo.candidates.push(item.sdid);
+        });
+
+        SYNC_VNW.syncCandidates(syncInfo.candidates);
+        SYNC_VNW.syncApplicationScores(syncInfo.entryIds);
+    });
 
 
     //console.log('applications online length: ', resumeOnlineData.length);
@@ -90,14 +116,6 @@ SYNC_VNW.syncApplication = function (jobIds, companyId) {
 
     });
 
-    // PULL applications that sent directly
-
-    var pullResumeDirectlySql = sprintf(VNW_QUERIES.pullAllResumeDirectly, jobIds);
-
-    var conn2 = getPoolConnection();
-    var resultDirectData = fetchVNWData(conn2, pullResumeDirectlySql);
-
-    console.log('applications direct length: ', resultDirectData.length);
     _.each(resultDirectData, function (row) {
         queueApplication.add(function (done) {
             /*var application = Collections.Applications.findOne({entryId: row.sdid});
@@ -140,27 +158,8 @@ SYNC_VNW.syncApplication = function (jobIds, companyId) {
         })
     });
 
-    Meteor.defer(function () {
-        var syncInfo = {
-            candidates: [],
-            entryIds: []
-        };
-
-        var allList = resultDirectData.concat(resumeOnlineData);
-
-        _.each(allList, function (item) {
-            if (item.userid) syncInfo.candidates.push(item.userid);
-            if (item.sdid) syncInfo.candidates.push(item.sdid);
-        });
-
-        SYNC_VNW.syncCandidates(syncInfo.candidates);
-        SYNC_VNW.syncApplicationScores(syncInfo.entryIds);
-    });
-
     conn1.release();
     conn2.release();
 
     queueApplication.run();
-
-//    console.log('end application queue');
 };

@@ -119,7 +119,7 @@ Meteor.publish('getApplications', function (filters, options) {
     check(filters, Object);
     check(options, Object);
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if(!user) return;
+    if (!user) return;
     filters['companyId'] = user.companyId;
 
     options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
@@ -159,6 +159,7 @@ Meteor.publish('applicationActivities', function (filters, options) {
     check(filters, Object);
     check(options, Object);
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if (!user) return;
 
     filters['companyId'] = user.companyId;
     return Collections.Activities.find(filters, options);
@@ -284,6 +285,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
     var count = 0;
     var initializing = true;
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if (!user) return;
 
     filters['companyId'] = user.companyId;
     var handle = Collections.Activities.find(filters).observeChanges({

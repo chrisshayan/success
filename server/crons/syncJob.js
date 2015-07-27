@@ -28,18 +28,29 @@ queueJob.onEnded = function () {
 };
 
 
-SYNC_VNW.syncJob = function (companyId, userId, status) {
+SYNC_VNW.syncJob = function (companyId, userId, typeQuery) {
     var query = VNW_QUERIES.pullJobs;
-    if (status == 'open')
-        query = VNW_QUERIES.pullOpenJobs;
-    if (status == 'closed')
-        query = VNW_QUERIES.pullClosedJobs;
+
+    switch (typeQuery) {
+        case 'open' :
+            query = VNW_QUERIES.pullOpenJobs;
+            break;
+        case 'closed':
+            query = VNW_QUERIES.pullClosedJobs;
+            break;
+        case 'cron':
+            query = VNW_QUERIES.cronNewJobs;
+            break;
+        default :
+            break;
+    }
 
     var pullJobSql = sprintf(query, userId);
 
     var connection = getPoolConnection();
     var rows = fetchVNWData(connection, pullJobSql);
-    //console.log(rows.length);
+    if (rows.length == 0) return;
+
     var jobIds = _.pluck(rows, 'jobid');
     //console.log(jobIds.join(','));
     try {
@@ -51,7 +62,7 @@ SYNC_VNW.syncJob = function (companyId, userId, status) {
                     //console.log('jobs:', row.jobid);
                     var job = new Schemas.Job();
                     job.jobId = row.jobid;
-                    job.companyId = companyId;
+                    job.companyId = row.companyid;
                     job.userId = userId;
                     job.data = row;
                     job.createdAt = row.createddate;
@@ -66,17 +77,21 @@ SYNC_VNW.syncJob = function (companyId, userId, status) {
                         });
                     }
                 }
-                //SYNC_VNW.pullApplications(row.jobid, companyId);
-                /*    Meteor.defer(function () {
-                 SYNC_VNW.syncApplication(job.jobId, companyId);
-                 });*/
+                //SYNC_VNW.pullApplications(row.jobid, companyIds);
+                if (typeQuery === 'cron')
+                    Meteor.defer(function () {
+                        SYNC_VNW.syncApplication(job.jobId, row.companyid, true);
+                    });
+
                 done();
             });
         });
 
         connection.release();
 
-        SYNC_VNW.syncApplication(jobIds.join(','), companyId);
+        if (typeQuery !== 'cron')
+            SYNC_VNW.syncApplication(jobIds.join(','), companyId);
+
         queueJob.run();
     }
     catch

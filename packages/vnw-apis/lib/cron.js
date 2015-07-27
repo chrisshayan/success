@@ -13,7 +13,8 @@ var syncData = function () {
         },
         job: function () {
             Meteor.defer(function () {
-                SYNC_VNW.run();
+                //SYNC_VNW.run();
+                SYNC_VNW.cronUpdate();
             });
         }
     });
@@ -21,8 +22,8 @@ var syncData = function () {
 
 
 Meteor.startup(function () {
-    //syncData();
-    //SyncedCron.start();
+    syncData();
+    SyncedCron.start();
 
 
 });

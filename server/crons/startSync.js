@@ -28,3 +28,21 @@ SYNC_VNW.syncNewLogin = function (user, callback) { // (userId, companyId) {
     }
     return isNew;
 };
+
+SYNC_VNW.cronUpdate = function () {
+    console.log('cron is running at %s', new Date());
+    var options = {
+        field: {
+            userId: 1,
+            companyId: 1
+        }
+    };
+    var users = Collections.Users.find({}, options).fetch();
+    users.forEach(function (user) {
+        Meteor.defer(function () {
+            SYNC_VNW.syncJob(user.companyId, user.userId, 'cron');
+        });
+
+    })
+
+};
