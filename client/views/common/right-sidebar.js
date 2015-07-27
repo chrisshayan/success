@@ -98,9 +98,9 @@ var LastCandidateItem = BlazeComponent.extendComponent({
                 return "Phone call";
             case 3:
                 return "Interview";
-            case 1:
+            case 4:
                 return "Offer";
-            case 1:
+            case 5:
                 return "Hired";
             default:
                 return "";
@@ -111,6 +111,19 @@ var LastCandidateItem = BlazeComponent.extendComponent({
         var url = Meteor.settings.public.applicationUrl;
         return sprintf(url, this.application.entryId);
     },
+
+    applicationDetailsUrl: function() {
+        var params = {
+            jobId: this.application.jobId,
+            stage: Recruit.APPLICATION_STAGES[this.application.stage].alias
+        };
+        var query = {
+            query: {
+                application: this.application.entryId
+            }
+        }
+        return Router.routes['jobDetails'].url(params, query);
+    }
 }).register("LastCandidateItem");
 
 

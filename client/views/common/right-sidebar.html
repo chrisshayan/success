@@ -39,23 +39,23 @@
 
 <template name="LastCandidateItem">
     <div class="sidebar-message">
-        <a href="#">
-            <div class="pull-left text-center">
-                <img alt="image" class="img-circle message-avatar" src="/img/a4.jpg">
-            </div>
-            <div class="media-body">
+        <div class="pull-left text-center">
+            <img alt="image" class="img-circle message-avatar" src="/img/a4.jpg">
+        </div>
+        <div class="media-body">
+            <a href="{{ applicationDetailsUrl }}">
                 <strong>{{ fullname }}</strong>
-                <br>
-                <span><i class="fa fa-mobile"></i>&nbsp;{{ tel }}</span>
-                <br>
-                <span><i class="fa fa-thumb-tack"></i>&nbsp;{{ stageLabel }}</span>
-                <br>
-                <a href="{{ profileUrl }}" target="_blank"><img src="http://images.vietnamworks.com/img/thumbnail.png"
-                                                                alt="" height="16px"/>&nbsp;Candidate profile</a>
-                <br>
-                <small class="text-muted">{{ appliedTimeago }}</small>
-            </div>
-        </a>
+            </a>
+            <br>
+            <span><i class="fa fa-mobile"></i>&nbsp;{{ tel }}</span>
+            <br>
+            <span><i class="fa fa-thumb-tack"></i>&nbsp;{{ stageLabel }}</span>
+            <br>
+            <a href="{{ profileUrl }}" target="_blank"><img src="http://images.vietnamworks.com/img/thumbnail.png"
+                                                            alt="" height="16px"/>&nbsp;Candidate profile</a>
+            <br>
+            <small class="text-muted">{{ appliedTimeago }}</small>
+        </div>
     </div>
 </template>
 
@@ -71,6 +71,7 @@
     <li>
         <a href="{{ jobDetailsUrl }}">
             <h4>{{ jobTitle }}</h4>
+
             <div class="clearfix">
                 <div class="small text-muted m-t-xs pull-right"><i class="fa fa-map-marker"></i> {{ location }}  </div>
                 <div class="small text-muted m-t-xs">expired {{ expiredAt }}</div>
