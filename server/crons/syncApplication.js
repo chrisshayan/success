@@ -23,12 +23,10 @@ var queueApplication = new PowerQueue({
 
 queueApplication.onStart = function () {
     console.log('application queue start running!');
-    console.time('applicationSync');
 };
 
 queueApplication.onEnded = function () {
     console.log('application queue done!');
-    console.timeEnd('applicationSync');
 };
 
 
