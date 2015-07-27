@@ -1,6 +1,6 @@
 pool = (function () {
     var options = Meteor.settings.mysql;
-    options.connectionLimit = 2;
+    options.connectionLimit = 5;
 
     return mysql.createPool(options);
 })();
