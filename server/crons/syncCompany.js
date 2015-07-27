@@ -48,6 +48,21 @@ SYNC_VNW.syncCompany = function (companyId, callback) {
                         company.phone = row.telephone;
                         company.cell = row.cellphone;
                         company.fax = row.faxnumber;
+
+                        var mailSignature = _.template(Assets.getText("mail-signature-template.html"));
+                        var mailParams = {
+                            logo: company.logo || "https://placeholdit.imgix.net/~text?txtsize=16&txt=100%C3%97100&w=100&h=100",
+                            companyName: company.companyName || "Company name",
+                            contactName: company.contactName || "Contact name",
+                            jobTitle: row.contactposition || "Job title",
+                            contactMail: row.contactemail || "Contact mail",
+                            contactPhone: company.cell || "Contact phone",
+                            companyPhone: company.phone || "Company phone",
+                            companyFax: company.fax || "Company fax",
+                            companyAddress: company.companyAddress || "Company address"
+                        };
+                        company.mailSignature = mailSignature(mailParams);
+
                         Collections.CompanySettings.insert(company);
                     } else {
                         if (company.data != row) {

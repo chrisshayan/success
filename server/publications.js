@@ -61,7 +61,10 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             createdAt: 1,
             "data.jobtitle": 1,
             "data.iscompleted": 1,
-            "data.expireddate": 1
+            "data.salarymin": 1,
+            "data.salarymax": 1,
+            "data.skillexperience": 1,
+            "data.expireddate": 1,
         }
     },
     DEFAULT_APPLICATION_OPTIONS = {
@@ -308,3 +311,54 @@ Meteor.publish("activityCounter", function (counterName, filters) {
         handle.stop();
     });
 });
+
+Meteor.publish('lastApplications', function() {
+    if(!this.userId) return [];
+    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if(!user) return [];
+
+    var filters = {
+        companyId: user.companyId
+    };
+
+    var options = DEFAULT_APPLICATION_OPTIONS;
+    options['limit'] = 10;
+    options['sort'] = {
+        createdAt: -1
+    };
+
+    var applicationCursor = Collections.Applications.find(filters, options);
+    var canIds = applicationCursor.map(function (doc) {
+        return doc.candidateId
+    });
+    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, DEFAULT_CANDIDATE_OPTIONS);
+    return [
+        applicationCursor,
+        canCursor
+    ];
+});
+
+
+Meteor.publish('lastOpenJobs', function() {
+    if(!this.userId) return [];
+    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    if(!user) return [];
+
+    var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
+    var filters = {
+        companyId: user.companyId,
+        'data.expireddate': {
+            $gte: today
+        }
+    };
+
+    var options = DEFAULT_JOB_OPTIONS;
+    options['limit'] = 10;
+    options['sort'] = {
+        createdAt: -1
+    };
+
+
+    return Collections.Jobs.find(filters, options);
+});
+

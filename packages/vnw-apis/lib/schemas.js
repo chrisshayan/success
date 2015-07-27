@@ -60,6 +60,7 @@ Schemas.CompanyInfo = function () {
         companyId: null,
         logo: null,
         data: {},
+
         createdAt: new Date(),
         lastSyncedAt: new Date()
     }
