@@ -64,12 +64,16 @@ SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
 
         _.each(allList, function (item) {
             if (item.userid) syncInfo.candidates.push(item.userid);
-            if (item.sdid) syncInfo.candidates.push(item.sdid);
+
+            if (item.entryid) syncInfo.entryIds.push(item.userid);
+            if (item.sdid) syncInfo.entryIds.push(item.sdid);
         });
 
         SYNC_VNW.syncCandidates(syncInfo.candidates);
         SYNC_VNW.syncApplicationScores(syncInfo.entryIds);
     });
+
+
 
 
     //console.log('applications online length: ', resumeOnlineData.length);

@@ -12,13 +12,13 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
 
         this.props.set("isLoading", true);
         Template.instance().autorun(function () {
-             //get job applications
+            //get job applications
             self.props.set("applicationId", Session.get("currentApplicationId"));
 
-            JobDetailsSubs.subscribe('activityCounter', self.counterName() , self.filters());
+            JobDetailsSubs.subscribe('activityCounter', self.counterName(), self.filters());
 
             var trackSub = JobDetailsSubs.subscribe('applicationActivities', self.filters(), self.options());
-            if(trackSub.ready()) {
+            if (trackSub.ready()) {
                 self.props.set("isLoading", false);
                 self.props.set("isLoadingMore", false);
             }
@@ -26,17 +26,17 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
 
     },
 
-    counterName: function() {
-        return  "application_activity_" + this.props.get("applicationId");
+    counterName: function () {
+        return "application_activity_" + this.props.get("applicationId");
     },
 
-    filters: function() {
+    filters: function () {
         return {
             "data.applicationId": this.props.get("applicationId")
         };
     },
 
-    options: function() {
+    options: function () {
         return {
             sort: {
                 createdAt: -1
@@ -45,17 +45,17 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         };
     },
 
-    total: function() {
+    total: function () {
         return this.props.get("page") * this.props.get("inc");
     },
 
-    maxLimit: function() {
+    maxLimit: function () {
         var counter = Collections.Counts.findOne(this.counterName());
         if (!counter) return 0;
         return counter.count;
     },
 
-    fetch: function() {
+    fetch: function () {
         return Collections.Activities.find(this.filters(), this.options());
     },
 
@@ -74,11 +74,11 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
     /**
      * HELPERS
      */
-    items: function() {
+    items: function () {
         return this.fetch();
     },
 
-    loadMoreAbility: function() {
+    loadMoreAbility: function () {
         return this.maxLimit() - this.total() > 0;
     }
 
@@ -210,6 +210,11 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         this.candidate = new ReactiveVar(null);
         this.application = new ReactiveVar(null);
 
+        Template.instance().autorun(function() {
+            var params = Router.current().params;
+            self.show.set(false);
+        });
+
 
         Event.on('toggleSendEmailCandidateForm', function () {
             var isShow = self.show.get();
@@ -235,7 +240,7 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                 self.show.set(true);
             }
 
-            Event.emit('slideToForm', 'email', !isShow);
+            //   Event.emit('slideToForm', 'email', !isShow);
 
         });
 
@@ -360,6 +365,11 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
         this.show = new ReactiveVar(false);
         this.isLoading = new ReactiveVar(false);
 
+        Template.instance().autorun(function() {
+            var params = Router.current().params;
+            self.show.set(false);
+        });
+
         Event.on('toggleCommentCandidateForm', function () {
             var isShow = self.show.get();
             if (isShow) {
@@ -369,12 +379,12 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
                 self.show.set(true);
             }
 
-            Event.emit('slideToForm', 'comment', !isShow);
+            //     Event.emit('slideToForm', 'comment', !isShow);
         });
 
     },
 
-    onDestroyed: function() {
+    onDestroyed: function () {
         Event.removeListener("toggleCommentCandidateForm");
     },
 

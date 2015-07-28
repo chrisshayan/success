@@ -12,6 +12,7 @@ Meteor.publish('jobDetails', function (options) {
 
 Meteor.publish('companyInfo', function () {
     var user = Collections.Users.findOne({userId: +this.userId});
+    if (!user) return;
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 
@@ -312,10 +313,10 @@ Meteor.publish("activityCounter", function (counterName, filters) {
     });
 });
 
-Meteor.publish('lastApplications', function() {
-    if(!this.userId) return [];
+Meteor.publish('lastApplications', function () {
+    if (!this.userId) return [];
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if(!user) return [];
+    if (!user) return [];
 
     var filters = {
         companyId: user.companyId
@@ -339,10 +340,10 @@ Meteor.publish('lastApplications', function() {
 });
 
 
-Meteor.publish('lastOpenJobs', function() {
-    if(!this.userId) return [];
+Meteor.publish('lastOpenJobs', function () {
+    if (!this.userId) return [];
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if(!user) return [];
+    if (!user) return [];
 
     var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
     var filters = {

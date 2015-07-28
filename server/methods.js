@@ -205,7 +205,7 @@ Meteor.methods({
         var options = {
             fields: {
                 entryId: 1,
-                userId: 1,
+                candidateId: 1,
                 jobId: 1,
                 source: 1,
                 stage: 1,
@@ -219,7 +219,7 @@ Meteor.methods({
         var canOptions = {
             fields: {
                 _id: 1,
-                userId: 1,
+                candidateId: 1,
                 "data.city": 1,
                 "data.username": 1,
                 "data.firstname": 1,
@@ -235,7 +235,7 @@ Meteor.methods({
             }
         };
         var application = Collections.Applications.findOne(conditions, options);
-        var candidate = Collections.Candidates.findOne({userId: application.userId}, canOptions);
+        var candidate = Collections.Candidates.findOne({candidateId: application.candidateId}, canOptions);
         return {
             application: application,
             candidate: candidate
@@ -596,6 +596,7 @@ Meteor.methods({
         options = _.defaults(DEFAULT_APPLICATION_OPTIONS, options);
 
         return Collections.Applications.find(filters, options).map(function (doc) {
+
             doc.candidate = Collections.Candidates.findOne({candidateId: doc.candidateId}, DEFAULT_APPLICATION_OPTIONS);
             return doc;
         });
