@@ -29,21 +29,23 @@ SYNC_VNW.syncCandidates = function (candidates) {
 
     try {
         var rows = fetchVNWData(conn, pullCandidatesSql);
+        conn.release();
         _.each(rows, function (row) {
-            var can = Collections.Candidates.findOne({userId: row.userid});
+            var candidate = Collections.Candidates.findOne({userId: row.userid});
 
-            if (!can) {
-                var can = new Schemas.Candidate();
-                can.candidateId = row.userid;
-                can.data = row;
-                can.createdAt = row.createddate;
+            if (!candidate) {
+                var newCandidate = new Schemas.Candidate();
+                newCandidate.candidateId = row.userid;
+                newCandidate.data = row;
+                newCandidate.createdAt = row.createddate;
                 Meteor.defer(function () {
-                    Collections.Candidates.insert(can);
+                    Collections.Candidates.insert(newCandidate);
                 })
             } else {
-                if (!_.isEqual(can.data, row)) {
+                if (!_.isEqual(candidate.data, row)) {
+
                     Meteor.defer(function () {
-                        Collections.Jobs.update(can._id, {
+                        Collections.Jobs.update(candidate._id, {
                             $set: {
                                 data: row,
                                 lastSyncedAt: new Date()
@@ -53,7 +55,6 @@ SYNC_VNW.syncCandidates = function (candidates) {
                 }
             }
         });
-        conn.release();
 
     } catch (e) {
         conn.release();

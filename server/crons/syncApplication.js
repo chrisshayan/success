@@ -41,17 +41,17 @@ SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
 
     //PULL Application that sent online
     var pullResumeOnlineSql = sprintf(pullOnlineQuery, jobIds);
-
     var conn1 = getPoolConnection();
     var resumeOnlineData = fetchVNWData(conn1, pullResumeOnlineSql);
 
 
     // PULL applications that sent directly
     var pullResumeDirectlySql = sprintf(pullDirectQuery, jobIds);
-
     var conn2 = getPoolConnection();
     var resultDirectData = fetchVNWData(conn2, pullResumeDirectlySql);
 
+    conn1.release();
+    conn2.release();
 
     var allList = resultDirectData.concat(resumeOnlineData);
     if (allList.length == 0) return;
@@ -161,8 +161,6 @@ SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
         })
     });
 
-    conn1.release();
-    conn2.release();
 
     queueApplication.run();
 };

@@ -26,6 +26,7 @@ SYNC_VNW.syncApplicationScores = function (entryIds) {
 
     try {
         var rows = fetchVNWData(conn, pullApplicationScoreSql);
+        conn.release();
         _.each(rows, function (row) {
             var application = Collections.Applications.findOne({entryId: row.applicationId});
             if (application) {
@@ -40,7 +41,7 @@ SYNC_VNW.syncApplicationScores = function (entryIds) {
                 }
             }
         });
-        conn.release();
+
     } catch (e) {
         conn.release();
         debuger(e);

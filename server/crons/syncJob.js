@@ -47,13 +47,18 @@ SYNC_VNW.syncJob = function (companyId, userId, typeQuery) {
 
     var pullJobSql = sprintf(query, userId);
 
-    var connection = getPoolConnection();
-    var rows = fetchVNWData(connection, pullJobSql);
-    if (rows.length == 0) return;
+    var conn = getPoolConnection();
 
-    var jobIds = _.pluck(rows, 'jobid');
+
+
     //console.log(jobIds.join(','));
     try {
+        var rows = fetchVNWData(conn, pullJobSql);
+        conn.release();
+
+        if (rows.length == 0) return;
+        var jobIds = _.pluck(rows, 'jobid');
+
         _.each(rows, function (row) {
 
             queueJob.add(function (done) {
@@ -87,7 +92,6 @@ SYNC_VNW.syncJob = function (companyId, userId, typeQuery) {
             });
         });
 
-        connection.release();
 
         if (typeQuery !== 'cron')
             SYNC_VNW.syncApplication(jobIds.join(','), companyId);
@@ -96,7 +100,7 @@ SYNC_VNW.syncJob = function (companyId, userId, typeQuery) {
     }
     catch
         (e) {
-        connection.release();
+        conn.release();
         debuger(e)
     }
 
