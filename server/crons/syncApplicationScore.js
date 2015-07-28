@@ -30,11 +30,13 @@ SYNC_VNW.syncApplicationScores = function (entryIds) {
             var application = Collections.Applications.findOne({entryId: row.applicationId});
             if (application) {
                 if (!_.isEqual(application.matchingScore, row.matchingScore)) {
-                    Collections.Applications.update(application._id, {
-                        $set: {
-                            matchingScore: row.matchingScore
-                        }
-                    });
+                    Meteor.defer(function () {
+                        Collections.Applications.update(application._id, {
+                            $set: {
+                                matchingScore: row.matchingScore
+                            }
+                        });
+                    })
                 }
             }
         });

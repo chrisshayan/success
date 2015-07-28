@@ -37,15 +37,19 @@ SYNC_VNW.syncCandidates = function (candidates) {
                 can.candidateId = row.userid;
                 can.data = row;
                 can.createdAt = row.createddate;
-                Collections.Candidates.insert(can);
+                Meteor.defer(function () {
+                    Collections.Candidates.insert(can);
+                })
             } else {
                 if (!_.isEqual(can.data, row)) {
-                    Collections.Jobs.update(can._id, {
-                        $set: {
-                            data: row,
-                            lastSyncedAt: new Date()
-                        }
-                    });
+                    Meteor.defer(function () {
+                        Collections.Jobs.update(can._id, {
+                            $set: {
+                                data: row,
+                                lastSyncedAt: new Date()
+                            }
+                        });
+                    })
                 }
             }
         });

@@ -85,8 +85,9 @@ SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
             newApplication.source = 1;
             newApplication.data = row;
             newApplication.createdAt = row.createddate;
-            Collections.Applications.insert(newApplication);
-
+            Meteor.defer(function () {
+                Collections.Applications.insert(newApplication);
+            });
             // Log applied activity
             var activity = new Activity();
             activity.companyId = companyId;
@@ -128,7 +129,9 @@ SYNC_VNW.syncApplication = function (jobIds, companyId, isCron) {
             newApplication.source = 2;
             newApplication.data = row;
             newApplication.createdAt = row.createddate;
-            Collections.Applications.insert(newApplication);
+            Meteor.defer(function () {
+                Collections.Applications.insert(newApplication);
+            })
 
             // Log applied activity
             var activity = new Activity();
