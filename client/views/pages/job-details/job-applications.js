@@ -28,7 +28,10 @@ JobApplications = BlazeComponent.extendComponent({
             var params = Router.current().params;
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
             self.jobId.set(parseInt(params.jobId));
-            self.stage.set(stage);
+            if(!stage)
+                self.stage.set(Recruit.APPLICATION_STAGES[1]);
+            else
+                self.stage.set(stage);
             // Send subscribe request
             JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
 
@@ -70,7 +73,9 @@ JobApplications = BlazeComponent.extendComponent({
     },
 
     counterName: function () {
-        return "job_application_" + this.jobId.get() + "_" + this.stage.get().id;
+        if(this.stage.get() && this.jobId.get())
+            return "job_application_" + this.jobId.get() + "_" + this.stage.get().id;
+        return "";
     },
 
     filters: function () {

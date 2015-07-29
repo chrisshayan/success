@@ -5,12 +5,12 @@ Collections.Users = new Mongo.Collection("vnw_users");
 Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 
 Collections.Jobs = new Mongo.Collection("vnw_jobs", {
-    transform: function(doc) {
-        if(!doc.hasOwnProperty("data") || !doc.data.hasOwnProperty("expireddate")) return doc;
+    transform: function (doc) {
+        if (!doc.hasOwnProperty("data") || !doc.data.hasOwnProperty("expireddate")) return doc;
 
         var today = new Date(moment().format("YYYY-MM-DD 00:00:00")).getTime();
         var expired = new Date(doc.data.expireddate).getTime();
-        if(expired >= today) {
+        if (expired >= today) {
             doc.status = 1;
         } else {
             doc.status = 0;
@@ -22,7 +22,7 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
 Collections.Applications = new Mongo.Collection("vnw_applications");
 
 Collections.Applications.allow({
-    update: function(userId, doc) {
+    update: function (userId, doc) {
         return !!userId;
     }
 });
@@ -40,7 +40,7 @@ Collections.MailTemplates.allow({
             return true;
         return false;
     },
-    update: function(userId, doc, fieldNames, modifier) {
+    update: function (userId, doc, fieldNames, modifier) {
         if (doc.createdBy == userId) {
             return true;
         }
@@ -57,7 +57,7 @@ Collections.MailTemplates.allow({
 })
 if (Meteor.isServer) {
     Collections.MailTemplates.before.insert(function (userId, doc) {
-        if(!userId) return;
+        if (!userId) return;
         doc.createdAt = new Date();
         doc.modifiedAt = new Date();
         doc.createdBy = parseInt(userId);
@@ -65,7 +65,7 @@ if (Meteor.isServer) {
     });
 }
 
-if(Meteor.isClient) {
+if (Meteor.isClient) {
     // virtual collection for counter
     Collections.Counts = new Mongo.Collection("vnw_counts");
 }

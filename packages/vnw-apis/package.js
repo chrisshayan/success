@@ -15,7 +15,8 @@ Package.onUse(function (api) {
         'aldeed:collection2',
         'matb33:collection-hooks',
         'aldeed:simple-schema',
-        'aldeed:autoform'
+        'aldeed:autoform',
+        'vsivsi:job-collection@1.2.0'
     ], both);
 
     api.use([
