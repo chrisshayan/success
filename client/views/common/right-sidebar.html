@@ -39,7 +39,7 @@
 
 <template name="LastCandidateItem">
     <div class="sidebar-message">
-        <div class="pull-left text-center">
+        <div class="pull-left text-center latest-candidate">
             <img alt="image" class="img-circle message-avatar" src="/img/a4.jpg">
         </div>
         <div class="media-body">
@@ -49,12 +49,20 @@
             <br>
             <span><i class="fa fa-mobile"></i>&nbsp;{{ tel }}</span>
             <br>
-            <span><i class="fa fa-thumb-tack"></i>&nbsp;{{ stageLabel }}</span>
+
+            <a href="{{ applicationDetailsUrl }}">
+                <span><i class="fa fa-thumb-tack"></i>&nbsp;{{ stageLabel }}</span>
+            </a>
             <br>
+
             <a href="{{ profileUrl }}" target="_blank"><img src="http://images.vietnamworks.com/img/thumbnail.png"
                                                             alt="" height="16px"/>&nbsp;Candidate profile</a>
-            <br>
+            <br/>
+            <span class="label pull-right {{matchingScoreLabel}}" data-toggle="tooltip" data-placement="bottom"
+                  title="MatchingScore {{matchingScore}}%">{{matchingScore}} %</span>
+            <br/>
             <small class="text-muted">{{ appliedTimeago }}</small>
+
         </div>
     </div>
 </template>
@@ -71,6 +79,7 @@
     <li>
         <a href="{{ jobDetailsUrl }}">
             <h4>{{ jobTitle }}</h4>
+            <span>{{salaryRange}}</span>
 
             <div class="clearfix">
                 <div class="small text-muted m-t-xs pull-right"><i class="fa fa-map-marker"></i> {{ location }}  </div>

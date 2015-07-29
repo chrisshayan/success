@@ -67,30 +67,41 @@ var LastCandidateItem = BlazeComponent.extendComponent({
         this.application = this.data();
         this.candidate = new ReactiveVar(null);
 
-        Template.instance().autorun(function() {
+        Template.instance().autorun(function () {
             self.candidate.set(Collections.Candidates.findOne({candidateId: self.application.candidateId}));
         });
     },
 
 
-
     fullname: function () {
-        if(!this.candidate.get()) return "";
+        if (!this.candidate.get()) return "";
         var data = this.candidate.get().data;
         return data.lastname + " " + data.firstname;
+    },
+
+    matchingScoreLabel: function () {
+        var matchingScore = this.application.matchingScore;
+        if (matchingScore >= 90)
+            return " label-success ";
+        if (matchingScore >= 70)
+            return " label-primary ";
+        if (matchingScore >= 50)
+            return " label-warning ";
+
+        return " label-default ";
     },
 
     appliedTimeago: function () {
         return moment(this.application.createdAt).fromNow();
     },
 
-    tel: function() {
-        if(!this.candidate.get()) return "";
+    tel: function () {
+        if (!this.candidate.get()) return "";
         var data = this.candidate.get().data;
         return data.cellphone || data.homephone || "";
     },
 
-    stageLabel: function() {
+    stageLabel: function () {
         switch (this.application.stage) {
             case 1:
                 return "Applied";
@@ -112,7 +123,7 @@ var LastCandidateItem = BlazeComponent.extendComponent({
         return sprintf(url, this.application.entryId);
     },
 
-    applicationDetailsUrl: function() {
+    applicationDetailsUrl: function () {
         var params = {
             jobId: this.application.jobId,
             stage: Recruit.APPLICATION_STAGES[this.application.stage].alias
@@ -177,7 +188,7 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
     },
 
 
-    jobTitle: function() {
+    jobTitle: function () {
         return this.job.data.jobtitle;
     },
 
@@ -185,15 +196,15 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
         return moment(this.job.createdAt).fromNow();
     },
 
-    expiredAt: function() {
+    expiredAt: function () {
         return moment(this.job.data.expireddate).format("ll");
     },
 
-    location: function() {
+    location: function () {
         return "Ho Chi Minh";
     },
 
-    skills: function() {
+    skills: function () {
         var nl2br = function (str, is_xhtml) {
             var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>'; // Adjust comment to avoid issue on phpjs.org display
 
@@ -201,8 +212,14 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
         };
         return nl2br(this.job.data.skillexperience);
     },
+    salaryRange: function () {
+        var minSalary = (this.job.data.salarymin) ? '$' + this.job.data.salarymin + ' - ' : ''
+            , maxSalary = (this.job.data.salarymax) ? '$' + this.job.data.salarymax : '';
 
-    jobDetailsUrl: function() {
+        return minSalary + maxSalary;
+    },
+
+    jobDetailsUrl: function () {
         var params = {
             jobId: this.job.jobId,
             stage: Recruit.APPLICATION_STAGES[1].alias
