@@ -35,14 +35,35 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     },
 
     onRendered: function () {
+        var self = this;
         // Add slimScroll to element
         $('.full-height-scroll').slimscroll({
             height: '100%'
         });
 
-
+        Template.instance().autorun(function () {
+            var params = Router.current().params;
+            self.scrollTop();
+        });
     },
     onDestroyed: function () {
+    },
+
+    scrollTop: function() {
+        var selectors = {
+            details: '.full-height-scroll.white-bg',
+            slimScroll: {
+                slimClass: '',
+                slimScrollClass: '.slimScrollBar'
+            }
+        };
+        var $details = $(selectors.details);
+        $details.animate({
+            scrollTop: 0
+        }, 'slow', function () {
+            $details.siblings(selectors.slimScroll.slimScrollClass)
+                .css({'top': 0 + 'px'});
+        });
     },
 
     events: function () {
@@ -114,6 +135,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         if (!can) return "";
         return can.data.city;
     },
+
     /**
      * Get candidate phone: cellphone or homephone
      * @returns {String}
@@ -131,6 +153,10 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     isDisqualified: function() {
         return this.props.get('application').disqualified;
+    },
+
+    matchingScore: function() {
+        return this.props.get('application').matchingScore;
     }
 
 }).register('JobApplicationProfile');

@@ -24,25 +24,23 @@ JobApplications = BlazeComponent.extendComponent({
         }
 
 
-        Meteor.defer(function () {
-            var tracker = instance.autorun(function () {
-                var params = Router.current().params;
-                var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-                self.jobId.set(parseInt(params.jobId));
-                self.stage.set(stage);
-                // Send subscribe request
-                JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
+        var tracker = instance.autorun(function () {
+            var params = Router.current().params;
+            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            self.jobId.set(parseInt(params.jobId));
+            self.stage.set(stage);
+            // Send subscribe request
+            JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
 
-                var trackSub = JobDetailsSubs.subscribe('getApplications', self.filters(), self.options());
+            var trackSub = JobDetailsSubs.subscribe('getApplications', self.filters(), self.options());
 
-                if (trackSub.ready()) {
-                    self.isLoading.set(false);
-                    self.isLoadingMore.set(false);
-                }
+            if (trackSub.ready()) {
+                self.isLoading.set(false);
+                self.isLoadingMore.set(false);
+            }
 
-            });
-            self.trackers.push(tracker);
         });
+        self.trackers.push(tracker);
 
         // Bind listener
         Event.on('movedApplicationStage', function () {

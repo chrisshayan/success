@@ -9,11 +9,15 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         this.props.set("inc", 5);
         this.props.set("isLoading", false);
         this.props.set("isLoadingMore", false);
+        this.props.set("isShowMailForm", false);
+        this.props.set("isShowCommentForm", false);
 
         this.props.set("isLoading", true);
         Template.instance().autorun(function () {
-            //get job applications
-            self.props.set("applicationId", Session.get("currentApplicationId"));
+            var params = Router.current().params;
+            self.props.set("applicationId", parseInt(params.query.application));
+            self.props.set("isShowMailForm", false);
+            self.props.set("isShowCommentForm", false);
 
             JobDetailsSubs.subscribe('activityCounter', self.counterName(), self.filters());
 
@@ -24,6 +28,26 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
             }
         });
 
+        this._onToggleMailForm = function(status) {
+            if(typeof status == "undefined")
+                status = !self.props.get("isShowMailForm");
+            self.props.set("isShowMailForm", status);
+        }
+
+        this._onToggleCommentForm = function(status) {
+            if(typeof status == "undefined")
+                status = !self.props.get("isShowCommentForm");
+            self.props.set("isShowCommentForm", status);
+        }
+
+        Event.on('toggleMailForm', this._onToggleMailForm);
+        Event.on('toggleCommentForm', this._onToggleCommentForm);
+    },
+
+    onDestroyed: function() {
+        var self = this;
+        Event.removeListener('toggleMailForm', self._onToggleMailForm);
+        Event.removeListener('toggleCommentForm', self._onToggleCommentForm);
     },
 
     counterName: function () {
@@ -204,52 +228,69 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
 SendEmailCandidateForm = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        this.show = new ReactiveVar(true);
         this.isLoading = new ReactiveVar(false);
 
         this.candidate = new ReactiveVar(null);
         this.application = new ReactiveVar(null);
+        this.applicationId = new ReactiveVar(null);
 
         Template.instance().autorun(function() {
             var params = Router.current().params;
-            self.show.set(false);
-        });
-
-
-        Event.on('toggleSendEmailCandidateForm', function () {
-            var isShow = self.show.get();
-            if (isShow) {
-                self.show.set(false);
-            } else {
-                self.isLoading.set(true);
-                $(".mail-subject").val("");
-                $(".mail-content").code("");
-                $(".mail-template-options").val(-1);
-                var params = Router.current().params;
-                if (params.query.hasOwnProperty("application")) {
-                    Meteor.call('getApplicationDetails', parseInt(params.query.application), function (err, result) {
-                        if (err) throw err;
-                        if (result) {
-                            self.application.set(result.application);
-                            self.candidate.set(result.candidate);
-                            $(".mail-to").val(result.candidate.data.username);
-                            self.isLoading.set(false);
-                        }
-                    });
+            if (params.query.hasOwnProperty("application")) {
+                self.applicationId.set(parseInt(params.query.application));
+                var application = Collections.Applications.findOne({entryId: self.applicationId.get()});
+                if(application) {
+                    self.application.set(application);
+                    var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+                    if(candidate) {
+                        self.candidate.set(candidate);
+                    } else {
+                        self.candidate.set(null);
+                    }
+                } else {
+                    self.application.set(null);
                 }
-                self.show.set(true);
+            } else {
+                self.applicationId.set(null);
             }
-
-            //   Event.emit('slideToForm', 'email', !isShow);
-
         });
-
 
         this.editor = undefined;
     },
 
     onRendered: function () {
-        this.show.set(false);
+        var self = this;
+        //reset value
+        $(".mail-to").val("");
+        $(".mail-subject").val("");
+        $(".mail-content").code("");
+        $(".mail-template-options").val("");
+        var selectors = {
+            details: '.full-height-scroll.white-bg',
+            slimScroll: {
+                slimClass: '',
+                slimScrollClass: '.slimScrollBar'
+            }
+        };
+        var $details = $(selectors.details);
+        var $mailContainer = $("#sendEmailCandidateForm");
+
+        var height = $mailContainer.offset().top - $details.offset().top;
+
+        $details.animate({
+            scrollTop: height
+        }, 'slow', function () {
+            $details.siblings(selectors.slimScroll.slimScrollClass)
+                .css({'top': height / 2 + 'px'});
+        });
+
+        Template.instance().autorun(function() {
+            var candidate = self.candidate.get();
+            if(candidate) {
+                var toAddress = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
+                $(".mail-to").val(toAddress);
+            }
+        });
     },
 
     events: function () {
@@ -277,28 +318,35 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
     send: function () {
         var self = this;
         self.isLoading.set(true);
+        var appId = this.applicationId.get();
+        if (!appId) return;
+
         var data = {
             subject: $(".mail-subject").val() || "",
             content: $(".mail-content").code() || "",
             mailTemplate: $(".mail-template-options").val() || "",
-            application: this.application.get().entryId
+            application: appId
         };
+
+        console.log(appId);
 
         Meteor.call('sendMailToCandidate', data, function (err, result) {
             if (err) throw err;
             if (result) {
                 Notification.success("Mail sent");
-                self.show.set(false);
                 self.isLoading.set(false);
+                Event.emit('toggleMailForm', false);
             }
         });
     },
 
     cancel: function () {
-        this.show.set(false);
+        Event.emit('toggleMailForm', false);
     }
 
 }).register('SendEmailCandidateForm');
+
+
 
 Template.mailContentEditor.onRendered(function () {
     var instance = Template.instance();
@@ -362,26 +410,28 @@ Template.mailContentEditor.onRendered(function () {
 AddCommentCandidateForm = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
-        this.show = new ReactiveVar(false);
         this.isLoading = new ReactiveVar(false);
+    },
 
-        Template.instance().autorun(function() {
-            var params = Router.current().params;
-            self.show.set(false);
-        });
-
-        Event.on('toggleCommentCandidateForm', function () {
-            var isShow = self.show.get();
-            if (isShow) {
-                self.show.set(false);
-            } else {
-                $(".comment-candidate").val("");
-                self.show.set(true);
+    onRendered: function() {
+        var selectors = {
+            details: '.full-height-scroll.white-bg',
+            slimScroll: {
+                slimClass: '',
+                slimScrollClass: '.slimScrollBar'
             }
+        };
+        var $details = $(selectors.details);
+        var $mailContainer = $("#addCommentForm");
 
-            //     Event.emit('slideToForm', 'comment', !isShow);
+        var height = $mailContainer.offset().top - $details.offset().top;
+
+        $details.animate({
+            scrollTop: height
+        }, 'slow', function () {
+            $details.siblings(selectors.slimScroll.slimScrollClass)
+                .css({'top': height / 2 + 'px'});
         });
-
     },
 
     onDestroyed: function () {
@@ -423,14 +473,14 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
         Meteor.call('addCommentApplication', data, function (err, result) {
             if (err) throw err;
             if (result) {
-                self.show.set(false);
+                Event.emit('toggleCommentForm', false);
                 self.isLoading.set(false);
             }
         });
     },
 
     cancel: function () {
-        this.show.set(false);
+        Event.emit('toggleCommentForm', false);
     }
 
 }).register('AddCommentCandidateForm');

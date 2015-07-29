@@ -11,7 +11,7 @@ Meteor.startup(function () {
         {
             label: "Settings",
             icon: "fa-cogs",
-            route: "#",
+            route: null,
             childrens: [
                 {label: "Company Info", icon: "fa-info", route: "companyInfo"},
                 {

@@ -46,7 +46,8 @@ function getUserInfo(userId) {
     return Collections.Users.findOne({userId: userId}, {
         fields: {
             userId: 1,
-            companyId: 1
+            companyId: 1,
+            username: 1
         }
     });
 }
@@ -423,15 +424,21 @@ Meteor.methods({
         var user = getUserInfo(+this.userId);
 
         var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
-        if (!mailTemplate) return false;
+        if (!mailTemplate) {
+            var from = user.username;
+        } else {
+            var from = mailTemplate.emailFrom;
+        }
 
         var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
         if (!application) return false;
-        var candidate = Collections.Candidates.findOne({userId: application.userId});
+        var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+        if(!candidate) return false;
+        var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
 
         var mail = {
-            to: candidate.data.username,
-            from: mailTemplate.emailFrom,
+            from: from,
+            to: to,
             subject: data.subject,
             html: data.content
         };

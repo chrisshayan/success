@@ -55,6 +55,11 @@ Template.menuItem.helpers({
             return "active";
         }
         return "";
+    },
+
+    menuUrl: function() {
+        if(!this.route) return "#"
+        return Router.url(this.route);
     }
 
 });

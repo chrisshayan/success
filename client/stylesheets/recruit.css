@@ -321,3 +321,25 @@
 .note-editor .note-editable {
     min-height: 240px;
 }
+
+.mc-logo {
+    display: inline-block !important;
+    background: url("http://images.vietnamworks.com/img/matchingscore-s.png") no-repeat top right;
+    width: 115px;
+    height: 12px;
+    margin-top: 5px;
+}
+
+.mc-score div {
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 14px;
+    text-align: right;
+    display: block !important;
+}
+
+.comment-candidate {
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}

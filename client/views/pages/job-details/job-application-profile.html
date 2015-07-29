@@ -24,9 +24,14 @@
                                         <span class="text-danger">Disqualified</span>
                                     {{/if}}
                                 </div>
+
                             </div>
                         </div>
-                        <div class="col-sm-7" style="padding-top: 25px;">
+                        <div class="col-sm-6" style="padding-top: 25px;">
+                            <span class="mc-score block text-right small">
+                                <div>{{ matchingScore }}%</div>
+                                <span class="mc-logo"></span>
+                            </span>
                         </div>
                     </div>
                     <div class="row">
@@ -35,7 +40,7 @@
                                 <p>{{{coverLetter}}}</p>
 
                                 <div class="text-right">
-                                    <a href="javascript:void(0)" class="more-coverletter">{{{ coverLetterToggle.get }}}</a>
+                                    <a class="more-coverletter">{{{ coverLetterToggle.get }}}</a>
                                 </div>
                             </div>
                     </div>

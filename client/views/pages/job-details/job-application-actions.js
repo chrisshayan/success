@@ -96,14 +96,14 @@ JobApplicationActions = BlazeComponent.extendComponent({
      * Send email to candidate
      */
     toggleSendEmailForm: function () {
-        Event.emit('toggleSendEmailCandidateForm');
+        Event.emit('toggleMailForm');
     },
 
     /**
      * add comment to candidate
      */
     toggleCommentForm: function () {
-        Event.emit('toggleCommentCandidateForm');
+        Event.emit('toggleCommentForm');
     },
 
 
