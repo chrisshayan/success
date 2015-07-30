@@ -30,6 +30,7 @@ SYNC_VNW.syncUser = function (userInfo) {
         //Intitial user data
         Meteor.defer(function () {
             Recruit.initialEmployerData(userInfo.userid, userInfo.username);
+            SYNC_VNW.pullCompanyInfo(userInfo.companyid);
             SYNC_VNW.addQueue('initCompany', _user);
         });
         _user.isNew = true;
