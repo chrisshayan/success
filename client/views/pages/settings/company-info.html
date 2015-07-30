@@ -3,7 +3,9 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5>Company <small>information</small></h5>
+                    <h5>Company
+                        <small>information</small>
+                    </h5>
                 </div>
                 <div class="ibox-content">
                     {{> companyInfoForm }}
@@ -60,6 +62,32 @@
             <label class="col-sm-2 control-label text-muted">Company email</label>
             <label class="col-sm-10 control-label"><span class="pull-left">{{ contactEmail }}</span></label>
         </div>
+        <div class="hr-line-dashed"></div>
+        <form>
+            <div class="form-group">
+                <label class="col-sm-2 control-label text-muted">Get jobs in</label>
+
+                <div class="col-sm-2">
+                    <select id="select-nom" class=" col-sm-4 form-control  pull-left">
+                        {{#each options}}
+                            <option value="{{value}}">
+                                {{label}}
+                            </option>
+                        {{/each}}
+                    </select>
+                    <label class="control-label" style="font-weight: normal;">Default : {{defaultMonth}}</label>
+                </div>
+                <div class=" col-sm-1 nomonth-action">
+                    <button class="nomonth confirm btn btn-white" type="submit">
+                        <span class="fa fa-check text-info"></span>
+                    </button>
+                    <button class="nomonth cancel btn btn-white" type="button">
+                        <span class="fa fa-ban text-danger"></span>
+                    </button>
+                </div>
+
+            </div>
+        </form>
         <div class="hr-line-dashed"></div>
     </div>
 </template>

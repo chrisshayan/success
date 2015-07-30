@@ -433,7 +433,7 @@ Meteor.methods({
         var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
         if (!application) return false;
         var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
-        if(!candidate) return false;
+        if (!candidate) return false;
         var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
 
         var mail = {
@@ -610,6 +610,27 @@ Meteor.methods({
     },
     getCompanyInfo: function (companyId) {
         return Collections.CompanySettings.findOne({companyId: companyId});
+    },
+    setNumberOfMonth: function (newValue, companyId) {
+        var query = {companyId: companyId}
+            , options = {
+                fields: {numberOfMonthSync: 1}
+            };
+
+        var oldValue = Collections.CompanySettings.findOne(query, options);
+        console.log(oldValue);
+        try {
+            Collections.CompanySettings.update(query, {$set: {numberOfMonthSync: newValue}});
+            if (!oldValue.numberOfMonthSync || oldValue.numberOfMonthSync < newValue) {
+                //TODO : re-sync data
+
+            }
+
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
     }
 
 });
