@@ -332,7 +332,11 @@ Meteor.publish('lastApplications', function () {
     var canIds = applicationCursor.map(function (doc) {
         return doc.candidateId
     });
-    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, DEFAULT_CANDIDATE_OPTIONS);
+    canIds = _.unique(canIds);
+
+    var canOptions = DEFAULT_CANDIDATE_OPTIONS;
+    canOptions['limit'] = 10;
+    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
     return [
         applicationCursor,
         canCursor
