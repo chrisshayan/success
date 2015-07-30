@@ -219,7 +219,7 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
      * @returns {*}
      */
     timeago: function () {
-        return moment(this.createdAt).fromNow();
+        return moment(this.createdAt).fromNow()
     }
 
 }).register('JobApplicationTimelineItem');
