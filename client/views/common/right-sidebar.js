@@ -33,68 +33,7 @@ var LastCandidates = BlazeComponent.extendComponent({
 
         instance.autorun(function () {
             var trackSub = DashboardSubs.subscribe('lastApplications');
-            if (trackSub.ready()) {
-                var options = {
-                    sort: {
-                        createdAt: -1
-                    }
-                };
-                Collections.Applications.find({}, options).observe({
-                    added: function (doc) {
-                        var o = self.newestApplication.get();
-                        if (o) {
-                            if (o.entryId != doc.entryId && doc.createdAt > o.createdAt) {
-                                var params = {
-                                    jobId: doc.jobId,
-                                    stage: Recruit.APPLICATION_STAGES[doc.stage].alias
-                                };
-                                var query = {
-                                    query: {
-                                        application: doc.entryId
-                                    }
-                                }
-
-                                var title = "New application";
-                                if(doc.matchingScore > 0) {
-                                    title = "New application with matching score "+  doc.matchingScore +" %";
-                                }
-                                var template = '<p><a href="<%=applicationLink%>">view details</a><span class="text-mute pull-right"><%=timeago%></span></p>';
-                                var tmplParams = {
-                                    applicationLink: Router.routes['jobDetails'].url(params, query),
-                                    timeago: moment(doc.createdAt).fromNow()
-                                };
-                                template = _.template(template);
-                                var content = template(tmplParams);
-                                toastr.success(content, title, {timeOut: 10000})
-                                self.newestApplication.set(doc);
-                            }
-                        } else {
-                            self.newestApplication.set(doc);
-                        }
-                    }
-                });
-            }
         });
-
-        instance.autorun(function () {
-            //var o = self.newestApplication.get();
-            //
-            //var n = Collections.Applications.findOne(self.filters(), {
-            //    sort: {
-            //        createdAt: -1
-            //    }
-            //});
-            //if(o) {
-            //    if(o.entryId != n.entryId) {
-            //        var content = "<p></p>";
-            //        Notification.info(content);
-            //    }
-            //}
-            //
-            //self.newestApplication.set(n);
-        });
-
-
     },
 
     filters: function () {
