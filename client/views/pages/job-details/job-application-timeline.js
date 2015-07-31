@@ -328,8 +328,6 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
             application: appId
         };
 
-        console.log(appId);
-
         Meteor.call('sendMailToCandidate', data, function (err, result) {
             if (err) throw err;
             if (result) {

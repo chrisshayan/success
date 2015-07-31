@@ -29,12 +29,72 @@ var LastCandidates = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
         var instance = Template.instance();
+        this.newestApplication = new ReactiveVar(null);
 
         instance.autorun(function () {
             var trackSub = DashboardSubs.subscribe('lastApplications');
             if (trackSub.ready()) {
+                var options = {
+                    sort: {
+                        createdAt: -1
+                    }
+                };
+                Collections.Applications.find({}, options).observe({
+                    added: function (doc) {
+                        var o = self.newestApplication.get();
+                        if (o) {
+                            if (o.entryId != doc.entryId && doc.createdAt > o.createdAt) {
+                                var params = {
+                                    jobId: doc.jobId,
+                                    stage: Recruit.APPLICATION_STAGES[doc.stage].alias
+                                };
+                                var query = {
+                                    query: {
+                                        application: doc.entryId
+                                    }
+                                }
+
+                                var title = "New application";
+                                if(doc.matchingScore > 0) {
+                                    title = "New application with matching score "+  doc.matchingScore +" %";
+                                }
+                                var template = '<p><a href="<%=applicationLink%>">view details</a><span class="text-mute pull-right"><%=timeago%></span></p>';
+                                var tmplParams = {
+                                    applicationLink: Router.routes['jobDetails'].url(params, query),
+                                    timeago: moment(doc.createdAt).fromNow()
+                                };
+                                template = _.template(template);
+                                var content = template(tmplParams);
+                                toastr.success(content, title, {timeOut: 10000})
+                                self.newestApplication.set(doc);
+                            }
+                        } else {
+                            self.newestApplication.set(doc);
+                        }
+                    }
+                });
             }
         });
+
+        instance.autorun(function () {
+            //var o = self.newestApplication.get();
+            //
+            //var n = Collections.Applications.findOne(self.filters(), {
+            //    sort: {
+            //        createdAt: -1
+            //    }
+            //});
+            //if(o) {
+            //    if(o.entryId != n.entryId) {
+            //        var content = "<p></p>";
+            //        Notification.info(content);
+            //    }
+            //}
+            //
+            //self.newestApplication.set(n);
+        });
+
+
     },
 
     filters: function () {
@@ -87,6 +147,8 @@ var LastCandidateItem = BlazeComponent.extendComponent({
             return " label-primary ";
         if (matchingScore >= 50)
             return " label-warning ";
+        if (!matchingScore || matchingScore <= 0)
+            return " hidden ";
 
         return " label-default ";
     },
@@ -119,8 +181,17 @@ var LastCandidateItem = BlazeComponent.extendComponent({
     },
 
     profileUrl: function () {
+        var app = this.application;
+        if (!app) return "";
+        var queryParams = "";
+        if (app.source == 1) {
+            queryParams = "?jobid=%s&appid=%s";
+        } else {
+            queryParams = "?jobid=%s&sdid=%s";
+        }
+
         var url = Meteor.settings.public.applicationUrl;
-        return sprintf(url, this.application.entryId);
+        return url + sprintf(queryParams, app.jobId, app.entryId);
     },
 
     applicationDetailsUrl: function () {

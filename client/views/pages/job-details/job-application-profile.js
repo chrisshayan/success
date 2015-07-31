@@ -28,10 +28,11 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         });
 
         // Bind empty event
-        Event.on('emptyProfile', function () {
+        this.onEmptyProfile = function () {
             self.props.set('application', null);
             self.props.set('candidate', null);
-        });
+        };
+        Event.on('emptyProfile', this.onEmptyProfile);
     },
 
     onRendered: function () {
@@ -47,6 +48,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         });
     },
     onDestroyed: function () {
+        Event.removeListener('emptyProfile', this.onEmptyProfile);
     },
 
     scrollTop: function() {
@@ -147,8 +149,17 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     },
 
     profileUrl: function () {
+        var app = this.props.get("application");
+        if(!app) return "";
+        var queryParams = "";
+        if(app.source == 1) {
+            queryParams = "?jobid=%s&appid=%s";
+        } else {
+            queryParams = "?jobid=%s&sdid=%s";
+        }
+
         var url = Meteor.settings.public.applicationUrl;
-        return sprintf(url, this.props.get('applicationId'));
+        return url + sprintf(queryParams, app.jobId, app.entryId);
     },
 
     isDisqualified: function() {

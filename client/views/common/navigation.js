@@ -2,6 +2,7 @@
 
 Template.navigation.onCreated(function () {
     var self = this;
+    if(!Meteor.user()) return;
     this.company = new ReactiveVar();
     var companyId = Meteor.user().companyid;
     Meteor.call('getCompanyInfo', companyId, function (err, info) {

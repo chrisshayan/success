@@ -46,7 +46,7 @@ JobApplications = BlazeComponent.extendComponent({
         self.trackers.push(tracker);
 
         // Bind listener
-        Event.on('movedApplicationStage', function () {
+        this.moveApplication = function () {
             if (self.fetch().count() > 0) {
                 Router.go('jobDetails', {
                     jobId: self.jobId.get(),
@@ -63,10 +63,12 @@ JobApplications = BlazeComponent.extendComponent({
                     stage: self.stage.get().alias
                 });
             }
-        });
+        };
+        Event.on('movedApplicationStage', this.moveApplication);
     },
 
     onDestroyed: function () {
+        Event.removeListener('movedApplicationStage', this.moveApplication);
         _.each(this.trackers, function (tracker) {
             tracker.stop();
         });
@@ -213,6 +215,8 @@ JobApplication = BlazeComponent.extendComponent({
             return " label-primary ";
         if (matchingScore >= 50)
             return " label-warning ";
+        if (!matchingScore || matchingScore <= 0)
+            return " hidden ";
 
         return " label-default ";
     },
