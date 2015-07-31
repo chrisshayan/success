@@ -9,11 +9,27 @@ function formatDatetimeFromVNW(datetime) {
 
 var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.queries;
-var fetchVNWData = Meteor.wrapAsync(function (sql, callback) {
-    //execute
-    connection.query(sql, function (err, rows, fields) {
+
+
+/*var fetchVNWData = Meteor.wrapAsync(function (sql, callback) {
+ //execute
+ connection.query(sql, function (err, rows, fields) {
+ if (err) throw err;
+ callback(null, rows);
+ });
+ });*/
+
+
+var getPoolConnection = Meteor.wrapAsync(function (callback) {
+    pool.getConnection(function (err, connection) {
+        callback(err, connection);
+    });
+});
+
+var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
+    connection.query(query, function (err, rows, fields) {
         if (err) throw err;
-        callback(null, rows);
+        callback(err, rows);
     });
 });
 
@@ -27,7 +43,9 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     check(companyId, Number);
     var pullCompanyInfoSql = sprintf(VNW_QUERIES.pullCompanyInfo, companyId);
     try {
-        var rows = fetchVNWData(pullCompanyInfoSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullCompanyInfoSql);
+        conn.release();
         _.each(rows, function (row) {
             var company = Collections.CompanySettings.findOne({companyId: row.companyid});
 
@@ -77,7 +95,9 @@ SYNC_VNW.pullJobs = function (userId, companyId) {
 
     var pullJobSql = sprintf(VNW_QUERIES.pullJobs, userId);
     try {
-        var rows = fetchVNWData(pullJobSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullJobSql);
+        conn.release();
         _.each(rows, function (row) {
             var job = new Schemas.Job();
             job.jobId = row.jobid;
@@ -104,7 +124,9 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
     var candidates = [];
     var entryIds = [];
     var pullResumeOnlineSql = sprintf(VNW_QUERIES.pullResumeOnline, jobId);
-    var rows = fetchVNWData(pullResumeOnlineSql);
+    var conn = getPoolConnection();
+    var rows = fetchVNWData(conn, pullResumeOnlineSql);
+    conn.release();
 
     _.each(rows, function (row) {
         var can = Collections.Applications.findOne({entryId: row.entryid});
@@ -147,7 +169,9 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
 
     // PULL applications that sent directly
     var pullResumeDirectlySql = sprintf(VNW_QUERIES.pullResumeDirectly, jobId);
-    var rows1 = fetchVNWData(pullResumeDirectlySql);
+    var conn = getPoolConnection();
+    var rows1 = fetchVNWData(conn, pullResumeDirectlySql);
+    conn.release();
     _.each(rows1, function (row) {
         var can = Collections.Applications.findOne({entryId: row.sdid});
         if (!can) {
@@ -202,7 +226,9 @@ SYNC_VNW.pullCandidates = function (candidates) {
     var pullCandidatesSql = sprintf(VNW_QUERIES.pullCandidates, candidates);
 
     try {
-        var rows = fetchVNWData(pullCandidatesSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullCandidatesSql);
+        conn.release();
         _.each(rows, function (row) {
             var can = Collections.Candidates.findOne({userId: row.userid});
 
@@ -236,7 +262,9 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
 
     var pullApplicationScoreSql = sprintf(VNW_QUERIES.pullApplicationScores, entryIds.join(","));
     try {
-        var rows = fetchVNWData(pullApplicationScoreSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullApplicationScoreSql);
+        conn.release();
         _.each(rows, function (row) {
             var application = Collections.Applications.findOne({entryId: row.applicationId});
             if (application) {
@@ -359,7 +387,9 @@ Workers.analyticApplications = function (companyId, items) {
 Workers.insertVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var rows = fetchVNWData(pullJobSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullJobSql);
+        conn.release();
         _.each(rows, function (row) {
             var job = new Schemas.Job();
             job.jobId = row.jobid;
@@ -381,7 +411,9 @@ Workers.insertVNWJob = function (jobId, companyId) {
 Workers.updateVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var rows = fetchVNWData(pullJobSql);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, pullJobSql);
+        conn.release();
         _.each(rows, function (row) {
             var criteria = {
                 jobId: jobId
@@ -420,8 +452,9 @@ Workers.insertVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-
-        var rows = fetchVNWData(query);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, query);
+        conn.release();
         _.each(rows, function (row) {
             var app = new Schemas.Application();
             if (data.source == 1) {
@@ -467,8 +500,9 @@ Workers.updateVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-
-        var rows = fetchVNWData(query);
+        var conn = getPoolConnection();
+        var rows = fetchVNWData(conn, query);
+        conn.release();
         _.each(rows, function (row) {
             var criteria = {
                 entryId: data.typeId
@@ -557,7 +591,9 @@ SYNC_VNW.syncNewCompany = function (j, cb) {
 
     // GET ALL JOB IDS
     jSql = sprintf(VNW_QUERIES.checkJobsUpdate, userId);
-    jRows = fetchVNWData(jSql);
+    var conn = getPoolConnection();
+    jRows = fetchVNWData(conn, jSql);
+    conn.release();
     if (jRows.length <= 0) {
         Collections.Users.update(user._id, {$set: {isSynchronizing: false}});
         return true;
@@ -567,7 +603,9 @@ SYNC_VNW.syncNewCompany = function (j, cb) {
     var jobIds = _.pluck(jRows, 'typeId');
     if (jobIds.length > 0) {
         var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, jobIds, jobIds);
-        var appRows = fetchVNWData(appSql);
+        var conn = getPoolConnection();
+        var appRows = fetchVNWData(conn, appSql);
+        conn.release();
         if (appRows.length > 0) {
             // Sync applications
             SYNC_VNW.pullData(companyId, appRows);
