@@ -24,9 +24,9 @@ Meteor.methods({
             this.setUserId(data.userid + "");
 
             var user = SYNC_VNW.syncUser(data);
-            console.log('new user : ', user.isNew);
-            if (user.isNew)
-                SYNC_VNW.syncNewLogin(user);
+            //console.log('new user : ', user.isNew);
+            //if (user.isNew)
+            //    SYNC_VNW.syncNewLogin(user);
 
         }
         console.log('logged in');
