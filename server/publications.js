@@ -124,6 +124,7 @@ Meteor.publish('getApplications', function (filters, options) {
     check(options, Object);
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return;
+    var cursors = [];
     filters['companyId'] = user.companyId;
 
     options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
@@ -131,14 +132,17 @@ Meteor.publish('getApplications', function (filters, options) {
         options['limit'] = 20;
     }
     var applicationCursor = Collections.Applications.find(filters, options);
+    cursors.push( applicationCursor );
     var canIds = applicationCursor.map(function (doc) {
         return doc.candidateId
     });
-    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, DEFAULT_CANDIDATE_OPTIONS);
-    return [
-        applicationCursor,
-        canCursor
-    ];
+    if(canIds.length > 0) {
+        var canOptions = DEFAULT_CANDIDATE_OPTIONS;
+        canOptions["limit"] = canIds.length;
+        var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
+        cursors.push( canCursor );
+    }
+    return cursors;
 });
 
 Meteor.publish('getApplicationDetails', function (applicationId) {
@@ -318,6 +322,7 @@ Meteor.publish('lastApplications', function () {
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return [];
 
+    var cursors = [];
     var filters = {
         companyId: user.companyId
     };
@@ -329,18 +334,17 @@ Meteor.publish('lastApplications', function () {
     };
 
     var applicationCursor = Collections.Applications.find(filters, options);
+    cursors.push( applicationCursor );
     var canIds = applicationCursor.map(function (doc) {
         return doc.candidateId
     });
-    canIds = _.unique(canIds);
-
-    var canOptions = DEFAULT_CANDIDATE_OPTIONS;
-    canOptions['limit'] = 10;
-    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
-    return [
-        applicationCursor,
-        canCursor
-    ];
+    if(canIds.length > 0) {
+        var canOptions = DEFAULT_CANDIDATE_OPTIONS;
+        canOptions["limit"] = canIds.length;
+        var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
+        cursors.push( canCursor );
+    }
+    return cursors;
 });
 
 
