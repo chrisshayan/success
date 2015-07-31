@@ -26,9 +26,6 @@ peerlibrary:blaze-components
 raix:eventemitter
 summernote:summernote
 mpowaga:autoform-summernote
-lab:vnw-apis
-lab:accounts-vnw
-lab:notifications
 meteorhacks:fast-render
 meteorhacks:subs-manager
 meteorhacks:kadira
@@ -37,4 +34,8 @@ kadira:debug
 vsivsi:queue-async
 cfs:reactive-list
 cfs:power-queue
+
+lab:vnw-apis
+lab:accounts-vnw
+lab:notifications
 
