@@ -39,3 +39,4 @@ lab:vnw-apis
 lab:accounts-vnw
 lab:notifications
 
+lab:mysql-connection-manager

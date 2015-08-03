@@ -41,6 +41,7 @@ jquery@1.11.3_2
 json@1.0.3
 kadira:debug@2.1.0
 lab:accounts-vnw@0.0.1
+lab:mysql-connection-manager@0.0.1
 lab:notifications@0.0.1
 lab:vnw-apis@0.0.1
 launch-screen@1.0.2
@@ -53,7 +54,7 @@ meteor@1.1.6
 meteor-platform@1.2.2
 meteorhacks:fast-render@2.7.1
 meteorhacks:inject-data@1.3.0
-meteorhacks:kadira@2.22.0
+meteorhacks:kadira@2.22.1
 meteorhacks:kadira-binary-deps@1.4.0
 meteorhacks:kadira-profiler@1.2.0
 meteorhacks:meteorx@1.3.1
@@ -87,8 +88,8 @@ sgi:sprintfjs@0.0.2
 spacebars@1.0.6
 spacebars-compiler@1.0.6
 steeve:reactive-cookie@0.0.8
-summernote:standalone@0.6.12
-summernote:summernote@0.6.12
+summernote:standalone@0.6.15
+summernote:summernote@0.6.15
 templating@1.1.1
 tracker@1.0.7
 twbs:bootstrap@3.3.5
