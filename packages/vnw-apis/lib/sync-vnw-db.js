@@ -20,12 +20,6 @@ var VNW_TABLES = Meteor.settings.tables,
  });*/
 
 
-var getPoolConnection = Meteor.wrapAsync(function (callback) {
-    pool.getConnection(function (err, connection) {
-        callback(err, connection);
-    });
-});
-
 var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
     connection.query(query, function (err, rows, fields) {
         if (err) throw err;
@@ -43,7 +37,7 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     check(companyId, Number);
     var pullCompanyInfoSql = sprintf(VNW_QUERIES.pullCompanyInfo, companyId);
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullCompanyInfoSql);
         conn.release();
         _.each(rows, function (row) {
@@ -95,7 +89,7 @@ SYNC_VNW.pullJobs = function (userId, companyId) {
 
     var pullJobSql = sprintf(VNW_QUERIES.pullJobs, userId);
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullJobSql);
         conn.release();
         _.each(rows, function (row) {
@@ -124,7 +118,7 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
     var candidates = [];
     var entryIds = [];
     var pullResumeOnlineSql = sprintf(VNW_QUERIES.pullResumeOnline, jobId);
-    var conn = getPoolConnection();
+    var conn = mysqlManager.getPoolConnection();
     var rows = fetchVNWData(conn, pullResumeOnlineSql);
     conn.release();
 
@@ -169,7 +163,7 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
 
     // PULL applications that sent directly
     var pullResumeDirectlySql = sprintf(VNW_QUERIES.pullResumeDirectly, jobId);
-    var conn = getPoolConnection();
+    var conn = mysqlManager.getPoolConnection();
     var rows1 = fetchVNWData(conn, pullResumeDirectlySql);
     conn.release();
     _.each(rows1, function (row) {
@@ -226,7 +220,7 @@ SYNC_VNW.pullCandidates = function (candidates) {
     var pullCandidatesSql = sprintf(VNW_QUERIES.pullCandidates, candidates);
 
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullCandidatesSql);
         conn.release();
         _.each(rows, function (row) {
@@ -262,7 +256,7 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
 
     var pullApplicationScoreSql = sprintf(VNW_QUERIES.pullApplicationScores, entryIds.join(","));
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullApplicationScoreSql);
         conn.release();
         _.each(rows, function (row) {
@@ -387,7 +381,7 @@ Workers.analyticApplications = function (companyId, items) {
 Workers.insertVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullJobSql);
         conn.release();
         _.each(rows, function (row) {
@@ -411,7 +405,7 @@ Workers.insertVNWJob = function (jobId, companyId) {
 Workers.updateVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, pullJobSql);
         conn.release();
         _.each(rows, function (row) {
@@ -452,7 +446,7 @@ Workers.insertVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, query);
         conn.release();
         _.each(rows, function (row) {
@@ -500,7 +494,7 @@ Workers.updateVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var rows = fetchVNWData(conn, query);
         conn.release();
         _.each(rows, function (row) {
@@ -592,7 +586,7 @@ function syncCompanyData(j, cb) {
 
         // GET ALL JOB IDS
         var jSql = sprintf(VNW_QUERIES.checkJobsUpdate, userId);
-        var conn = getPoolConnection();
+        var conn = mysqlManager.getPoolConnection();
         var jRows = fetchVNWData(conn, jSql);
 
         conn.release();
@@ -606,7 +600,7 @@ function syncCompanyData(j, cb) {
         if (jobIds.length > 0) {
 
             var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, jobIds, jobIds);
-            var conn = getPoolConnection();
+            var conn = mysqlManager.getPoolConnection();
             var appRows = fetchVNWData(conn, appSql);
             conn.release();
             if (appRows.length > 0) {

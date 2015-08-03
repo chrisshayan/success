@@ -1,14 +1,16 @@
 var crypto = Npm.require('crypto');
 
-connection = mysql.createConnection(Meteor.settings.mysql);
-connection.connect(function (err) {
-    if (err) {
-        console.error('error connecting: ' + err.stack);
-        return;
-    }
+/*
+ connection = mysql.createConnection(Meteor.settings.mysql);
+ connection.connect(function (err) {
+ if (err) {
+ console.error('error connecting: ' + err.stack);
+ return;
+ }
 
-    debuger('connected as id ' + connection.threadId);
-});
+ debuger('connected as id ' + connection.threadId);
+ });
+ */
 
 VNW_TABLES = Meteor.settings.tables;
 VNW_QUERIES = Meteor.settings.queries;
@@ -48,13 +50,17 @@ APIS.login = function (username, password, type, callback) {
     };
 
     var sql = sprintf(VNW_QUERIES.checkLogin, username, password, type);
-    connection.query(sql, function (err, rows, fields) {
+    var conn = mysqlManager.getPoolConnection();
+
+    conn.query(sql, function (err, rows, fields) {
         if (err) throw err;
         if (rows.length === 1) {
             result.success = true;
             result.msg = "";
             result.data = rows[0];
         }
+        conn.release();
         callback(null, result);
+
     });
 };

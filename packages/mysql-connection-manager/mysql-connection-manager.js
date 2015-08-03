@@ -20,9 +20,21 @@ if(Meteor.settings.hasOwnProperty('mysql')) {
         keepAliveInterval: 30000// How frequently keep-alive pings will be sent; milliseconds.
     };
 
-    mysqlManager.pool = mysql.createPool(mysqlConfig);
+    var pool = mysql.createPool(mysqlConfig);
 
-    mysqlManager.manager = new MySQLConnectionManager(options, mysqlManager.pool);
+    mysqlManager.manager = new MySQLConnectionManager(options, pool);
+
+    mysqlManager.getPoolConnection = Meteor.wrapAsync(function (callback) {
+        try {
+            mysqlManager.manager.connection.getConnection(function (err, connection) {
+                callback(err, connection);
+            });
+        } catch (e) {
+            console.log('err');
+            throw e;
+        }
+    });
+
 
     mysqlManager.manager.on('connect', function (connection) {
         console.log("Mysql connected")
