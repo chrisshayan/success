@@ -15,7 +15,6 @@ iron:router
 twbs:bootstrap
 fortawesome:fontawesome
 momentjs:moment
-pcel:mysql
 sgi:sprintfjs
 wylio:mandrill
 aldeed:collection2

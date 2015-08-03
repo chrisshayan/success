@@ -36,7 +36,7 @@ Recruit.APPLICATION_STAGES = {
  * Initial data after first time user login
  * @param userId {Number}
  */
-Recruit.initialEmployerData = function(userId, username) {
+Recruit.initialEmployerData = function(userId, username, companyId) {
     check(userId, Number);
     check(username, String);
 
@@ -46,6 +46,7 @@ Recruit.initialEmployerData = function(userId, username) {
             template = _.extend(template, tmpl);
             template.type = 1;
             template.emailFrom = username;
+            template.companyId =  companyId;
             template.modifiedBy = template.createdBy = userId;
             Collections.MailTemplates.insert(template);
         });

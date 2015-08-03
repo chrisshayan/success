@@ -1,3 +1,4 @@
+
 function formatDatetimeFromVNW(datetime) {
     var d = moment(datetime);
     var offsetBase = 420;
@@ -11,15 +12,6 @@ var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.queries;
 
 
-/*var fetchVNWData = Meteor.wrapAsync(function (sql, callback) {
- //execute
- connection.query(sql, function (err, rows, fields) {
- if (err) throw err;
- callback(null, rows);
- });
- });*/
-
-
 var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
     connection.query(query, function (err, rows, fields) {
         if (err) throw err;
@@ -27,8 +19,40 @@ var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
     });
 });
 
-//Namespace to share methods to manual sync data from Vietnamworks
+//Namespace to share methods to manual sync data from VietnamSYNC_VNW
 SYNC_VNW = {};
+
+
+//Namespace to share methods to manual sync data from VietnamSYNC_VNW
+SYNC_VNW.syncUser = function (userInfo) {
+    var _user = Collections.Users.findOne({userId: userInfo.userid});
+
+    if (!_user) {
+        var _user = new Schemas.User();
+        _user.data = userInfo;
+        _user.companyId = userInfo.companyid;
+        _user.userId = userInfo.userid;
+        _user.username = userInfo.username;
+        _user.createdAt = userInfo.createddate;
+        Collections.Users.insert(_user);
+
+        //Intitial user data
+        Meteor.defer(function () {
+            Recruit.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
+            SYNC_VNW.pullCompanyInfo(userInfo.companyid);
+            var jobData = {
+                userId: _user.userId,
+                companyId: userInfo.companyid
+            }
+            SYNC_VNW.addQueue('pullCompanyData', jobData);
+        });
+    } else if (!_.isEqual(_user.data, userInfo)) {
+        Collections.Users.update(_user._id, {$set: {data: userInfo, lastSyncedAt: new Date()}});
+    }
+
+    return _user;
+};
+
 
 /**
  * Pull company info
@@ -77,38 +101,6 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     } catch (e) {
         debuger(e);
     }
-}
-
-/**
- * Pull new jobs and sync db
- * @param userId {Number} (Optional) Vietnamworks user id
- */
-SYNC_VNW.pullJobs = function (userId, companyId) {
-    check(userId, Number);
-    check(companyId, Number);
-
-    var pullJobSql = sprintf(VNW_QUERIES.pullJobs, userId);
-    try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullJobSql);
-        conn.release();
-        _.each(rows, function (row) {
-            var job = new Schemas.Job();
-            job.jobId = row.jobid;
-            job.companyId = companyId;
-            job.userId = userId;
-            job.data = row;
-            job.createdAt = formatDatetimeFromVNW(row.createddate);
-            Collections.Jobs.upsert({jobId: row.jobid}, job);
-
-            SYNC_VNW.pullApplications(row.jobid, companyId);
-        });
-
-    } catch (e) {
-        debuger(e)
-    }
-
-    Collections.Users.update({userId: userId}, {$set: {isSynchronizing: false}});
 }
 
 SYNC_VNW.pullApplications = function (jobId, companyId) {
@@ -207,6 +199,7 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
     Meteor.defer(function () {
         SYNC_VNW.pullCandidates(candidates);
     });
+
     Meteor.defer(function () {
         SYNC_VNW.pullApplicationScores(entryIds);
     });
@@ -277,14 +270,8 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
     }
 }
 
-Workers = {};
 
-Workers.initialCompany = function (userId, companyId) {
-    // Insert company info
-    SYNC_VNW.sync([userId]);
-}
-
-Workers.analyticJobs = function (companyId, items) {
+SYNC_VNW.analyticJobs = function (companyId, items) {
     check(companyId, Number);
     check(items, Array);
     var result = {
@@ -325,7 +312,7 @@ Workers.analyticJobs = function (companyId, items) {
     return result;
 }
 
-Workers.analyticApplications = function (companyId, items) {
+SYNC_VNW.analyticApplications = function (companyId, items) {
     check(companyId, Number);
     check(items, Array);
     var result = {
@@ -378,7 +365,7 @@ Workers.analyticApplications = function (companyId, items) {
     return result;
 }
 
-Workers.insertVNWJob = function (jobId, companyId) {
+SYNC_VNW.insertVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
         var conn = mysqlManager.getPoolConnection();
@@ -394,7 +381,7 @@ Workers.insertVNWJob = function (jobId, companyId) {
             job.createdAt = formatDatetimeFromVNW(row.createddate);
             Collections.Jobs.insert(job);
 
-            SYNC_VNW.pullApplications(jobId, companyId);
+            //SYNC_VNW.pullApplications(jobId, companyId);
         });
 
     } catch (e) {
@@ -402,7 +389,7 @@ Workers.insertVNWJob = function (jobId, companyId) {
     }
 }
 
-Workers.updateVNWJob = function (jobId, companyId) {
+SYNC_VNW.updateVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
         var conn = mysqlManager.getPoolConnection();
@@ -424,7 +411,7 @@ Workers.updateVNWJob = function (jobId, companyId) {
     }
 }
 
-Workers.deleteVNWJobs = function (jobIds) {
+SYNC_VNW.deleteVNWJobs = function (jobIds) {
     try {
         check(jobIds, Array);
         if (jobIds.length <= 0) return true;
@@ -436,11 +423,11 @@ Workers.deleteVNWJobs = function (jobIds) {
         };
         Collections.Jobs.remove(criteria);
     } catch (e) {
-        debuger(e)
+        debuger(e);
     }
 }
 
-Workers.insertVNWApplication = function (data, companyId) {
+SYNC_VNW.insertVNWApplication = function (data, companyId) {
     try {
         var query = sprintf(VNW_QUERIES.pullAppOnline, data.typeId);
         if (data.source == 2) {
@@ -488,7 +475,7 @@ Workers.insertVNWApplication = function (data, companyId) {
     }
 }
 
-Workers.updateVNWApplication = function (data, companyId) {
+SYNC_VNW.updateVNWApplication = function (data, companyId) {
     try {
         var query = sprintf(VNW_QUERIES.pullAppOnline, data.typeId);
         if (data.source == 2) {
@@ -515,7 +502,7 @@ Workers.updateVNWApplication = function (data, companyId) {
     }
 }
 
-Workers.deleteVNWApplications = function (items) {
+SYNC_VNW.deleteVNWApplications = function (items) {
     try {
         check(items, Array);
         if (items.length <= 0) return true;
@@ -534,100 +521,97 @@ Workers.deleteVNWApplications = function (items) {
 
 
 SYNC_VNW.pullData = function (companyId, items) {
-    check(items, Array);
-    if (items.length <= 0) return true;
-    // Check items new, updated, deleted
-    var mainType = items[0].type;
-    switch (mainType) {
-        case "job":
+    try {
+        check(items, Array);
+        if (items.length <= 0) return true;
+        // Check items new, updated, deleted
+        var mainType = items[0].type;
+        switch (mainType) {
+            case "job":
 
-            var result = Workers.analyticJobs(companyId, items);
-            // Insert new job
-            _.each(result.added, function (jobId) {
-                Workers.insertVNWJob(jobId, companyId);
-            });
-            // Update new job
-            _.each(result.changed, function (jobId) {
-                Workers.updateVNWJob(jobId, companyId);
-            });
-            // Delete new jobs
-            Workers.deleteVNWJobs(result.removed);
+                var result = SYNC_VNW.analyticJobs(companyId, items);
+                // Insert new job
+                _.each(result.added, function (jobId) {
+                    SYNC_VNW.insertVNWJob(jobId, companyId);
+                });
+                // Update new job
+                _.each(result.changed, function (jobId) {
+                    SYNC_VNW.updateVNWJob(jobId, companyId);
+                });
+                // Delete new jobs
+                SYNC_VNW.deleteVNWJobs(result.removed);
 
-            break;
+                break;
 
-        case "application":
-            var result = Workers.analyticApplications(companyId, items);
-            // Insert new job
-            _.each(result.added, function (app) {
-                Workers.insertVNWApplication(app, companyId);
-            });
-            // Update new job
-            _.each(result.changed, function (app) {
-                Workers.updateVNWApplication(app, companyId);
-            });
-            // Delete new jobs
-            Workers.deleteVNWApplications(result.removed);
-            break;
+            case "application":
+                var result = SYNC_VNW.analyticApplications(companyId, items);
+                // Insert new job
+                _.each(result.added, function (app) {
+                    SYNC_VNW.insertVNWApplication(app, companyId);
+                });
+                // Update new job
+                _.each(result.changed, function (app) {
+                    SYNC_VNW.updateVNWApplication(app, companyId);
+                });
+                // Delete new jobs
+                SYNC_VNW.deleteVNWApplications(result.removed);
+                break;
 
-        case "candidate":
+            case "candidate":
 
-            break;
-        default:
-            return true;
+                break;
+            default:
+                return true;
+        }
+    } catch (e) {
+        debuger(e)
     }
 }
 
-function syncCompanyData(j, cb) {
+function pullCompanyData(j, cb) {
     var user = j.data;
     var userId = user.userId;
     var companyId = user.companyId;
-    try {
-        Collections.Users.update(user._id, {$set: {isSynchronizing: true}});
 
+    try {
         // GET ALL JOB IDS
+
         var jSql = sprintf(VNW_QUERIES.checkJobsUpdate, userId);
         var conn = mysqlManager.getPoolConnection();
         var jRows = fetchVNWData(conn, jSql);
 
         conn.release();
+
         if (jRows.length <= 0) {
-            Collections.Users.update(user._id, {$set: {isSynchronizing: false}});
             return true;
         }
         SYNC_VNW.pullData(companyId, jRows);
 
         var jobIds = _.pluck(jRows, 'typeId');
         if (jobIds.length > 0) {
-
-            var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, jobIds, jobIds);
-            var conn = mysqlManager.getPoolConnection();
-            var appRows = fetchVNWData(conn, appSql);
-            conn.release();
-            if (appRows.length > 0) {
-                // Sync applications
-                SYNC_VNW.pullData(companyId, appRows);
+            while(jobIds.length > 0 ) {
+                var chunk = jobIds.splice(0, 20);
+                var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, chunk, chunk);
+                var conn = mysqlManager.getPoolConnection();
+                var appRows = fetchVNWData(conn, appSql);
+                conn.release();
+                if (appRows.length > 0) {
+                    // Sync applications
+                    SYNC_VNW.pullData(companyId, appRows);
+                }
             }
+
         }
         j.done();
-    } catch(e) {
-        j.fail();
+    } catch (e) {
+        j.fail(e);
         debuger(e);
     }
-    Collections.Users.update(user._id, {$set: {isSynchronizing: false}});
     cb();
 }
 
-SYNC_VNW.sync = function (users) {
-
-    if (!users)
-        var users = Collections.Users.find({isSynchronizing: false}).fetch();
-
-    _.each(users, function (user) {
-        Meteor.defer(function () {
-            SYNC_VNW.addQueue('pullCompanyData', user);
-        })
-    });
-
+SYNC_VNW.sync = function () {
+    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {$set: {status: "ready", runId: null}})
 }
 
 SYNC_VNW.addQueue = function (type, data) {
@@ -637,8 +621,7 @@ SYNC_VNW.addQueue = function (type, data) {
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;
 Collections.SyncQueue = JobCollection('vnw_sync_queue');
-Collections.SyncQueue.processJobs('initCompany', {concurrency: 20, payload: 1}, syncCompanyData);
-Collections.SyncQueue.processJobs('pullCompanyData', {concurrency: 5, payload: 1}, syncCompanyData);
+Collections.SyncQueue.processJobs('pullCompanyData', {concurrency: 20, payload: 1}, pullCompanyData);
 
 Meteor.startup(function () {
     return Collections.SyncQueue.startJobServer();
