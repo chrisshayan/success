@@ -1,13 +1,10 @@
 if(Meteor.settings.hasOwnProperty('mysql')) {
+    mysqlManager = {};
     var mysqlConfig = Meteor.settings.mysql;
+    var mysql = Npm.require('mysql');
     var MySQLConnectionManager = Npm.require('mysql-connection-manager');
 
     var options = {
-        host: mysqlConfig.host,
-        port: 3306,
-        user: mysqlConfig.user,
-        password: mysqlConfig.password,
-        database: mysqlConfig.database,
         autoReconnect: true,// Whether or not to re-establish a database connection after a disconnect.
         reconnectDelay: [
             500,// Time between each attempt in the first group of reconnection attempts; milliseconds.
@@ -23,17 +20,19 @@ if(Meteor.settings.hasOwnProperty('mysql')) {
         keepAliveInterval: 30000// How frequently keep-alive pings will be sent; milliseconds.
     };
 
-    mysqlManager = new MySQLConnectionManager(options);
+    mysqlManager.pool = mysql.createPool(mysqlConfig);
 
-    mysqlManager.on('connect', function (connection) {
+    mysqlManager.manager = new MySQLConnectionManager(options, mysqlManager.pool);
+
+    mysqlManager.manager.on('connect', function (connection) {
         console.log("Mysql connected")
     });
 
-    mysqlManager.on('reconnect', function (connection) {
+    mysqlManager.manager.on('reconnect', function (connection) {
         console.log("Mysql reconnected")
     });
 
-    mysqlManager.on('disconnect', function () {
+    mysqlManager.manager.on('disconnect', function () {
         console.log("Mysql disconnected")
     });
 }

@@ -11,6 +11,7 @@ Package.describe({
 });
 
 Npm.depends({
+    'mysql': '2.8.0',
     'mysql-connection-manager': '0.0.10'
 });
 
