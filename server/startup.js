@@ -1,5 +1,3 @@
-
-
 Meteor.startup(function () {
     Meteor.Mandrill.config({
         username: Meteor.settings.mandrill.username,
@@ -9,7 +7,7 @@ Meteor.startup(function () {
     /* create index */
     var options = Meteor.settings.indexMongo._options;
     var collections = Meteor.settings.indexMongo.collections;
-    
+
     if (collections)
         _.each(collections, function (indexObj, key) {
             if (Collections[key]) {
@@ -17,7 +15,7 @@ Meteor.startup(function () {
                 indexObj.forEach(function (obj) {
                     col.createIndex(obj, options, function (err, result) {
                         if (err) throw err;
-                        console.log('indexed : %s !', result)
+                        console.log('database %s indexed %s !', key, result)
                     })
                 })
             }
