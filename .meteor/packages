@@ -33,6 +33,7 @@ kadira:debug
 vsivsi:queue-async
 cfs:reactive-list
 cfs:power-queue
+reywood:publish-composite
 
 lab:vnw-apis
 lab:accounts-vnw

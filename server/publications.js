@@ -119,7 +119,38 @@ Meteor.publish('getJobs', function (filters, options) {
 });
 
 
-Meteor.publish('getApplications', function (filters, options) {
+Meteor.publishComposite('getApplications', function (filters, options) {
+    return {
+        find: function() {
+            if(!this.userId) return [];
+            check(filters, Object);
+            check(options, Object);
+            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+            if (!user) return;
+            filters['companyId'] = user.companyId;
+
+            options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
+            if (!options.hasOwnProperty("limit")) {
+                options['limit'] = 20;
+            }
+            return Collections.Applications.find(filters, options);
+        },
+        children: [
+            {
+                find: function(application) {
+                    var cond = {
+                        candidateId: application.candidateId
+                    };
+                    var options = DEFAULT_CANDIDATE_OPTIONS;
+                    options.limit = 1;
+                    return Collections.Candidates.find(cond, options)
+                }
+            }
+        ]
+    }
+});
+
+Meteor.publish('getApplications1', function (filters, options) {
     check(filters, Object);
     check(options, Object);
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
@@ -317,7 +348,41 @@ Meteor.publish("activityCounter", function (counterName, filters) {
     });
 });
 
-Meteor.publish('lastApplications', function () {
+Meteor.publishComposite('lastApplications', function () {
+    return {
+        find: function() {
+            if (!this.userId) return [];
+            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+            if (!user) return [];
+
+            var cursors = [];
+            var filters = {
+                companyId: user.companyId
+            };
+
+            var options = DEFAULT_APPLICATION_OPTIONS;
+            options['limit'] = 10;
+            options['sort'] = {
+                createdAt: -1
+            };
+
+            return Collections.Applications.find(filters, options);
+        },
+        children: [
+            {
+                find: function(application) {
+                    var cond = {
+                        candidateId: application.candidateId
+                    };
+                    var options = DEFAULT_CANDIDATE_OPTIONS;
+                    options.limit = 1;
+                    return Collections.Candidates.find(cond, options)
+                }
+            }
+        ]
+    }
+});
+Meteor.publish('lastApplications1', function () {
     if (!this.userId) return [];
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return [];
