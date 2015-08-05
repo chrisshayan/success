@@ -194,7 +194,7 @@ SYNC_VNW.pullCandidates = function (candidates) {
         var rows = fetchVNWData(conn, pullCandidatesSql);
         conn.release();
         _.each(rows, function (row) {
-            var can = Collections.Candidates.findOne({userId: row.userid});
+            var can = Collections.Candidates.findOne({candidateId: row.userid});
 
             if (!can) {
                 can = new Schemas.Candidate();
@@ -356,6 +356,7 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
             job.data = row;
             job.expiredAt = formatDatetimeFromVNW(row.expireddate);
             job.createdAt = formatDatetimeFromVNW(row.createddate);
+            job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
             Collections.Jobs.insert(job);
 
             //SYNC_VNW.pullApplications(jobId, companyId);
@@ -561,6 +562,7 @@ function pullCompanyData(j, cb) {
         conn.release();
 
         if (jRows.length <= 0) {
+            j.done();
             return true;
         }
         SYNC_VNW.pullData(companyId, jRows);
@@ -584,11 +586,17 @@ function pullCompanyData(j, cb) {
         j.fail(e);
         debuger(e);
     }
+
     cb();
 }
 
 SYNC_VNW.sync = function () {
-    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {$set: {status: "ready", runId: null}})
+    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {
+        $set: {
+            status: "ready",
+            runId: null
+        }
+    })
 };
 
 SYNC_VNW.addQueue = function (type, data) {
