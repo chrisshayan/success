@@ -351,7 +351,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 Meteor.publishComposite('lastApplications', function () {
     return {
         find: function() {
-            if (!this.userId) return [];
+            if (!this.userId) return this.ready();
             var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
             if (!user) return [];
 
