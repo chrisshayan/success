@@ -32,13 +32,14 @@ Package.onUse(function (api) {
     api.addFiles([
         'lib/debuger.js',
         'lib/collections.js',
-        'lib/schemas.js',
+        'lib/schemas.js'
     ], both);
 
     api.addFiles([
         'lib/sync-vnw-db.js',
+        'lib/cron-vnw-db.js',
         'lib/cron.js',
-        'lib/apis.js',
+        'lib/apis.js'
     ], 'server');
 
     /**
