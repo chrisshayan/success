@@ -586,17 +586,19 @@ function pullCompanyData(j, cb) {
         j.fail(e);
         debuger(e);
     }
+    var cronData = {
+        lastUpdated: new Date(),
+        userId: userId,
+        companyId: companyId
+    };
 
+    SYNC_VNW.addQueue('cronData', cronData);
     cb();
 }
 
 SYNC_VNW.sync = function () {
-    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {
-        $set: {
-            status: "ready",
-            runId: null
-        }
-    })
+    Collections.SyncQueue.remove({type: "cronData"});
+    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {$set: {status: "ready", runId: null}})
 };
 
 SYNC_VNW.addQueue = function (type, data) {

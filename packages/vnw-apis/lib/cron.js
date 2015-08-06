@@ -12,7 +12,7 @@ var syncData = function () {
             return parser.text(Meteor.settings.private.cronJobSchedule);
         },
         job: function () {
-            SYNC_VNW.sync();
+            CRON_VNW.cron();
         }
     });
 };
