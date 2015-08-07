@@ -5,13 +5,24 @@
 # but you can also edit it by hand.
 
 meteor-platform
-autopublish
 less
 iron:router
 twbs:bootstrap
-fortawesome:fontawesome
 zimme:iron-router-active
 jquery
 okgrow:iron-router-autoscroll
 anti:fake
 momentjs:moment
+dbarrett:dropzonejs
+aldeed:collection2
+aldeed:simple-schema
+aldeed:autoform
+accounts-password
+fortawesome:fontawesome
+mizzao:user-status
+useraccounts:bootstrap
+accounts-facebook
+service-configuration
+accounts-ui
+pauli:accounts-linkedin
+accounts-google
