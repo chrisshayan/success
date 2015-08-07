@@ -26,3 +26,8 @@ service-configuration
 accounts-ui
 pauli:accounts-linkedin
 accounts-google
+
+matb33:collection-hooks
+ahmetcetin:autoform-tags
+mpowaga:autoform-summernote
+reactive-dict

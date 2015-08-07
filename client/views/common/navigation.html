@@ -49,7 +49,27 @@
                     <a href="{{ pathFor 'dashboard' }}">
                         <i class="fa fa-th-large"></i>
                         <span class="nav-label">Dashboard</span>
-                        <span class="fa arrow"></span>
+                    </a>
+                </li>
+
+                <li class="{{isActiveRoute regex='jobs'}}">
+                    <a href="{{ pathFor 'jobs' }}">
+                        <i class="fa fa-briefcase"></i>
+                        <span class="nav-label">Jobs</span>
+                    </a>
+                </li>
+
+                <li class="{{isActiveRoute regex='candidates'}}">
+                    <a href="{{ pathFor 'candidates' }}">
+                        <i class="fa fa-users"></i>
+                        <span class="nav-label">Candidates</span>
+                    </a>
+                </li>
+
+                <li class="{{isActiveRoute regex='mailbox'}}">
+                    <a href="{{ pathFor 'mailBox' }}">
+                        <i class="fa fa-envelope-o"></i>
+                        <span class="nav-label">Mail Box</span>
                     </a>
                 </li>
 

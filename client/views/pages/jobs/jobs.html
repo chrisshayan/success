@@ -1,0 +1,93 @@
+<template name="jobs">
+    <div class="wrapper wrapper-content" style="padding-bottom: 60px;">
+        <div class="row wrapper border-bottom white-bg page-heading" style="margin-bottom: 20px">
+            <div class="col-sm-12">
+                <h2>
+                    <a href="{{pathFor 'addJob'}}" class="btn btn-primary pull-right">Add new job</a>
+                    Jobs
+                </h2>
+            </div>
+        </div>
+        <ul class="positions">
+            {{#each items}}
+                {{> jobItem}}
+            {{/each}}
+        </ul>
+    </div>
+</template>
+
+<template name="jobItem">
+    <li class="job">
+        <div class="hdr">
+            <h2><a href="#">{{title}}</a></h2>
+
+            <div class="meta">
+                {{#if city}}
+                <h2><i class="fa fa-map-marker"></i>&nbsp;<span>{{location}}</span></h2>
+                {{/if}}
+            </div>
+        </div>
+
+        <div class="stages stages--compact">
+            <ul class="col6">
+                <li class="sourced">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Sourced</span>
+                            <span class="stage__number">1</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="applied">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Applied</span>
+                            <span class="stage__number">-</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="phone-screen">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Phone call</span>
+                            <span class="stage__number">1</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="interview">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Interview</span>
+                            <span class="stage__number">1</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="offer">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Offer</span>
+                            <span class="stage__number">1</span>
+                        </a>
+                    </div>
+                </li>
+
+                <li class="hired">
+                    <div class="stage__inner">
+                        <a class="stage" href="#">
+                            <span class="stage__label">Hired</span>
+                            <span class="stage__number">5</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="ftr">
+            <em class="pull-right">updated about {{timeago}}</em>
+        </div>
+    </li>
+</template>

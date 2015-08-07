@@ -7,7 +7,7 @@ Router.configure({
  * Check user login
  */
 Router.onBeforeAction(function () {
-        if (!Meteor.userId() || Meteor.loggingIn())
+        if (!Meteor.userId())
             this.redirect('login');
         else
             this.next();
@@ -58,6 +58,23 @@ Router.route('/logout', function() {
 Router.route('/dashboard', {
     name: "dashboard",
     action: function () {
-        this.render('jobs');
+        this.render('dashboard');
     }
 });
+
+
+Router.route('/jobs', {
+    name: "jobs",
+    action: function () {
+        this.render('jobs');
+    }
+})
+
+Router.route('/jobs/add', {
+    name: "addJob",
+    action: function () {
+        this.render('addJob');
+    }
+});
+
+
