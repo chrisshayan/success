@@ -77,4 +77,22 @@ Router.route('/jobs/add', {
     }
 });
 
+Router.route('/mailbox', {
+    name: "mailbox",
+    action: function () {
+        this.render('mailbox');
+    }
+});
 
+Router.route('/mailbox/compose', {
+    name: "emailCompose",
+    action: function () {
+        this.render('emailCompose');
+    }
+})
+Router.route('/mailbox/view', {
+    name: "emailView",
+    action: function () {
+        this.render('emailView');
+    }
+})

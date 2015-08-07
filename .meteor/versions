@@ -21,12 +21,12 @@ coffeescript@1.0.6
 dbarrett:dropzonejs@4.0.2
 ddp@1.1.0
 deps@1.0.7
-digilord:faker@1.0.6
 ejson@1.0.6
 email@1.0.6
 facebook@1.2.1
 fastclick@1.0.3
 fortawesome:fontawesome@4.3.0
+gbit:faker@0.0.3
 geojson-utils@1.0.3
 google@1.1.5
 html-tools@1.0.4
