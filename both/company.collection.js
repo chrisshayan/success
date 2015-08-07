@@ -3,20 +3,25 @@
  */
 
 
+Collections.Companies = new Mongo.Collection("Companies");
+
 Schemas.companySchema = new SimpleSchema({
-    companyId: {
-        type: Number
-    },
     companyName: {
         type: String,
         label: "Company name"
     },
     ownedByUsername: {
         type: String,
-        label: "Own by user"
+        label: "Own by user",
+        autoform: {
+            omit: true
+        }
     },
     ownedByUserId: {
-        type: Number
+        type: Number,
+        autoform: {
+            omit: true
+        }
     },
     logo: {
         type: String,
@@ -24,35 +29,42 @@ Schemas.companySchema = new SimpleSchema({
     },
     lastSync: {
         type: Date,
-        defaultValue: new Date()
+        defaultValue: new Date(),
+        autoform: {
+            omit: true
+        }
+
 
     },
     createdAt: {
         type: Date,
-        defaultValue: new Date()
+        defaultValue: new Date(),
+        autoform: {
+            omit: true
+        }
     }
 
 });
 
 
-var collections = new Mongo.Collection("Company");
-collections.attachSchema(Schemas.companySchema);
-
-Collections.Company = collections;
+Collections.Companies.attachSchema(Schemas.companySchema);
 
 
 Meteor.methods({
-    createCompany: function (obj) {
-        if (!obj) {
-            obj = {};
-            obj.companyId = faker.random.number({min: 0, max: 99999});
-            obj.companyName = faker.company.companyName();
-            obj.ownedByUsername = 'testuser'; //hard code here;
-            obj.ownedByUserId = 9999; // hard code here
-            obj.logo = faker.image.avatar();
-        }
+    createCompany: function (inputObj) {
+        inputObj = inputObj || {};
 
+        var obj = {};
+        //obj._id = companyId
+        obj.companyName = faker.company.companyName();
+        obj.ownedByUsername = 'testuser'; //hard code here;
+        obj.ownedByUserId = 9999; // hard code here
+        obj.logo = faker.image.avatar();
+
+        _.extend(obj, inputObj);
         console.log('obj:', obj);
-        Collections.Company.insert(obj);
+
+        Collections.Companies.insert(obj);
     }
-});
+})
+;
