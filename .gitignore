@@ -1,3 +1,10 @@
-.idea
 .meteor/local
-settings/*
+.meteor/meteorite
+
+.idea
+settings/
+
+.settings/settings.json
+
+packages/vnw-apis/.npm/*
+packages/*/.npm/

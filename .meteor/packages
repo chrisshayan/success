@@ -11,7 +11,6 @@ twbs:bootstrap
 zimme:iron-router-active
 jquery
 okgrow:iron-router-autoscroll
-anti:fake
 momentjs:moment
 dbarrett:dropzonejs
 aldeed:collection2
@@ -26,8 +25,8 @@ service-configuration
 accounts-ui
 pauli:accounts-linkedin
 accounts-google
-
 matb33:collection-hooks
 ahmetcetin:autoform-tags
 mpowaga:autoform-summernote
 reactive-dict
+digilord:faker
