@@ -14,18 +14,8 @@ Template.dashboard.rendered = function(){
 
     // Set deta and options ofr main chart
     var lineData = {
-        labels: ["January", "February", "March", "April", "May", "June", "July"],
+        labels: ["02/08", "03/08", "04/08", "05/08", "06/08", "07/08", "08/08"],
         datasets: [
-            {
-                label: "Example dataset",
-                fillColor: "rgba(220,220,220,0.5)",
-                strokeColor: "rgba(220,220,220,1)",
-                pointColor: "rgba(220,220,220,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(220,220,220,1)",
-                data: [65, 59, 80, 81, 56, 55, 40]
-            },
             {
                 label: "Example dataset",
                 fillColor: "rgba(26,179,148,0.5)",
