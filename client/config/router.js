@@ -4,6 +4,29 @@ Router.configure({
 });
 
 /**
+ * Check user login
+ */
+Router.onBeforeAction(function () {
+        if (!Meteor.userId() || Meteor.loggingIn())
+            this.redirect('login');
+        else
+            this.next();
+    }
+    , {except: ['login', 'landing']}
+);
+/**
+ * Redirect to dashboard if user is already logged in
+ */
+Router.onBeforeAction(function () {
+        if (Meteor.userId())
+            this.redirect('dashboard');
+        else
+            this.next();
+    }
+    , {only: 'login'}
+);
+
+/**
  * Landing page
  */
 Router.route('/', {
@@ -25,6 +48,10 @@ Router.route('/login', {
     }
 });
 
+Router.route('/logout', function() {
+    AccountsTemplates.logout();
+});
+
 /**
  * Dashboard -> render jobs listing
  */
@@ -32,15 +59,5 @@ Router.route('/dashboard', {
     name: "dashboard",
     action: function () {
         this.render('jobs');
-    }
-});
-
-/**
- * Applicants tracking
- */
-Router.route('/jobtracking', {
-    name: "jobTrackingBoard",
-    action: function () {
-        this.render('jobTrackingBoard');
     }
 });
