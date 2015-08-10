@@ -365,9 +365,9 @@
 }
 
 .resume-viewer.fullscreen iframe {
-    width: 80% !important;
+    width: 900px !important;
+    max-width: 90% !important;
     min-width: 800px !important;
-    max-width: 1024px !important;
     height: 100% !important;
 }
 

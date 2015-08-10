@@ -109,6 +109,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     exitFullscreen: function() {
         this.props.set('isViewFullscreen', false);
+        this.props.set('isViewResume', false);
     },
 
     /**
