@@ -273,7 +273,7 @@
 }
 
 .cover-letter {
-    margin: 20px auto;
+    margin: 15px auto;
     width: 90%;
 }
 
@@ -285,7 +285,7 @@
     text-align: justify;
     font-family: "Helvetica Neue", "Helvetica", Helvetica, sans-serif;
     font-size: 14px;
-    height: 150px;
+    height: 100px;
     overflow: hidden;
     position: relative;
 }

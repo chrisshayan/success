@@ -40,3 +40,5 @@ lab:accounts-vnw
 lab:notifications
 
 lab:mysql-connection-manager
+http
+froatsnook:request

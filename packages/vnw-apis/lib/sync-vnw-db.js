@@ -569,7 +569,7 @@ function pullCompanyData(j, cb) {
         var jobIds = _.pluck(jRows, 'typeId');
         if (jobIds.length > 0) {
             while (jobIds.length > 0) {
-                var chunk = jobIds.splice(0, 20);
+                var chunk = jobIds.splice(0, 5);
                 var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, chunk, chunk);
                 var connApplication = mysqlManager.getPoolConnection();
                 var appRows = fetchVNWData(connApplication, appSql);

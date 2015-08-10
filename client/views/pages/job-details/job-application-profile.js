@@ -46,6 +46,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             var params = Router.current().params;
             self.scrollTop();
         });
+
+
     },
     onDestroyed: function () {
         Event.removeListener('emptyProfile', this.onEmptyProfile);
@@ -168,6 +170,19 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     matchingScore: function() {
         return this.props.get('application').matchingScore;
+    },
+
+    isSentDirectly: function() {
+        return this.props.get('application').source === 2;
+    },
+    applicationId: function() {
+        return this.props.get("application").entryId;
+    },
+
+    resumeFileUrl: function() {
+        var data = this.props.get('application');
+        var link = "downloadresume/" + data.companyId + "/" + data.entryId;
+        return Meteor.absoluteUrl(link);
     }
 
 }).register('JobApplicationProfile');
