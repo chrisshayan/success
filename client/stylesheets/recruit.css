@@ -349,3 +349,35 @@
     width: 90%;
     margin: 0 auto;
 }
+
+.resume-viewer.fullscreen {
+    position: fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+
+    background: rgba(0,0,0,0.4);
+    text-align: center;
+}
+
+.resume-viewer.fullscreen iframe {
+    width: 80% !important;
+    min-width: 800px !important;
+    max-width: 1024px !important;
+    height: 100% !important;
+}
+
+.resume-viewer-normal-mode {
+    display: none;
+}
+
+.resume-viewer.fullscreen .resume-viewer-normal-mode {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    margin: 5px;
+}

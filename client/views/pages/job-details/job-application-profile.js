@@ -7,6 +7,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         this.props = new ReactiveDict;
         this.props.setDefault('isLoading', false);
         this.props.setDefault('isViewResume', false);
+        this.props.setDefault('isViewFullscreen', false);
 
         this.defaultToggle = 'More cover letter <i class="fa fa-angle-down"></i>';
         this.coverLetterToggle = new ReactiveVar(this.defaultToggle);
@@ -18,6 +19,10 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
             var applicationId = parseInt(params.query.application);
             self.props.set('applicationId', applicationId);
+            
+            self.props.set('isLoading', false);
+            self.props.set('isViewResume', false);
+            self.props.set('isViewFullscreen', false);
 
             var application = Collections.Applications.findOne({entryId: applicationId});
             self.props.set('application', application);
@@ -74,7 +79,9 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     events: function () {
         return [{
             'click .more-coverletter': this.toggleCoverLetter,
-            'click .view-resume': this.toggleViewResume
+            'click .view-resume': this.toggleViewResume,
+            'click .resume-viewer-fullscreen-mode': this.viewFullscreen,
+            'click .resume-viewer-normal-mode': this.exitFullscreen,
         }];
     },
 
@@ -96,6 +103,13 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         this.props.set('isViewResume', !this.props.get('isViewResume'));
     },
 
+    viewFullscreen: function() {
+        this.props.set('isViewFullscreen', true);
+    },
+
+    exitFullscreen: function() {
+        this.props.set('isViewFullscreen', false);
+    },
 
     /**
      * HELPERS
@@ -189,6 +203,9 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         var data = this.props.get('application');
         var link = "downloadresume/" + data.companyId + "/" + data.entryId;
         return Meteor.absoluteUrl(link);
+    },
+    fullscreenClass: function() {
+        return this.props.get('isViewFullscreen') ? " fullscreen " : "";
     }
 
 }).register('JobApplicationProfile');
