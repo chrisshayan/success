@@ -343,3 +343,9 @@
     border-right: none !important;
     border-bottom: none !important;
 }
+
+
+.resume-viewer {
+    width: 90%;
+    margin: 0 auto;
+}

@@ -54,40 +54,30 @@
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3">
                             <div class="well text-center">
-                                <button class="btn btn-success btn-sm" data-toggle="modal" data-target=".resume-viewer">
-                                    <i class="fa fa-eye"></i>&nbsp;View resume
-                                </button>
+                                {{#if props.get "isViewResume"}}
+                                    <button class="btn btn-success btn-sm view-resume">
+                                        <i class="fa fa-eye-slash"></i>&nbsp;Hide resume
+                                    </button>
+                                {{else}}
+                                    <button class="btn btn-success btn-sm view-resume">
+                                        <i class="fa fa-eye"></i>&nbsp;View resume
+                                    </button>
+                                {{/if}}
                                 &nbsp;
                                 <a href="{{ resumeFileUrl }}" class="btn btn-success btn-sm"><i class="fa fa-cloud-download"></i>&nbsp;Download
                                     resume
                                 </a>
                             </div>
-
-                            <!-- Large modal -->
-                            <div class="modal fade resume-viewer" tabindex="-1" role="dialog"
-                                 aria-labelledby="resume-viewer">
-                                <div class="modal-dialog modal-lg">
-
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span></button>
-                                            <h4 class="modal-title">{{ fullname }}</h4>
-                                        </div>
-
-                                        <div style="text-align: center">
-                                            <iframe src="https://docs.google.com/viewer?embedded=true&url={{ resumeFileUrl }}" style="width:100%;height:550px;border:none"></iframe>
-                                        </div>
-
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-default" data-dismiss="modal">Close
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
+
+                    {{#if props.get "isViewResume"}}
+                        <div class="row">
+                            <div class="resume-viewer">
+                                <iframe src="https://docs.google.com/viewer?embedded=true&url={{ resumeFileUrl }}" style="width:100%;height:550px;border:none"></iframe>
+                            </div>
+                        </div>
+                    {{/if}}
                 {{/if}}
             </div>
 

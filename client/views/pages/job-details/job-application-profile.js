@@ -6,6 +6,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         var self = this;
         this.props = new ReactiveDict;
         this.props.setDefault('isLoading', false);
+        this.props.setDefault('isViewResume', false);
 
         this.defaultToggle = 'More cover letter <i class="fa fa-angle-down"></i>';
         this.coverLetterToggle = new ReactiveVar(this.defaultToggle);
@@ -72,7 +73,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     events: function () {
         return [{
-            'click .more-coverletter': this.toggleCoverLetter
+            'click .more-coverletter': this.toggleCoverLetter,
+            'click .view-resume': this.toggleViewResume
         }];
     },
 
@@ -88,6 +90,10 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             target.addClass("more");
             this.coverLetterToggle.set('Less cover letter <i class="fa fa-angle-up"></i>');
         }
+    },
+
+    toggleViewResume: function() {
+        this.props.set('isViewResume', !this.props.get('isViewResume'));
     },
 
 
