@@ -552,6 +552,11 @@ function pullCompanyData(j, cb) {
     var userId = user.userId;
     var companyId = user.companyId;
 
+    var cronData = {
+        lastUpdated: new Date(),
+        userId: userId,
+        companyId: companyId
+    };
 
     try {
         // GET ALL JOB IDS
@@ -562,6 +567,8 @@ function pullCompanyData(j, cb) {
         conn.release();
 
         if (jRows.length <= 0) {
+            console.log('create cron');
+            SYNC_VNW.addQueue('cronData', cronData);
             j.done();
             return true;
         }
@@ -581,18 +588,16 @@ function pullCompanyData(j, cb) {
             }
 
         }
+
+        console.log('create cron');
+        SYNC_VNW.addQueue('cronData', cronData);
+
         j.done();
     } catch (e) {
         j.fail(e);
         debuger(e);
     }
-    var cronData = {
-        lastUpdated: new Date(),
-        userId: userId,
-        companyId: companyId
-    };
 
-    SYNC_VNW.addQueue('cronData', cronData);
     cb();
 }
 
