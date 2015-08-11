@@ -7,7 +7,7 @@ Meteor.loggingIn = AccountsVNW.loggingIn;
 Meteor.logout = AccountsVNW.logout;
 Meteor.loginToken = AccountsVNW.loginToken;
 Meteor.setRecruiterEmail = AccountsVNW.setRecruiterEmail;
-Meteor.setShowAllJobs = AccountsVNW.setShowAllJobs;
+Meteor.setShowMyJob = AccountsVNW.setShowMyJob;
 Meteor.currentRecruiter = AccountsVNW.currentRecruiter;
 
 ////////////////////////////////////////////////////////////////////

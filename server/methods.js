@@ -634,3 +634,25 @@ Meteor.methods({
     }
 
 });
+
+Meteor.methods({
+    'getEmailList': function () {
+        var listEmail = [];
+        var user = Collections.Users.findOne({userId: +this.userId});
+        var query = {
+            companyId: user.companyId
+        };
+        var options = {
+            fields: {
+                'data.emailaddress': 1
+            }
+        };
+
+
+        Collections.Jobs.find(query, options).map(function (obj) {
+            listEmail = listEmail.concat(obj.data.emailaddress.split(','));
+        });
+
+        return _.unique(listEmail);
+    }
+})

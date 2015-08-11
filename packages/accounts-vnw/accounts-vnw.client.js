@@ -1,31 +1,34 @@
-AccountsVNW = {}
+AccountsVNW = {};
 AccountsVNW._store = ReactiveCookie;
 AccountsVNW._loggingIn = new ReactiveVar(false);
 AccountsVNW._loginDuration = Meteor.settings.public.loginDuration || {days: 1};
 AccountsVNW._connection = Meteor.connection;
 
-AccountsVNW._setUserLogin = function(user) {
+AccountsVNW._setUserLogin = function (user) {
     AccountsVNW._store.set('user', EJSON.stringify(user), this._loginDuration);
     AccountsVNW.initUserLogin();
 };
 
-AccountsVNW._setLoginToken = function(token) {
-    AccountsVNW._store.set('loginToken', token, this._loginDuration);
-}
 
-AccountsVNW.initUserLogin = function() {
+AccountsVNW._setLoginToken = function (token) {
+    AccountsVNW._store.set('loginToken', token, this._loginDuration);
+};
+
+AccountsVNW.initUserLogin = function () {
+
     var _user = AccountsVNW.user();
-    if( _user ) {
+    if (_user) {
         AccountsVNW._connection.setUserId(_user.userid);
         Meteor.call('onUserReconnect', _user.userid, AccountsVNW.onReconnect);
-        AccountsVNW._connection.onReconnect = function() {
+        AccountsVNW._connection.onReconnect = function () {
             Meteor.call('onUserReconnect', _user.userid, AccountsVNW.onReconnect);
+
         };
     }
 };
 
-AccountsVNW.onReconnect = function(err, result) {
-    if(err) throw err;
+AccountsVNW.onReconnect = function (err, result) {
+    if (err) throw err;
     AccountsVNW._store.set('user', EJSON.stringify(result.data), this._loginDuration);
     AccountsVNW._setLoginToken(result.token);
 }
@@ -41,11 +44,11 @@ AccountsVNW.loginAsEmployer = function (username, password, callback) {
     AccountsVNW._loggingIn.set(true);
 
     var _account = {username: username, password: password};
-    Meteor.call('loginAsEmployer', _account, function(err, result) {
+    Meteor.call('loginAsEmployer', _account, function (err, result) {
         AccountsVNW._loggingIn.set(false);
 
-        if(!err) {
-            if( result.success ) {
+        if (!err) {
+            if (result.success) {
                 AccountsVNW._setUserLogin(result.data);
                 //AccountsVNW._setLoginToken(result.token);
                 callback && callback(result);
@@ -67,56 +70,62 @@ AccountsVNW.loginAsEmployer = function (username, password, callback) {
  */
 AccountsVNW.loginAsJobSeeker = function (username, password, callback) {
 
-}
+};
 /**
  * Get user logged in
  * @returns {*}
  */
-AccountsVNW.user = function() {
+AccountsVNW.user = function () {
     var _user = AccountsVNW._store.get('user');
-    return  _user ? EJSON.parse(_user) : undefined;
-}
+    return _user ? EJSON.parse(_user) : undefined;
+};
 
-AccountsVNW.userId = function() {
+AccountsVNW.userId = function () {
     return AccountsVNW.user() ? AccountsVNW.user().userid : undefined;
-}
+};
 
-AccountsVNW.loggingIn = function() {
+AccountsVNW.loggingIn = function () {
     return AccountsVNW._loggingIn.get();
-}
+};
 
-AccountsVNW.logout = function() {
+AccountsVNW.logout = function () {
     AccountsVNW._store.clearAll();
     AccountsVNW._connection.setUserId(null);
     AccountsVNW._connection.onReconnect = null;
-}
+};
 
-AccountsVNW.loginToken = function() {
-    return  AccountsVNW._store.get('loginToken') || undefined;
-}
+AccountsVNW.loginToken = function () {
+    return AccountsVNW._store.get('loginToken') || undefined;
+};
 
 
-AccountsVNW.setRecruiterEmail = function(email) {
+AccountsVNW.setRecruiterEmail = function (email) {
     AccountsVNW._store.set('recruiterEmail', EJSON.stringify(email));
-}
+};
 
 
-AccountsVNW.setShowAllJobs = function(status) {
-    AccountsVNW._store.set('showAllJobs', EJSON.stringify(status));
-}
+AccountsVNW.setShowMyJob = function (status) {
+    AccountsVNW._store.set('showMyJob', status);
+};
 
-AccountsVNW.currentRecruiter = function() {
+AccountsVNW.currentRecruiter = function () {
+    var obj = {};
+
     try {
-        var email = EJSON.parse(AccountsVNW._store.get('recruiterEmail')) || "";
-        var showAll = EJSON.parse(AccountsVNW._store.get('showAllJobs'));
-        if(!email)
-            showAll = true;
+        obj.email = (AccountsVNW._store.get('recruiterEmail') != null)
+            ? EJSON.parse(AccountsVNW._store.get('recruiterEmail')) : null;
 
-        return {
-            email: email,
-            showAll: !!showAll
-        };
-    } catch(e) {
+        obj.showMyJob = (!obj.email) ? false : (AccountsVNW._store.get('showMyJob') != 'false');
+
+    } catch (e) {
+        console.log(e);
         debuger(e);
     }
-}
+
+    return obj;
+};
+AccountsVNW.getEmailList = function () {
+    Meteor.call('getEmailList', function (err, result) {
+        return result;
+    });
+};
