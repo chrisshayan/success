@@ -29,7 +29,7 @@ Meteor.methods({
                 companyId: data.companyid,
                 expireTime: moment(new Date()).add(1, 'day').valueOf()
             };
-            //result.token = IZToken.encode(tokenData);
+            result.token = IZToken.encode(tokenData);
         }
         
         return result;
