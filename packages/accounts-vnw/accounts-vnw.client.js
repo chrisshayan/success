@@ -86,12 +86,37 @@ AccountsVNW.loggingIn = function() {
 }
 
 AccountsVNW.logout = function() {
-    AccountsVNW._store.clear('user');
-    AccountsVNW._store.clear('loginToken');
+    AccountsVNW._store.clearAll();
     AccountsVNW._connection.setUserId(null);
     AccountsVNW._connection.onReconnect = null;
 }
 
 AccountsVNW.loginToken = function() {
     return  AccountsVNW._store.get('loginToken') || undefined;
+}
+
+
+AccountsVNW.setRecruiterEmail = function(email) {
+    AccountsVNW._store.set('recruiterEmail', EJSON.stringify(email));
+}
+
+
+AccountsVNW.setShowAllJobs = function(status) {
+    AccountsVNW._store.set('showAllJobs', EJSON.stringify(status));
+}
+
+AccountsVNW.currentRecruiter = function() {
+    try {
+        var email = EJSON.parse(AccountsVNW._store.get('recruiterEmail')) || "";
+        var showAll = EJSON.parse(AccountsVNW._store.get('showAllJobs'));
+        if(!email)
+            showAll = true;
+
+        return {
+            email: email,
+            showAll: !!showAll
+        };
+    } catch(e) {
+        debuger(e);
+    }
 }
