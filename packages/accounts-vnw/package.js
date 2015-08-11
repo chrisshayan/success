@@ -35,6 +35,7 @@ function configure(api) {
         'reactive-var',
     ], both);
 
+    api.use(['izzilab:token', 'momentjs:moment'], 'server');
     api.use('ui', 'client');
     api.use('steeve:reactive-cookie', 'client');
 

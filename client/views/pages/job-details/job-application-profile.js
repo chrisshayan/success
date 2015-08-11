@@ -19,7 +19,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
             var applicationId = parseInt(params.query.application);
             self.props.set('applicationId', applicationId);
-            
+
             self.props.set('isLoading', false);
             self.props.set('isViewResume', false);
             self.props.set('isViewFullscreen', false);
@@ -27,7 +27,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             var application = Collections.Applications.findOne({entryId: applicationId});
             self.props.set('application', application);
 
-            if(application) {
+            if (application) {
                 var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
                 self.props.set('candidate', candidate);
             }
@@ -59,7 +59,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         Event.removeListener('emptyProfile', this.onEmptyProfile);
     },
 
-    scrollTop: function() {
+    scrollTop: function () {
         var selectors = {
             details: '.full-height-scroll.white-bg',
             slimScroll: {
@@ -99,15 +99,34 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         }
     },
 
-    toggleViewResume: function() {
+    toggleViewResume: function () {
         this.props.set('isViewResume', !this.props.get('isViewResume'));
+        if (this.props.get('isViewResume')) {
+            var selectors = {
+                details: '.full-height-scroll.white-bg',
+                slimScroll: {
+                    slimClass: '',
+                    slimScrollClass: '.slimScrollBar'
+                }
+            };
+            var $details = $(selectors.details);
+            var $mailContainer = $("#timeline");
+            var height = $mailContainer.offset().top - $details.offset().top;
+
+            $details.animate({
+                scrollTop: height
+            }, 'slow', function () {
+                $details.siblings(selectors.slimScroll.slimScrollClass)
+                    .css({'top': height / 2 + 'px'});
+            });
+        }
     },
 
-    viewFullscreen: function() {
+    viewFullscreen: function () {
         this.props.set('isViewFullscreen', true);
     },
 
-    exitFullscreen: function() {
+    exitFullscreen: function () {
         this.props.set('isViewFullscreen', false);
         this.props.set('isViewResume', false);
     },
@@ -173,9 +192,9 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     profileUrl: function () {
         var app = this.props.get("application");
-        if(!app) return "";
+        if (!app) return "";
         var queryParams = "";
-        if(app.source == 1) {
+        if (app.source == 1) {
             queryParams = "?jobid=%s&appid=%s";
         } else {
             queryParams = "?jobid=%s&sdid=%s";
@@ -185,27 +204,27 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         return url + sprintf(queryParams, app.jobId, app.entryId);
     },
 
-    isDisqualified: function() {
+    isDisqualified: function () {
         return this.props.get('application').disqualified;
     },
 
-    matchingScore: function() {
+    matchingScore: function () {
         return this.props.get('application').matchingScore;
     },
 
-    isSentDirectly: function() {
+    isSentDirectly: function () {
         return this.props.get('application').source === 2;
     },
-    applicationId: function() {
+    applicationId: function () {
         return this.props.get("application").entryId;
     },
 
-    resumeFileUrl: function() {
+    resumeFileUrl: function () {
         var data = this.props.get('application');
-        var link = "downloadresume/" + data.companyId + "/" + data.entryId;
+        var link = "downloadresume/" + data.companyId + "/" + data.entryId + '/' + Meteor.loginToken();
         return Meteor.absoluteUrl(link);
     },
-    fullscreenClass: function() {
+    fullscreenClass: function () {
         return this.props.get('isViewFullscreen') ? " fullscreen " : "";
     }
 

@@ -5,6 +5,7 @@ Meteor.user = AccountsVNW.user;
 Meteor.userId = AccountsVNW.userId;
 Meteor.loggingIn = AccountsVNW.loggingIn;
 Meteor.logout = AccountsVNW.logout;
+Meteor.loginToken = AccountsVNW.loginToken;
 
 ////////////////////////////////////////////////////////////////////
 // EXTEND ACCOUNTS METHODS

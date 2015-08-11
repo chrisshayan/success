@@ -9,16 +9,26 @@ AccountsVNW._setUserLogin = function(user) {
     AccountsVNW.initUserLogin();
 };
 
+AccountsVNW._setLoginToken = function(token) {
+    AccountsVNW._store.set('loginToken', token, this._loginDuration);
+}
+
 AccountsVNW.initUserLogin = function() {
     var _user = AccountsVNW.user();
     if( _user ) {
         AccountsVNW._connection.setUserId(_user.userid);
-        Meteor.call('onUserReconnect', _user.userid);
+        Meteor.call('onUserReconnect', _user.userid, AccountsVNW.onReconnect);
         AccountsVNW._connection.onReconnect = function() {
-            Meteor.call('onUserReconnect', _user.userid);
+            Meteor.call('onUserReconnect', _user.userid, AccountsVNW.onReconnect);
         };
     }
 };
+
+AccountsVNW.onReconnect = function(err, result) {
+    if(err) throw err;
+    AccountsVNW._store.set('user', EJSON.stringify(result.data), this._loginDuration);
+    AccountsVNW._setLoginToken(result.token);
+}
 
 
 /**
@@ -37,6 +47,7 @@ AccountsVNW.loginAsEmployer = function (username, password, callback) {
         if(!err) {
             if( result.success ) {
                 AccountsVNW._setUserLogin(result.data);
+                //AccountsVNW._setLoginToken(result.token);
                 callback && callback(result);
             } else {
                 callback && callback(result);
@@ -76,6 +87,11 @@ AccountsVNW.loggingIn = function() {
 
 AccountsVNW.logout = function() {
     AccountsVNW._store.clear('user');
+    AccountsVNW._store.clear('loginToken');
     AccountsVNW._connection.setUserId(null);
     AccountsVNW._connection.onReconnect = null;
+}
+
+AccountsVNW.loginToken = function() {
+    return  AccountsVNW._store.get('loginToken') || undefined;
 }
