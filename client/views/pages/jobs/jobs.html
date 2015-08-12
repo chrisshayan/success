@@ -111,7 +111,7 @@
                 name="filer-email">
             <option value="">Select your email</option>
             {{#each emailList}}
-                <option value="{{this}}">{{this}}</option>
+                <option value="{{this}}" selected="{{isSelectedEMail this}}">{{this}}</option>
             {{/each}}
         </select>
 

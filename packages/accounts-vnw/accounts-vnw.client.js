@@ -36,15 +36,16 @@ AccountsVNW.onReconnect = function (err, result) {
 
     var isShowMyJobs = AccountsVNW._store.get('showMyJob');
     var recruiterEmail = AccountsVNW._store.get('recruiterEmail');
-    console.log(isShowMyJobs);
-    if(recruiterEmail)
+
+    if (recruiterEmail)
         recruiterEmail = EJSON.parse(recruiterEmail);
-    if(!recruiterEmail)
+    else
         isShowMyJobs = false;
-    isShowMyJobs = (!recruiterEmail) ? false : (isShowMyJobs != 'false');
+    
+    isShowMyJobs = (!recruiterEmail) ? false : (isShowMyJobs + '' !== 'false');
     AccountsVNW._isShowMyJobs.set(isShowMyJobs);
     AccountsVNW._recruiterEmail.set(recruiterEmail);
-}
+};
 
 
 /**

@@ -41,9 +41,9 @@ Jobs = BlazeComponent.extendComponent({
         }
 
         if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
-            var pat = new RegExp(Meteor.currentRecruiter().email, "i");
-            filters['data.emailaddress'] = pat;
+            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
         }
+
         return filters;
     },
 
@@ -146,6 +146,7 @@ filterByEmail = BlazeComponent.extendComponent({
 
         Meteor.call('getEmailList', function (err, result) {
             self.emails.set(result);
+            $('.chosen-select').val(Meteor.currentRecruiter().email || '');
 
         });
     },
@@ -153,7 +154,6 @@ filterByEmail = BlazeComponent.extendComponent({
     onRendered: function () {
         var showTab = (Meteor.currentRecruiter().showMyJob) ? '.my-job' : '.all-job';
         $(showTab).trigger('click');
-        $('.chosen-select').val(Meteor.currentRecruiter().email || '')
     },
 
     events: function () {
@@ -182,6 +182,10 @@ filterByEmail = BlazeComponent.extendComponent({
     emailList: function () {
         return this.emails.get();
     },
+    isSelectedEMail: function (email) {
+        return (Meteor.currentRecruiter().email === email);
+    }
+
 
     /**
      * Helpers
