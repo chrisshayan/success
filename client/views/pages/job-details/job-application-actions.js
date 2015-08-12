@@ -14,9 +14,15 @@ JobApplicationActions = BlazeComponent.extendComponent({
             var params = Router.current().params;
             var jobId = parseInt(params.jobId);
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            var applicationId = parseInt(params.query.application);
+            var applicationId = params.query.application;
             self.props.set('applicationId', applicationId);
-            var application = Collections.Applications.findOne({entryId: applicationId});
+            var cond = {
+                $or: [
+                    {entryId: +applicationId ? +applicationId : applicationId},
+                    {_id: applicationId}
+                ]
+            }
+            var application = Collections.Applications.findOne(cond);
             self.props.set('application', application);
 
         }));
@@ -50,6 +56,9 @@ JobApplicationActions = BlazeComponent.extendComponent({
     moveStage: function (e, tmpl) {
         var toStage = $(e.target).data("move-stage");
         toStage = parseInt(toStage);
+        var app = this.props.get('application');
+        if(app.stage == 0 && toStage == 1) return;
+
         var stage = Recruit.APPLICATION_STAGES[toStage];
         if (stage) {
             //call update stage request
@@ -115,7 +124,10 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var stage = this.props.get("stage");
         if (stage.id == 5)
             return stage;
-        var nextStage = Recruit.APPLICATION_STAGES[stage.id + 1];
+        var next = stage.id + 1;
+        if(stage.id == 0)
+            next = stage.id + 2;
+        var nextStage = Recruit.APPLICATION_STAGES[next];
         return nextStage;
     },
     nextStageAbility: function () {
@@ -139,7 +151,9 @@ JobApplicationActions = BlazeComponent.extendComponent({
             if (!_.isEmpty(html)) {
                 html = sprintf(html, stage.id, stage.label);
             }
-            items.push({html: html});
+            if(currentStage.id != 0 || stage.id != 1) {
+                items.push({html: html});
+            }
         });
         return items;
     },

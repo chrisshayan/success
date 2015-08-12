@@ -151,12 +151,14 @@ JobApplication = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             self.props.set("stage", Session.get("currentStage"));
             self.props.set("jobId", Session.get("currentJobId"));
-            self.props.set("applicationId", self.data().entryId);
+            self.props.set("applicationId", self.data().entryId || self.data()._id);
             self.props.set("candidateId", self.data().candidateId);
             self.props.set("application", self.data());
             self.props.set("matchingScore", self.data().matchingScore);
-
-            var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
+            if(self.data().source == 3)
+                var candidate = Collections.CandidateSources.findOne({_id: self.data().candidateId});
+            else
+                var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
             self.props.set("candidate", candidate);
             self.props.set("currentApplication", Session.get("currentApplicationId"));
 
@@ -233,6 +235,9 @@ JobApplication = BlazeComponent.extendComponent({
     fullname: function () {
         var can = this.props.get("candidate");
         if (!can) return "";
+        if(this.props.get("application").source == 3)
+            return can.lastName + " " + can.firstName;
+
         return can.data.lastname + " " + can.data.firstname;
     },
 
@@ -243,6 +248,11 @@ JobApplication = BlazeComponent.extendComponent({
     city: function () {
         var can = this.props.get("candidate");
         if (!can) return "";
+        if(this.props.get("application").source == 3) {
+            if(can.source == "other")
+                return can.otherSource;
+            return can.source;
+        }
         return can.data.city;
     },
     /**
@@ -252,6 +262,8 @@ JobApplication = BlazeComponent.extendComponent({
     phone: function () {
         var can = this.props.get("candidate");
         if (!can) return "";
+        if(this.props.get("application").source == 3)
+            return can.phone || "";
         return can.data.cellphone || can.data.homephone || "";
     },
 }).register('JobApplication');

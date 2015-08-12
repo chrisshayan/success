@@ -107,9 +107,8 @@ Meteor.methods({
      * @returns {Boolean} the update result
      */
     updateApplicationStage: function (option) {
-        console.log(option)
         check(option, {
-            application: Number,
+            application: Match.Any,
             stage: Number
         });
 
@@ -117,18 +116,21 @@ Meteor.methods({
         var user = getUserInfo(+this.userId);
         var cond = {
             companyId: user.companyId,
-            entryId: option.application
+            $or: [
+                {entryId: +option.application ? +option.application : option.application},
+                {_id: option.application}
+            ]
         };
 
         var application = Collections.Applications.findOne(cond);
         if (!application) return false;
+        if (application.stage == 0  && option.stage == 1) return false;
 
         var data = {
             $set: {
                 stage: option.stage
             }
         }
-        console.log(data)
         var result = Collections.Applications.update(application._id, data);
         if (result) {
             // log to activities
@@ -264,6 +266,8 @@ Meteor.methods({
         }, {sort: {matchingScore: -1}});
 
         if (application) {
+            if(application.source == 3)
+                return application._id;
             return application.entryId;
         }
         return null;
@@ -281,12 +285,15 @@ Meteor.methods({
         check(opt, {
             jobId: Number,
             stage: Number,
-            application: Number
+            application: Match.Any
         });
         var conditions = {
             jobId: opt.jobId,
             stage: opt.stage,
-            entryId: opt.application
+            $or: [
+                {entryId: +opt.application ? +opt.application : opt.application},
+                {_id: opt.application}
+            ]
         };
         return !!Collections.Applications.find(conditions).count();
     },
@@ -620,7 +627,6 @@ Meteor.methods({
             };
 
         var oldValue = Collections.CompanySettings.findOne(query, options);
-        console.log(oldValue);
         try {
             Collections.CompanySettings.update(query, {$set: {numberOfMonthSync: newValue}});
             if (!oldValue.numberOfMonthSync || oldValue.numberOfMonthSync < newValue) {
@@ -633,6 +639,24 @@ Meteor.methods({
             console.log(e);
             return false;
         }
+    },
+
+
+    addCandidate: function(data, jobId) {
+        check(data, Object);
+        check(jobId, Number);
+        var user = getUserInfo(+this.userId);
+        var candidateId = Collections.CandidateSources.insert(data);
+        var application = new Schemas.Application();
+        application.source = 3;
+        application.stage = 0;
+        application.companyId = user.companyId;
+        application.jobId = jobId;
+        application.candidateId = candidateId;
+        application.data = {};
+        var appId = Collections.Applications.insert(application);
+
+        return true;
     }
 
 });

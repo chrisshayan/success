@@ -28,6 +28,8 @@ Collections.Applications.allow({
 });
 
 Collections.Candidates = new Mongo.Collection("vnw_candidates");
+Collections.CandidateSources = new Mongo.Collection("vnw_candidate_sources");
+
 Collections.Activities = new Mongo.Collection("vnw_activities");
 
 /**

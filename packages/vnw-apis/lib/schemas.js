@@ -82,7 +82,7 @@ Schemas.Application = function () {
         candidateId: null,
         companyId: null,
         jobId: null,
-        source: 1, // 1: is online, 2: sent directly
+        source: 1, // 1: is online, 2: sent directly, 3: add manually
         stage: 1, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
         matchingScore: 0,
         data: {},
@@ -273,3 +273,106 @@ Schemas.addCommentCandidateForm = new SimpleSchema({
         }
     }
 });
+
+Schemas.CandidateSource = new SimpleSchema({
+    firstName: {
+        type: String,
+        label: "First name",
+        autoform: {
+            label: false,
+            placeholder: "First name (required)"
+        }
+    },
+    lastName: {
+        type: String,
+        label: "Last name",
+        autoform: {
+            label: false,
+            placeholder: "Last name (required)"
+        }
+    },
+    headline: {
+        type: String,
+        label: "Headline",
+        optional: true,
+        autoform: {
+            label: false,
+            placeholder: "Headline"
+        }
+    },
+    email: {
+        type: String,
+        label: "Email",
+        regEx: SimpleSchema.RegEx.Email,
+        optional: true,
+        autoform: {
+            label: false,
+            placeholder: "Email"
+        }
+    },
+    phone: {
+        type: Number,
+        label: "Phone",
+        optional: true,
+        autoform: {
+            label: false,
+            placeholder: "Phone"
+        }
+    },
+    source: {
+        type: String,
+        label: "Source",
+        autoform: {
+            type: "select",
+            label: false,
+            options: [
+                {label: "Linkedin", value: "linkedin"},
+                {label: "Google", value: "google"},
+                {label: "Facebook", value: "facebook"},
+                {label: "Jobstreet", value: "jobstreet"},
+                {label: "ITViec", value: "itviec"},
+                {label: "CareerBuilder", value: "careerbuilder"},
+                {label: "CareerLink", value: "careerlink"},
+                {label: "Other", value: "other"}
+            ]
+        }
+    },
+    otherSource: {
+        type: String,
+        optional: true,
+        custom: function () {
+            if(Meteor.isClient) {
+                var val = this.value || "";
+                if(this.field("source").value == "other" && val.trim().length <= 0) {
+                    return "required";
+                }
+            }
+        },
+        autoform: {
+            label: false,
+            placeholder: "Other source"
+        }
+    },
+    profileLink: {
+        type: String,
+        label: "Profile link",
+        optional: true,
+        regEx: SimpleSchema.RegEx.Url,
+        autoform: {
+            label: false,
+            placeholder: "Profile link"
+        }
+    },
+    comment: {
+        type: String,
+        label: "Comment",
+        optional: true,
+        autoform: {
+            type: "textarea",
+            label: false,
+            placeholder: "Comment"
+        }
+    }
+});
+
+Collections.CandidateSources.attachSchema(Schemas.CandidateSource);

@@ -17,18 +17,30 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             var params = Router.current().params;
             var jobId = parseInt(params.jobId);
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            var applicationId = parseInt(params.query.application);
+            var applicationId = params.query.application;
+            applicationId = params.query.application;
+            if(_.isNumber(applicationId))
+                applicationId = parseInt(applicationId);
             self.props.set('applicationId', applicationId);
 
             self.props.set('isLoading', false);
             self.props.set('isViewResume', false);
             self.props.set('isViewFullscreen', false);
 
-            var application = Collections.Applications.findOne({entryId: applicationId});
+            var application = Collections.Applications.findOne({
+                $or: [
+                    {entryId: applicationId},
+                    {_id: applicationId}
+                ]
+            });
             self.props.set('application', application);
 
             if (application) {
-                var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+                if(application.source == 3)
+                    var candidate = Collections.CandidateSources.findOne({_id: application.candidateId});
+                else
+                    var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+
                 self.props.set('candidate', candidate);
             }
         });
@@ -142,6 +154,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     fullname: function () {
         var can = this.props.get('candidate');
         if (!can) return "";
+        if(this.props.get("application").source == 3 )
+            return can.lastName + " " + can.firstName;
         return can.data.lastname + " " + can.data.firstname;
     },
 
@@ -152,6 +166,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     jobTitle: function () {
         var can = this.props.get('candidate');
         if (!can) return "";
+        if(this.props.get("application").source == 3 )
+            return "";
         return can.data.jobtitle;
     },
 
@@ -161,6 +177,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     coverLetter: function () {
         var app = this.props.get('application');
         if (!app)
+            return "";
+        if(app.source == 3 )
             return "";
         var nl2br = function (str, is_xhtml) {
             var breakTag = (is_xhtml || typeof is_xhtml === 'undefined') ? '<br ' + '/>' : '<br>'; // Adjust comment to avoid issue on phpjs.org display
@@ -177,6 +195,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     city: function () {
         var can = this.props.get('candidate');
         if (!can) return "";
+        if(this.props.get("application").source == 3 )
+            return can.source;
         return can.data.city;
     },
 
@@ -187,12 +207,14 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     phone: function () {
         var can = this.props.get('candidate');
         if (!can) return "";
+        if(this.props.get("application").source == 3 )
+            return can.phone;
         return can.data.cellphone || can.data.homephone || "";
     },
 
     profileUrl: function () {
         var app = this.props.get("application");
-        if (!app) return "";
+        if (!app || app.source == 3) return "";
         var queryParams = "";
         if (app.source == 1) {
             queryParams = "?jobid=%s&appid=%s";

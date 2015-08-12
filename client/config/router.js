@@ -117,7 +117,7 @@ Router.route('/job/:jobId/stage/:stage', {
             var options = {
                 jobId: parseInt(self.params.jobId),
                 stage: stage.id,
-                application: parseInt(self.params.query.application)
+                application: self.params.query.application
             };
             Meteor.call('checkApplicationInStage', options, function(err, isExists) {
                 if(err) throw err;

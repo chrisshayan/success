@@ -1,3 +1,21 @@
+AutoForm.hooks({
+    addCandidateForm: {
+        onSubmit: function(doc) {
+            var jobId = Router.current().params.jobId || null;
+            if(jobId) jobId = +jobId;
+            Meteor.call("addCandidate", doc, jobId, function(err, result) {
+                if(err) throw err;
+                if(result) {
+                    AutoForm.resetForm("addCandidateForm");
+                    $("#add-candidate-area").removeClass("open");
+                }
+
+            });
+            return false;
+        }
+    }
+});
+
 
 JobInfo = BlazeComponent.extendComponent({
     onCreated: function () {
@@ -64,4 +82,19 @@ Template.JobInfoItem.helpers({
     title: function() {
         return this.data.jobtitle;
     }
+});
+
+
+Template.addCandidate.onRendered(function() {
+    $("#add-candidate-area .dropdown-toggle").on('click', function (event) {
+        $(this).parent().toggleClass("open");
+        event.stopPropagation();
+    });
+
+    $('body').on('click', function (e) {
+        if (!$("#add-candidate-area").is(e.target) && $("#add-candidate-area").has(e.target).length === 0 && $('.open').has(e.target).length === 0) {
+            $("#add-candidate-area").removeClass('open');
+        }
+        e.stopPropagation();
+    });
 });

@@ -138,43 +138,27 @@ Meteor.publishComposite('getApplications', function (filters, options) {
         children: [
             {
                 find: function(application) {
-                    var cond = {
-                        candidateId: application.candidateId
-                    };
-                    var options = DEFAULT_CANDIDATE_OPTIONS;
-                    options.limit = 1;
-                    return Collections.Candidates.find(cond, options)
+                    if(application.source == 3) {
+                        var cond = {
+                            _id: application.candidateId
+                        };
+                        var options = {};
+                        options.limit = 1;
+                        return Collections.CandidateSources.find(cond, options)
+                    } else {
+                        var cond = {
+                            candidateId: application.candidateId
+                        };
+                        var options = DEFAULT_CANDIDATE_OPTIONS;
+                        options.limit = 1;
+                        return Collections.Candidates.find(cond, options)
+                    }
                 }
             }
         ]
     }
 });
 
-Meteor.publish('getApplications1', function (filters, options) {
-    check(filters, Object);
-    check(options, Object);
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return;
-    var cursors = [];
-    filters['companyId'] = user.companyId;
-
-    options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
-    if (!options.hasOwnProperty("limit")) {
-        options['limit'] = 20;
-    }
-    var applicationCursor = Collections.Applications.find(filters, options);
-    cursors.push( applicationCursor );
-    var canIds = applicationCursor.map(function (doc) {
-        return doc.candidateId
-    });
-    if(canIds.length > 0) {
-        var canOptions = DEFAULT_CANDIDATE_OPTIONS;
-        canOptions["limit"] = canIds.length;
-        var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
-        cursors.push( canCursor );
-    }
-    return cursors;
-});
 
 Meteor.publish('getApplicationDetails', function (applicationId) {
     check(applicationId, Number);

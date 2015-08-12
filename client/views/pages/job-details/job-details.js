@@ -6,7 +6,9 @@ Template.jobDetails.onCreated(function () {
         Session.set("currentJobId", jobId);
         Session.set("currentStage", stage);
         if (params.query.hasOwnProperty('application')) {
-            applicationId = parseInt(params.query.application);
+            applicationId = params.query.application;
+            if(_.isNumber(applicationId))
+                applicationId = parseInt(applicationId);
             Session.set("currentApplicationId", applicationId);
         }
     });

@@ -1,6 +1,6 @@
 <template name="JobInfo">
     <div class="row wrapper border-bottom" id="job-info">
-        <div class="dropdown">
+        <div class="dropdown pull-left">
             <a id="drop3" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style="font-size: 22px; color: #666">
                 <i class="fa fa-cloud" style="color: #1ab394"></i>&nbsp;{{currentJobTitle}}
                 <span class="caret"></span>
@@ -10,6 +10,10 @@
                     {{> JobInfoItem}}
                 {{/each}}
             </ul>
+        </div>
+
+        <div class="pull-right" style="padding-right: 30px;padding-top: 5px;">
+            {{> addCandidate}}
         </div>
     </div>
 </template>
@@ -21,4 +25,32 @@
             <span class="label label-primary pull-right" style="margin-top: 5px">published</span>
         </a>
     </li>
+</template>
+
+
+<template name="addCandidate">
+    <div class="btn-group" id="add-candidate-area">
+        <button data-toggle="dropdown" class="btn btn-primary btn-xs dropdown-toggle"><i class="fa fa-plus"></i>&nbsp;Add candidate</button>
+        <div class="dropdown-menu add-candidate-box">
+
+            <div class="col-sm-12">
+                {{#autoForm schema="Schemas.CandidateSource" id="addCandidateForm"}}
+                    <fieldset>
+                        {{> afQuickField name="firstName"}}
+                        {{> afQuickField name="lastName"}}
+                        {{> afQuickField name="headline"}}
+                        {{> afQuickField name="email"}}
+                        {{> afQuickField name="phone"}}
+                        {{> afQuickField name="source"}}
+                        {{#if afFieldValueIs name="source" value="other"}}
+                            {{> afQuickField name="otherSource"}}
+                        {{/if}}
+                        {{> afQuickField name="profileLink"}}
+                        {{> afQuickField name="comment"}}
+                        <button type="submit" class="btn btn-primary btn-block btn-block btn-sm"><i class="fa fa-user-plus"></i>&nbsp;Add</button>
+                    </fieldset>
+                {{/autoForm}}
+            </div>
+        </div>
+    </div>
 </template>
