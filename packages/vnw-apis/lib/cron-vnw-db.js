@@ -126,9 +126,12 @@ function processJob(item, companyId) {
             // update
 
             if (mongoJob
-                && (parseTimeToString(mongoJob.createdAt) != parseTimeToString(item.createdAt)
-                || parseTimeToString(mongoJob.updatedAt) != parseTimeToString(item.updatedAt))) {
+                && (parseTimeToString(mongoJob.createdAt) !== parseTimeToString(job.createdAt)
+                || parseTimeToString(mongoJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
                 console.log('update Job :', job.jobId);
+
+                console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);
+                console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
                 Collections.Jobs.update(query, job);
 
                 // add new
