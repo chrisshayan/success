@@ -3,6 +3,7 @@ Jobs = BlazeComponent.extendComponent({
         var self = this;
         if (!this.data().hasOwnProperty("status")) return;
 
+
         var instance = Template.instance();
         var data = this.data();
 
@@ -18,8 +19,12 @@ Jobs = BlazeComponent.extendComponent({
             this.isLoading.set(true);
 
         instance.autorun(function () {
-            DashboardSubs.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters());
-            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options());
+            var filterEmailAddress = null;
+            if (self.filters()['data.emailaddress'])
+                filterEmailAddress = Meteor.currentRecruiter().email;
+
+            Meteor.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters(), filterEmailAddress);
+            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options(), filterEmailAddress);
             if (trackSub.ready()) {
                 self.isLoading.set(false);
                 self.isLoadingMore.set(false);
