@@ -3,6 +3,8 @@ AccountsVNW._store = ReactiveCookie;
 AccountsVNW._loggingIn = new ReactiveVar(false);
 AccountsVNW._loginDuration = Meteor.settings.public.loginDuration || {days: 1};
 AccountsVNW._connection = Meteor.connection;
+AccountsVNW._isShowMyJobs = new ReactiveVar(true);
+AccountsVNW._recruiterEmail = new ReactiveVar("");
 
 AccountsVNW._setUserLogin = function (user) {
     AccountsVNW._store.set('user', EJSON.stringify(user), this._loginDuration);
@@ -31,6 +33,17 @@ AccountsVNW.onReconnect = function (err, result) {
     if (err) throw err;
     AccountsVNW._store.set('user', EJSON.stringify(result.data), this._loginDuration);
     AccountsVNW._setLoginToken(result.token);
+
+    var isShowMyJobs = AccountsVNW._store.get('showMyJob');
+    var recruiterEmail = AccountsVNW._store.get('recruiterEmail');
+    console.log(isShowMyJobs);
+    if(recruiterEmail)
+        recruiterEmail = EJSON.parse(recruiterEmail);
+    if(!recruiterEmail)
+        isShowMyJobs = false;
+    isShowMyJobs = (!recruiterEmail) ? false : (isShowMyJobs != 'false');
+    AccountsVNW._isShowMyJobs.set(isShowMyJobs);
+    AccountsVNW._recruiterEmail.set(recruiterEmail);
 }
 
 
@@ -101,21 +114,21 @@ AccountsVNW.loginToken = function () {
 
 AccountsVNW.setRecruiterEmail = function (email) {
     AccountsVNW._store.set('recruiterEmail', EJSON.stringify(email));
+    AccountsVNW._recruiterEmail.set(email);
 };
 
 
 AccountsVNW.setShowMyJob = function (status) {
     AccountsVNW._store.set('showMyJob', status);
+    AccountsVNW._isShowMyJobs.set(status);
 };
 
 AccountsVNW.currentRecruiter = function () {
     var obj = {};
 
     try {
-        obj.email = (AccountsVNW._store.get('recruiterEmail') != null)
-            ? EJSON.parse(AccountsVNW._store.get('recruiterEmail')) : null;
-
-        obj.showMyJob = (!obj.email) ? false : (AccountsVNW._store.get('showMyJob') != 'false');
+        obj.email = AccountsVNW._recruiterEmail.get();
+        obj.showMyJob = (!obj.email) ? false : AccountsVNW._isShowMyJobs.get();
 
     } catch (e) {
         console.log(e);
