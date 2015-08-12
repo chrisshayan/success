@@ -2,7 +2,7 @@
 
 Template.navigation.onCreated(function () {
     var self = this;
-    if(!Meteor.user()) return;
+    if (!Meteor.user()) return;
     this.company = new ReactiveVar();
     var companyId = Meteor.user().companyid;
     Meteor.call('getCompanyInfo', companyId, function (err, info) {
@@ -23,8 +23,12 @@ Template.navigation.helpers({
         if (company)
             return company.logo;
 
+    },
+    displayName: function () {
+        return Meteor.currentRecruiter().email;
     }
 });
+
 
 Template.menuItem.onRendered(function () {
     if (!Router.current().route) return;
@@ -58,8 +62,8 @@ Template.menuItem.helpers({
         return "";
     },
 
-    menuUrl: function() {
-        if(!this.route) return "#"
+    menuUrl: function () {
+        if (!this.route) return "#"
         return Router.url(this.route);
     }
 
