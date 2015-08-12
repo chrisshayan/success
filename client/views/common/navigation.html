@@ -19,7 +19,13 @@
                         {{/if}}
                         <span class="clear">
                             <span class="block m-t-xs">
-                                <strong class="font-bold nav-username">{{username}}</strong>
+                                <strong class="font-bold nav-username">
+                                    {{#if displayName}}
+                                        {{displayName}}
+                                    {{else}}
+                                        {{username}}
+                                    {{/if}}
+                                </strong>
                             </span>
                         </span>
                     </div>

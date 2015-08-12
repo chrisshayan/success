@@ -418,17 +418,24 @@ Meteor.methods({
             application: Number,
             mailTemplate: String,
             subject: String,
-            content: String
+            content: String,
+            emailFrom: String
         });
         var self = this;
         var user = getUserInfo(+this.userId);
-
         var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
-        if (!mailTemplate) {
-            var from = user.username;
-        } else {
-            var from = mailTemplate.emailFrom;
+
+        var from = '';
+        if (data.emailFrom) {
+            from = data.emailFrom
         }
+        else if (!mailTemplate) {
+            from = user.username;
+        }
+        else {
+            from = mailTemplate.emailFrom;
+        }
+        console.log('email from : ', from);
 
         var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
         if (!application) return false;
@@ -539,7 +546,7 @@ Meteor.methods({
                 doc.stages[stage.id] = Collections.Applications.find(cond, {fields: {_id: 1}}).count();
             });
             return doc;
-        }
+        };
         return {
             jobs: Collections.Jobs.find(filters, options).map(mapStats),
             total: Collections.Jobs.find(filters).count()
@@ -634,3 +641,25 @@ Meteor.methods({
     }
 
 });
+
+Meteor.methods({
+    'getEmailList': function () {
+        var listEmail = [];
+        var user = Collections.Users.findOne({userId: +this.userId});
+        var query = {
+            companyId: user.companyId
+        };
+        var options = {
+            fields: {
+                'data.emailaddress': 1
+            }
+        };
+
+
+        Collections.Jobs.find(query, options).map(function (obj) {
+            listEmail = listEmail.concat(obj.data.emailaddress.split(','));
+        });
+
+        return _.unique(listEmail);
+    }
+})

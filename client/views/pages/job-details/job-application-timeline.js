@@ -28,14 +28,14 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
             }
         });
 
-        this._onToggleMailForm = function(status) {
-            if(typeof status == "undefined")
+        this._onToggleMailForm = function (status) {
+            if (typeof status == "undefined")
                 status = !self.props.get("isShowMailForm");
             self.props.set("isShowMailForm", status);
         }
 
-        this._onToggleCommentForm = function(status) {
-            if(typeof status == "undefined")
+        this._onToggleCommentForm = function (status) {
+            if (typeof status == "undefined")
                 status = !self.props.get("isShowCommentForm");
             self.props.set("isShowCommentForm", status);
         }
@@ -44,7 +44,7 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         Event.on('toggleCommentForm', this._onToggleCommentForm);
     },
 
-    onDestroyed: function() {
+    onDestroyed: function () {
         var self = this;
         Event.removeListener('toggleMailForm', self._onToggleMailForm);
         Event.removeListener('toggleCommentForm', self._onToggleCommentForm);
@@ -234,15 +234,15 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         this.application = new ReactiveVar(null);
         this.applicationId = new ReactiveVar(null);
 
-        Template.instance().autorun(function() {
+        Template.instance().autorun(function () {
             var params = Router.current().params;
             if (params.query.hasOwnProperty("application")) {
                 self.applicationId.set(parseInt(params.query.application));
                 var application = Collections.Applications.findOne({entryId: self.applicationId.get()});
-                if(application) {
+                if (application) {
                     self.application.set(application);
                     var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
-                    if(candidate) {
+                    if (candidate) {
                         self.candidate.set(candidate);
                     } else {
                         self.candidate.set(null);
@@ -284,9 +284,9 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                 .css({'top': height / 2 + 'px'});
         });
 
-        Template.instance().autorun(function() {
+        Template.instance().autorun(function () {
             var candidate = self.candidate.get();
-            if(candidate) {
+            if (candidate) {
                 var toAddress = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
                 $(".mail-to").val(toAddress);
             }
@@ -321,11 +321,13 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         var appId = this.applicationId.get();
         if (!appId) return;
 
+
         var data = {
             subject: $(".mail-subject").val() || "",
             content: $(".mail-content").code() || "",
             mailTemplate: $(".mail-template-options").val() || "",
-            application: appId
+            application: appId,
+            emailFrom: Meteor.currentRecruiter().email
         };
 
         Meteor.call('sendMailToCandidate', data, function (err, result) {
@@ -343,7 +345,6 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
     }
 
 }).register('SendEmailCandidateForm');
-
 
 
 Template.mailContentEditor.onRendered(function () {
@@ -411,7 +412,7 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
         this.isLoading = new ReactiveVar(false);
     },
 
-    onRendered: function() {
+    onRendered: function () {
         var selectors = {
             details: '.full-height-scroll.white-bg',
             slimScroll: {
