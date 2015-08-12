@@ -51,11 +51,11 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var toStage = $(e.target).data("move-stage");
         toStage = parseInt(toStage);
         var stage = Recruit.APPLICATION_STAGES[toStage];
-        if (toStage) {
+        if (stage) {
             //call update stage request
             var data = {
                 application: this.props.get("applicationId"),
-                stage: toStage
+                stage: stage.id
             };
             Meteor.call('updateApplicationStage', data, function (err, result) {
                 if (err) throw err;

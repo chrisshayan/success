@@ -107,11 +107,13 @@ Meteor.methods({
      * @returns {Boolean} the update result
      */
     updateApplicationStage: function (option) {
+        console.log(option)
         check(option, {
             application: Number,
             stage: Number
         });
-        check(option.stage, Match.OneOf(1, 2, 3, 4, 5));
+
+        check(option.stage, Match.OneOf(0,1,2,3,4,5));
         var user = getUserInfo(+this.userId);
         var cond = {
             companyId: user.companyId,
@@ -126,7 +128,7 @@ Meteor.methods({
                 stage: option.stage
             }
         }
-
+        console.log(data)
         var result = Collections.Applications.update(application._id, data);
         if (result) {
             // log to activities

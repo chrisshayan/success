@@ -2,9 +2,14 @@ Recruit = {};
 
 /**
  *
- * @type {{1: string, 2: string, 3: string, 4: string, 5: string}}
+ * @type {{0: string, 1: string, 2: string, 3: string, 4: string, 5: string}}
  */
 Recruit.APPLICATION_STAGES = {
+    0: {
+        id: 0,
+        alias: "sourced",
+        label: "Sourced"
+    },
     1: {
         id: 1,
         alias: "applied",
