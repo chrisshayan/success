@@ -105,6 +105,8 @@ AccountsVNW.loggingIn = function () {
 AccountsVNW.logout = function () {
     AccountsVNW._store.clearAll();
     AccountsVNW._connection.setUserId(null);
+    AccountsVNW._isShowMyJobs.set('false');
+    AccountsVNW._recruiterEmail.set(null);
     AccountsVNW._connection.onReconnect = null;
 };
 
