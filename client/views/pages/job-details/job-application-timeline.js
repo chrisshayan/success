@@ -15,7 +15,11 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         this.props.set("isLoading", true);
         Template.instance().autorun(function () {
             var params = Router.current().params;
-            self.props.set("applicationId", parseInt(params.query.application));
+            var applicationId = params.query.application;
+            if(!_.isNaN(+applicationId)){
+                applicationId = +applicationId;
+            }
+            self.props.set("applicationId", applicationId);
             self.props.set("isShowMailForm", false);
             self.props.set("isShowCommentForm", false);
 
@@ -168,6 +172,11 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
                 var comment = this.data().data;
                 this.title = comment.content;
                 this.icon = " fa-comment ";
+                break;
+
+            case 7:// Comment
+                this.title = "Added for this position";
+                this.icon = " fa-briefcase ";
                 break;
 
             default:

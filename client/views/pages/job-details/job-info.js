@@ -2,14 +2,18 @@ AutoForm.hooks({
     addCandidateForm: {
         onSubmit: function(doc) {
             var jobId = Router.current().params.jobId || null;
+            var currentApplication = Router.current().params.query.application;
             if(jobId) jobId = +jobId;
             Meteor.call("addCandidate", doc, jobId, function(err, result) {
                 if(err) throw err;
                 if(result) {
                     AutoForm.resetForm("addCandidateForm");
                     $("#add-candidate-area").removeClass("open");
-                }
 
+                    if(!currentApplication) {
+                        window.location.reload();
+                    }
+                }
             });
             return false;
         }

@@ -372,7 +372,14 @@ Schemas.CandidateSource = new SimpleSchema({
             label: false,
             placeholder: "Comment"
         }
+    },
+    skills: {
+        type: [String],
+        label: "Candidate skills",
+        optional: true,
+        autoform: {
+            type: "tags",
+            placeholder: "Candidate skills"
+        }
     }
 });
-
-Collections.CandidateSources.attachSchema(Schemas.CandidateSource);

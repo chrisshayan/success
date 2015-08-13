@@ -1,13 +1,13 @@
 // Used only on OffCanvas layout
 
 Template.navigation.onCreated(function () {
-    var self = this;
+    var instance = Template.instance();
+    instance.company = new ReactiveVar();
     if(!Meteor.user()) return;
-    this.company = new ReactiveVar();
     var companyId = Meteor.user().companyid;
     Meteor.call('getCompanyInfo', companyId, function (err, info) {
         if (err) console.error(err);
-        else self.company.set(info);
+        else instance.company.set(info);
     });
 });
 
@@ -19,10 +19,11 @@ Template.navigation.events({
 
 Template.navigation.helpers({
     company_logo: function () {
-        var company = Template.instance().company.get();
+        var instance = Template.instance();
+        var company = instance.company.get();
         if (company)
             return company.logo;
-
+        return "";
     }
 });
 

@@ -1,3 +1,115 @@
+CandidateTransform = function (doc) {
+    _.extend(this, doc);
+};
+
+CandidateTransform.prototype = {
+    constructor: CandidateTransform,
+
+    fullname: function () {
+        var data = this.data;
+        var firstName = data.firstname || data.firstName || "";
+        var lastName = data.lastname || data.lastName || "";
+        return lastName + " " + firstName;
+    },
+
+    /**
+     * get candidate city location
+     * @returns {String}
+     */
+    city: function () {
+        return this.data.city || this.source() || "";
+    },
+
+    /**
+     * Get candidate phone: cellphone or homephone
+     * @returns {String}
+     */
+    phone: function () {
+        return this.data.cellphone || this.data.homephone || "";
+    },
+
+    skills: function () {
+        return this.data.skills;
+    },
+
+    headline: function () {
+        return this.data.jobtitle || this.data.headline;
+    },
+
+    source: function() {
+        if(!this.data.source) return "";
+        if(this.data.source == "other") return this.data.otherSource;
+        return this.data.source;
+    }
+};
+
+ApplicationTransform = function (doc) {
+    _.extend(this, doc);
+};
+
+ApplicationTransform.prototype = {
+    constructor: ApplicationTransform,
+
+    /**
+     * Get 2 lines of cover letter
+     * @returns {String}
+     */
+    shortCoverLetter: function () {
+        if (!this.data.coverletter) return "";
+        return this.data.coverletter.split(/\s+/).splice(0, 14).join(" ") + "...";
+    },
+
+    coverLetter: function () {
+        return this.data.coverletter;
+    },
+
+    /**
+     * Get matching score label
+     * @returns {String}
+     */
+    matchingScoreLabel: function () {
+        var matchingScore = this.matchingScore;
+        if (matchingScore >= 90)
+            return " label-success ";
+        if (matchingScore >= 70)
+            return " label-primary ";
+        if (matchingScore >= 50)
+            return " label-warning ";
+        if (!matchingScore || matchingScore <= 0)
+            return " hidden ";
+
+        return " label-default ";
+    },
+
+    timeago: function () {
+        return moment(this.createdAt).fromNow();
+    },
+
+    vnwProfileLink: function () {
+        var queryParams = "";
+        if (this.source == 3) {
+            return "";
+        } else if (this.source == 1) {
+            queryParams = "?jobid=%s&appid=%s";
+        } else {
+            queryParams = "?jobid=%s&sdid=%s";
+        }
+
+        var url = Meteor.settings.public.applicationUrl;
+        return url + sprintf(queryParams, this.jobId, this.entryId);
+    },
+
+    isSentDirectly: function () {
+        return this.source === 2;
+    },
+
+    resumeFileUrl: function () {
+        var link = "downloadresume/" + this.companyId + "/" + this.entryId + '/' + Meteor.loginToken();
+        return Meteor.absoluteUrl(link);
+    },
+};
+
+
 //Namespace Collections
 Collections = {};
 Collections.Users = new Mongo.Collection("vnw_users");
@@ -19,16 +131,24 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
     }
 });
 
-Collections.Applications = new Mongo.Collection("vnw_applications");
+Collections.Candidates = new Mongo.Collection("vnw_candidates", {
+    transform: function (doc) {
+        return new CandidateTransform(doc);
+    }
+});
+
+
+Collections.Applications = new Mongo.Collection("vnw_applications", {
+    transform: function (doc) {
+        return new ApplicationTransform(doc);
+    }
+});
 
 Collections.Applications.allow({
     update: function (userId, doc) {
         return !!userId;
     }
 });
-
-Collections.Candidates = new Mongo.Collection("vnw_candidates");
-Collections.CandidateSources = new Mongo.Collection("vnw_candidate_sources");
 
 Collections.Activities = new Mongo.Collection("vnw_activities");
 

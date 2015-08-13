@@ -98,31 +98,49 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             "data.district": 1,
             "data.email1": 1,
             "data.homephone": 1,
-            "data.cellphone": 1
+            "data.cellphone": 1,
+            "data.firstName": 1,
+            "data.lastName": 1,
+            "data.headline": 1,
+            "data.email": 1,
+            "data.phone": 1,
+            "data.source": 1,
+            "data.otherSource": 1,
+            "data.profileLink": 1,
+            "data.comment": 1,
+            "data.skills": 1
         }
     };
 
 Meteor.publish('getJobs', function (filters, options) {
-    check(filters, Object);
-    check(options, Match.Optional(Object));
+    try {
+        if(!this.userId) this.ready();
 
-    var DEFAULT_FILTERS = {
-        userId: parseInt(this.userId)
-    };
+        check(filters, Object);
+        check(options, Match.Optional(Object));
 
-    filters = _.defaults(filters, DEFAULT_FILTERS);
-    options = _.defaults(options, DEFAULT_JOB_OPTIONS);
-    if (!options.hasOwnProperty("limit")) {
-        options['limit'] = 10;
+        var DEFAULT_FILTERS = {
+            userId: parseInt(this.userId)
+        };
+
+        filters = _.defaults(filters, DEFAULT_FILTERS);
+        options = _.defaults(options, DEFAULT_JOB_OPTIONS);
+        if (!options.hasOwnProperty("limit")) {
+            options['limit'] = 10;
+        }
+        return Collections.Jobs.find(filters, options);
+    } catch(e) {
+        debuger(e);
+        return this.ready();
     }
-    return Collections.Jobs.find(filters, options);
 });
 
 
 Meteor.publishComposite('getApplications', function (filters, options) {
     return {
         find: function() {
-            if(!this.userId) return [];
+            if(!this.userId) return this.ready();
+
             check(filters, Object);
             check(options, Object);
             var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
@@ -138,44 +156,18 @@ Meteor.publishComposite('getApplications', function (filters, options) {
         children: [
             {
                 find: function(application) {
-                    if(application.source == 3) {
-                        var cond = {
-                            _id: application.candidateId
-                        };
-                        var options = {};
-                        options.limit = 1;
-                        return Collections.CandidateSources.find(cond, options)
-                    } else {
-                        var cond = {
-                            candidateId: application.candidateId
-                        };
-                        var options = DEFAULT_CANDIDATE_OPTIONS;
-                        options.limit = 1;
-                        return Collections.Candidates.find(cond, options)
-                    }
+                    var cond = {
+                        candidateId: application.candidateId
+                    };
+                    var options = DEFAULT_CANDIDATE_OPTIONS;
+                    options.limit = 1;
+                    return Collections.Candidates.find(cond, options)
                 }
             }
         ]
     }
 });
 
-
-Meteor.publish('getApplicationDetails', function (applicationId) {
-    check(applicationId, Number);
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-
-    var appCursor = Collections.Applications.find({
-        companyId: user.companyId,
-        applicationId: applicationId
-    }, DEFAULT_APPLICATION_OPTIONS);
-
-    var canIds = appCursor.map(function (doc) {
-        return doc.candidateId
-    });
-    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}})
-
-    return [appCursor, canCursor];
-});
 
 
 Meteor.publish('applicationActivities', function (filters, options) {
@@ -340,7 +332,6 @@ Meteor.publishComposite('lastApplications', function () {
             var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
             if (!user) return [];
 
-            var cursors = [];
             var filters = {
                 companyId: user.companyId
             };

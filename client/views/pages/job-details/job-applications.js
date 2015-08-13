@@ -151,14 +151,12 @@ JobApplication = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             self.props.set("stage", Session.get("currentStage"));
             self.props.set("jobId", Session.get("currentJobId"));
-            self.props.set("applicationId", self.data().entryId || self.data()._id);
+            self.props.set("applicationId", self.data().entryId);
             self.props.set("candidateId", self.data().candidateId);
             self.props.set("application", self.data());
             self.props.set("matchingScore", self.data().matchingScore);
-            if(self.data().source == 3)
-                var candidate = Collections.CandidateSources.findOne({_id: self.data().candidateId});
-            else
-                var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
+
+            var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
             self.props.set("candidate", candidate);
             self.props.set("currentApplication", Session.get("currentApplicationId"));
 
@@ -195,75 +193,7 @@ JobApplication = BlazeComponent.extendComponent({
         return Router.routes['jobDetails'].url(params, query);
     },
 
-    /**
-     * Get 2 lines of cover letter
-     * @returns {String}
-     */
-    shortCoverLetter: function () {
-        var application = this.props.get("application");
-        if (!application.data.coverletter) return "";
-        return application.data.coverletter.split(/\s+/).splice(0, 14).join(" ") + "...";
-    },
-
-    /**
-     * Get matching score label
-     * @returns {String}
-     */
-    matchingScoreLabel: function () {
-        var matchingScore = this.props.get("matchingScore");
-        if (matchingScore >= 90)
-            return " label-success ";
-        if (matchingScore >= 70)
-            return " label-primary ";
-        if (matchingScore >= 50)
-            return " label-warning ";
-        if (!matchingScore || matchingScore <= 0)
-            return " hidden ";
-
-        return " label-default ";
-    },
-
-    timeago: function () {
-        var latestDate = this.props.get("application").createdAt;
-        return moment(latestDate).fromNow();
-    },
-
-    /**
-     * get candidate fullname
-     * @returns {string}
-     */
-    fullname: function () {
-        var can = this.props.get("candidate");
-        if (!can) return "";
-        if(this.props.get("application").source == 3)
-            return can.lastName + " " + can.firstName;
-
-        return can.data.lastname + " " + can.data.firstname;
-    },
-
-    /**
-     * get candidate city location
-     * @returns {String}
-     */
-    city: function () {
-        var can = this.props.get("candidate");
-        if (!can) return "";
-        if(this.props.get("application").source == 3) {
-            if(can.source == "other")
-                return can.otherSource;
-            return can.source;
-        }
-        return can.data.city;
-    },
-    /**
-     * Get candidate phone: cellphone or homephone
-     * @returns {String}
-     */
-    phone: function () {
-        var can = this.props.get("candidate");
-        if (!can) return "";
-        if(this.props.get("application").source == 3)
-            return can.phone || "";
-        return can.data.cellphone || can.data.homephone || "";
-    },
+    candidate: function() {
+        return Collections.Candidates.findOne({candidateId: this.props.get("candidateId")});
+    }
 }).register('JobApplication');

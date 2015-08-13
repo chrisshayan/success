@@ -1,5 +1,5 @@
 <template name="JobApplicationProfile">
-    {{#if props.get "application"}}
+    {{#if application}}
         <div class="job-application-actions clearfix ">
             <div class="pull-right">
                 {{> JobApplicationActions}}
@@ -15,42 +15,61 @@
                                 <img src="http://placehold.it/80x80" class="img-thumbnail">
                             </div>
                             <div class="job-candidate-info">
-                                <h2>{{fullname}}</h2>
-                                {{#with jobTitle}}
-                                    <h3>{{jobTitle}}</h3>
+                                <h2>{{candidate.fullname}}</h2>
+
+                                {{#if candidate.headline}}
+                                    <h3>{{candidate.headline}}</h3>
+                                {{/if}}
+
+                                {{#if candidate.city }}
+                                    <div>
+                                        <i class="fa fa-map-marker"></i> &nbsp; {{ candidate.city }}
+                                    </div>
+                                {{/if}}
+
+                                {{#if application.vnwProfileLink}}
+                                    <a href="{{ application.vnwProfileLink }}" target="_blank"><img
+                                            src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate
+                                        profile</a>
+                                {{/if}}
+
+                                {{#with candidate.skills}}
+                                    {{#each candidate.skills}}
+                                        <span class="label label-default">{{ this }}</span>
+                                    {{/each}}
                                 {{/with}}
-                                <a href="{{ profileUrl }}" target="_blank"><img
-                                        src="http://images.vietnamworks.com/img/thumbnail.png" alt=""/>&nbsp;Candidate
-                                    profile</a>
-                                {{#if isDisqualified}}
+
+                                {{#if application.disqualified}}
                                     <span class="text-danger">Disqualified</span>
                                 {{/if}}
                             </div>
 
                         </div>
                     </div>
-                    {{#if matchingScore}}
+                    {{#if application.matchingScore}}
                         <div class="col-sm-6" style="padding-top: 25px;">
                             <span class="mc-score block text-right small">
-                                <div>{{ matchingScore }}%</div>
+                                <div>{{ application.matchingScore }}%</div>
                                 <span class="mc-logo"></span>
                             </span>
                         </div>
                     {{/if}}
                 </div>
 
-                <div class="row">
-                    <!--COVER LETTER-->
-                    <div class="cover-letter">
-                        <p>{{{coverLetter}}}</p>
+                {{#if application.coverLetter}}
+                    <div class="row">
+                        <!--COVER LETTER-->
+                        <div class="cover-letter">
+                            <p>{{{application.coverLetter}}}</p>
 
-                        <div class="text-right">
-                            <a class="more-coverletter">{{{ coverLetterToggle.get }}}</a>
+                            <div class="text-right">
+                                <a class="more-coverletter">{{{ coverLetterToggle.get }}}</a>
+                            </div>
                         </div>
                     </div>
-                </div>
+                {{/if}}
 
-                {{#if isSentDirectly}}
+                {{#if application.isSentDirectly}}
                     <div class="row">
                         <div class="col-sm-6 col-sm-offset-3">
                             <div class="well text-center">
@@ -68,7 +87,7 @@
                                     </button>
                                 {{/if}}
                                 &nbsp;
-                                <a href="{{ resumeFileUrl }}" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-cloud-download"></i>&nbsp;Download
+                                <a href="{{ application.resumeFileUrl }}" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-cloud-download"></i>&nbsp;Download
                                     resume
                                 </a>
                             </div>
@@ -78,7 +97,7 @@
                     {{#if props.get "isViewResume"}}
                         <div class="row">
                             <div class="resume-viewer {{fullscreenClass}}">
-                                <iframe src="https://docs.google.com/viewer?embedded=true&url={{ resumeFileUrl }}" style="width:100%;height:550px;border:none"></iframe>
+                                <iframe src="https://docs.google.com/viewer?embedded=true&url={{ application.resumeFileUrl }}" style="width:100%;height:550px;border:none"></iframe>
                                 <button class="btn btn-info btn-sm resume-viewer-normal-mode">Exit fullscreen</button>
                             </div>
                         </div>

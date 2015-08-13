@@ -17,6 +17,7 @@ Activity.prototype.ACTION_TYPE = {
     REVERT_APPLICATION: 4,
     SEND_MAIL_TO_CANDIDATE: 5,
     ADD_COMMENT_TO_APPLICATION: 6,
+    ADD_CANDIDATE_TO_SOURCED: 7,
 };
 
 
@@ -59,12 +60,16 @@ Activity.prototype.revertApplication = function() {
 }
 
 Activity.prototype.sendMailToCandidate = function() {
-    this.actionType = this.ACTION_TYPE.SEND_MAIL_TO_CANDIDATE
+    this.actionType = this.ACTION_TYPE.SEND_MAIL_TO_CANDIDATE;
     this.save();
 }
 
 Activity.prototype.addCommentApplication = function() {
-    this.actionType = this.ACTION_TYPE.ADD_COMMENT_TO_APPLICATION
+    this.actionType = this.ACTION_TYPE.ADD_COMMENT_TO_APPLICATION;
+    this.save();
+}
+Activity.prototype.addCandidateToSourced = function() {
+    this.actionType = this.ACTION_TYPE.ADD_CANDIDATE_TO_SOURCED;
     this.save();
 }
 
