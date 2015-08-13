@@ -114,7 +114,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 
-Meteor.publish('getJobs', function (filters, options) {
+Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
     try {
         if(!this.userId) this.ready();
 
@@ -127,6 +127,11 @@ Meteor.publish('getJobs', function (filters, options) {
 
         filters = _.defaults(filters, DEFAULT_FILTERS);
         options = _.defaults(options, DEFAULT_JOB_OPTIONS);
+
+        if (filterEmailAddress)
+            filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
+
+
         if (!options.hasOwnProperty("limit")) {
             options['limit'] = 10;
         }
