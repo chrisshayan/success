@@ -558,6 +558,7 @@ function pullCompanyData(j, cb) {
         companyId: companyId
     };
 
+    console.log('pulling from user : ', userId);
     try {
         // GET ALL JOB IDS
 
@@ -603,7 +604,10 @@ function pullCompanyData(j, cb) {
 
 SYNC_VNW.sync = function () {
     Collections.SyncQueue.remove({type: "cronData"});
-    Collections.SyncQueue.update({type: "pullCompanyData", status: "completed"}, {$set: {status: "ready", runId: null}})
+    Collections.SyncQueue.find({type: "pullCompanyData", status: {"$in": ["completed", "failed"]}}).map(function (job) {
+        console.log('init Job', job.data);
+        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
+    });
 };
 
 SYNC_VNW.addQueue = function (type, data) {

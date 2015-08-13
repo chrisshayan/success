@@ -180,7 +180,10 @@ Collections.MailTemplates.allow({
         }
         return false;
     }
-})
+});
+
+Collections.SkillTerms = new Mongo.Collection("vnw_skills");
+
 if (Meteor.isServer) {
     Collections.MailTemplates.before.insert(function (userId, doc) {
         if (!userId) return;

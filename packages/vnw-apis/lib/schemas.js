@@ -383,3 +383,11 @@ Schemas.CandidateSource = new SimpleSchema({
         }
     }
 });
+
+Schemas.skill = function () {
+    return {
+        skillId: Number,
+        skillName: String
+    }
+}
+
