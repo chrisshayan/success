@@ -534,6 +534,20 @@ Meteor.methods({
             if (!this.userId) return false;
             check(data, Object);
             check(jobId, Number);
+
+            if(data.email) {
+                var criteria = {
+                    $or: [
+                        {"data.username": data.email},
+                        {"data.email": data.email},
+                        {"data.email1": data.email},
+                        {"data.email2": data.email}
+                    ]
+                };
+                if(Collections.Candidates.find(criteria).count() > 0)
+                    return false;
+            }
+
             var user = getUserInfo(+this.userId);
             can = new Schemas.Candidate();
             can.candidateId = null;

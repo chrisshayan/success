@@ -38,7 +38,8 @@ SimpleSchema.messages({
      * Custom error messages
      */
     movedStageNotAllowTheSame: "From stage and to stage are not allow the same.",
-    mailTemplateAlreadyExists: "Mail template is already exists"
+    mailTemplateAlreadyExists: "Mail template is already exists",
+    candidateExists: "This candidate is already applied"
 });
 Schemas = {};
 
@@ -305,6 +306,31 @@ Schemas.CandidateSource = new SimpleSchema({
         label: "Email",
         regEx: SimpleSchema.RegEx.Email,
         optional: true,
+        custom: function() {
+            if(Meteor.isClient && this.isSet) {
+                var self = this;
+                Meteor.call("checkCandidateExists", this.value, function(err, result) {
+                    if(err) throw err;
+                    if(result)
+                        Schemas.CandidateSource.namedContext("addCandidateForm").addInvalidKeys([{name: "email", type: "candidateExists"}]);
+
+                });
+            } else {
+                email = this.value;
+                if(!email) return;
+                var criteria = {
+                    $or: [
+                        {"data.username": email},
+                        {"data.email": email},
+                        {"data.email1": email},
+                        {"data.email2": email}
+                    ]
+                };
+                if(Collections.Candidates.find(criteria).count() > 0) {
+                    return "exists";
+                }
+            }
+        },
         autoform: {
             label: false,
             placeholder: "Email"
