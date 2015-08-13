@@ -225,5 +225,32 @@ function cronApps(appRows, companyId) {
 
 }
 
+/*
+ * Below is data that only does cron once a day
+ *
+ */
+
+function cronCity() {
+
+}
+
+
+// Cron tbkskill_term table
+
+function cronSkills() {
+    var skillTermsQuery = VNW_QUERIES.getSkillTerm;
+    //    console.log('appOnline', appOnlineSQL);
+    var conn = mysqlManager.getPoolConnection();
+    var skillRows = fetchVNWData(conn, skillTermsQuery);
+    conn.release();
+
+    skillRows.forEach(function (row) {
+        var skill = new Schemas.skill();
+        skill.skillId = row.skillId;
+        skill.skillName = row.skillName;
+        Collections.SkillTerms.insert(skill);
+    })
+}
+
 
 Collections.SyncQueue.processJobs('cronData', {concurrency: 20, payload: 1}, cronData);
