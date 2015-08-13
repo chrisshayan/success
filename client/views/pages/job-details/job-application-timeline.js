@@ -475,7 +475,7 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
         self.isLoading.set(true);
         var data = {
             content: $(".comment-candidate").val(),
-            application: parseInt(params.query.application)
+            application: params.query.application
         };
 
         Meteor.call('addCommentApplication', data, function (err, result) {
