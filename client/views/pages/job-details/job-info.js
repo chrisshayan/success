@@ -1,3 +1,4 @@
+
 AutoForm.hooks({
     addCandidateForm: {
         onSubmit: function(doc) {
@@ -37,18 +38,18 @@ JobInfo = BlazeComponent.extendComponent({
         });
     },
 
-    limit: function() {
+    limit: function () {
         return this.page.get() * this.inc;
     },
 
-    fetchOtherJobs: function() {
+    fetchOtherJobs: function () {
         var filters = {
             jobId: {
                 $nin: [this.job.jobId]
             }
         };
         var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
-        if(this.job.status == 1) {
+        if (this.job.status == 1) {
             filters['data.expireddate'] = {
                 $gte: today
             }
@@ -58,6 +59,10 @@ JobInfo = BlazeComponent.extendComponent({
             }
         }
 
+        if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
+            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
+        }
+
         var options = {
             limit: this.limit()
         };
@@ -65,15 +70,14 @@ JobInfo = BlazeComponent.extendComponent({
     },
 
     events: function () {
-        return [{
-        }];
+        return [{}];
     },
 
-    currentJobTitle: function() {
+    currentJobTitle: function () {
         return this.job.data.jobtitle;
     },
 
-    otherJobs: function() {
+    otherJobs: function () {
         return this.fetchOtherJobs();
 
     }
@@ -83,7 +87,7 @@ JobInfo = BlazeComponent.extendComponent({
 
 
 Template.JobInfoItem.helpers({
-    title: function() {
+    title: function () {
         return this.data.jobtitle;
     }
 });

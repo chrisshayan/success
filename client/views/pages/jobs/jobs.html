@@ -1,49 +1,52 @@
 <template name="Dashboard">
     <div class="wrapper wrapper-content" style="padding-bottom: 60px;">
+        <div class="filter-email col-sm-3 pull-right">
+            {{> filterByEmail }}
+        </div>
         {{> Jobs
-            status="1"
-            title="PUBLISHED POSITIONS"
-            icon="fa-cloud"
-            emptyMessage="There is no position here."}}
+        status="1"
+        title="PUBLISHED POSITIONS"
+        icon="fa-cloud"
+        emptyMessage="There is no position here."}}
 
         {{> Jobs
-            status="0"
-            title="CLOSED POSITIONS"
-            icon="fa-archive"
-            emptyMessage="Positions that no longer accepting new applicants will appear here."}}
+        status="0"
+        title="CLOSED POSITIONS"
+        icon="fa-archive"
+        emptyMessage="Positions that no longer accepting new applicants will appear here."}}
     </div>
 </template>
 
 <template name="Jobs">
 
-        <div class="row" style="margin-bottom: 20px">
-            <div class="col-sm-12">
-                <h3><i class="fa {{this.icon}}"></i>&nbsp;{{this.title}} ({{total}})</h3>
+    <div class="row" style="margin-bottom: 20px">
+        <div class="col-sm-12">
+            <h3><i class="fa {{this.icon}}"></i>&nbsp;{{this.title}} ({{total}})</h3>
 
-                <div class="jobs-list">
-                    {{#if isLoading.get}}
-                        {{> waveLoading}}
+            <div class="jobs-list">
+                {{#if isLoading.get}}
+                    {{> waveLoading}}
+                {{else}}
+                    {{#if items.count}}
+                        {{#each items}}
+                            {{> JobItem}}
+                        {{/each}}
                     {{else}}
-                        {{#if items.count}}
-                            {{#each items}}
-                                {{> JobItem}}
-                            {{/each}}
-                        {{else}}
-                            {{> emptyJobs message=this.emptyMessage}}
-                        {{/if}}
+                        {{> emptyJobs message=this.emptyMessage}}
                     {{/if}}
-                </div>
-                {{#unless isLoading.get}}
-                    {{#if isLoadingMore.get}}
-                        {{> spinLoading}}
-                    {{else}}
-                        {{#if loadMoreAbility}}
-                            <button class="btn btn-small btn-block" data-load-more="true">Load more</button>
-                        {{/if}}
-                    {{/if}}
-                {{/unless}}
+                {{/if}}
             </div>
+            {{#unless isLoading.get}}
+                {{#if isLoadingMore.get}}
+                    {{> spinLoading}}
+                {{else}}
+                    {{#if loadMoreAbility}}
+                        <button class="btn btn-small btn-block" data-load-more="true">Load more</button>
+                    {{/if}}
+                {{/if}}
+            {{/unless}}
         </div>
+    </div>
 </template>
 
 <template name="emptyJobs">
@@ -99,6 +102,31 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</template>
+
+<template name="filterByEmail">
+    <div class="select-list-job" style="float:right;padding: 5px 0;">
+        <a href="#" class="all-job"><span class="text-primary">All Job</span></a>
+        / <a class="my-job" href="#"><span class="text-primary">My Job</span></a>
+    </div>
+    <div class="select-email-list">
+        <select data-placeholder="Select your email" tabindex="-1" class="chosen-select form-control m-t"
+                name="filer-email">
+            <option value="">Select your email</option>
+            {{#each emailList}}
+                <option value="{{this}}" selected="{{isSelectedEMail this}}">{{this}}</option>
+            {{/each}}
+        </select>
+
+        <div class="select-mail-action" style="display: none;">
+            <button class="select-mail confirm btn btn-white" type="submit">
+                <span class="fa fa-check text-info"></span>
+            </button>
+            <button class="select-mail cancel btn btn-white" type="button">
+                <span class="fa fa-ban text-danger"></span>
+            </button>
         </div>
     </div>
 </template>

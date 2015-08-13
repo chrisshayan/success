@@ -388,20 +388,27 @@ Meteor.methods({
                 application: Match.Any,
                 mailTemplate: String,
                 subject: String,
-                content: String
+                content: String,
+                emailForm: String
             });
 
-            data.application = transformEntryId(data.application);
 
+            data.application = transformEntryId(data.application);
             var self = this;
             var user = getUserInfo(+this.userId);
-
             var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
-            if (!mailTemplate) {
-                var from = user.username;
-            } else {
-                var from = mailTemplate.emailFrom;
+
+            var from = '';
+            if (data.emailFrom) {
+                from = data.emailFrom
             }
+            else if (!mailTemplate) {
+                from = user.username;
+            }
+            else {
+                from = mailTemplate.emailFrom;
+            }
+            console.log('email from : ', from);
 
             var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
             if (!application) return false;
@@ -564,3 +571,25 @@ Meteor.methods({
     }
 
 });
+
+Meteor.methods({
+    'getEmailList': function () {
+        var listEmail = [];
+        var user = Collections.Users.findOne({userId: +this.userId});
+        var query = {
+            companyId: user.companyId
+        };
+        var options = {
+            fields: {
+                'data.emailaddress': 1
+            }
+        };
+
+
+        Collections.Jobs.find(query, options).map(function (obj) {
+            listEmail = listEmail.concat(obj.data.emailaddress.split(','));
+        });
+
+        return _.unique(listEmail);
+    }
+})

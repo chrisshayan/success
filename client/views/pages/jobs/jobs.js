@@ -3,6 +3,7 @@ Jobs = BlazeComponent.extendComponent({
         var self = this;
         if (!this.data().hasOwnProperty("status")) return;
 
+
         var instance = Template.instance();
         var data = this.data();
 
@@ -14,13 +15,17 @@ Jobs = BlazeComponent.extendComponent({
         this.isLoading = new ReactiveVar(false);
         this.isLoadingMore = new ReactiveVar(false);
 
-        if(Collections.Jobs.find({}, {limit: 1}).count() !== 1 )
+        if (Collections.Jobs.find({}, {limit: 1}).count() !== 1)
             this.isLoading.set(true);
 
         instance.autorun(function () {
-            DashboardSubs.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters());
-            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options());
-            if(trackSub.ready()) {
+            var filterEmailAddress = null;
+            if (self.filters()['data.emailaddress'])
+                filterEmailAddress = Meteor.currentRecruiter().email;
+
+            Meteor.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters(), filterEmailAddress);
+            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options(), filterEmailAddress);
+            if (trackSub.ready()) {
                 self.isLoading.set(false);
                 self.isLoadingMore.set(false);
             }
@@ -39,6 +44,11 @@ Jobs = BlazeComponent.extendComponent({
                 $lt: today
             }
         }
+
+        if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
+            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
+        }
+
         return filters;
     },
 
@@ -80,7 +90,7 @@ Jobs = BlazeComponent.extendComponent({
 
     total: function () {
         var counter = Collections.Counts.findOne("jobs_status_" + this.status);
-        if(!counter) return 0;
+        if (!counter) return 0;
         return counter.count;
     },
 
@@ -89,7 +99,6 @@ Jobs = BlazeComponent.extendComponent({
     }
 
 }).register('Jobs');
-
 
 
 JobItem = BlazeComponent.extendComponent({
@@ -126,7 +135,72 @@ JobItem = BlazeComponent.extendComponent({
     // Get number of application in job's stage
     counter: function (id) {
         var counter = Collections.Counts.findOne("job_stages_" + this.jobId);
-        if(!counter) return "-";
+        if (!counter) return "-";
         return counter.count[id] || "-";
     }
 }).register('JobItem');
+
+
+filterByEmail = BlazeComponent.extendComponent({
+    onCreated: function () {
+        var self = this;
+        this.emails = new ReactiveVar([]);
+        this.showMyJob = new ReactiveVar(false);
+
+        (Meteor.currentRecruiter()) && this.showMyJob.set(Meteor.currentRecruiter().showMyJob);
+
+        Meteor.call('getEmailList', function (err, result) {
+            self.emails.set(result);
+            $('.chosen-select').val(Meteor.currentRecruiter().email || '');
+
+        });
+    },
+
+    onRendered: function () {
+        var showTab = (Meteor.currentRecruiter().showMyJob) ? '.my-job' : '.all-job';
+        $(showTab).trigger('click');
+    },
+
+    events: function () {
+        return [{
+            'change .chosen-select': function (e) {
+                var value = $(e.target).val();
+                Meteor.setRecruiterEmail(value);
+            },
+            'click .select-list-job a': function (e) {
+                e.preventDefault();
+
+                var $this = $(e.target).closest('a');
+                $this.siblings('a').removeClass('active text-muted');
+                $this.addClass('active text-muted');
+
+                var showMine = $this.hasClass('my-job');
+                $('.select-email-list').toggle(showMine);
+                Meteor.setShowMyJob(showMine);
+            }
+        }]
+    },
+
+    onDestroyed: function () {
+    },
+
+    emailList: function () {
+        return this.emails.get();
+    },
+    isSelectedEMail: function (email) {
+        return (Meteor.currentRecruiter().email === email);
+    }
+
+
+    /**
+     * Helpers
+     */
+    // Get number of application in job's stage
+    /*counter: function (id) {
+     var counter = Collections.Counts.findOne("job_stages_" + this.jobId);
+     if (!counter) return "-";
+     return counter.count[id] || "-";
+     }*/
+}).register('filterByEmail');
+
+

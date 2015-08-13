@@ -23,9 +23,14 @@ Template.navigation.helpers({
         var company = instance.company.get();
         if (company)
             return company.logo;
+
         return "";
+    },
+    displayName: function () {
+        return Meteor.currentRecruiter().email;
     }
 });
+
 
 Template.menuItem.onRendered(function () {
     if (!Router.current().route) return;
@@ -59,8 +64,8 @@ Template.menuItem.helpers({
         return "";
     },
 
-    menuUrl: function() {
-        if(!this.route) return "#"
+    menuUrl: function () {
+        if (!this.route) return "#"
         return Router.url(this.route);
     }
 
