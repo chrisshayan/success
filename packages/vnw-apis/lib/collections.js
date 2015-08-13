@@ -36,13 +36,13 @@ CandidateTransform.prototype = {
         return this.data.jobtitle || this.data.headline;
     },
 
-    source: function () {
-        if (!this.data.source) return "";
-        if (this.data.source == "other") return this.data.otherSource;
+    source: function() {
+        if(!this.data.source) return "";
+        if(this.data.source == "other") return this.data.otherSource;
         return this.data.source;
     },
 
-    email: function () {
+    email: function() {
         return this.data.email1 || this.data.email2 || this.data.username || this.data.email;
     }
 };
@@ -135,7 +135,18 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
     }
 });
 
-Collections.Applications = new Mongo.Collection("vnw_applications");
+Collections.Candidates = new Mongo.Collection("vnw_candidates", {
+    transform: function (doc) {
+        return new CandidateTransform(doc);
+    }
+});
+
+
+Collections.Applications = new Mongo.Collection("vnw_applications", {
+    transform: function (doc) {
+        return new ApplicationTransform(doc);
+    }
+});
 
 Collections.Applications.allow({
     update: function (userId, doc) {
@@ -143,7 +154,6 @@ Collections.Applications.allow({
     }
 });
 
-Collections.Candidates = new Mongo.Collection("vnw_candidates");
 Collections.Activities = new Mongo.Collection("vnw_activities");
 
 /**

@@ -301,12 +301,7 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var candidate = self.candidate.get();
             if (candidate) {
-<<<<<<< HEAD
-                var toAddress = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
-                $(".mail-to").val(toAddress);
-=======
                 $(".mail-to").val(candidate.email());
->>>>>>> fd785c4... Fixed add candidate bugs
             }
         });
     },
