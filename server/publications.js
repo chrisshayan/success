@@ -356,6 +356,7 @@ Meteor.publishComposite('lastApplications', function () {
             if (!user) return [];
 
             var filters = {
+                source: {$ne: 3},
                 companyId: user.companyId
             };
 
@@ -381,35 +382,7 @@ Meteor.publishComposite('lastApplications', function () {
         ]
     }
 });
-Meteor.publish('lastApplications1', function () {
-    if (!this.userId) return [];
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return [];
 
-    var cursors = [];
-    var filters = {
-        companyId: user.companyId
-    };
-
-    var options = DEFAULT_APPLICATION_OPTIONS;
-    options['limit'] = 10;
-    options['sort'] = {
-        createdAt: -1
-    };
-
-    var applicationCursor = Collections.Applications.find(filters, options);
-    cursors.push(applicationCursor);
-    var canIds = applicationCursor.map(function (doc) {
-        return doc.candidateId
-    });
-    if (canIds.length > 0) {
-        var canOptions = DEFAULT_CANDIDATE_OPTIONS;
-        canOptions["limit"] = canIds.length;
-        var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}}, canOptions);
-        cursors.push(canCursor);
-    }
-    return cursors;
-});
 
 
 Meteor.publish('lastOpenJobs', function () {
