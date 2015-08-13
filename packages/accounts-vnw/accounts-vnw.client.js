@@ -33,7 +33,9 @@ AccountsVNW.onReconnect = function (err, result) {
     if (err) throw err;
     AccountsVNW._store.set('user', EJSON.stringify(result.data), this._loginDuration);
     AccountsVNW._setLoginToken(result.token);
+};
 
+Meteor.startup(function () {
     var isShowMyJobs = AccountsVNW._store.get('showMyJob');
     var recruiterEmail = AccountsVNW._store.get('recruiterEmail');
 
@@ -41,11 +43,12 @@ AccountsVNW.onReconnect = function (err, result) {
         recruiterEmail = EJSON.parse(recruiterEmail);
     else
         isShowMyJobs = false;
-    
+
     isShowMyJobs = (!recruiterEmail) ? false : (isShowMyJobs + '' !== 'false');
     AccountsVNW._isShowMyJobs.set(isShowMyJobs);
     AccountsVNW._recruiterEmail.set(recruiterEmail);
-};
+
+});
 
 
 /**
