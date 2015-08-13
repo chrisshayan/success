@@ -246,10 +246,15 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var params = Router.current().params;
             if (params.query.hasOwnProperty("application")) {
-                self.applicationId.set(parseInt(params.query.application));
+                var applicationId = params.query.application;
+                if(!_.isNaN(+applicationId))
+                    applicationId = +applicationId;
+
+                self.applicationId.set(applicationId);
                 var application = Collections.Applications.findOne({entryId: self.applicationId.get()});
                 if (application) {
                     self.application.set(application);
+
                     var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
                     if (candidate) {
                         self.candidate.set(candidate);
@@ -296,8 +301,12 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var candidate = self.candidate.get();
             if (candidate) {
+<<<<<<< HEAD
                 var toAddress = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
                 $(".mail-to").val(toAddress);
+=======
+                $(".mail-to").val(candidate.email());
+>>>>>>> fd785c4... Fixed add candidate bugs
             }
         });
     },

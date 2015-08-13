@@ -9,7 +9,7 @@ function replacePlaceholder(userId, application, candidate, mail) {
             if (replaces.hasOwnProperty(p)) return;
             switch (p1) {
                 case "candidate_first_name":
-                    replaces[p1] = candidate.data.firstname;
+                    replaces[p1] = candidate.data.firstname || candidate.data.firstName;
                     break;
 
                 case "position":
@@ -389,7 +389,7 @@ Meteor.methods({
                 mailTemplate: String,
                 subject: String,
                 content: String,
-                emailForm: String
+                emailFrom: Match.Any
             });
 
 
@@ -414,7 +414,8 @@ Meteor.methods({
             if (!application) return false;
             var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
             if (!candidate) return false;
-            var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username;
+            var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username || candidate.data.email || "";
+            if(!to) return false;
 
             var mail = {
                 from: from,

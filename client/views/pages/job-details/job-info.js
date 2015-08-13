@@ -1,27 +1,4 @@
 
-AutoForm.hooks({
-    addCandidateForm: {
-        onSubmit: function(doc) {
-            var jobId = Router.current().params.jobId || null;
-            var currentApplication = Router.current().params.query.application;
-            if(jobId) jobId = +jobId;
-            Meteor.call("addCandidate", doc, jobId, function(err, result) {
-                if(err) throw err;
-                if(result) {
-                    AutoForm.resetForm("addCandidateForm");
-                    $("#add-candidate-area").removeClass("open");
-
-                    if(!currentApplication) {
-                        window.location.reload();
-                    }
-                }
-            });
-            return false;
-        }
-    }
-});
-
-
 JobInfo = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
@@ -38,18 +15,18 @@ JobInfo = BlazeComponent.extendComponent({
         });
     },
 
-    limit: function () {
+    limit: function() {
         return this.page.get() * this.inc;
     },
 
-    fetchOtherJobs: function () {
+    fetchOtherJobs: function() {
         var filters = {
             jobId: {
                 $nin: [this.job.jobId]
             }
         };
         var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
-        if (this.job.status == 1) {
+        if(this.job.status == 1) {
             filters['data.expireddate'] = {
                 $gte: today
             }
@@ -59,10 +36,6 @@ JobInfo = BlazeComponent.extendComponent({
             }
         }
 
-        if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
-            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
-        }
-
         var options = {
             limit: this.limit()
         };
@@ -70,14 +43,15 @@ JobInfo = BlazeComponent.extendComponent({
     },
 
     events: function () {
-        return [{}];
+        return [{
+        }];
     },
 
-    currentJobTitle: function () {
+    currentJobTitle: function() {
         return this.job.data.jobtitle;
     },
 
-    otherJobs: function () {
+    otherJobs: function() {
         return this.fetchOtherJobs();
 
     }
@@ -87,22 +61,19 @@ JobInfo = BlazeComponent.extendComponent({
 
 
 Template.JobInfoItem.helpers({
-    title: function () {
+    title: function() {
         return this.data.jobtitle;
     }
 });
 
 
 Template.addCandidate.onRendered(function() {
-    $("#add-candidate-area .dropdown-toggle").on('click', function (event) {
-        $(this).parent().toggleClass("open");
-        event.stopPropagation();
-    });
-
-    $('body').on('click', function (e) {
-        if (!$("#add-candidate-area").is(e.target) && $("#add-candidate-area").has(e.target).length === 0 && $('.open').has(e.target).length === 0) {
-            $("#add-candidate-area").removeClass('open');
-        }
+    //$("#add-candidate-area .dropdown-toggle").on('click', function (event) {
+    //    $(this).parent().toggleClass("open");
+    //    event.stopPropagation();
+    //});
+    $('#add-candidate-area .dropdown-menu').click(function (e)
+    {
         e.stopPropagation();
     });
 });
