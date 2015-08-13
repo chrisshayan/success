@@ -131,7 +131,7 @@ Meteor.methods({
 
             var application = Collections.Applications.findOne(cond);
             if (!application) return false;
-            if (application.stage == 0 && option.stage == 1) return false;
+            if ( (application.stage == 0 && option.stage == 1) || (application.stage == 1 && option.stage == 0)) return false;
 
             var data = {
                 $set: {
@@ -569,6 +569,24 @@ Meteor.methods({
             return false;
         }
         return true;
+    },
+
+    checkCandidateExists: function(email) {
+        check(email, String);
+        email = email.trim();
+
+        var criteria = {
+            $or: [
+                {"data.username": email},
+                {"data.email": email},
+                {"data.email1": email},
+                {"data.email2": email}
+            ]
+        };
+        var options = {
+            limit: 1
+        };
+        return Collections.Candidates.find(criteria, options).count() > 0;
     }
 
 });

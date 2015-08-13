@@ -144,7 +144,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
             if (!_.isEmpty(html)) {
                 html = sprintf(html, stage.id, stage.label);
             }
-            if(currentStage.id != 0 || stage.id != 1) {
+            if((currentStage.id != 0 || stage.id != 1) && (currentStage.id != 1 || stage.id != 0)) {
                 items.push({html: html});
             }
         });

@@ -1,20 +1,46 @@
 AutoForm.hooks({
     addCandidateForm: {
-        onSubmit: function (doc) {
-            var jobId = Router.current().params.jobId || null;
-            var currentApplication = Router.current().params.query.application;
-            if (jobId) jobId = +jobId;
-            Meteor.call("addCandidate", doc, jobId, function (err, result) {
-                if (err) throw err;
-                if (result) {
-                    AutoForm.resetForm("addCandidateForm");
-                    $("#add-candidate-area").removeClass("open");
 
-                    if (!currentApplication) {
-                        window.location.reload();
+        onSubmit: function (doc) {
+            if(doc.email.length > 0) {
+                Meteor.call("checkCandidateExists", doc.email, function(err, result) {
+                    if(err) throw err;
+                    if(result) {
+                        Schemas.CandidateSource.namedContext("addCandidateForm").addInvalidKeys([{name: "email", type: "notUnique"}]);
+                    } else {
+                        var jobId = Router.current().params.jobId || null;
+                        var currentApplication = Router.current().params.query.application;
+                        if (jobId) jobId = +jobId;
+                        Meteor.call("addCandidate", doc, jobId, function (err, result) {
+                            if (err) throw err;
+                            if (result) {
+                                AutoForm.resetForm("addCandidateForm");
+                                $("#add-candidate-area").removeClass("open");
+
+                                if (!currentApplication) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
                     }
-                }
-            });
+                });
+            } else {
+                var jobId = Router.current().params.jobId || null;
+                var currentApplication = Router.current().params.query.application;
+                if (jobId) jobId = +jobId;
+                Meteor.call("addCandidate", doc, jobId, function (err, result) {
+                    if (err) throw err;
+                    if (result) {
+                        AutoForm.resetForm("addCandidateForm");
+                        $("#add-candidate-area").removeClass("open");
+
+                        if (!currentApplication) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            }
+
             return false;
         }
     }
