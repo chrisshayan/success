@@ -21,4 +21,5 @@ Meteor.startup(function () {
             }
         });
 
+    SYNC_VNW.sync();
 });
