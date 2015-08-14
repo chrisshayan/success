@@ -18,10 +18,10 @@ var syncData = function () {
     SyncedCron.add({
         name: 'Pull and sync skill term from VNW',
         schedule: function (parser) {
-            return parser.recur().on(0,12).hour();
+            return parser.recur().on(0, 12).hour();
         },
         job: function () {
-            //CRON_VNW.cron();
+            CRON_VNW.cronSkills();
         }
     });
 };

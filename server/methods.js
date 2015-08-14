@@ -53,7 +53,7 @@ function getUserInfo(userId) {
 }
 
 function transformEntryId(id) {
-    if(_.isNaN(+id))
+    if (_.isNaN(+id))
         return id;
     return +id;
 }
@@ -131,7 +131,7 @@ Meteor.methods({
 
             var application = Collections.Applications.findOne(cond);
             if (!application) return false;
-            if ( (application.stage == 0 && option.stage == 1) || (application.stage == 1 && option.stage == 0)) return false;
+            if ((application.stage == 0 && option.stage == 1) || (application.stage == 1 && option.stage == 0)) return false;
 
             var data = {
                 $set: {
@@ -315,7 +315,7 @@ Meteor.methods({
      */
     revertApplication: function (applicationId) {
         try {
-            if(!this.userId) return false;
+            if (!this.userId) return false;
 
             check(applicationId, Match.Any);
             applicationId = transformEntryId(applicationId);
@@ -353,7 +353,7 @@ Meteor.methods({
      */
     updateMailSignature: function (signature) {
         try {
-            if(!this.userId) return false;
+            if (!this.userId) return false;
 
             check(signature, String);
             var user = Collections.Users.findOne({userId: +this.userId});
@@ -367,7 +367,7 @@ Meteor.methods({
             };
 
             return Collections.CompanySettings.update(cond, modifier);
-        } catch(e) {
+        } catch (e) {
             debuger(e);
             return false;
         }
@@ -382,7 +382,7 @@ Meteor.methods({
      */
     sendMailToCandidate: function (data) {
         try {
-            if(!this.userId) return false;
+            if (!this.userId) return false;
 
             check(data, {
                 application: Match.Any,
@@ -415,7 +415,7 @@ Meteor.methods({
             var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
             if (!candidate) return false;
             var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username || candidate.data.email || "";
-            if(!to) return false;
+            if (!to) return false;
 
             var mail = {
                 from: from,
@@ -435,7 +435,7 @@ Meteor.methods({
                 activity.data = mail;
                 activity.sendMailToCandidate();
             });
-        } catch(e) {
+        } catch (e) {
             debuger(e);
         }
         return true;
@@ -467,7 +467,7 @@ Meteor.methods({
                 content: data.content
             };
             activity.addCommentApplication();
-        } catch(e) {
+        } catch (e) {
             debuger(e);
             return false;
         }
@@ -535,7 +535,7 @@ Meteor.methods({
             check(data, Object);
             check(jobId, Number);
 
-            if(data.email) {
+            if (data.email) {
                 var criteria = {
                     $or: [
                         {"data.username": data.email},
@@ -544,7 +544,7 @@ Meteor.methods({
                         {"data.email2": data.email}
                     ]
                 };
-                if(Collections.Candidates.find(criteria).count() > 0)
+                if (Collections.Candidates.find(criteria).count() > 0)
                     return false;
             }
 
@@ -578,14 +578,14 @@ Meteor.methods({
             activity.addCandidateToSourced();
 
 
-        } catch(e) {
+        } catch (e) {
             debuger(e);
             return false;
         }
         return true;
     },
 
-    checkCandidateExists: function(email) {
+    checkCandidateExists: function (email) {
         check(email, String);
         email = email.trim();
 
@@ -620,9 +620,10 @@ Meteor.methods({
 
 
         Collections.Jobs.find(query, options).map(function (obj) {
-            listEmail = listEmail.concat(obj.data.emailaddress.split(','));
+            if (obj.data.emailaddress)
+                listEmail = listEmail.concat(obj.data.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
         });
 
         return _.unique(listEmail);
     }
-})
+});

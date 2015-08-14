@@ -415,5 +415,5 @@ Schemas.skill = function () {
         skillId: Number,
         skillName: String
     }
-}
+};
 

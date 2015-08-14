@@ -33,6 +33,10 @@ CRON_VNW.cron = function () {
     Collections.SyncQueue.update({type: "cronData", status: "completed"}, {$set: {status: "ready", runId: null}})
 };
 
+CRON_VNW.cronSkills = function () {
+    Collections.SyncQueue.update({type: "cronSkills", status: "completed"}, {$set: {status: "ready", runId: null}})
+};
+
 CRON_VNW.addQueueCron = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
@@ -254,3 +258,4 @@ function cronSkills() {
 
 
 Collections.SyncQueue.processJobs('cronData', {concurrency: 20, payload: 1}, cronData);
+Collections.SyncQueue.processJobs('cronSkills', {concurrency: 20, payload: 1}, cronSkills);
