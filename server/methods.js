@@ -577,6 +577,34 @@ Meteor.methods({
             activity.createdAt = application.createdAt;
             activity.addCandidateToSourced();
 
+            if(data.email) {
+                Meteor.defer(function () {
+                    try {
+                        var apiUrl = Meteor.settings.VNW_API.apiUrl + Meteor.settings.VNW_API.registerAccount;
+                        var apiKey = Meteor.settings.VNW_API.apiConsumerKey;
+                        var result = Meteor.http.call(
+                            "POST",
+                            apiUrl , {
+                                headers: {
+                                    "content-type": "application/json",
+                                    "Accept": "application/json",
+                                    "content-md5": apiKey
+                                },
+                                data: {
+                                    "email": data.email,
+                                    "firstname": data.firstName,
+                                    "lastname": data.lastName
+                                }
+                            }
+                        );
+
+                        var content = JSON.parse(result.content);
+                        console.log("Add account vnw: ", content);
+                    } catch (e) {
+                        throw new Meteor.Error("rest-api-failed", "Failed to call the REST api on VietnamWorks");
+                    }
+                })
+            }
 
         } catch (e) {
             debuger(e);
