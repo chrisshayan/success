@@ -34,7 +34,12 @@ CRON_VNW.cron = function () {
 };
 
 CRON_VNW.cronSkills = function () {
-    Collections.SyncQueue.update({type: "cronSkills", status: "completed"}, {$set: {status: "ready", runId: null}})
+    Collections.SyncQueue.update({type: "cronSkills", status: {$in: ["completed", "failed"]}}, {
+        $set: {
+            status: "ready",
+            runId: null
+        }
+    })
 };
 
 CRON_VNW.addQueueCron = function (type, data) {
@@ -46,7 +51,7 @@ function cronData(j, cb) {
     var info = j.data;
     var userId = info.userId
         , companyId = info.companyId
-        , lastRunObj = moment(info.lastUpdated || info.doc.created)
+        , lastRunObj = moment(info.lastUpdated || j.doc.created)
         , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss');
     console.log('last sync: ', lastRunFormat);
     //get latest syncTime
@@ -128,7 +133,6 @@ function processJob(item, companyId) {
             job.updatedAt = formatDatetimeFromVNW(jRow.lastupdateddate);
 
             // update
-
             if (mongoJob
                 && (parseTimeToString(mongoJob.createdAt) !== parseTimeToString(job.createdAt)
                 || parseTimeToString(mongoJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
@@ -229,6 +233,12 @@ function cronApps(appRows, companyId) {
 
 }
 
+
+function cronResumeOnline(resumeId) {
+
+    var conn = mysqlManager.getPoolConnection();
+
+}
 /*
  * Below is data that only does cron once a day
  *
@@ -241,19 +251,35 @@ function cronCity() {
 
 // Cron tbkskill_term table
 
-function cronSkills() {
-    var skillTermsQuery = VNW_QUERIES.getSkillTerm;
-    //    console.log('appOnline', appOnlineSQL);
-    var conn = mysqlManager.getPoolConnection();
-    var skillRows = fetchVNWData(conn, skillTermsQuery);
-    conn.release();
+function cronSkills(j, cb) {
+    try {
+        var skillTermsQuery = VNW_QUERIES.getSkillTerm;
 
-    skillRows.forEach(function (row) {
-        var skill = new Schemas.skill();
-        skill.skillId = row.skillId;
-        skill.skillName = row.skillName;
-        Collections.SkillTerms.insert(skill);
-    })
+        var conn = mysqlManager.getPoolConnection();
+        var skillRows = fetchVNWData(conn, skillTermsQuery);
+        conn.release();
+        console.log('cronSkill run: ', skillRows.length);
+        var storedSkills = Collections.SkillTerms.find().count();
+        if (skillRows.length !== storedSkills) {
+            skillRows.forEach(function (row) {
+                var existSkill = Collections.SkillTerms.findOne({skillId: row.skillId});
+
+                if (!existSkill) {
+                    var skill = new Schemas.skill();
+                    skill.skillId = row.skillId;
+                    skill.skillName = row.skillName;
+                    Collections.SkillTerms.insert(skill);
+                }
+
+            });
+        }
+        console.log('cronSkills done!');
+        j.done();
+    } catch (e) {
+        console.log(e);
+        j.fail();
+    }
+    cb();
 }
 
 

@@ -36,13 +36,13 @@ CandidateTransform.prototype = {
         return this.data.jobtitle || this.data.headline;
     },
 
-    source: function() {
-        if(!this.data.source) return "";
-        if(this.data.source == "other") return this.data.otherSource;
+    source: function () {
+        if (!this.data.source) return "";
+        if (this.data.source == "other") return this.data.otherSource;
         return this.data.source;
     },
 
-    email: function() {
+    email: function () {
         return this.data.email1 || this.data.email2 || this.data.username || this.data.email;
     }
 };
@@ -183,6 +183,7 @@ Collections.MailTemplates.allow({
 });
 
 Collections.SkillTerms = new Mongo.Collection("vnw_skills");
+
 
 if (Meteor.isServer) {
     Collections.MailTemplates.before.insert(function (userId, doc) {
