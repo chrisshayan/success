@@ -32,7 +32,7 @@ function configure(api) {
     api.use([
         'underscore',
         'ejson',
-        'reactive-var',
+        'reactive-var'
     ], both);
 
     api.use(['izzilab:token', 'momentjs:moment'], 'server');

@@ -162,28 +162,25 @@ Collections.Activities = new Mongo.Collection("vnw_activities");
 Collections.MailTemplates = new Mongo.Collection("vnw_mail_templates");
 Collections.MailTemplates.allow({
     insert: function (userId, doc) {
-        if (userId)
-            return true;
-        return false;
+        return (userId);
     },
     update: function (userId, doc, fieldNames, modifier) {
-        if (doc.createdBy == userId) {
-            return true;
-        }
-        return false;
+        return (doc.createdBy == userId);
     },
     remove: function (userId, doc) {
-        if (doc.type == 2) {
-            if (doc.createdBy == userId) {
-                return true;
-            }
-        }
-        return false;
+
+        return (doc.type == 2 && doc.createdBy == userId);
     }
 });
 
-Collections.SkillTerms = new Mongo.Collection("vnw_skills");
+/* synced once per day Colection */
 
+Collections.SkillTerms = new Mongo.Collection("vnw_skills");
+Collections.Cities = new Mongo.Collection('vnw_cities');
+Collections.Degrees = new Mongo.Collection('vnw_degrees');
+
+
+Collections.Resumes = new Mongo.Collection('vnw_resumes');
 
 if (Meteor.isServer) {
     Collections.MailTemplates.before.insert(function (userId, doc) {

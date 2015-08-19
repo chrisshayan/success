@@ -21,9 +21,12 @@ var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.cronQueries;
 
 
-var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
-    connection.query(query, function (err, rows, fields) {
+var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
+    var conn = mysqlManager.getPoolConnection();
+
+    conn.query(query, function (err, rows, fields) {
         if (err) throw err;
+        conn.release();
         callback(err, rows);
     });
 });
@@ -60,9 +63,7 @@ function cronData(j, cb) {
         //get all jobs
         var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId);
         //console.log('jsql : ', jSql);
-        var conn = mysqlManager.getPoolConnection();
-        var updateJobs = fetchVNWData(conn, jSql);
-        conn.release();
+        var updateJobs = fetchVNWData(jSql);
 
         updateJobs.forEach(function (job) {
             if (moment(job.createdAt) > lastRunObj || moment(job.updatedAt) > lastRunObj) {
@@ -79,9 +80,7 @@ function cronData(j, cb) {
             var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, lastRunFormat, jobIds, lastRunFormat);
             //console.log('appSql', appSql);
 
-            var appConn = mysqlManager.getPoolConnection();
-            var appRows = fetchVNWData(appConn, appSql);
-            appConn.release();
+            var appRows = fetchVNWData(appSql);
 
             if (appRows.length) {
                 cronApps(appRows, companyId);
@@ -117,8 +116,7 @@ function processJob(item, companyId) {
     } else {
         var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.typeId);
         //console.log(getJobQuery);
-        var conn = mysqlManager.getPoolConnection();
-        var cJobs = fetchVNWData(conn, getJobQuery);
+        var cJobs = fetchVNWData(getJobQuery);
         cJobs.forEach(function (jRow) {
             var query = {
                 jobId: item.typeId
@@ -176,9 +174,7 @@ function processApp(appRows, companyId) {
 
 function processCandidates(candidateList) {
     var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-    var conn = mysqlManager.getPoolConnection();
-    var candidateRows = fetchVNWData(conn, getCandidatesSQL);
-    conn.release();
+    var candidateRows = fetchVNWData(getCandidatesSQL);
 
     candidateRows.forEach(function (row) {
         var candidate = Collections.Candidates.findOne({candidateId: row.userid});
@@ -213,19 +209,24 @@ function cronApps(appRows, companyId) {
     if (groupedApp['1']) {
         var appOnlineSQL = sprintf(VNW_QUERIES.pullAllAppsOnline, _.pluck(groupedApp['1'], 'typeId').join(','));
         //    console.log('appOnline', appOnlineSQL);
-        conn = mysqlManager.getPoolConnection();
-        var appOnlineRows = fetchVNWData(conn, appOnlineSQL);
-        conn.release();
+        var appOnlineRows = fetchVNWData(appOnlineSQL);
         if (appOnlineRows.length > 0) {
             processApp(appOnlineRows, companyId);
         }
+        Meteor.refer(function () {
+            _.each(appOnlineRows, function (item) {
+                console.log('cron item', item.resumeId);
+                item.resumeId && SYNC_VNW.syncResume(item.resumeId);
+            });
+        })
+
+
     }
     if (groupedApp['2']) {
         var appDirectSQL = sprintf(VNW_QUERIES.pullAllAppsDirect, _.pluck(groupedApp['2'], 'typeId').join(','));
         //     console.log('appDirect', appDirectSQL);
-        conn = mysqlManager.getPoolConnection();
-        var appDirectRows = fetchVNWData(conn, appDirectSQL);
-        conn.release();
+        var appDirectRows = fetchVNWData(appDirectSQL);
+
         if (appDirectRows.length > 0) {
             processApp(appDirectRows, companyId);
         }
@@ -234,30 +235,62 @@ function cronApps(appRows, companyId) {
 }
 
 
-function cronResumeOnline(resumeId) {
-
-    var conn = mysqlManager.getPoolConnection();
-
-}
 /*
  * Below is data that only does cron once a day
  *
  */
 
-function cronCity() {
+CRON_VNW.cronCity = function () {
+    // Remove old one
+    Collections.Cities.remove({});
 
-}
+    var skillTermsQuery = VNW_QUERIES.cronCities;
+
+
+    fetchVNWData(skillTermsQuery).forEach(function (row) {
+        var city = new Schemas.city();
+
+        city.id = row.cityid;
+        city.languageId = row.languageid;
+        city.country = row.countryid;
+        city.name = row.cityname;
+        city.order = row.cityorder;
+        Collections.Cities.insert(city);
+    });
+
+    console.log('CronCity : Done!');
+
+};
+
+CRON_VNW.cronDegree = function () {
+    // Remove old one
+    Collections.Degrees.remove({});
+
+    var skillTermsQuery = VNW_QUERIES.cronDegrees;
+
+    fetchVNWData(skillTermsQuery).forEach(function (row) {
+        var degree = new Schemas.degree();
+
+        degree.languageId = row.languageid;
+        degree.id = row.highestdegreeid;
+        degree.highestDegreeName = row.highestdegreename;
+        degree.highestDegreeOrder = row.highestdegreeorder;
+        degree.weight = row.weight;
+        degree.isExact = row.isexact;
+        Collections.Degrees.insert(degree);
+    });
+    //console.log(degreeRows);
+    console.log('CronDegree : Done!');
+};
 
 
 // Cron tbkskill_term table
 
 function cronSkills(j, cb) {
     try {
-        var skillTermsQuery = VNW_QUERIES.getSkillTerm;
+        var skillTermsQuery = VNW_QUERIES.cronSkillTerm;
 
-        var conn = mysqlManager.getPoolConnection();
-        var skillRows = fetchVNWData(conn, skillTermsQuery);
-        conn.release();
+        var skillRows = fetchVNWData(skillTermsQuery);
         console.log('cronSkill run: ', skillRows.length);
         var storedSkills = Collections.SkillTerms.find().count();
         if (skillRows.length !== storedSkills) {

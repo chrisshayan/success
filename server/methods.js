@@ -577,14 +577,14 @@ Meteor.methods({
             activity.createdAt = application.createdAt;
             activity.addCandidateToSourced();
 
-            if(data.email) {
+            if (data.email) {
                 Meteor.defer(function () {
                     try {
                         var apiUrl = Meteor.settings.VNW_API.apiUrl + Meteor.settings.VNW_API.registerAccount;
                         var apiKey = Meteor.settings.VNW_API.apiConsumerKey;
                         var result = Meteor.http.call(
                             "POST",
-                            apiUrl , {
+                            apiUrl, {
                                 headers: {
                                     "content-type": "application/json",
                                     "Accept": "application/json",
@@ -653,5 +653,8 @@ Meteor.methods({
         });
 
         return _.unique(listEmail);
+    },
+    'getResumeOnlineInfo': function (resumeId) {
+        return Collections.Resumes.findOne({resumeId: resumeId});
     }
 });

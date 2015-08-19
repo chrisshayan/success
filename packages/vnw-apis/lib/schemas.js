@@ -306,18 +306,21 @@ Schemas.CandidateSource = new SimpleSchema({
         label: "Email",
         regEx: SimpleSchema.RegEx.Email,
         optional: true,
-        custom: function() {
-            if(Meteor.isClient && this.isSet) {
+        custom: function () {
+            if (Meteor.isClient && this.isSet) {
                 var self = this;
-                Meteor.call("checkCandidateExists", this.value, function(err, result) {
-                    if(err) throw err;
-                    if(result)
-                        Schemas.CandidateSource.namedContext("addCandidateForm").addInvalidKeys([{name: "email", type: "candidateExists"}]);
+                Meteor.call("checkCandidateExists", this.value, function (err, result) {
+                    if (err) throw err;
+                    if (result)
+                        Schemas.CandidateSource.namedContext("addCandidateForm").addInvalidKeys([{
+                            name: "email",
+                            type: "candidateExists"
+                        }]);
 
                 });
             } else {
                 email = this.value;
-                if(!email) return;
+                if (!email) return;
                 var criteria = {
                     $or: [
                         {"data.username": email},
@@ -326,7 +329,7 @@ Schemas.CandidateSource = new SimpleSchema({
                         {"data.email2": email}
                     ]
                 };
-                if(Collections.Candidates.find(criteria).count() > 0) {
+                if (Collections.Candidates.find(criteria).count() > 0) {
                     return "exists";
                 }
             }
@@ -367,9 +370,9 @@ Schemas.CandidateSource = new SimpleSchema({
         type: String,
         optional: true,
         custom: function () {
-            if(Meteor.isClient) {
+            if (Meteor.isClient) {
                 var val = this.value || "";
-                if(this.field("source").value == "other" && val.trim().length <= 0) {
+                if (this.field("source").value == "other" && val.trim().length <= 0) {
                     return "required";
                 }
             }
@@ -417,3 +420,41 @@ Schemas.skill = function () {
     }
 };
 
+Schemas.resume = function () {
+    this.resumeId = null;
+    this.resumeTitle = null;
+    this.userId = null;
+    this.fullName = null;
+    this.highestDegreeId = null;
+    this.mostRecentPosition = null;
+    this.mostRecentEmployer = null;
+    this.suggestedSalary = null;
+    this.careerObjective = null;
+    this.updatedAt = null;
+    this.createdAt = null;
+    this.emailAddress = null;
+    this.cellphone = null;
+    this.address = null;
+    this.desireJobTitle = null;
+    this.education = [];
+    this.experience = [];
+    this.reference = [];
+
+};
+
+Schemas.city = function () {
+    this.languageId = null;
+    this.id = null;
+    this.country = null;
+    this.name = null;
+    this.order = null;
+};
+
+Schemas.degree = function () {
+    this.languageId = null;
+    this.id = null;
+    this.highestDegreeName = null;
+    this.highestDegreeOrder = null;
+    this.weight = null;
+    this.isExact = null;
+};

@@ -390,6 +390,10 @@
     font-weight: lighter;
 }
 
-#addCandidateForm {
+#resumeForm {
     padding: 10px;
+}
+
+.row-contents {
+    padding: 20px;
 }

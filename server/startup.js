@@ -15,11 +15,13 @@ Meteor.startup(function () {
                 indexObj.forEach(function (obj) {
                     col.createIndex(obj, options, function (err, result) {
                         if (err) throw err;
-                        console.log('database %s indexed %s !', key, result)
+                        console.log('Collection %s indexed %s !', key, result)
                     })
                 })
             }
         });
 
     SYNC_VNW.sync();
+    CRON_VNW.cronCity();
+    CRON_VNW.cronDegree();
 });

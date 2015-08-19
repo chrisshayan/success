@@ -46,5 +46,5 @@ Package.onUse(function (api) {
      * Export namespace
      */
     api.export(['Collections', 'Schemas','debuger'], both);
-    api.export(['APIS', 'SYNC_VNW'], 'server');
+    api.export(['APIS', 'SYNC_VNW','CRON_VNW'], 'server');
 });

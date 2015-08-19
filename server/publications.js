@@ -81,7 +81,8 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             disqualified: 1,
             createdAt: 1,
             "data.appSubject": 1,
-            "data.coverletter": 1
+            "data.coverletter": 1,
+            "data.resumeid": 1
         }
     },
     DEFAULT_CANDIDATE_OPTIONS = {
@@ -116,7 +117,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
 
 Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
     try {
-        if(!this.userId) this.ready();
+        if (!this.userId) this.ready();
 
         check(filters, Object);
         check(options, Match.Optional(Object));
@@ -136,7 +137,7 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
             options['limit'] = 10;
         }
         return Collections.Jobs.find(filters, options);
-    } catch(e) {
+    } catch (e) {
         debuger(e);
         return this.ready();
     }
@@ -146,8 +147,8 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
 Meteor.publishComposite('getApplications', function (filters, options) {
     return {
 
-        find: function() {
-            if(!this.userId) return this.ready();
+        find: function () {
+            if (!this.userId) return this.ready();
             check(filters, Object);
             check(options, Object);
             var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
@@ -192,7 +193,6 @@ Meteor.publish('getApplicationDetails', function (applicationId) {
 
     return [appCursor, canCursor];
 });
-
 
 
 Meteor.publish('applicationActivities', function (filters, options) {
@@ -389,7 +389,6 @@ Meteor.publishComposite('lastApplications', function () {
 });
 
 
-
 Meteor.publish('lastOpenJobs', function () {
     if (!this.userId) return [];
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
@@ -411,5 +410,12 @@ Meteor.publish('lastOpenJobs', function () {
 
 
     return Collections.Jobs.find(filters, options);
+});
+
+Meteor.publish('staticModels', function () {
+    var query = {languageId: 2};
+
+    return [Collections.Degrees.find(query)
+        , Collections.Cities.find(query)];
 });
 

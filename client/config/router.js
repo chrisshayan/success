@@ -8,6 +8,13 @@ JobDetailsSubs = new SubsManager({
     expireIn: 2
 });
 
+StaticSubs = new SubsManager({
+    cacheLimit: 1000,
+    expireIn: 30
+});
+
+StaticSubs.subscribe('staticModels');
+
 Router.configure({
     layoutTemplate: 'mainLayout',
     notFoundTemplate: 'notFound',
@@ -60,7 +67,7 @@ Router.route('/login', {
 
 Router.route('/logout', {
     name: "logout",
-    action: function (){
+    action: function () {
         DashboardSubs.clear();
         JobDetailsSubs.clear();
         Meteor.logout();
@@ -82,26 +89,26 @@ Router.route('/dashboard', {
 Router.route('/job/:jobId/stage/:stage', {
     name: "jobDetails",
     fastRender: true,
-    waitOn: function() {
-        if( !this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage') )
+    waitOn: function () {
+        if (!this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage'))
             throw Meteor.Error(404);
         return [
             Meteor.subscribe('jobDetails', {jobId: parseInt(this.params.jobId)}),
             Meteor.subscribe('mailTemplates')
         ];
     },
-    action: function() {
+    action: function () {
         var self = this;
         var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
-        if(!this.params.query.hasOwnProperty('application')) {
+        if (!this.params.query.hasOwnProperty('application')) {
 
             var options = {
                 jobId: parseInt(this.params.jobId),
                 stage: stage.id
             };
-            Meteor.call('getFirstJobApplication', options, function(err, applicationId) {
-                if(err) throw err;
-                if(applicationId) {
+            Meteor.call('getFirstJobApplication', options, function (err, applicationId) {
+                if (err) throw err;
+                if (applicationId) {
                     Router.go('jobDetails', {
                         jobId: self.params.jobId,
                         stage: self.params.stage
@@ -119,9 +126,9 @@ Router.route('/job/:jobId/stage/:stage', {
                 stage: stage.id,
                 application: self.params.query.application
             };
-            Meteor.call('checkApplicationInStage', options, function(err, isExists) {
-                if(err) throw err;
-                if(!isExists) {
+            Meteor.call('checkApplicationInStage', options, function (err, isExists) {
+                if (err) throw err;
+                if (!isExists) {
                     Router.go('jobDetails', {
                         jobId: self.params.jobId,
                         stage: self.params.stage
@@ -131,7 +138,7 @@ Router.route('/job/:jobId/stage/:stage', {
         }
         this.render("jobDetails");
     },
-    data: function() {
+    data: function () {
         var jobId = parseInt(this.params.jobId);
         return {
             job: Collections.Jobs.findOne({jobId: jobId}),
@@ -146,15 +153,15 @@ Router.route('/job/:jobId/stage/:stage', {
 Router.route('/settings/companyinfo', {
     name: "companyInfo",
     fastRender: true,
-    waitOn: function(){
+    waitOn: function () {
         return [
             DashboardSubs.subscribe('companyInfo')
         ];
     },
-    action: function() {
+    action: function () {
         this.render('companyInfo');
     },
-    data: function() {
+    data: function () {
         return Collections.CompanySettings.findOne();
     }
 });
@@ -163,12 +170,12 @@ Router.route('/settings/companyinfo', {
 Router.route('/settings/mailtemplates', {
     name: "mailTemplates",
     fastRender: true,
-    waitOn: function() {
+    waitOn: function () {
         return [
             Meteor.subscribe('mailTemplates'),
         ];
     },
-    action: function() {
+    action: function () {
         this.render('mailTemplates');
     }
 });
@@ -176,28 +183,28 @@ Router.route('/settings/mailtemplates', {
 
 Router.route('/settings/mailtemplates/create', {
     name: "createMailTemplate",
-    waitOn: function() {
+    waitOn: function () {
         return [
             Meteor.subscribe('mailTemplates'),
         ];
     },
-    action: function() {
+    action: function () {
         this.render('createMailTemplate');
     }
 });
 
 Router.route('/settings/mailtemplates/update/:_id', {
     name: "updateMailTemplate",
-    waitOn: function() {
+    waitOn: function () {
         return [
             Meteor.subscribe('mailTemplates'),
             Meteor.subscribe('mailTemplateDetails', this.params._id)
         ];
     },
-    action: function() {
+    action: function () {
         this.render('createMailTemplate');
     },
-    data: function() {
+    data: function () {
         return {
             doc: Collections.MailTemplates.findOne(this.params._id)
         };
@@ -206,27 +213,27 @@ Router.route('/settings/mailtemplates/update/:_id', {
 
 Router.route('/settings/mailsignature', {
     name: "mailSignature",
-    waitOn: function() {
+    waitOn: function () {
         return Meteor.subscribe('companySettings')
     },
-    action: function() {
+    action: function () {
         this.render('mailSignature');
     },
-    data: function() {
+    data: function () {
         return Collections.CompanySettings.findOne();
     }
 })
 
 Router.route('/activites', {
     name: "activities",
-    waitOn: function() {
+    waitOn: function () {
         return [
             Meteor.subscribe('activities'),
             Meteor.subscribe('candidateInfo'),
             Meteor.subscribe('jobs')
         ];
     },
-    action: function() {
+    action: function () {
         this.render('activities');
     }
 });

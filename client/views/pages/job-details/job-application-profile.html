@@ -114,35 +114,57 @@
                                     <i class="fa fa-eye"></i>&nbsp;View resume
                                 </button>
                                 &nbsp;
-                                <a href="{{ application.resumeOnlyFileUrl }}" target="_blank"
-                                   class="btn btn-success btn-sm"><i class="fa fa-cloud-download"></i>&nbsp;
-                                    Resume only
-                                </a>
-                                &nbsp;
-                                <a href="{{ application.resumeWithCoverLetterFileUrl }}" target="_blank"
-                                   class="btn btn-success btn-sm"><i class="fa fa-cloud-download"></i>&nbsp;
-                                    Resume with cover letter
-                                </a>
                             </div>
                         </div>
                     </div>
                     {{#if props.get "isViewResume"}}
-                        <div id="addCandidateForm" novalidate="novalidate">
+                        <div id="resumeForm" novalidate="novalidate">
                             <fieldset>
-                                {{> resumeGeneral }}
+                                <div>
+                                    {{> resumeGeneral resume}}
+                                </div>
                             </fieldset>
-                            <fieldset>
-                                {{> resumeCareerObject}}
-                            </fieldset>
-                            <fieldset>
-                                {{> resumeEducations}}
-                            </fieldset>
-                            <fieldset>
-                                {{> resumeExperiences }}
-                            </fieldset>
-                            <fieldset>
-                                {{> resumeReferences}}
-                            </fieldset>
+                            <br/>
+
+                            <div class="hr-line-dashed"></div>
+                            {{#if resume.careerObjective}}
+                                <fieldset>
+                                    <div class="col-sm-10">
+                                        {{> resumeCareerObject resume}}
+                                    </div>
+                                </fieldset>
+                                <br/>
+
+                                <div class="hr-line-dashed"></div>
+                            {{/if}}
+                            {{#if resume.education}}
+                                <fieldset>
+                                    <div class="col-sm-10">
+                                        {{> resumeEducations resume}}
+                                    </div>
+                                </fieldset>
+                                <br/>
+
+                                <div class="hr-line-dashed"></div>
+                            {{/if}}
+                            {{#if resume.experience}}
+                                <fieldset>
+                                    <div class="col-sm-10">
+                                        {{> resumeExperiences resume}}
+                                    </div>
+                                </fieldset>
+                                <br/>
+
+                                <div class="hr-line-dashed"></div>
+                            {{/if}}
+                            {{#if resume.reference}}
+                                <fieldset>
+                                    <div class="col-sm-10">
+                                        {{> resumeReferences resume}}
+                                    </div>
+                                </fieldset>
+                                <br/>
+                            {{/if}}
 
                         </div>
                     {{/if}}
@@ -166,67 +188,141 @@
     <div class="form-group">
         <label class="col-lg-2 control-label">Highest Education</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{getDegreeName highestDegreeId}}</p></div>
     </div>
     <div class="form-group">
         <label class="col-lg-2 control-label">Total Years of Experience</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{yearOfExperience}}</p></div>
     </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Language Proficiency</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
-    </div>
     <div class="form-group">
         <label class="col-lg-2 control-label">Most Recent Job</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{mostRecentPosition}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Current Job Level</label>
+        <label class="col-lg-2 control-label">Most Recent Company</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{mostRecentEmployer}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Expected Position</label>
+        <label class="col-lg-2 control-label">Desire Job Title</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{desireJobTitle}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Expected Job Level</label>
+        <label class="col-lg-2 control-label">Address</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{address}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Expected Work Place</label>
+        <label class="col-lg-2 control-label">Email address</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{emailAddress}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Expected Job Category</label>
+        <label class="col-lg-2 control-label">Mobile phone</label>
 
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        <div class="col-lg-10"><p class="form-control-static">{{cellphone}}</p></div>
     </div>
+
     <div class="form-group">
         <label class="col-lg-2 control-label">Expected Salary</label>
-
-        <div class="col-lg-10"><p class="form-control-static">email@example.com</p></div>
+        {{#if suggestedSalary}}
+            <div class="col-lg-10"><p class="form-control-static">${{suggestedSalary}}</p></div>
+        {{else}}
+            <div class="col-lg-10"><p class="form-control-static">Negotiable</p></div>
+        {{/if}}
     </div>
 </template>
 
 <template name="resumeCareerObject">
     <h2>Career Objective</h2>
+
+    <div class="form-group">
+        <div class="col-lg-10"><p class="form-control-static">{{{careerObjective}}}</p></div>
+    </div>
+    <br/>
 </template>
 
 <template name="resumeEducations">
     <h2>Education & Qualifications</h2>
+
+
+    {{#each education}}
+        <div class="row-contents">
+            <h3>{{schoolName}}</h3>
+
+            <div class="form-group">
+                <strong>{{major}}</strong>
+                {{#if isString startDate}}
+                    <small>({{formatDate startDate 1}} - {{formatDate endDate 1}})</small>
+                    <br/>
+                {{/if}}
+            </div>
+            <div class="form-group">
+                <strong>Education Achievements</strong>
+                <br/>
+
+                <div>
+                    <p class="form-control-static">{{{description}}}</p></div>
+            </div>
+        </div>
+    {{/each}}
+
 </template>
 
 <template name="resumeExperiences">
     <h2>Work Experience</h2>
+    {{#each experience}}
+        <div class="row-contents">
+            <h3>{{companyName}}</h3>
+            <strong>{{jobTitle}}</strong>
+        <span>({{formatDate startDate 1}} - {{#if isCurrent}}
+            Current {{else}}  {{formatDate endDate 1}} {{/if}})</span>
+            <br/>
+
+            <div class="form-group">
+                <div>
+                    <p class="form-control-static">
+                        {{{description}}}
+                    </p>
+                </div>
+            </div>
+        </div>
+    {{/each}}
+
 </template>
 
 <template name="resumeReferences">
     <h2>References</h2>
+
+    {{#each reference}}
+        <div class="row-contents">
+            <h3>{{name}} - {{title}}</h3>
+            <br/>
+
+            <strong>Phone</strong>
+
+            <div class="form-group">
+                    <span class="form-control-static">
+                        {{{phone}}}
+                    </span>
+            </div>
+
+            <strong>Email</strong>
+
+            <div class="form-group">
+                <span>{{email}}</span>
+            </div>
+
+            <strong>Description</strong>
+
+            <div class="form-group">
+                <span>{{description}}</span>
+            </div>
+        </div>
+    {{/each}}
+
 </template>

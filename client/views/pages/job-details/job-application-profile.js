@@ -32,6 +32,10 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
         };
         Event.on('emptyProfile', this.onEmptyProfile);
+
+        this.resumeInfo = new ReactiveVar([]);
+
+
     },
 
     onRendered: function () {
@@ -100,25 +104,25 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     toggleViewResume: function () {
         this.props.set('isViewResume', !this.props.get('isViewResume'));
-        if (this.props.get('isViewResume')) {
-            var selectors = {
-                details: '.full-height-scroll.white-bg',
-                slimScroll: {
-                    slimClass: '',
-                    slimScrollClass: '.slimScrollBar'
-                }
-            };
-            var $details = $(selectors.details);
-            var $mailContainer = $("#timeline");
-            var height = $mailContainer.offset().top - $details.offset().top;
-
-            $details.animate({
-                scrollTop: height
-            }, 'slow', function () {
-                $details.siblings(selectors.slimScroll.slimScrollClass)
-                    .css({'top': height / 2 + 'px'});
-            });
-        }
+        /*if (this.props.get('isViewResume')) {
+         var selectors = {
+         details: '.full-height-scroll.white-bg',
+         slimScroll: {
+         slimClass: '',
+         slimScrollClass: '.slimScrollBar'
+         }
+         };
+         var $details = $(selectors.details);
+         var $resumeBtnGroup = $('.btn-sm.view-resume');
+         var height = $resumeBtnGroup.offset().top - $details.offset().top;
+         console.log(height);
+         $details.animate({
+         scrollTop: height
+         }, 'slow', function () {
+         $details.siblings(selectors.slimScroll.slimScrollClass)
+         .css({'top': height / 2 + 'px'});
+         });
+         }*/
     },
 
     viewFullscreen: function () {
@@ -139,11 +143,37 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         return this.props.get('isViewFullscreen') ? " fullscreen " : "";
     },
 
+    resume: function () {
+        return this.resumeInfo.get();
+
+
+    },
+
     application: function () {
+        var self = this;
         var app = Collections.Applications.findOne({entryId: this.props.get("applicationId")});
-        if (app)
+        if (app) {
             this.props.set("candidateId", app.candidateId);
+
+            var resumeId = (app.data) ? app.data.resumeid : null;
+            //var results = Collections.Resumes.findOne({resumeId: resumeId});
+
+            resumeId && Meteor.call('getResumeOnlineInfo', resumeId, function (err, results) {
+                self.resumeInfo.set(results);
+            });
+        }
+
+
         return app;
+    },
+
+    getDegreeName: function (id) {
+        return Collections.Degrees.findOne({id: id}).highestDegreeName;
+
+    },
+
+    isString: function (input) {
+        return (typeof input === 'object');
     },
 
     candidate: function () {

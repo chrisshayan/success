@@ -7,16 +7,24 @@ function formatDatetimeFromVNW(datetime) {
     return d.toDate();
 }
 
+function parseTimeToString(date) {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+}
+
 var VNW_TABLES = Meteor.settings.tables,
     VNW_QUERIES = Meteor.settings.queries;
 
 
-var fetchVNWData = Meteor.wrapAsync(function (connection, query, callback) {
-    connection.query(query, function (err, rows, fields) {
+var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
+    var conn = mysqlManager.getPoolConnection();
+
+    conn.query(query, function (err, rows, fields) {
         if (err) throw err;
+        conn.release();
         callback(err, rows);
     });
 });
+
 
 //Namespace to share methods to manual sync data from VietnamSYNC_VNW
 SYNC_VNW = {};
@@ -61,9 +69,9 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     check(companyId, Number);
     var pullCompanyInfoSql = sprintf(VNW_QUERIES.pullCompanyInfo, companyId);
     try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullCompanyInfoSql);
-        conn.release();
+
+        var rows = fetchVNWData(pullCompanyInfoSql);
+
         _.each(rows, function (row) {
             var company = Collections.CompanySettings.findOne({companyId: row.companyid});
 
@@ -110,9 +118,8 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
     var candidates = [];
     var entryIds = [];
     var pullApplicationOnlineSql = sprintf(VNW_QUERIES.pullApplicationOnline, jobId);
-    var conn = mysqlManager.getPoolConnection();
-    var rows = fetchVNWData(conn, pullApplicationOnlineSql);
-    conn.release();
+
+    var rows = fetchVNWData(pullApplicationOnlineSql);
 
     _.each(rows, function (row) {
         var applicationOnline = new Schemas.Application();
@@ -143,9 +150,9 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
 
     // PULL applications that sent directly
     var pullApplicationDirectlySql = sprintf(VNW_QUERIES.pullApplicationDirectly, jobId);
-    var connDirect = mysqlManager.getPoolConnection();
-    var rows1 = fetchVNWData(connDirect, pullApplicationDirectlySql);
-    connDirect.release();
+
+    fetchVNWData(pullApplicationDirectlySql);
+
     _.each(rows1, function (row) {
         var applicationDirect = new Schemas.Application();
         applicationDirect.entryId = row.sdid;
@@ -190,9 +197,8 @@ SYNC_VNW.pullCandidates = function (candidates) {
     var pullCandidatesSql = sprintf(VNW_QUERIES.pullCandidates, candidates);
 
     try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullCandidatesSql);
-        conn.release();
+        var rows = fetchVNWData(pullCandidatesSql);
+
         _.each(rows, function (row) {
             var can = Collections.Candidates.findOne({candidateId: row.userid});
 
@@ -226,9 +232,7 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
 
     var pullApplicationScoreSql = sprintf(VNW_QUERIES.pullApplicationScores, entryIds.join(","));
     try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullApplicationScoreSql);
-        conn.release();
+        var rows = fetchVNWData(pullApplicationScoreSql);
         _.each(rows, function (row) {
             var application = Collections.Applications.findOne({entryId: row.applicationId});
             if (application) {
@@ -345,9 +349,9 @@ SYNC_VNW.analyticApplications = function (companyId, items) {
 SYNC_VNW.insertVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullJobSql);
-        conn.release();
+
+        var rows = fetchVNWData(pullJobSql);
+
         _.each(rows, function (row) {
             var job = new Schemas.Job();
             job.jobId = row.jobid;
@@ -370,9 +374,8 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
 SYNC_VNW.updateVNWJob = function (jobId, companyId) {
     var pullJobSql = sprintf(VNW_QUERIES.pullJob, jobId);
     try {
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, pullJobSql);
-        conn.release();
+        var rows = fetchVNWData(pullJobSql);
+
         _.each(rows, function (row) {
             var criteria = {
                 jobId: jobId
@@ -411,9 +414,8 @@ SYNC_VNW.insertVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, query);
-        conn.release();
+        var rows = fetchVNWData(query);
+
         _.each(rows, function (row) {
             var app = new Schemas.Application();
             if (data.source == 1) {
@@ -427,6 +429,7 @@ SYNC_VNW.insertVNWApplication = function (data, companyId) {
             app.source = data.source;
             app.data = row;
             app.matchingScore = data.matchingScore;
+
             app.createdAt = formatDatetimeFromVNW(row.createddate);
             Collections.Applications.insert(app);
 
@@ -459,9 +462,8 @@ SYNC_VNW.updateVNWApplication = function (data, companyId) {
         if (data.source == 2) {
             query = sprintf(VNW_QUERIES.pullAppDirect, data.typeId);
         }
-        var conn = mysqlManager.getPoolConnection();
-        var rows = fetchVNWData(conn, query);
-        conn.release();
+
+        var rows = fetchVNWData(query);
         _.each(rows, function (row) {
             var criteria = {
                 entryId: data.typeId
@@ -523,6 +525,15 @@ SYNC_VNW.pullData = function (companyId, items) {
                 break;
 
             case "application":
+
+                Meteor.defer(function () {
+                    items.forEach(function (item) {
+                        if (item.source === 1) {
+                            item.resumeId && SYNC_VNW.syncResume(item.resumeId);
+                        }
+                    });
+                });
+
                 result = SYNC_VNW.analyticApplications(companyId, items);
                 // Insert new job
                 _.each(result.added, function (app) {
@@ -536,6 +547,7 @@ SYNC_VNW.pullData = function (companyId, items) {
                 SYNC_VNW.deleteVNWApplications(result.removed);
                 break;
 
+
             case "candidate":
 
                 break;
@@ -546,6 +558,95 @@ SYNC_VNW.pullData = function (companyId, items) {
         debuger(e)
     }
 };
+
+SYNC_VNW.syncResume = function (resumeId) {
+    var generalQuery = sprintf(VNW_QUERIES.general, resumeId);
+    var resumeRows = fetchVNWData(generalQuery);
+
+    _.each(resumeRows, function (row) {
+        var resume = Collections.Resumes.findOne({resumeId: resumeId});
+        var formatLastUpdated = formatDatetimeFromVNW(row.lastdateupdated);
+
+        if (!resume || parseTimeToString(formatLastUpdated) != parseTimeToString(resume.updatedAt)) {
+            if (resume)
+                Collections.Resumes.remove({resumeId: resumeId});
+
+            resume = new Schemas.resume();
+
+            resume.resumeId = resumeId;
+            resume.resumeTitle = row.resumetitle;
+            resume.userId = row.userid;
+            resume.fullName = row.fullname;
+            resume.highestDegreeId = row.highestdegreeid;
+            resume.mostRecentPosition = row.mostrecentposition;
+            resume.mostRecentEmployer = row.mostrecentemployer;
+            resume.yearOfExperience = row.yearsexperienceid || 0;
+            resume.suggestedSalary = row.suggestedsalary;
+            resume.careerObjective = row.jobdescription;
+            resume.address = row.address;
+            resume.emailAddress = row.emailaddress;
+            resume.desireJobTitle = row.desiredjobtitle;
+            resume.cellphone = row.cellphone;
+            resume.updatedAt = formatLastUpdated;
+            resume.data = row;
+            resume.createdAt = formatDatetimeFromVNW(row.createddate);
+
+            // get Education
+            var educationQuery = sprintf(VNW_QUERIES.education, resumeId);
+
+            var educationRows = fetchVNWData(educationQuery);
+
+            _.each(educationRows, function (row) {
+                resume.education.push({
+                    highestDegreeId: row.highestdegreeid,
+                    schoolName: row.schoolname,
+                    major: row.major,
+                    startDate: row.startdate,
+                    endDate: row.enddate,
+                    description: row.description,
+                    educationOrder: row.educationorder
+                });
+            });
+
+            var experienceQuery = sprintf(VNW_QUERIES.experience, resumeId);
+
+            var experienceRows = fetchVNWData(experienceQuery);
+
+            _.each(experienceRows, function (row) {
+                resume.experience.push({
+                    jobTitle: row.jobtitle,
+                    companyName: row.companyname,
+                    startDate: row.startdate,
+                    endDate: row.enddate,
+                    description: row.description,
+                    experienceOrder: row.experienceorder,
+                    isCurrent: row.iscurrent
+
+                })
+            });
+
+            var referenceQuery = sprintf(VNW_QUERIES.reference, resumeId);
+            var referenceRows = fetchVNWData(referenceQuery);
+
+            _.each(referenceRows, function (row) {
+                resume.reference.push({
+                    name: row.name,
+                    title: row.title,
+                    companyName: row.companyname,
+                    phone: row.phone,
+                    email: row.email,
+                    description: row.description,
+                    referenceType: row.referencetype,
+                    referenceOrder: row.referenceorther,
+                    isAvailable: row.isavailable
+                })
+            });
+            Collections.Resumes.insert(resume);
+
+        }
+    });
+}
+
 
 function pullCompanyData(j, cb) {
     var user = j.data;
@@ -563,9 +664,8 @@ function pullCompanyData(j, cb) {
         // GET ALL JOB IDS
 
         var jSql = sprintf(VNW_QUERIES.checkJobsUpdate, userId);
-        var conn = mysqlManager.getPoolConnection();
-        var jRows = fetchVNWData(conn, jSql);
-        conn.release();
+
+        var jRows = fetchVNWData(jSql);
 
         if (jRows.length <= 0) {
             console.log('create cron');
@@ -579,9 +679,8 @@ function pullCompanyData(j, cb) {
             while (jobIds.length > 0) {
                 var chunk = jobIds.splice(0, 5);
                 var appSql = sprintf(VNW_QUERIES.checkApplicationsUpdate, chunk, chunk);
-                var connApplication = mysqlManager.getPoolConnection();
-                var appRows = fetchVNWData(connApplication, appSql);
-                connApplication.release();
+
+                var appRows = fetchVNWData(appSql);
                 if (appRows.length > 0) {
                     // Sync applications
                     SYNC_VNW.pullData(companyId, appRows);
