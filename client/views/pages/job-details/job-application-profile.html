@@ -118,7 +118,7 @@
                         </div>
                     </div>
                     {{#if props.get "isViewResume"}}
-                        <div id="resumeForm" novalidate="novalidate">
+                        <div id="resumeForm" class="form-horizontal" novalidate="novalidate">
                             <fieldset>
                                 <div>
                                     {{> resumeGeneral resume}}
@@ -186,53 +186,53 @@
     <h2>General information</h2>
 
     <div class="form-group">
-        <label class="col-lg-2 control-label">Highest Education</label>
+        <label class="col-lg-3 control-label">Highest Education</label>
 
-        <div class="col-lg-10"><p class="form-control-static">{{getDegreeName highestDegreeId}}</p></div>
+        <div class="col-lg-9"><p class="form-control-static">{{getDegreeName highestDegreeId}}</p></div>
     </div>
     <div class="form-group">
-        <label class="col-lg-2 control-label">Total Years of Experience</label>
+        <label class="col-lg-3 control-label">Total Years of Experience</label>
 
-        <div class="col-lg-10"><p class="form-control-static">{{yearOfExperience}}</p></div>
-    </div>
-
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Most Recent Job</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{mostRecentPosition}}</p></div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Most Recent Company</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{mostRecentEmployer}}</p></div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Desire Job Title</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{desireJobTitle}}</p></div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Address</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{address}}</p></div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Email address</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{emailAddress}}</p></div>
-    </div>
-    <div class="form-group">
-        <label class="col-lg-2 control-label">Mobile phone</label>
-
-        <div class="col-lg-10"><p class="form-control-static">{{cellphone}}</p></div>
+        <div class="col-lg-9"><p class="form-control-static">{{yearOfExperience}}</p></div>
     </div>
 
     <div class="form-group">
-        <label class="col-lg-2 control-label">Expected Salary</label>
+        <label class="col-lg-3 control-label">Most Recent Job</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{mostRecentPosition}}</p></div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Most Recent Company</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{mostRecentEmployer}}</p></div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Desire Job Title</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{desireJobTitle}}</p></div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Address</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{address}}</p></div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Email address</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{emailAddress}}</p></div>
+    </div>
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Mobile phone</label>
+
+        <div class="col-lg-9"><p class="form-control-static">{{cellphone}}</p></div>
+    </div>
+
+    <div class="form-group">
+        <label class="col-lg-3 control-label">Expected Salary</label>
         {{#if suggestedSalary}}
-            <div class="col-lg-10"><p class="form-control-static">${{suggestedSalary}}</p></div>
+            <div class="col-lg-9"><p class="form-control-static">${{suggestedSalary}}</p></div>
         {{else}}
-            <div class="col-lg-10"><p class="form-control-static">Negotiable</p></div>
+            <div class="col-lg-9"><p class="form-control-static">Negotiable</p></div>
         {{/if}}
     </div>
 </template>
@@ -251,24 +251,24 @@
 
 
     {{#each education}}
-        <div class="row-contents">
-            <h3>{{schoolName}}</h3>
+        <h3>{{schoolName}}</h3>
 
+
+        <div class="row-contents">
             <div class="form-group">
-                <strong>{{major}}</strong>
+                <strong><i>{{major}}</i></strong>
                 {{#if isString startDate}}
                     <small>({{formatDate startDate 1}} - {{formatDate endDate 1}})</small>
-                    <br/>
                 {{/if}}
             </div>
             <div class="form-group">
                 <strong>Education Achievements</strong>
-                <br/>
 
                 <div>
                     <p class="form-control-static">{{{description}}}</p></div>
             </div>
         </div>
+        <br/>
     {{/each}}
 
 </template>
@@ -276,13 +276,16 @@
 <template name="resumeExperiences">
     <h2>Work Experience</h2>
     {{#each experience}}
-        <div class="row-contents">
-            <h3>{{companyName}}</h3>
-            <strong>{{jobTitle}}</strong>
-        <span>({{formatDate startDate 1}} - {{#if isCurrent}}
-            Current {{else}}  {{formatDate endDate 1}} {{/if}})</span>
-            <br/>
+        <h3>{{companyName}}</h3>
 
+
+        <div class="row-contents">
+            <div class="form-group">
+                <strong><i>{{jobTitle}}</i></strong>
+                <small>({{formatDate startDate 1}} - {{#if isCurrent}}
+                    Current {{else}}  {{formatDate endDate 1}} {{/if}})
+                </small>
+            </div>
             <div class="form-group">
                 <div>
                     <p class="form-control-static">
@@ -291,6 +294,7 @@
                 </div>
             </div>
         </div>
+        <br/>
     {{/each}}
 
 </template>
@@ -300,29 +304,32 @@
 
     {{#each reference}}
         <div class="row-contents">
-            <h3>{{name}} - {{title}}</h3>
-            <br/>
-
-            <strong>Phone</strong>
+            <h3>{{name}}</h3>
 
             <div class="form-group">
-                    <span class="form-control-static">
-                        {{{phone}}}
-                    </span>
+                <label class="col-lg-3 control-label">Title</label>
+
+                <div class="col-lg-9"><p class="form-control-static">{{title}}</p></div>
             </div>
 
-            <strong>Email</strong>
-
             <div class="form-group">
-                <span>{{email}}</span>
+                <label class="col-lg-3 control-label">Phone</label>
+
+                <div class="col-lg-9"><p class="form-control-static">{{phone}}</p></div>
             </div>
-
-            <strong>Description</strong>
-
             <div class="form-group">
-                <span>{{description}}</span>
+                <label class="col-lg-3 control-label">Email address</label>
+
+                <div class="col-lg-9"><p class="form-control-static">{{email}}</p></div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-3 control-label">Description</label>
+
+                <div class="col-lg-9"><p class="form-control-static">{{description}}</p></div>
             </div>
         </div>
+        <br/>
+
     {{/each}}
 
 </template>

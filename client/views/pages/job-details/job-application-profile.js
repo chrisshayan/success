@@ -168,7 +168,9 @@ JobApplicationProfile = BlazeComponent.extendComponent({
     },
 
     getDegreeName: function (id) {
-        return Collections.Degrees.findOne({id: id}).highestDegreeName;
+        var Degrees = Collections.Degrees.findOne({id: id});
+
+        return (Degrees) ? Degrees.highestDegreeName : '';
 
     },
 
