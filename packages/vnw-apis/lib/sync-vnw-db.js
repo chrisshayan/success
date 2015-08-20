@@ -708,13 +708,20 @@ SYNC_VNW.sync = function () {
         SYNC_VNW.addQueue('cronSkills', {});
     }
 
-    Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
-        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
+    Collections.SyncQueue.remove({type: "cronData"});
+
+    Collections.SyncQueue.find({type: "pullCompanyData"}).map(function (job) {
+        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
     });
 
-    Collections.SyncQueue.find({type: "pullCompanyData", status: {$in: ['running', 'fail']}}).map(function (job) {
-        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
-    });
+
+    /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
+     Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
+     });
+
+     Collections.SyncQueue.find({type: "pullCompanyData", status: {$in: ['running', 'fail']}}).map(function (job) {
+     Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
+     });*/
 };
 
 SYNC_VNW.addQueue = function (type, data) {
