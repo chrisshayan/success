@@ -213,10 +213,10 @@ function cronApps(appRows, companyId) {
         if (appOnlineRows.length > 0) {
             processApp(appOnlineRows, companyId);
         }
-        Meteor.refer(function () {
+        Meteor.defer(function () {
             _.each(appOnlineRows, function (item) {
-                console.log('cron item', item.resumeId);
-                item.resumeId && SYNC_VNW.syncResume(item.resumeId);
+                console.log('cron resume: ', item.resumeid);
+                item.resumeid && SYNC_VNW.syncResume(item.resumeid);
             });
         })
 
