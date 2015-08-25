@@ -22,7 +22,7 @@ Meteor.publish('mailTemplates', function () {
     };
     var options = {
         sort: {createdAt: -1}
-    }
+    };
     return Collections.MailTemplates.find(cond, options);
 });
 

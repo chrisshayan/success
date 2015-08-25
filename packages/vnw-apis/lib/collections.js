@@ -110,7 +110,7 @@ ApplicationTransform.prototype = {
     resumeFileUrl: function () {
         var link = "downloadresume/" + this.companyId + "/" + this.entryId + '/' + Meteor.loginToken();
         return Meteor.absoluteUrl(link);
-    },
+    }
 };
 
 
