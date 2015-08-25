@@ -30,8 +30,9 @@ model.appendSchema({
         type: String,
         optional: true
     },
-    data: {
-        type: Object
+    vnwData: {
+        type: Object,
+        optional: true
     },
     createdAt: {
         type: Date

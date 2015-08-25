@@ -10,7 +10,7 @@ model.appendSchema({
     jobId: {type: Number},
     companyId: {type: Number},
     jobEmailTo: {type: String},
-    data: {type: Object},
+    vnwData: {type: Object, optional: true},
     createdAt: {type: Date},
     updatedAt: {type: Date}
 

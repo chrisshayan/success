@@ -4,6 +4,16 @@
 
 
 
+var profile = new SimpleSchema({
+    firstname: {
+        type: String
+    },
+    lastname: {
+        type: String
+    }
+});
+
+
 Collection = User._collection;
 
 User.appendSchema({
@@ -14,8 +24,15 @@ User.appendSchema({
     userId: {
         type: Number
     },
-    data: {
-        type: String
+    vnwData: {
+        type: Object,
+        optional: true
+    },
+    role: {
+        type: Number
+    },
+    profile: {
+        type: profile
     },
     createdAt: {
         type: Date

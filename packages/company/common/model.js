@@ -9,7 +9,7 @@ Collection = model.collection;
 
 model.appendSchema({
     companyId: {type: Number},
-    data: {type: Object, optional: true},
+    vnwData: {type: Object, optional: true},
     companyName: {type: String},
     companyAddress: {type: String},
     contactName: {type: String},

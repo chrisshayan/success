@@ -31,7 +31,10 @@ model.appendSchema({
         type: Boolean,
         defaultValue: false
     },
-    data: {type: Object},
+    vnwData: {
+        type: Object,
+        optional: true
+    },
     createdAt: {type: Date},
     updatedAt: {type: Date, optional: true}
 
