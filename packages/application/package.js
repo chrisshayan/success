@@ -13,7 +13,9 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.1.0.3');
     api.use(["vnw:core"]);
+    api.use(["vnw:company"]);
     api.use(["vnw:job"]);
+    api.use(["vnw:application"]);
 
     /* namespace */
     api.addFiles(['application.js'], ['server']);
@@ -25,7 +27,9 @@ Package.onUse(function (api) {
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
-    api.imply('vnw:user');
+    api.imply('vnw:company');
+    api.imply('vnw:job');
+    api.imply(["vnw:application"]);
 
     /* export */
     api.export('Application');

@@ -6,11 +6,24 @@ var model = BaseModel.extendAndSetupCollection("applications");
 
 Collection = model.collection;
 
+model.prototype.candidate = function (options) {
+    if (this.candidateId == void 0) return [];
+    return Candidate.model._collection.find({candidateId: this.candidateId}, options || {});
+};
+
 model.appendSchema({
-    jobId: {type: Number},
-    entryId: {type: Number},
-    candidateId: {type: Number},
-    companyId: {type: Number},
+    applicationId: {
+        type: Number
+    },
+    jobId: {
+        type: Number
+    },
+    candidateId: {
+        type: Number
+    },
+    companyId: {
+        type: Number
+    },
     coverLetter: {
         type: String,
         defaultValue: ''
@@ -18,7 +31,9 @@ model.appendSchema({
     resumeId: {
         type: Number
     },
-    source: {type: Number}, // 1: is online, 2: sent directly, 3: add manually
+    source: {
+        type: Number
+    }, // 1: is online, 2: sent directly, 3: add manually
     stage: {
         type: Number
         , defaultValue: 0
@@ -35,8 +50,13 @@ model.appendSchema({
         type: Object,
         optional: true
     },
-    createdAt: {type: Date},
-    updatedAt: {type: Date, optional: true}
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date,
+        optional: true
+    }
 
 });
 
