@@ -23,14 +23,14 @@ JobCandidatesActions = React.createClass({
         this.setState({showSortBox: !this.state.showSortBox});
     },
     render() {
+
+        //<button onClick={ this.toggleSearchBox } className="btn btn-link btn-md" data-toggle="tooltip"
+        //        data-placement="top" title="" data-original-title="Search candidate"><i
+        //    className="fa fa-search"></i></button>
         return (
             <div style={ {boxShadow: "0px 5px 11px -8px #666"} }>
                 <div className="job-candidate-actions" style={styles.jobCandidates.actions}>
                     <ActionSelectAll onClick={this.props.onSelectAll}/>
-
-                    <button onClick={ this.toggleSearchBox } className="btn btn-link btn-md" data-toggle="tooltip"
-                            data-placement="top" title="" data-original-title="Search candidate"><i
-                        className="fa fa-search"></i></button>
 
                     <button className="btn btn-link btn-md" data-toggle="tooltip" data-placement="top" title=""
                             data-original-title="Sort" onClick={ this.toggleSortBox }><i className="fa fa-sort-amount-asc"></i></button>
