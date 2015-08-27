@@ -6,3 +6,8 @@ settings/
 
 packages/vnw-apis/.npm/*
 packages/*/.npm/
+
+
+
+packages/react-bootstrap/*.map
+packages/react-bootstrap/*.cached
