@@ -19,8 +19,9 @@ Package.onUse(function (api) {
 
     api.addFiles(['job.js']);
 
-    api.addFiles(['common/model.js', 'common/extends.js']);
-    api.addFiles(['server/publications.js', 'server/methods.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
+
+    api.addFiles(['server/publications.js', 'server/methods.js'], ['server']);
 
     api.imply('vnw:user');
     api.imply('vnw:company');

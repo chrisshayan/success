@@ -47,8 +47,10 @@ model.appendSchema({
         defaultValue: false
     },
     vnwData: {
-        type: Object,
-        optional: true
+        type: Object
+    },
+    'vnwData.$.resumeid': {
+        type: Number
     },
     createdAt: {
         type: Date

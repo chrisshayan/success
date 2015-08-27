@@ -13,8 +13,7 @@ var profile = new SimpleSchema({
     }
 });
 
-
-Collection = User._collection;
+Collection = Meteor.users;
 
 User.appendSchema({
     emailSignature: {
@@ -25,8 +24,10 @@ User.appendSchema({
         type: Number
     },
     vnwData: {
-        type: Object,
-        optional: true
+        type: Object
+    },
+    'vnwData.$.userid': {
+        type: String
     },
     role: {
         type: Number

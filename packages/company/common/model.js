@@ -3,17 +3,25 @@
  */
 
 
-var model = BaseModel.extendAndSetupCollection('company');
+//var model = BaseModel.extendAndSetupCollection('company');
+var model = BaseModel.extendAndSetupCollection('companies');
 
 Collection = model.collection;
+
+model.prototype.user = function (options) {
+    if (this.companyId == void 0) return [];
+    UserApi.methods.find({companyId: this.companyId}, options || {}).fetch();
+};
 
 model.appendSchema({
     companyId: {
         type: Number
     },
     vnwData: {
-        type: Object,
-        optional: true
+        type: Object
+    },
+    'vnwData.$.comanyid': {
+        type: String
     },
     companyName: {
         type: String
@@ -37,8 +45,10 @@ model.appendSchema({
     },
     email: {
         type: String
-    },
-    //mailSignature: {type: String, optional: true},
+    }, //mailSignature: {type: String, optional: true},
+    createdBy: {
+        type: String
+    }, // userId first Login
     createdAt: {
         type: Date
     },

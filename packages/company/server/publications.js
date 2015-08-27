@@ -4,14 +4,37 @@
 
 
 Company.publications = {
-    pubCompanySettings: function (companyId, options) {
-        var query = (companyId) ? {companyId: companyId} : {};
+    oldPubCompanySettings: function (options) {
+        console.log('this', this.userId);
+        if (this.userId == void 0) return null;
+
+        var user = UserApi.methods.getUser(this.userId);
         var defaultOptions = {
             limit: 1
         };
-        _.extend(defaultOptions, options);
+        var query = {};
+        if (user == void 0)
+            query.companyId = user.companyId;
 
+        _.extend(defaultOptions, options || {});
+        return Collection.find(query, defaultOptions);
+
+    },
+    pubCompanySettings: function (options) {
+        console.log('this', this.userId);
+        if (this.userId == void 0) return null;
+        var query = {createdBy: this.userId};
+        var defaultOptions = {
+            limit: 1
+        };
+
+        _.extend(defaultOptions, options || {});
         return Collection.find(query, defaultOptions);
     }
 
 };
+
+
+/*Meteor.publish('companyInfo', Company.publications.oldPubCompanySettings);
+
+ Meteor.publish('companySettings', Company.publications.oldPubCompanySettings);*/

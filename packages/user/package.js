@@ -16,13 +16,17 @@ Package.onUse(function (api) {
     api.use(["vnw:core"]);
 
     /* namespace */
-    api.addFiles(['user.js'], ['server']);
+    api.addFiles(['user.js']);
 
     /* model */
     api.addFiles(['common/model.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
+
+    /* imply */
+    api.imply('vnw:core');
+    api.imply(["socialize:user-model"]);
 
     api.export('UserApi')
 });

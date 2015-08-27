@@ -15,7 +15,6 @@ Package.onUse(function (api) {
     api.use(["vnw:core"]);
     api.use(["vnw:company"]);
     api.use(["vnw:job"]);
-    api.use(["vnw:application"]);
 
     /* namespace */
     api.addFiles(['application.js'], ['server']);
@@ -29,7 +28,6 @@ Package.onUse(function (api) {
     /* imply changes */
     api.imply('vnw:company');
     api.imply('vnw:job');
-    api.imply(["vnw:application"]);
 
     /* export */
     api.export('Application');
