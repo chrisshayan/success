@@ -235,8 +235,8 @@ AppStores['JobDetails'] = Fluxxor.createStore({
         } else {
             Event.emit('emptyProfile');
             Router.go('jobDetails', {
-                jobId: self.jobId.get(),
-                stage: self.stage.get().alias
+                jobId: this.currentJobId,
+                stage: this.stage.alias
             });
         }
         this.triggerAppChanged();
@@ -289,12 +289,13 @@ AppStores['JobDetails'] = Fluxxor.createStore({
             if (app) {
                 var candidate = Collections.Candidates.findOne({candidateId: app.candidateId});
                 if (candidate) {
-                    var email = candidate.data.username || candidate.data.email1 || candidate.data.email2;
+                    var email = candidate.data.username || candidate.data.email1 || candidate.data.email2 || candidate.data.email;
+                    if(!email) return;
                     appIds.push(appId);
                     emails.push(email);
                 }
             }
-        })
+        });
         return {
             appIds: appIds,
             emails: emails

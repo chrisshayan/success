@@ -157,7 +157,14 @@ const BulkActions = React.createClass({
     },
     onSendMassEmail(e) {
         e.preventDefault();
-        this.setState({isSendMassEmail: true});
+        var mailTo = this.getFlux().store("JobDetailsStore").getSelectedEmails();
+        if(mailTo.emails.length > 0)
+            this.setState({isSendMassEmail: true});
+        else
+            swal({
+                type: "warning",
+                title: "There is no email"
+            })
     },
 
     onHideSendMassModal () {
