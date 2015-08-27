@@ -110,6 +110,19 @@ ApplicationTransform.prototype = {
     resumeFileUrl: function () {
         var link = "downloadresume/" + this.companyId + "/" + this.entryId + '/' + Meteor.loginToken();
         return Meteor.absoluteUrl(link);
+    },
+
+    link: function() {
+        var params = {
+            jobId: this.jobId,
+            stage: Recruit.APPLICATION_STAGES[this.stage].alias
+        };
+        var queryParams = {
+            query: {
+                application: this.entryId
+            }
+        };
+        return Router.url('jobDetails', params, queryParams)
     }
 };
 

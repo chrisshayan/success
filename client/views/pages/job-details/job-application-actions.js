@@ -66,7 +66,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
                     // remove application from list
                     // change current application
                     Notification.success(sprintf('Moved to %s successfully', stage.label));
-                    Event.emit('movedApplicationStage');
+                    window.stores.JobDetailsStore.triggerMoveApplication()
                 }
             });
         }
@@ -80,6 +80,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         Meteor.call('disqualifyApplication', this.props.get("applicationId"), function(err, result){
             if(err) throw err;
             self.props.set('disqualified', true);
+            window.stores.JobDetailsStore.triggerAppChanged()
         });
     },
 
@@ -91,6 +92,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         Meteor.call('revertApplication', this.props.get("applicationId"), function(err, result){
             if(err) throw err;
             self.props.set('disqualified', false);
+            window.stores.JobDetailsStore.triggerAppChanged()
         });
     },
 

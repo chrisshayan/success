@@ -12,6 +12,9 @@ jquery
 reactive-var
 reactive-dict
 iron:router
+react
+react-template-helper
+izzilab:fluxxor
 twbs:bootstrap
 fortawesome:fontawesome
 momentjs:moment
@@ -27,14 +30,13 @@ summernote:summernote
 mpowaga:autoform-summernote
 meteorhacks:fast-render
 meteorhacks:subs-manager
-meteorhacks:kadira
-meteorhacks:kadira-profiler
-kadira:debug
+#meteorhacks:kadira
+#meteorhacks:kadira-profiler
+#kadira:debug
 vsivsi:queue-async
 cfs:reactive-list
 cfs:power-queue
 reywood:publish-composite
-
 lab:vnw-apis
 lab:accounts-vnw
 lab:notifications
@@ -44,3 +46,7 @@ http
 froatsnook:request
 izzilab:token
 ahmetcetin:autoform-tags
+izzilab:react-bootstrap@0.0.1
+stevezhu:lodash
+thereactivestack:blazetoreact
+ajduke:bootstrap-tagsinput

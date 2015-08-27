@@ -35,7 +35,6 @@ function replacePlaceholder(userId, application, candidate, mail) {
     _.templateSettings = {
         interpolate: /\[\[(.+?)\]\]/g
     };
-
     var template = _.template(mail.html);
     mail.html = template(replaces);
 
@@ -235,7 +234,7 @@ Meteor.methods({
             var application = Collections.Applications.findOne({
                 jobId: opt.jobId,
                 stage: opt.stage
-            }, {sort: {matchingScore: -1}});
+            }, {sort: {createdAt: -1}});
 
             return application.entryId;
         } catch (e) {
@@ -305,6 +304,44 @@ Meteor.methods({
                 };
                 activity.disqualifiedApplication();
             }
+        } catch (e) {
+            debuger(e);
+        }
+    },
+
+
+    disqualifyApplications: function (ids) {
+        try {
+            if (!this.userId) return false;
+            this.unblock();
+
+            check(ids, [String]);
+
+            var user = getUserInfo(+this.userId);
+            _.each(ids, function(_id) {
+                Meteor.defer(function() {
+                    var application = Collections.Applications.findOne({_id: _id}, {fields: {_id: 1, disqualified: 1}});
+                    if (!application || application.disqualified == true) return;
+
+                    var modifier = {
+                        $set: {
+                            disqualified: true
+                        }
+                    }
+                    var result = Collections.Applications.update(application._id, modifier);
+                    if (result) {
+                        // Log activity
+                        var activity = new Activity();
+                        activity.companyId = user.companyId;
+                        activity.createdBy = user.userId;
+                        activity.data = {
+                            applicationId: application.entryId
+                        };
+                        activity.disqualifiedApplication();
+                    }
+                });
+            });
+
         } catch (e) {
             debuger(e);
         }
@@ -435,6 +472,70 @@ Meteor.methods({
                 activity.data = mail;
                 activity.sendMailToCandidate();
             });
+        } catch (e) {
+            debuger(e);
+        }
+        return true;
+    },
+
+    sendMailToCandidates: function (data) {
+        try {
+            if (!this.userId) return false;
+            check(data, {
+                to: [String],
+                mailTemplate: String,
+                subject: String,
+                content: String,
+                emailFrom: Match.Optional(String)
+            });
+
+            this.unblock();
+            var self = this;
+            var user = getUserInfo(+this.userId);
+
+            _.each(data.to, function(appId) {
+                var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
+
+                var from = '';
+                if (data.emailFrom) {
+                    from = data.emailFrom
+                }
+                else if (!mailTemplate) {
+                    from = user.username;
+                }
+                else {
+                    from = mailTemplate.emailFrom;
+                }
+                console.log('email from : ', from);
+
+                var application = Collections.Applications.findOne({_id: appId, companyId: user.companyId});
+                if (!application) return false;
+                var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+                if (!candidate) return false;
+                var to = candidate.data.username || candidate.data.email1 || candidate.data.email2 || candidate.data.email || "";
+                if (!to) return false;
+
+                var mail = {
+                    from: from,
+                    to: to,
+                    subject: data.subject,
+                    html: data.content
+                };
+
+                Meteor.defer(function () {
+                    mail = replacePlaceholder(self.userId, application, candidate, mail);
+
+                    Meteor.Mandrill.send(mail);
+                    var activity = new Activity();
+
+                    mail.applicationId = application.entryId;
+                    activity.companyId = user.companyId;
+                    activity.createdBy = user.userId;
+                    activity.data = mail;
+                    activity.sendMailToCandidate();
+                });
+            });
+
         } catch (e) {
             debuger(e);
         }

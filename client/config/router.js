@@ -140,6 +140,7 @@ Router.route('/job/:jobId/stage/:stage', {
     },
     data: function () {
         var jobId = parseInt(this.params.jobId);
+
         return {
             job: Collections.Jobs.findOne({jobId: jobId}),
             isEmpty: !this.params.query.hasOwnProperty('application')

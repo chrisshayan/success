@@ -7,7 +7,7 @@ Template.jobDetails.onCreated(function () {
         Session.set("currentStage", stage);
         if (params.query.hasOwnProperty('application')) {
             applicationId = params.query.application;
-            if(_.isNumber(applicationId))
+            if (_.isNumber(applicationId))
                 applicationId = parseInt(applicationId);
             Session.set("currentApplicationId", applicationId);
         }
@@ -15,7 +15,6 @@ Template.jobDetails.onCreated(function () {
 });
 
 Template.jobDetails.onRendered(function () {
-
     $('[data-toggle="tooltip"]').tooltip();
 // Add special class for full height
     $('body').addClass('fixed-sidebar');
@@ -94,4 +93,8 @@ Template.jobDetails.onDestroyed(function () {
     $('.sidebar-collapse').removeAttr("style");
 });
 
-
+Template.jobDetails.helpers({
+    JobCandidatesContainer: function () {
+        return JobCandidatesContainer;
+    }
+});
