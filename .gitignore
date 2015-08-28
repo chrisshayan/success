@@ -1,5 +1,6 @@
 .idea
 .meteor/local
+.meteor/versions
 settings/
 
 .settings/settings.json

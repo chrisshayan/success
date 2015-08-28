@@ -64,7 +64,6 @@ meteorhacks:fast-render@2.8.1
 meteorhacks:inject-data@1.4.0
 meteorhacks:picker@1.0.3
 meteorhacks:subs-manager@1.5.2
-meteorhacks:unblock@1.1.0
 minifiers@1.1.5
 minimongo@1.0.8
 mobile-status-bar@1.0.3
@@ -96,9 +95,6 @@ routepolicy@1.0.5
 service-configuration@1.0.4
 session@1.1.0
 sgi:sprintfjs@0.0.2
-socialize:base-model@0.2.3
-socialize:server-time@0.1.1
-socialize:user-model@0.1.4
 spacebars@1.0.6
 spacebars-compiler@1.0.6
 steeve:reactive-cookie@0.0.8
@@ -107,18 +103,11 @@ summernote:standalone@0.6.15
 summernote:summernote@0.6.15
 templating@1.1.1
 thereactivestack:blazetoreact@0.1.0
-tmeasday:publish-with-relations@0.2.0
 tracker@1.0.7
 twbs:bootstrap@3.3.5
 ui@1.0.6
 underscore@1.0.3
 url@1.0.4
-vnw:application@0.0.1
-vnw:candidate@0.0.1
-vnw:company@0.0.1
-vnw:core@0.0.1
-vnw:job@0.0.1
-vnw:user@0.0.1
 vsivsi:job-collection@1.2.2
 vsivsi:queue-async@1.0.7
 webapp@1.2.0
