@@ -105,6 +105,8 @@ twbs:bootstrap@3.3.5
 ui@1.0.6
 underscore@1.0.3
 url@1.0.4
+vnw:application@0.0.1
+vnw:candidate@0.0.1
 vnw:company@0.0.1
 vnw:core@0.0.1
 vnw:job@0.0.1
