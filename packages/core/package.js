@@ -14,7 +14,7 @@ Package.onUse(function (api) {
     api.versionsFrom('0.9.1');
     api.addFiles('core.js');
     /* import using packages */
-    api.use(["socialize:user-model@0.1.4"]);
+    api.use(["socialize:user-model@0.1.4", "momentjs:moment@2.10.6"]);
     /* public modules */
     api.imply(["socialize:user-model"]);
 

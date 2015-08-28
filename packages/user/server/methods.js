@@ -7,13 +7,18 @@ UserApi.methods = {
         if (!userId) return false;
         return (Collection.findOne({userId: userId}));
     },
-    updateUser: function (query, options) {
-        return !!(Collection.update(query, options));
+    getUser: function (userId) {
+        if (!userId) return false;
+
+        return Collections.Users.findOne({userId: +userId});
+    },
+    updateUser: function (query, data) {
+        return !!(Collection.update(query, data));
     },
     findOne: function (query, options) {
         return Collection.findOne(query, options || {});
     },
     find: function (query, options) {
-        return Collection.find(query, options).fetch();
+        return Collection.find(query, options || {}).fetch();
     }
 };

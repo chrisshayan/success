@@ -17,7 +17,7 @@ Package.onUse(function (api) {
     api.use(["vnw:user"]);
 
     /* namespace */
-    api.addFiles(['company.js'], ['server']);
+    api.addFiles(['company.js']);
 
     /* model */
     api.addFiles(['common/model.js', 'common/extends.js']);

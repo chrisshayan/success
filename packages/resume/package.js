@@ -12,9 +12,23 @@ Package.describe({
 
 Package.onUse(function (api) {
     api.versionsFrom('1.1.0.3');
-    api.use('vnw:company');
-    api.use('vnw:user');
-    api.addFiles('resume.js');
+
+    api.use(['vnw:user', 'vnw:application']);
+
+    /* namespace */
+    api.addFiles(['resume.js']);
+
+    /* model */
+    api.addFiles(['common/model.js', 'common/extends.js']);
+
+    /* methods, api */
+    api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
+
+    /* imply changes */
+    api.imply(['vnw:candidate', 'vnw:application']);
+
+    /* export */
+    api.export('Resume');
 });
 
 Package.onTest(function (api) {

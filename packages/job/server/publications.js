@@ -13,25 +13,24 @@ Job.publications = {
         try {
             if (!this.userId) this.ready();
 
-            /*check(filters, Object);
-             check(options, Match.Optional(Object));*/
+            check(filters, Object);
+            check(options, Match.Optional(Object));
 
             var DEFAULT_FILTERS = {
                 userId: parseInt(this.userId)
             };
 
-            filters = _.assign(DEFAULT_FILTERS, filters);
-            options = _.assign(CONFIG.defaultJobOptions, options);
+            filters = _.extend(DEFAULT_FILTERS, filters);
+            options = _.extend(CONFIG.defaultJobOptions, options);
 
             if (filterEmailAddress)
-                filters['jobEmailTo'] = new RegExp(filterEmailAddress, 'i');
+                filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
 
             if (!options.hasOwnProperty("limit")) {
                 options['limit'] = 10;
             }
-
-            return Collection.find(filters, options);
+            return Collections.Jobs.find(filters, options);
         } catch (e) {
             debuger(e);
             return this.ready();
@@ -40,17 +39,14 @@ Job.publications = {
 
     getLatestJob: function () {
         if (!this.userId) return [];
-        var query = {
-            userId: +this.userId
-        };
 
-        var options = {
+        var userOptions = {
             fields: {
                 userId: 1, companyId: 1
             }
         };
 
-        var user = User.methods.findOne(query, options); //var user = User.model.collection.findOne();
+        var user = UserApi.methods.getUser(+this.userId, userOptions); //var user = User.model.collection.findOne();
 
         if (!user) return [];
 
@@ -72,3 +68,7 @@ Job.publications = {
     }
 
 };
+
+/*Meteor.publish('getJobs', Job.publications.getJobs);
+
+ Meteor.publish('getLatestJob', Job.publications.getLatestJob);*/

@@ -6,11 +6,11 @@
 
 Company.model.prototype.job = function (options) {
     if (this.companyId == void 0) return [];
-    return Collection.find({companyId: this.companyId}, options || {});
+    return Collection.find({companyId: this.companyId}, options || {}).fetch();
 };
 
 
 User.prototype.job = function (options) {
     if (this.email == void 0) return [];
-    return Collection.find({jobEmailTo: this.email}, options || {})
+    return Collection.find({jobEmailTo: this.email}, options || {}).fetch();
 };
