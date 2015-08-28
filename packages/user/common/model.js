@@ -24,10 +24,12 @@ User.appendSchema({
         type: Number
     },
     vnwData: {
-        type: Object
+        type: Object,
+        blackbox: true
     },
     'vnwData.$.userid': {
-        type: String
+        type: String,
+        optional: true
     },
     role: {
         type: Number

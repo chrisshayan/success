@@ -35,8 +35,8 @@ model.appendSchema({
         type: Number
     }, // 1: is online, 2: sent directly, 3: add manually
     stage: {
-        type: Number
-        , defaultValue: 0
+        type: Number,
+        defaultValue: 0
     }, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
     matchingScore: {
         type: Number,
@@ -47,10 +47,13 @@ model.appendSchema({
         defaultValue: false
     },
     vnwData: {
-        type: Object
+        type: Object,
+        blackbox: true
+
     },
     'vnwData.$.resumeid': {
-        type: Number
+        type: Number,
+        optional: true
     },
     createdAt: {
         type: Date

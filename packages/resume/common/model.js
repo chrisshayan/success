@@ -2,26 +2,28 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-//var model = BaseModel.extendAndSetupCollection("jobs");
-var model = BaseModel.extendAndSetupCollection("jobs");
+var model = BaseModel.extendAndSetupCollection("vnw_resumes");
 
 Collection = model.collection;
 
+
+model.prototype.candidate = function (options) {
+    if (this.candidateId == void 0) return [];
+    return Candidate.model._collection.find({candidateId: this.candidateId}, options || {}).fetch();
+};
+
 model.appendSchema({
-    jobId: {
+    resumeId: {
         type: Number
     },
-    companyId: {
+    candidateId: {
         type: Number
-    },
-    jobEmailTo: {
-        type: String
     },
     vnwData: {
         type: Object,
         blackbox: true
     },
-    'vnwData.$.jobid': {
+    'vnwData.$.resumeid': {
         type: String,
         optional: true
     },
@@ -34,4 +36,4 @@ model.appendSchema({
 
 });
 
-Job.model = model;
+Resume.model = model;

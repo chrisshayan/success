@@ -18,10 +18,12 @@ model.appendSchema({
         type: Number
     },
     vnwData: {
-        type: Object
+        type: Object,
+        blackbox: true
     },
     'vnwData.$.comanyid': {
-        type: String
+        type: String,
+        optional: true
     },
     companyName: {
         type: String
