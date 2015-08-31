@@ -21,6 +21,9 @@ model.appendSchema({
         type: Object,
         blackbox: true
     },
+    isActive: {
+        type: Number
+    },
     'vnwData.$.jobid': {
         type: String,
         optional: true
