@@ -66,7 +66,8 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             "data.salarymax": 1,
             "data.skillexperience": 1,
             "data.expireddate": 1,
-            "data.emailaddress": 1
+            "data.emailaddress": 1,
+            'data.isactive': 1
         }
     },
     DEFAULT_APPLICATION_OPTIONS = {
