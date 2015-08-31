@@ -11,4 +11,3 @@ Company.methods = {
         return !!(Collection.update(query, data));
     }
 };
-
