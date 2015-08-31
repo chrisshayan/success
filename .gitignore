@@ -8,5 +8,5 @@ settings/
 packages/vnw-apis/.npm/*
 packages/*/.npm/
 
-packages/**/*.cached
-packages/**/*.map
+**/**/*.cached
+**/**/*.map
