@@ -8,7 +8,7 @@ Jobs = BlazeComponent.extendComponent({
         var data = this.data();
 
         //properties
-        this.status = parseInt(data.status);
+        this.status = +data.status;
         this.inc = 5;
         this.page = new ReactiveVar(1);
 
@@ -38,7 +38,8 @@ Jobs = BlazeComponent.extendComponent({
         if (this.status == 1) {
             filters['data.expireddate'] = {
                 $gte: today
-            }
+            };
+            filters['data.isactive'] = 1;
         } else {
             filters['data.expireddate'] = {
                 $lt: today
