@@ -43,7 +43,7 @@ Jobs = BlazeComponent.extendComponent({
         } else {
             filters['data.expireddate'] = {
                 $lt: today
-            }
+            };
         }
 
         if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {

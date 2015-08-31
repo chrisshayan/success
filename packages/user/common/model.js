@@ -20,6 +20,10 @@ User.appendSchema({
         type: String,
         optional: true
     },
+    vnw_password: {
+        type: String,
+        optional: true
+    },
     userId: {
         type: Number
     },
