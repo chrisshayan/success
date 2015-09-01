@@ -29,7 +29,11 @@ accounts-ui
 kadira:flow-router
 kadira:reaktor
 
+
 npm-container
+
+aldeed:simple-schema
+aldeed:autoform
 
 vnw:user
 vnw:company

@@ -1,0 +1,7 @@
+<template name="loginForm">
+    {{#autoForm schema=schema id="loginForm" }}
+        {{> afQuickField name="email" }}
+        {{> afQuickField name="password" }}
+        <button type="submit" class="btn btn-primary block full-width m-b" id="loginBtn" data-loading-text="Loading..." >Login</button>
+    {{/autoForm}}
+</template>

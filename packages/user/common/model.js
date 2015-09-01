@@ -6,45 +6,59 @@
 
 var profile = new SimpleSchema({
     firstname: {
-        type: String
+        type: String,
+        optional: true
     },
     lastname: {
-        type: String
+        type: String,
+        optional: true
     }
 });
 
-Collection = User._collection;
+Collection = Meteor.users;
 
 User.appendSchema({
+    emails: {
+        type: [Object],
+        // this must be optional if you also use other login services like facebook,
+        // but if you use only accounts-password, then it can be required
+        optional: true
+    },
+    "emails.$.address": {
+        type: String,
+        regEx: SimpleSchema.RegEx.Email
+    },
+    "emails.$.verified": {
+        type: Boolean
+    },
     emailSignature: {
         type: String,
         optional: true
     },
-    vnw_password: {
-        type: String,
-        optional: true
-    },
     userId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     vnwData: {
         type: Object,
-        blackbox: true
-    },
-    'vnwData.$.userid': {
-        type: String,
+        blackbox: true,
         optional: true
     },
-    role: {
-        type: Number
+    services: {
+        type: Object,
+        optional: true,
+        blackbox: true
+    },
+    roles: {
+        type: [String],
+        optional: true
     },
     profile: {
-        type: profile
+        type: profile,
+        optional: true
     },
+
     createdAt: {
-        type: Date
-    },
-    updatedAt: {
         type: Date
     }
 });

@@ -47,4 +47,14 @@ if(Meteor.settings.hasOwnProperty('mysql')) {
     mysqlManager.manager.on('disconnect', function () {
         console.log("Mysql disconnected")
     });
+
+    fetchVNWData = Meteor.wrapAsync(function (query, callback) {
+        var conn = mysqlManager.getPoolConnection();
+
+        conn.query(query, function (err, rows, fields) {
+            if (err) throw err;
+            conn.release();
+            callback(err, rows);
+        });
+    });
 }

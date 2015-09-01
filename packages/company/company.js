@@ -1,3 +1,7 @@
 // Write your package code here!
 
-Company = {};
+Company = {
+    model: null,
+    publications: null,
+    methods: null
+};

@@ -17,7 +17,7 @@ Npm.depends({
 
 Package.onUse(function (api) {
     api.addFiles('mysql-connection-manager.js', 'server');
-    api.export('mysqlManager', 'server');
+    api.export(['mysqlManager', 'fetchVNWData'], 'server');
 });
 
 Package.onTest(function (api) {

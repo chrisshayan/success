@@ -10,14 +10,11 @@ Collection = model.collection;
 
 model.prototype.user = function (options) {
     if (this.companyId == void 0) return [];
-    Meteor.users.find({userId: this.ownerUserId}, options || {}).fetch();
+    UserApi.methods.find({companyId: this.companyId}, options || {}).fetch();
 };
 
 model.appendSchema({
     companyId: {
-        type: Number
-    },
-    ownerUserId: {
         type: Number
     },
     vnwData: {
@@ -51,12 +48,9 @@ model.appendSchema({
     email: {
         type: String
     }, //mailSignature: {type: String, optional: true},
-    amountOfTimeCron: {
-        type: Number,
-        autoValue: function () {
-            return 6;
-        }
-    },
+    createdBy: {
+        type: String
+    }, // userId first Login
     createdAt: {
         type: Date
     },

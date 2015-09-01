@@ -11,9 +11,10 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.versionsFrom('1.1.0.3');
+    api.versionsFrom('0.9.0');
 
     api.use(["vnw:core"]);
+    api.use("accounts-password")
 
     /* namespace */
     api.addFiles(['user.js']);
