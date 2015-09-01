@@ -14,3 +14,22 @@ User.prototype.company = function (options) {
     return Collection.find({companyId: this.userId}, options || {}).fetch();
 };
 
+
+Company.model.prototype.callUpdateInfo = function (info, cb) {
+    var company = {
+        _id: this._id,
+        ownerUserId: this.ownerUserId
+    };
+
+    Meteor.call('updateCompanyInfo', company, info, cb);
+};
+
+Company.model.prototype.callUpdateCronTime = function (number, cb) {
+    var company = {
+        _id: this._id,
+        ownerUserId: this.ownerUserId
+    };
+
+    return Meteor.call('updateCompanyCronTime', company, number, cb);
+};
+

@@ -10,14 +10,14 @@ Collection = model.collection;
 
 model.prototype.user = function (options) {
     if (this.companyId == void 0) return [];
-    UserApi.methods.find({companyId: this.companyId}, options || {}).fetch();
+    Meteor.users.find({userId: this.ownerUserId}, options || {}).fetch();
 };
 
 model.appendSchema({
     companyId: {
         type: Number
     },
-    ownedUserId: {
+    ownerUserId: {
         type: Number
     },
     vnwData: {

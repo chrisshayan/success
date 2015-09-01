@@ -24,15 +24,11 @@ var methods = {
     isExist: function (compId) {
         return Collection.findOne({companyId: compId});
     },
-    getCompanyInfo: function () {
-        isLoggedIn();
-        return Meteor.user().company();
-    },
-    updateCompanyInfo: function (data) {
-        isLoggedIn();
-        var company = Meteor.user().company();
 
-        if (!data || company.ownedUserId !== Meteor.user().userId) return false;
+    updateCompanyInfo: function (company, data) {
+        isLoggedIn();
+
+        if (!data || company.ownerUserId !== Meteor.user().userId) return false;
 
         var query = {
             _id: company._id
@@ -41,13 +37,14 @@ var methods = {
 
         return updateCompany(query, modifier);
     },
-    updateCompanyCronTime: function (numberOfMonth) {
+
+    updateCompanyCronTime: function (_id, numberOfMonth) {
         isLoggedIn();
-        var company = Meteor.user().company();
-        if (!company || numberOfMonth == void 0 || company.ownedUserId !== Meteor.user().userId)
+
+        if (!company || numberOfMonth == void 0 || company.ownerUserId !== Meteor.user().userId)
             return false;
 
-        var query = {_id: company._id};
+        var query = {_id: _id};
         var modifier = setModifier({amountOfTimeCron: numberOfMonth});
 
         return updateCompany(query, modifier);

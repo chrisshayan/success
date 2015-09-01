@@ -3,7 +3,7 @@
  */
 
 
-UserApi.publications = {
+var publications = {
     pubUserInfo: function (userId, options) {
         if (this.userId() == void 0) this.ready();
         var query = (userId) ? {userId: userId} : {};
@@ -13,4 +13,4 @@ UserApi.publications = {
 };
 
 
-Meteor.publish('userInfo', UserApi.publications.pubUserInfo);
+Meteor.publish('userInfo', publications.pubUserInfo);
