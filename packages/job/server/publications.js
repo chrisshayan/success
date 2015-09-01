@@ -5,40 +5,37 @@
 
 Job.publications = {
     getJobByCompanyId: function (companyId, options) {
-        if (companyId == void 0) return [];
+        if (companyId == void 0) return this.ready();
         return Collection.find({companyId: companyId}, options || {});
     },
 
     getJobs: function (filters, options, filterEmailAddress) {
         try {
-            if (!this.userId) this.ready();
-
-            check(filters, Object);
-            check(options, Match.Optional(Object));
+            if (!this.userId()) return this.ready();
 
             var DEFAULT_FILTERS = {
-                userId: parseInt(this.userId)
+                userId: this.user().userId
             };
 
             filters = _.extend(DEFAULT_FILTERS, filters);
             options = _.extend(CONFIG.defaultJobOptions, options);
 
             if (filterEmailAddress)
-                filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
+                filters.jobEmailTo = new RegExp(filterEmailAddress, 'i');
 
 
             if (!options.hasOwnProperty("limit")) {
                 options['limit'] = 10;
             }
-            return Collections.Jobs.find(filters, options);
+            return Collection.find(filters, options);
         } catch (e) {
             debuger(e);
             return this.ready();
         }
     },
 
-    getLatestJob: function () {
-        if (!this.userId) return [];
+    getLatestJob: function (filterEmailAddress) {
+        if (!this.userId()) this.ready();
 
         var userOptions = {
             fields: {
@@ -46,17 +43,20 @@ Job.publications = {
             }
         };
 
-        var user = UserApi.methods.getUser(+this.userId, userOptions); //var user = User.model.collection.findOne();
+        var user = UserApi.methods.getUser(this.user().userId, userOptions); //var user = User.model.collection.findOne();
 
         if (!user) return [];
 
         var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
         var filters = {
             companyId: user.companyId,
-            'data.expireddate': {
+            expiredDate: {
                 $gte: today
             }
         };
+
+        if (filterEmailAddress)
+            filters.jobEmailTo = new RegExp(filterEmailAddress, 'i');
 
         var options = CONFIG.defaultJobOptions;
         options['limit'] = 10;
@@ -69,6 +69,6 @@ Job.publications = {
 
 };
 
-/*Meteor.publish('getJobs', Job.publications.getJobs);
+Meteor.publish('getJobs', Job.publications.getJobs);
 
- Meteor.publish('getLatestJob', Job.publications.getLatestJob);*/
+Meteor.publish('getLatestJob', Job.publications.getLatestJob);

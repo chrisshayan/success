@@ -17,6 +17,9 @@ model.appendSchema({
     companyId: {
         type: Number
     },
+    ownedUserId: {
+        type: Number
+    },
     vnwData: {
         type: Object,
         blackbox: true
@@ -48,9 +51,12 @@ model.appendSchema({
     email: {
         type: String
     }, //mailSignature: {type: String, optional: true},
-    createdBy: {
-        type: String
-    }, // userId first Login
+    amountOfTimeCron: {
+        type: Number,
+        autoValue: function () {
+            return 6;
+        }
+    },
     createdAt: {
         type: Date
     },

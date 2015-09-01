@@ -8,7 +8,7 @@ FlowRouter.route("/", {
     action() {
         ReactLayout.render(MainLayout, {content: <Home />});
     }
-})
+});
 
 AppRoute = FlowRouter.group({
     prefix: "/app"

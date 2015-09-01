@@ -14,6 +14,10 @@ model.appendSchema({
     companyId: {
         type: Number
     },
+    source: {
+        type: Number, // vnw : 0, custom : 1
+        defaultValue: 0
+    },
     jobEmailTo: {
         type: String
     },
@@ -27,6 +31,9 @@ model.appendSchema({
     'vnwData.$.jobid': {
         type: String,
         optional: true
+    },
+    expiredDate: {
+        type: Date
     },
     createdAt: {
         type: Date

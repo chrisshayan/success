@@ -13,7 +13,7 @@ var profile = new SimpleSchema({
     }
 });
 
-Collection = Meteor.users;
+Collection = User._collection;
 
 User.appendSchema({
     emailSignature: {
