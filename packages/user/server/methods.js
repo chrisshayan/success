@@ -12,26 +12,33 @@ function hashVNWPassword(password) {
     return hash.digest('hex');
 }
 
-UserApi.methods = {
-    isExist: function (userId) {
-        if (!userId) return false;
-        return (Collection.findOne({userId: userId}));
-    },
-    getUser: function (userId) {
-        if (!userId) return false;
 
-        return Collections.Users.findOne({userId: +userId});
-    },
-    updateUser: function (query, data) {
-        return !!(Collection.update(query, data));
-    },
-    findOne: function (query, options) {
-        return Collection.findOne(query, options || {});
-    },
-    find: function (query, options) {
-        return Collection.find(query, options || {}).fetch();
+var methods = {
+    updateEmailSignature: function (newSignature) {
+        isLoggedIn();
+        if (!newSignature) return false;
+
+        var query = {
+            _id: Meteor.userId()
+        };
+        var modifier = setModifier({emailSignature: newSignature});
+
+        return updateUser(query, modifier);
     },
 
+    updateUserInfo: function (data) {
+        isLoggedIn();
+
+        if (data == void 0) return false;
+
+        var query = {
+            _id: Meteor.userId()
+        };
+
+        var modifier = setModifier(data);
+
+        return updateUser(query, modifier);
+    },
     loginWithVNW: function (email, password) {
         check(email, String);
         check(password, String);
@@ -45,7 +52,7 @@ UserApi.methods = {
             // pull vnw user -> if exists -> create account in Recruit
             var sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
             var query = fetchVNWData(sql);
-            if(query.length == 1) {
+            if (query.length == 1) {
                 var vnwData = query[0];
                 var _id = Accounts.createUser({
                     email: email,
@@ -55,7 +62,7 @@ UserApi.methods = {
                         lastname: vnwData.lastname
                     }
                 });
-                if(_id) {
+                if (_id) {
                     Meteor.users.update({_id: _id}, {
                         $set: {
                             userId: vnwData.userid,
@@ -70,7 +77,7 @@ UserApi.methods = {
             // pull vnw user -> if exists -> create account in Recruit
             var sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
             var query = fetchVNWData(sql);
-            if(query.length == 1) {
+            if (query.length == 1) {
                 var vnwData = query[0];
                 Accounts.setPassword(user._id, password);
                 Meteor.users.update({_id: user._id}, {
@@ -85,4 +92,4 @@ UserApi.methods = {
 };
 
 
-Meteor.methods(UserApi.methods);
+Meteor.methods(methods);

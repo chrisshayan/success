@@ -14,3 +14,9 @@ User.prototype.job = function (options) {
     if (this.email == void 0) return [];
     return Collection.find({jobEmailTo: this.email}, options || {}).fetch();
 };
+
+
+User.prototype.callUpdateCustomJob = function (data, cb) {
+    return Meteor.call('updateCustomJob', this.jobId, data, cb);
+};
+
