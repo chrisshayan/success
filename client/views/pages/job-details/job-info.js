@@ -13,6 +13,14 @@ AutoForm.hooks({
                     if (!currentApplication) {
                         window.location.reload();
                     }
+
+                    var action = 'Add New Candidate';
+                    var info = {
+                        category: ['Recruiter', Meteor.userId()].join(':'),
+                        label: ['Candidate:', result.candidateId, jobId].join(':')
+                    };
+
+                    Utils.trackEvent(action, info);
                 }
             });
 

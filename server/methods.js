@@ -318,8 +318,8 @@ Meteor.methods({
             check(ids, [String]);
 
             var user = getUserInfo(+this.userId);
-            _.each(ids, function(_id) {
-                Meteor.defer(function() {
+            _.each(ids, function (_id) {
+                Meteor.defer(function () {
                     var application = Collections.Applications.findOne({_id: _id}, {fields: {_id: 1, disqualified: 1}});
                     if (!application || application.disqualified == true) return;
 
@@ -493,7 +493,7 @@ Meteor.methods({
             var self = this;
             var user = getUserInfo(+this.userId);
 
-            _.each(data.to, function(appId) {
+            _.each(data.to, function (appId) {
                 var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
 
                 var from = '';
@@ -711,7 +711,7 @@ Meteor.methods({
             debuger(e);
             return false;
         }
-        return true;
+        return { candidateId: candidateId};
     },
 
     checkCandidateExists: function (email) {

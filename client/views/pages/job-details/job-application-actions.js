@@ -13,7 +13,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         this.trackers.push(Template.instance().autorun(function () {
             var params = Router.current().params;
             var applicationId = params.query.application;
-            if(!_.isNaN(+applicationId))
+            if (!_.isNaN(+applicationId))
                 applicationId = +applicationId;
             self.props.set('applicationId', applicationId);
             var application = Collections.Applications.findOne({entryId: applicationId});
@@ -24,7 +24,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
     onRendered: function () {
     },
     onDestroyed: function () {
-        _.each(this.tracker, function(tracker) {
+        _.each(this.tracker, function (tracker) {
             tracker.stop();
         });
     },
@@ -50,7 +50,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var toStage = $(e.target).data("move-stage");
         toStage = parseInt(toStage);
         var app = this.props.get('application');
-        if(app.stage == 0 && toStage == 1) return;
+        if (app.stage == 0 && toStage == 1) return;
 
         var stage = Recruit.APPLICATION_STAGES[toStage];
         if (stage) {
@@ -66,7 +66,15 @@ JobApplicationActions = BlazeComponent.extendComponent({
                     // remove application from list
                     // change current application
                     Notification.success(sprintf('Moved to %s successfully', stage.label));
-                    window.stores.JobDetailsStore.triggerMoveApplication()
+                    window.stores.JobDetailsStore.triggerMoveApplication();
+
+                    var action = 'Change Stage';
+                    var info = {
+                        category: ['Recruiter', Meteor.userId()].join(':'),
+                        label: ['APP_ID', data.application, app.stage, toStage].join(':')
+                    };
+                    console.log('info', info);
+                    Utils.trackEvent(action, info);
                 }
             });
         }
@@ -77,10 +85,19 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     disqualifyApplication: function () {
         var self = this;
-        Meteor.call('disqualifyApplication', this.props.get("applicationId"), function(err, result){
-            if(err) throw err;
+        var applicationId = this.props.get("applicationId");
+        Meteor.call('disqualifyApplication', applicationId, function (err, result) {
+            if (err) throw err;
             self.props.set('disqualified', true);
-            window.stores.JobDetailsStore.triggerAppChanged()
+            window.stores.JobDetailsStore.triggerAppChanged();
+
+            var action = 'Disqualify Application';
+            var info = {
+                category: ['Recruiter', Meteor.userId()].join(':'),
+                label: ['APP_ID', applicationId].join(':')
+            };
+
+            Utils.trackEvent(action, info);
         });
     },
 
@@ -89,10 +106,19 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     revertApplication: function () {
         var self = this;
-        Meteor.call('revertApplication', this.props.get("applicationId"), function(err, result){
-            if(err) throw err;
+        var applicationId = this.props.get("applicationId");
+        Meteor.call('revertApplication', applicationId, function (err, result) {
+            if (err) throw err;
             self.props.set('disqualified', false);
-            window.stores.JobDetailsStore.triggerAppChanged()
+            window.stores.JobDetailsStore.triggerAppChanged();
+
+            var action = 'Undo Disqualify Application';
+            var info = {
+                category: ['Recruiter', Meteor.userId()].join(':'),
+                label: ['APP_ID', applicationId].join(':')
+            };
+
+            Utils.trackEvent(action, info);
         });
     },
 
@@ -120,7 +146,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         if (stage.id == 5)
             return stage;
         var next = stage.id + 1;
-        if(stage.id == 0)
+        if (stage.id == 0)
             next = stage.id + 2;
         var nextStage = Recruit.APPLICATION_STAGES[next];
         return nextStage;
@@ -146,24 +172,24 @@ JobApplicationActions = BlazeComponent.extendComponent({
             if (!_.isEmpty(html)) {
                 html = sprintf(html, stage.id, stage.label);
             }
-            if((currentStage.id != 0 || stage.id != 1) && (currentStage.id != 1 || stage.id != 0)) {
+            if ((currentStage.id != 0 || stage.id != 1) && (currentStage.id != 1 || stage.id != 0)) {
                 items.push({html: html});
             }
         });
         return items;
     },
 
-    application: function() {
+    application: function () {
         var app = Collections.Applications.findOne({
             entryId: this.props.get("applicationId")
         });
-        if(app) {
+        if (app) {
             this.props.set("candidateId", app.candidateId);
         }
         return app;
     },
 
-    candidate: function() {
+    candidate: function () {
         return Collections.Candidates.findOne({candidateId: this.props.get("candidateId")});
     }
 }).register('JobApplicationActions');

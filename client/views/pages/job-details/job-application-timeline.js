@@ -16,7 +16,7 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var params = Router.current().params;
             var applicationId = params.query.application;
-            if(!_.isNaN(+applicationId)){
+            if (!_.isNaN(+applicationId)) {
                 applicationId = +applicationId;
             }
             self.props.set("applicationId", applicationId);
@@ -247,7 +247,7 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
             var params = Router.current().params;
             if (params.query.hasOwnProperty("application")) {
                 var applicationId = params.query.application;
-                if(!_.isNaN(+applicationId))
+                if (!_.isNaN(+applicationId))
                     applicationId = +applicationId;
 
                 self.applicationId.set(applicationId);
@@ -349,6 +349,14 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                 Notification.success("Mail sent");
                 self.isLoading.set(false);
                 Event.emit('toggleMailForm', false);
+
+                var action = 'Send Email';
+                var info = {
+                    category: ['Recruiter', Meteor.userId()].join(':'),
+                    label: ['APP_ID', data.application].join(':')
+                };
+
+                Utils.trackEvent(action, info);
             }
         });
     },
@@ -487,6 +495,14 @@ AddCommentCandidateForm = BlazeComponent.extendComponent({
             if (result) {
                 Event.emit('toggleCommentForm', false);
                 self.isLoading.set(false);
+
+                var action = 'Add Comment';
+                var info = {
+                    category: ['Recruiter', Meteor.userId()].join(':'),
+                    label: ['APP_ID', data.application].join(':')
+                };
+
+                Utils.trackEvent(action, info);
             }
         });
     },
