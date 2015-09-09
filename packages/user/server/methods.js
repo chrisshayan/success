@@ -12,8 +12,21 @@ function hashVNWPassword(password) {
     return hash.digest('hex');
 }
 
+var setModifier = function (obj) {
+    if (typeof obj !== 'object' || obj.length != void 0) return;
+    // remove unchanged field
+    delete obj._id;
+    delete obj.userId;
 
-var methods = {
+    return {'$set ': obj};
+};
+
+
+function updateUser(query, data) {
+    return !!(Collection.update(query, data));
+}
+
+UserApi.methods = {
     updateEmailSignature: function (newSignature) {
         isLoggedIn();
         if (!newSignature) return false;
@@ -39,6 +52,7 @@ var methods = {
 
         return updateUser(query, modifier);
     },
+
     loginWithVNW: function (email, password) {
         check(email, String);
         check(password, String);
@@ -48,12 +62,13 @@ var methods = {
          * 3) Email exists but password invalid -> update data from vnw -> client call login with password
          */
         var user = Meteor.users.findOne({"emails.address": email});
+        var sql, query, vnwData;
         if (!user) {
             // pull vnw user -> if exists -> create account in Recruit
-            var sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
-            var query = fetchVNWData(sql);
+            sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
+            query = fetchVNWData(sql);
             if (query.length == 1) {
-                var vnwData = query[0];
+                vnwData = query[0];
                 var _id = Accounts.createUser({
                     email: email,
                     password: password,
@@ -72,24 +87,36 @@ var methods = {
                     })
                 }
             }
-        } else if (user) {
+            return true;
+
+        } else {
             // pull vnw user -> if exists -> update password
             // pull vnw user -> if exists -> create account in Recruit
-            var sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
-            var query = fetchVNWData(sql);
+            sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
+            query = fetchVNWData(sql);
             if (query.length == 1) {
-                var vnwData = query[0];
+                vnwData = query[0];
                 Accounts.setPassword(user._id, password);
-                Meteor.users.update({_id: user._id}, {
-                    $set: {
-                        vnwData: EJSON.parse(EJSON.stringify(vnwData))
-                    }
-                });
+                var data = {
+                    vnwData: EJSON.parse(EJSON.stringify(vnwData))
+                };
+                var modifier = setModifier(data);
+
+                return updateUser({_id: user._id}, modifier);
             }
+            return true;
         }
-        return true;
+
+
+    },
+
+    getUser: function (userId, filters) {
+        return Collection.find({userId: userId}, filters).fetch();
+    },
+    getConfig: function (name) {
+        return CONFIG[name];
     }
 };
 
 
-Meteor.methods(methods);
+Meteor.methods(UserApi.methods);

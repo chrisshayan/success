@@ -18,7 +18,8 @@ Package.onUse(function (api) {
         "socialize:user-model@0.1.4",
         "momentjs:moment@2.10.6",
         "accounts-password",
-        "lab:mysql-connection-manager"
+        "lab:mysql-connection-manager",
+        "reywood:publish-composite"
     ]);
     /* public modules */
     api.imply([

@@ -9,6 +9,9 @@ Job.methods = {
     },
     updateJob: function (query, data) {
         return !!(Collection.update(query, data));
+    },
+    getConfig: function (name) {
+        return CONFIG[name];
     }
 };
 

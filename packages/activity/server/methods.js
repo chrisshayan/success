@@ -3,5 +3,7 @@
  */
 
 Activity.methods = {
-
+    getConfig: function (name) {
+        return CONFIG[name];
+    }
 };

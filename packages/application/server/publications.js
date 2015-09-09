@@ -3,7 +3,7 @@
  */
 
 
-Application.publications = {
+var publications = {
     getApplications: function (filters, options) {
         if (!this.userId) return this.ready();
         /*check(filters, Object);
@@ -17,6 +17,8 @@ Application.publications = {
         if (!options.hasOwnProperty("limit")) {
             options['limit'] = 20;
         }
-        return Collections.Applications.find(filters, options);
+        return Collection.find(filters, options);
     }
 };
+
+Meteor.publish('getApplications', publications.getApplications);

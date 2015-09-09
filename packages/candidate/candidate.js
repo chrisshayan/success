@@ -3,10 +3,10 @@
  */
 
 
+CONFIG = {};
 
 Candidate = {
     model: null,
-    publications: null,
     methods: null
 };
 

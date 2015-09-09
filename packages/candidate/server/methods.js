@@ -10,5 +10,8 @@ Candidate.methods = {
     updateCandidate: function (query, data) {
         if (!data || typeof data !== 'object') return;
         return Collection.update(query, data);
+    },
+    getConfig: function (name) {
+        return CONFIG[name];
     }
 };

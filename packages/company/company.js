@@ -1,7 +1,8 @@
 // Write your package code here!
 
+CONFIG = {};
+
 Company = {
     model: null,
-    publications: null,
     methods: null
 };

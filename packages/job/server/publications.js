@@ -3,7 +3,7 @@
  */
 
 
-Job.publications = {
+var publications = {
     getJobByCompanyId: function (companyId, options) {
         if (companyId == void 0) return [];
         return Collection.find({companyId: companyId}, options || {});
@@ -69,6 +69,6 @@ Job.publications = {
 
 };
 
-/*Meteor.publish('getJobs', Job.publications.getJobs);
+/*Meteor.publish('getJobs', publications.getJobs);
 
- Meteor.publish('getLatestJob', Job.publications.getLatestJob);*/
+ Meteor.publish('getLatestJob', publications.getLatestJob);*/

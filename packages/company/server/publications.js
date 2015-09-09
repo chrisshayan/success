@@ -3,7 +3,7 @@
  */
 
 
-Company.publications = {
+var publications = {
     oldPubCompanySettings: function (options) {
         console.log('this', this.userId);
         if (this.userId == void 0) return null;
@@ -35,6 +35,6 @@ Company.publications = {
 };
 
 
-/*Meteor.publish('companyInfo', Company.publications.oldPubCompanySettings);
+/*Meteor.publish('companyInfo', publications.oldPubCompanySettings);
 
- Meteor.publish('companySettings', Company.publications.oldPubCompanySettings);*/
+ Meteor.publish('companySettings', publications.oldPubCompanySettings);*/
