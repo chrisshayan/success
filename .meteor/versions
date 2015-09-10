@@ -60,10 +60,10 @@ logging@1.0.7
 matb33:collection-hooks@0.7.13
 meteor@1.1.6
 meteor-platform@1.2.2
-meteorhacks:fast-render@2.8.1
+meteorhacks:fast-render@2.10.0
 meteorhacks:inject-data@1.4.0
 meteorhacks:picker@1.0.3
-meteorhacks:subs-manager@1.5.2
+meteorhacks:subs-manager@1.6.2
 minifiers@1.1.5
 minimongo@1.0.8
 mobile-status-bar@1.0.3
@@ -100,7 +100,7 @@ spacebars@1.0.6
 spacebars-compiler@1.0.6
 steeve:reactive-cookie@0.0.8
 stevezhu:lodash@3.10.1
-summernote:standalone@0.6.15
+summernote:standalone@0.6.16
 summernote:summernote@0.6.15
 templating@1.1.1
 thereactivestack:blazetoreact@0.1.0
@@ -109,7 +109,7 @@ twbs:bootstrap@3.3.5
 ui@1.0.6
 underscore@1.0.3
 url@1.0.4
-vsivsi:job-collection@1.2.2
+vsivsi:job-collection@1.2.3
 vsivsi:queue-async@1.0.7
 webapp@1.2.0
 webapp-hashing@1.0.3

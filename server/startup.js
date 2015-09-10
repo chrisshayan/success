@@ -21,6 +21,7 @@ Meteor.startup(function () {
             }
         });
 
+    SYNC_VNW.migration();
     SYNC_VNW.sync();
     CRON_VNW.cronCity();
     CRON_VNW.cronDegree();

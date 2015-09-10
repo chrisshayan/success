@@ -728,6 +728,32 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
+SYNC_VNW.migration = function () {
+    var filter = {
+        fields: {
+            candidateId: 1,
+            'data.firstname': 1,
+            'data.lastname': 1
+        }
+    };
+    var num = 0;
+    Collections.Candidates.find({}, filter).forEach(function (can) {
+        num++;
+        var fullname = [can.data.firstname, can.data.lastname].join(' ') || '';
+        var query = {candidateId: can.candidateId};
+        var update = {
+            '$set': {
+                fullname: fullname.trim()
+            }
+        };
+        var options = {
+            multi: true
+        };
+        Collections.Applications.update(query, update, options);
+    });
+    console.log('synced %s candidate', num);
+};
+
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;
 Collections.SyncQueue = JobCollection('vnw_sync_queue');
