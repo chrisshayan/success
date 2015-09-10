@@ -147,6 +147,16 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
         return doc;
     }
 });
+function transformVNWId(id) {
+    if (_.isNaN(+id))
+        return id;
+    return +id;
+}
+Collections.Jobs.before.find(function(userId, filter, option) {
+    if(filter.hasOwnProperty('jobId')) {
+        filter.jobId = transformVNWId(filter.jobId);
+    }
+});
 
 Collections.Candidates = new Mongo.Collection("vnw_candidates", {
     transform: function (doc) {
@@ -164,6 +174,16 @@ Collections.Applications = new Mongo.Collection("vnw_applications", {
 Collections.Applications.allow({
     update: function (userId, doc) {
         return !!userId;
+    }
+});
+
+Collections.Applications.before.find(function(userId, filter, option) {
+    if(filter.hasOwnProperty('jobId')) {
+        filter.jobId = transformVNWId(filter.jobId);
+    }
+
+    if(filter.hasOwnProperty('entryId')) {
+        filter.entryId = transformVNWId(filter.entryId);
     }
 });
 

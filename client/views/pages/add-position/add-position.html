@@ -1,9 +1,13 @@
 <template name="AddPosition">
-    <div class="wraper-content">
+    <div class="wraper-content" style="padding: 20px 0">
         <div class="row">
             <div class="col-md-8">
-                <div class="ibox-content">
-                    {{> quickForm schema="Schemas.addPositionForm" type="method" meteormethod="addPosition" id="addPosition" }}
+
+                <div class="ibox">
+                    <div class="ibox-title">Add new position</div>
+                    <div class="ibox-content">
+                        {{> quickForm schema="Schemas.addPositionForm" type="method" meteormethod="addPosition" id="addPosition" }}
+                    </div>
                 </div>
             </div>
         </div>

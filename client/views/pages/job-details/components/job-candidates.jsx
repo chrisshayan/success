@@ -15,7 +15,7 @@ JobCandidates = React.createClass({
         var candidates = [];
         var isLoading = true;
         //JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
-        var sub = JobDetailsSubs.subscribe('getApplications', this.filter(), this.options());
+        var sub = Meteor.subscribe('getApplications', this.filter(), this.options());
         if (sub.ready()) {
             isLoading = false;
             candidates = this.fetch();

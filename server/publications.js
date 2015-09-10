@@ -1,9 +1,15 @@
+function transformVNWId(id) {
+    if (_.isNaN(+id))
+        return id;
+    return +id;
+}
+
 Meteor.publish('jobDetails', function (options) {
     check(options, {
         jobId: Match.Any
     });
     var cond = {
-        jobId: options.jobId,
+        jobId: transformVNWId(options.jobId),
         userId: parseInt(this.userId)
     };
     return Collections.Jobs.find(cond, {limit: 1});
@@ -141,8 +147,8 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
             userId: parseInt(this.userId)
         };
 
-        filters = _.defaults(DEFAULT_FILTERS, filters);
-        options = _.defaults(DEFAULT_JOB_OPTIONS, options);
+        filters = _.defaults(filters, DEFAULT_FILTERS);
+        options = _.defaults(options, DEFAULT_JOB_OPTIONS);
 
         if (filterEmailAddress)
             filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
@@ -151,7 +157,6 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
         if (!options.hasOwnProperty("limit")) {
             options['limit'] = 5;
         }
-        console.log(Collections.Jobs.find(filters, options).count())
         return Collections.Jobs.find(filters, options);
     } catch (e) {
         debuger(e);
@@ -161,6 +166,7 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
 
 
 Meteor.publishComposite('getApplications', function (filters, options) {
+    console.log(filters)
     return {
 
         find: function () {
@@ -177,7 +183,6 @@ Meteor.publishComposite('getApplications', function (filters, options) {
             } else {
                 options['limit'] += 10;
             }
-
             return Collections.Applications.find(filters, options);
         },
         children: [

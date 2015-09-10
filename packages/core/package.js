@@ -27,7 +27,7 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager"
     ]);
 
-    api.addFiles('utils/common.js');
+    api.addFiles('utils/common.js', ['server', 'client']);
     api.addFiles('utils/server.js', 'server');
     api.addFiles('utils/client.js', 'client');
 

@@ -112,7 +112,7 @@ function processJob(item, companyId) {
     //remove
     if (mongoJob && item.isdeleted) {
         Collections.Jobs.remove({jobId: item.typeId});
-
+        console.log("processJob")
     } else {
         var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.typeId);
         //console.log(getJobQuery);

@@ -230,9 +230,8 @@ Meteor.methods({
                 jobId: Match.Any,
                 stage: Number
             });
-
             var application = Collections.Applications.findOne({
-                jobId: opt.jobId,
+                jobId: transformEntryId(opt.jobId),
                 stage: opt.stage
             }, {sort: {createdAt: -1}});
 
@@ -259,6 +258,7 @@ Meteor.methods({
             application: Match.Any
         });
         opt.application = transformEntryId(opt.application);
+        opt.jobId = transformEntryId(opt.jobId);
         var conditions = {
             jobId: opt.jobId,
             stage: opt.stage,

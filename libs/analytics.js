@@ -14,6 +14,12 @@ if (Meteor.isClient) {
 
             info.category = [_gaCategory, info.category].join(':');
             analytics.track(actionName, info);
+        },
+
+        transformVNWId: function (id) {
+            if (_.isNaN(+id))
+                return id;
+            return +id;
         }
     };
 }

@@ -132,7 +132,7 @@ Router.route('/job/:jobId/stage/:stage', {
             });
         } else {
             var options = {
-                jobId: self.params.jobId,
+                jobId: Utils.transformVNWId(self.params.jobId),
                 stage: stage.id,
                 application: self.params.query.application
             };
@@ -140,7 +140,7 @@ Router.route('/job/:jobId/stage/:stage', {
                 if (err) throw err;
                 if (!isExists) {
                     Router.go('jobDetails', {
-                        jobId: self.params.jobId,
+                        jobId: Utils.transformVNWId(self.params.jobId),
                         stage: self.params.stage
                     });
                 }
@@ -150,7 +150,7 @@ Router.route('/job/:jobId/stage/:stage', {
     },
     data: function () {
         return {
-            job: Collections.Jobs.findOne({jobId: this.params.jobId}),
+            job: Collections.Jobs.findOne({jobId: Utils.transformVNWId(this.params.jobId)}),
             isEmpty: !this.params.query.hasOwnProperty('application')
         }
     }

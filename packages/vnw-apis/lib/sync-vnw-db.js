@@ -398,6 +398,7 @@ SYNC_VNW.deleteVNWJobs = function (jobIds) {
         if (jobIds.length <= 0) return true;
 
         var criteria = {
+            source: null,
             jobId: {
                 $in: jobIds
             }
@@ -489,6 +490,9 @@ SYNC_VNW.deleteVNWApplications = function (items) {
         var entryIds = _.pluck(items, 'typeId');
 
         var criteria = {
+            source: {
+                $ne: 3
+            },
             entryId: {
                 $in: entryIds
             }
