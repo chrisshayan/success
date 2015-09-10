@@ -743,7 +743,7 @@ SYNC_VNW.migration = function () {
     var num = 0;
     Collections.Candidates.find({}, filter).forEach(function (can) {
         num++;
-        var fullname = [can.data.firstname, can.data.lastname].join(' ') || '';
+        var fullname = [can.data.lastname, can.data.firstname].join(' ') || '';
         var query = {candidateId: can.candidateId};
         var update = {
             '$set': {

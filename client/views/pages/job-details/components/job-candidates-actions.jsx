@@ -12,7 +12,7 @@ JobCandidatesActions = React.createClass({
         }
     },
 
-    getStateFromFlux: function() {
+    getStateFromFlux: function () {
         return this.getFlux().store("JobDetailsStore").getCandidateActionsState();
     },
 
@@ -32,9 +32,10 @@ JobCandidatesActions = React.createClass({
                         className="fa fa-search"></i></button>
 
                     <button className="btn btn-link btn-md" data-toggle="tooltip" data-placement="top" title=""
-                            data-original-title="Sort" onClick={ this.toggleSortBox }><i className="fa fa-sort-amount-asc"></i></button>
+                            data-original-title="Sort" onClick={ this.toggleSortBox }><i
+                        className="fa fa-sort-amount-asc"></i></button>
 
-                    <BulkActions disabled={ !this.state.selectedItems.length } />
+                    <BulkActions disabled={ !this.state.selectedItems.length }/>
                 </div>
 
                 {this.state.showSearchBox ? (<ActionSearch />) : null}
@@ -73,19 +74,22 @@ var ActionSelectAll = React.createClass({
 var ActionSearch = React.createClass({
     mixins: [FluxMixin],
     getInitialState() {
-        return {
-
-        };
+        return {};
     },
 
-    onSearch: function(e) {
+    onSearch: function (e) {
         this.getFlux().actions.searchCandidate(e.target.value);
+    },
+
+    componentDidMount(){
+        React.findDOMNode(this.refs.searchInput).focus();
     },
 
     render() {
         return (
             <div>
-                <input ref="searchInput" type="text" className="form-control" placeholder="Search candidates" onKeyUp={this.onSearch} />
+                <input ref="searchInput" type="text" className="form-control" placeholder="Search candidates"
+                       onKeyUp={this.onSearch}/>
             </div>
         );
     }
@@ -112,7 +116,7 @@ var ActionSort = React.createClass({
         var field = target.data("sort-field");
         var type = target.data("sort-type");
         var sort = _.findWhere(this.state.items, {field: field, type: type});
-        if(sort) {
+        if (sort) {
             this.setState({
                 currentSort: sort
             });
@@ -123,8 +127,9 @@ var ActionSort = React.createClass({
     render() {
         return (
             <div>
-                <div className="btn-group" style={{width: "100%"}} >
-                    <button type="button" style={{width: "100%"}} className="btn btn-white btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <div className="btn-group" style={{width: "100%"}}>
+                    <button type="button" style={{width: "100%"}} className="btn btn-white btn-sm dropdown-toggle"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {this.state.currentSort.label} {" "}<span className="caret"></span>
 
                     </button>
@@ -137,7 +142,8 @@ var ActionSort = React.createClass({
     },
 
     renderSort(data, key) {
-        return (<li key={key}><a href="#" onClick={this.onSort} data-sort-field={data.field} data-sort-type={data.type}>{ data.label }</a></li>);
+        return (<li key={key}><a href="#" onClick={this.onSort} data-sort-field={data.field}
+                                 data-sort-type={data.type}>{ data.label }</a></li>);
     }
 });
 
@@ -157,7 +163,7 @@ const BulkActions = React.createClass({
     onSendMassEmail(e) {
         e.preventDefault();
         var mailTo = this.getFlux().store("JobDetailsStore").getSelectedEmails();
-        if(mailTo.emails.length > 0)
+        if (mailTo.emails.length > 0)
             this.setState({isSendMassEmail: true});
         else
             swal({
@@ -183,7 +189,7 @@ const BulkActions = React.createClass({
             confirmButtonText: "Yes",
             closeOnConfirm: false,
             html: false
-        }, function(){
+        }, function () {
             Meteor.call('disqualifyApplications', appState.selected);
             swal("Disqualifed!", "", "success");
             self.getFlux().store("JobDetailsStore").deselectAllCandidates();
@@ -193,9 +199,13 @@ const BulkActions = React.createClass({
     render() {
         return (
             <DropdownButton disabled={this.props.disabled} title='bulk actions' bsStyle="link" className="pull-right">
-                <MenuItem eventKey='1' onClick={this.onSendMassEmail}><i className="fa fa-envelope-o"></i>&nbsp;Send mass emails</MenuItem>
-                <MenuItem onClick={this.massDisqualify} eventKey='2'><i className="fa fa-thumbs-o-down"></i>&nbsp;Disqualify candidates</MenuItem>
-                <div>{this.state.isSendMassEmail ? <MailComposerModal show={true} onHide={this.onHideSendMassModal} /> : null}</div>
+                <MenuItem eventKey='1' onClick={this.onSendMassEmail}><i className="fa fa-envelope-o"></i>&nbsp;Send
+                    mass emails</MenuItem>
+                <MenuItem onClick={this.massDisqualify} eventKey='2'><i className="fa fa-thumbs-o-down"></i>&nbsp;
+                    Disqualify candidates</MenuItem>
+
+                <div>{this.state.isSendMassEmail ?
+                    <MailComposerModal show={true} onHide={this.onHideSendMassModal}/> : null}</div>
             </DropdownButton>
         );
     }
@@ -214,8 +224,9 @@ MailComposerModal = React.createClass({
     },
     render() {
         return (
-            <Modal {...this.props} className="mass-email-modal" bsSize='large' show={this.props.show} onHide={this.props.onHide}>
-                <MailComposer onDiscard={this.props.onHide} to={this.state.to} />
+            <Modal {...this.props} className="mass-email-modal" bsSize='large' show={this.props.show}
+                                   onHide={this.props.onHide}>
+                <MailComposer onDiscard={this.props.onHide} to={this.state.to}/>
             </Modal>
         );
     }

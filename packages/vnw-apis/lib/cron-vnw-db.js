@@ -174,7 +174,7 @@ function processApp(appRows, companyId) {
             application.createdAt = formatDatetimeFromVNW(row.createddate);
 
             var candidateInfo = Collections.Candidates.findOne({candidateId: row.userid}, filter);
-            var fullname = (candidateInfo) ? [candidateInfo.data.firstname, candidateInfo.data.lastname].join(' ') : '';
+            var fullname = (candidateInfo) ? [candidateInfo.data.lastname, candidateInfo.data.firstname].join(' ') : '';
             application.fullname = fullname;
 
             console.log('insert application:', application.entryId);

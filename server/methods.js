@@ -235,7 +235,7 @@ Meteor.methods({
                 stage: opt.stage
             }, {sort: {createdAt: -1}});
 
-            return application? application.entryId : null;
+            return application ? application.entryId : null;
         } catch (e) {
             debuger(e);
         }
@@ -664,6 +664,7 @@ Meteor.methods({
             application.jobId = jobId;
             application.candidateId = candidateId;
             application.data = {};
+            application.fullname = [data.lastName, data.firstName].join(' ').trim();
             var appId = Collections.Applications.insert(application);
             Collections.Applications.update({_id: appId}, {$set: {entryId: appId}});
 
@@ -711,7 +712,7 @@ Meteor.methods({
             debuger(e);
             return false;
         }
-        return { candidateId: candidateId};
+        return {candidateId: candidateId};
     },
 
     checkCandidateExists: function (email) {
@@ -761,10 +762,10 @@ Meteor.methods({
 });
 
 Meteor.methods({
-    addPosition: function(data) {
-        if(!this.userId) return false;
+    addPosition: function (data) {
+        if (!this.userId) return false;
         var currentUser = getUserInfo(+this.userId);
-        if(currentUser) {
+        if (currentUser) {
             data.companyId = currentUser.companyId;
             data.data = {};
             data.source = "recruit";
@@ -774,10 +775,12 @@ Meteor.methods({
             data.userId = +this.userId;
 
             var jobId = Collections.Jobs.insert(data);
-            if(jobId) {
-                Collections.Jobs.update({_id: jobId}, {$set: {
-                    jobId: jobId
-                }});
+            if (jobId) {
+                Collections.Jobs.update({_id: jobId}, {
+                    $set: {
+                        jobId: jobId
+                    }
+                });
             }
         }
         return false;
