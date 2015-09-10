@@ -166,7 +166,6 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
 
 
 Meteor.publishComposite('getApplications', function (filters, options) {
-    console.log(filters)
     return {
 
         find: function () {

@@ -91,6 +91,7 @@ Schemas.Application = function () {
         createdAt: new Date(),
         modifiedAt: null,
         modifiedBy: null,
+        fullname: null,
         lastSyncedAt: new Date()
     }
 };

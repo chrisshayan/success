@@ -150,6 +150,13 @@ function processJob(item, companyId) {
 }
 
 function processApp(appRows, companyId) {
+    var filter = {
+        fields: {
+            candidateId: 1,
+            'data.firstname': 1,
+            'data.lastname': 1
+        }
+    };
 
     appRows.forEach(function (row) {
         var appId = row.entryid || row.sdid;
@@ -165,6 +172,10 @@ function processApp(appRows, companyId) {
             application.source = 1;
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
+
+            var candidateInfo = Collections.Candidates.findOne({candidateId: row.userid}, filter);
+            var fullname = (candidateInfo) ? [candidateInfo.data.firstname, candidateInfo.data.lastname].join(' ') : '';
+            application.fullname = fullname;
 
             console.log('insert application:', application.entryId);
             Collections.Applications.insert(application);
@@ -314,7 +325,6 @@ function cronSkills(j, cb) {
     }
     cb();
 }
-
 
 Collections.SyncQueue.processJobs('cronData', {concurrency: 20, payload: 1}, cronData);
 Collections.SyncQueue.processJobs('cronSkills', {concurrency: 20, payload: 1}, cronSkills);
