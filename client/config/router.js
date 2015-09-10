@@ -85,6 +85,16 @@ Router.route('/dashboard', {
     }
 });
 
+Router.route('/add-position', {
+    name: 'addPosition',
+    waitOn: function() {
+        return DashboardSubs.subscribe('addPositionPage');
+    },
+    action: function() {
+        this.render('AddPosition');
+    }
+});
+
 
 Router.route('/job/:jobId/stage/:stage', {
     name: "jobDetails",
@@ -93,7 +103,7 @@ Router.route('/job/:jobId/stage/:stage', {
         if (!this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage'))
             throw Meteor.Error(404);
         return [
-            Meteor.subscribe('jobDetails', {jobId: parseInt(this.params.jobId)}),
+            Meteor.subscribe('jobDetails', {jobId: this.params.jobId}),
             Meteor.subscribe('mailTemplates')
         ];
     },
@@ -103,7 +113,7 @@ Router.route('/job/:jobId/stage/:stage', {
         if (!this.params.query.hasOwnProperty('application')) {
 
             var options = {
-                jobId: parseInt(this.params.jobId),
+                jobId: this.params.jobId,
                 stage: stage.id
             };
             Meteor.call('getFirstJobApplication', options, function (err, applicationId) {
@@ -122,7 +132,7 @@ Router.route('/job/:jobId/stage/:stage', {
             });
         } else {
             var options = {
-                jobId: parseInt(self.params.jobId),
+                jobId: self.params.jobId,
                 stage: stage.id,
                 application: self.params.query.application
             };
@@ -139,10 +149,8 @@ Router.route('/job/:jobId/stage/:stage', {
         this.render("jobDetails");
     },
     data: function () {
-        var jobId = parseInt(this.params.jobId);
-
         return {
-            job: Collections.Jobs.findOne({jobId: jobId}),
+            job: Collections.Jobs.findOne({jobId: this.params.jobId}),
             isEmpty: !this.params.query.hasOwnProperty('application')
         }
     }

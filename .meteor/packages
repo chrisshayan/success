@@ -23,6 +23,8 @@ wylio:mandrill
 aldeed:collection2
 aldeed:simple-schema
 aldeed:autoform
+natestrauser:select2
+aldeed:autoform-select2
 steeve:reactive-cookie
 peerlibrary:blaze-components
 raix:eventemitter
@@ -51,3 +53,6 @@ stevezhu:lodash
 thereactivestack:blazetoreact
 ajduke:bootstrap-tagsinput
 okgrow:analytics
+vnw:city
+vnw:industries
+vnw:job

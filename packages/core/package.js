@@ -14,11 +14,24 @@ Package.onUse(function (api) {
     api.versionsFrom('0.9.1');
     api.addFiles('core.js');
     /* import using packages */
-    api.use(["socialize:user-model@0.1.4"]);
+    api.use([
+        "socialize:user-model@0.1.4",
+        "momentjs:moment@2.10.6",
+        "accounts-password",
+        "lab:mysql-connection-manager"
+    ]);
     /* public modules */
-    api.imply(["socialize:user-model"]);
+    api.imply([
+        "socialize:user-model",
+        "accounts-password",
+        "lab:mysql-connection-manager"
+    ]);
 
-    api.export('Core');
+    api.addFiles('utils/common.js');
+    api.addFiles('utils/server.js', 'server');
+    api.addFiles('utils/client.js', 'client');
+
+    api.export(['Core', 'Utils']);
 
 });
 

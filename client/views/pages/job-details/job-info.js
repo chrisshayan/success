@@ -3,7 +3,6 @@ AutoForm.hooks({
         onSubmit: function (doc) {
             var jobId = Router.current().params.jobId || null;
             var currentApplication = Router.current().params.query.application;
-            if (jobId) jobId = +jobId;
             Meteor.call("addCandidate", doc, jobId, function (err, result) {
                 if (err) throw err;
                 if (result) {
@@ -40,7 +39,6 @@ JobInfo = BlazeComponent.extendComponent({
         this.job = this.data().job;
 
         Template.instance().subscribe('jobs', {
-            status: this.job.status,
             limit: this.limit(),
             except: [this.job.jobId]
         });

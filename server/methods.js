@@ -227,7 +227,7 @@ Meteor.methods({
             if (!this.userId) return false;
 
             check(opt, {
-                jobId: Number,
+                jobId: Match.Any,
                 stage: Number
             });
 
@@ -236,7 +236,7 @@ Meteor.methods({
                 stage: opt.stage
             }, {sort: {createdAt: -1}});
 
-            return application.entryId;
+            return application? application.entryId : null;
         } catch (e) {
             debuger(e);
         }
@@ -254,7 +254,7 @@ Meteor.methods({
     checkApplicationInStage: function (opt) {
         if (!this.userId) return false;
         check(opt, {
-            jobId: Number,
+            jobId: Match.Any,
             stage: Number,
             application: Match.Any
         });
@@ -634,7 +634,7 @@ Meteor.methods({
         try {
             if (!this.userId) return false;
             check(data, Object);
-            check(jobId, Number);
+            check(jobId, Match.Any);
 
             if (data.email) {
                 var criteria = {
@@ -757,5 +757,29 @@ Meteor.methods({
     },
     'getResumeOnlineInfo': function (resumeId) {
         return Collections.Resumes.findOne({resumeId: resumeId});
+    }
+});
+
+Meteor.methods({
+    addPosition: function(data) {
+        if(!this.userId) return false;
+        var currentUser = getUserInfo(+this.userId);
+        if(currentUser) {
+            data.companyId = currentUser.companyId;
+            data.data = {};
+            data.source = "recruit";
+            data.status = 1;
+            data.createdAt = new Date();
+            data.createdBy = +this.userId;
+            data.userId = +this.userId;
+
+            var jobId = Collections.Jobs.insert(data);
+            if(jobId) {
+                Collections.Jobs.update({_id: jobId}, {$set: {
+                    jobId: jobId
+                }});
+            }
+        }
+        return false;
     }
 });

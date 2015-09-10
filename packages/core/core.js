@@ -6,3 +6,5 @@ Core = {};
 Core.imported = function () {
     return 'Core is imported!';
 };
+
+Utils = {};

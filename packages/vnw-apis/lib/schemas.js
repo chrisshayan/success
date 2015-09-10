@@ -458,3 +458,184 @@ Schemas.degree = function () {
     this.weight = null;
     this.isExact = null;
 };
+
+SimpleSchema.messages({
+    salaryMaxInvalid: "Max salary must greater than min salary"
+});
+
+Schemas.addPositionForm = new SimpleSchema({
+
+    title: {
+        type: String,
+        label: "Job Title",
+        autoform: {
+            placeholder: "Position Title"
+        }
+    },
+
+    level: {
+        type: String,
+        autoform: {
+            type: "select2",
+            firstOption: true,
+            options: function () {
+                var items = [{label: "Please select", value: ""}];
+                var criteria = {
+                    languageId: 2
+                };
+                var levels = Meteor.job_levels.find(criteria).map(function (doc) {
+                    return {
+                        label: doc.name,
+                        value: doc._id
+                    }
+                });
+                _.each(levels, function (i) {
+                    items.push(i)
+                });
+                return items;
+            }
+        }
+    },
+
+    categories: {
+        type: [String],
+        autoform: {
+            type: "select2",
+            multiple: true,
+            options: function () {
+                var criteria = {
+                    languageId: 2
+                };
+                var options = {
+                    sort: {
+                        order: 1
+                    }
+                };
+                return Meteor.industries.find(criteria, options).map(function (doc) {
+                    return {
+                        label: doc.name,
+                        value: doc._id
+                    }
+                });
+            }
+        }
+    },
+
+    locations: {
+        type: [String],
+        autoform: {
+            type: "select2",
+            multiple: true,
+            options: function () {
+                var criteria = {
+                    languageId: 2
+                };
+                var options = {
+                    sort: {
+                        order: 1
+                    }
+                };
+                return Meteor.cities.find(criteria, options).map(function (doc) {
+                    return {
+                        label: doc.name,
+                        value: doc._id
+                    }
+                });
+            }
+        }
+    },
+
+    salaryMin: {
+        type: Number,
+        defaultValue: 0,
+        autoform: {
+            type: "select2",
+            options: function () {
+                var items = [];
+                var salaryRange = [0, 500, 1000, 1500, 2000, 3000, 5000, 10000];
+                _.each(salaryRange, function (salary) {
+                    items.push({
+                        label: salary,
+                        value: salary
+                    });
+                });
+                return items;
+            }
+        }
+    },
+
+    salaryMax: {
+        type: Number,
+        defaultValue: 500,
+        custom: function () {
+            if (this.isSet) {
+                if (this.value < this.field("salaryMin").value)
+                    return "salaryMaxInvalid";
+            }
+        },
+        autoform: {
+            type: "select2",
+            options: function () {
+                var items = [];
+                var salaryRange = [500, 1000, 1500, 2000, 3000, 5000, 10000];
+                _.each(salaryRange, function (salary) {
+                    items.push({
+                        label: salary,
+                        value: salary
+                    });
+                });
+                return items;
+            }
+        }
+    },
+
+    showSalary: {
+        type: Boolean,
+        optional: true,
+        defaultValue: true,
+        autoform: {
+            type: "boolean-radios",
+            trueLabel: "Yes",
+            falseLabel: "No"
+        }
+    },
+
+    description: {
+        type: String,
+        autoform: {
+            type: "textarea",
+            rows: 7,
+            cols: 30,
+            placeholder: "Enter your description here"
+        }
+    },
+
+    requirements: {
+        type: String,
+        autoform: {
+            type: "textarea",
+            rows: 7,
+            cols: 30,
+            placeholder: "Enter your requirements here"
+        }
+    },
+
+    benifits: {
+        type: String,
+        optional: true,
+        autoform: {
+            type: "textarea",
+            rows: 7,
+            cols: 30,
+            placeholder: "Enter benifits"
+        }
+    },
+
+    skills: {
+        type: [String],
+        optional: true,
+        autoform: {
+            type: "tags"
+        }
+    }
+});

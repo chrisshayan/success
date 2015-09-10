@@ -1,6 +1,6 @@
 Meteor.publish('jobDetails', function (options) {
     check(options, {
-        jobId: Number
+        jobId: Match.Any
     });
     var cond = {
         jobId: options.jobId,
@@ -59,7 +59,20 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             jobId: 1,
             userId: 1,
             companyId: 1,
+            title: 1,
+            level: 1,
+            categories: 1,
+            locations: 1,
+            salaryMin: 1,
+            salaryMax: 1,
+            showSalary: 1,
+            description: 1,
+            requirements: 1,
+            benifits: 1,
+            source: 1,
+            //status: 1,
             createdAt: 1,
+            createdBy: 1,
             "data.jobtitle": 1,
             "data.iscompleted": 1,
             "data.salarymin": 1,
@@ -81,6 +94,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             matchingScore: 1,
             disqualified: 1,
             createdAt: 1,
+            fullname: 1,
             "data.appSubject": 1,
             "data.coverletter": 1,
             "data.resumeid": 1
@@ -127,16 +141,17 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
             userId: parseInt(this.userId)
         };
 
-        filters = _.defaults(filters, DEFAULT_FILTERS);
-        options = _.defaults(options, DEFAULT_JOB_OPTIONS);
+        filters = _.defaults(DEFAULT_FILTERS, filters);
+        options = _.defaults(DEFAULT_JOB_OPTIONS, options);
 
         if (filterEmailAddress)
             filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
 
         if (!options.hasOwnProperty("limit")) {
-            options['limit'] = 10;
+            options['limit'] = 5;
         }
+        console.log(Collections.Jobs.find(filters, options).count())
         return Collections.Jobs.find(filters, options);
     } catch (e) {
         debuger(e);
@@ -247,7 +262,7 @@ Meteor.publish("jobCounter", function (counterName, filters, filterEmailAddress)
 Meteor.publish("jobStagesCounter", function (counterName, jobId) {
     var self = this;
     check(counterName, String);
-    check(jobId, Number);
+    check(jobId, Match.Any);
     var count = {
         0: 0,
         1: 0,
@@ -421,5 +436,18 @@ Meteor.publish('staticModels', function () {
 
     return [Collections.Degrees.find(query)
         , Collections.Cities.find(query)];
+});
+
+Meteor.publish('addPositionPage', function() {
+    if(!this.userId) return null;
+    var cursors = [];
+    var jobLevels = Meteor.job_levels.find();
+    var industries = Meteor.industries.find();
+    var cities = Meteor.cities.find();
+
+    cursors.push(jobLevels);
+    cursors.push(industries);
+    cursors.push(cities);
+    return cursors;
 });
 

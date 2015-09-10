@@ -73,7 +73,6 @@ JobApplicationActions = BlazeComponent.extendComponent({
                         category: ['Recruiter', Meteor.userId()].join(':'),
                         label: ['APP_ID', data.application, app.stage, toStage].join(':')
                     };
-                    console.log('info', info);
                     Utils.trackEvent(action, info);
                 }
             });

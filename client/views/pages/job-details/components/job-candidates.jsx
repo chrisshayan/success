@@ -14,10 +14,9 @@ JobCandidates = React.createClass({
         var self = this;
         var candidates = [];
         var isLoading = true;
-
         //JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
         var sub = JobDetailsSubs.subscribe('getApplications', this.filter(), this.options());
-        if(sub.ready()) {
+        if (sub.ready()) {
             isLoading = false;
             candidates = this.fetch();
         }
@@ -29,10 +28,17 @@ JobCandidates = React.createClass({
     },
 
     filter: function () {
-        return {
+        var filter = {
             jobId: this.state.jobId,
             stage: this.state.stage.id
         };
+        if (this.state.search.length > 0) {
+            filter.fullname = {
+                $regex: this.state.search.replace(/\s+/g,'|'),
+                $options: 'i'
+            }
+        }
+        return filter;
     },
 
     options: function () {
@@ -74,12 +80,14 @@ JobCandidates = React.createClass({
     },
     render() {
         var loadmoreBtn = null;
-        if(this.state.isLoadMore) {
-            loadmoreBtn = <button className="btn btn-default btn-block btn-sm" onClick={ ()=> this.getFlux().actions.loadMoreCandidate() }>load more</button>;
+        if (this.state.isLoadMore) {
+            loadmoreBtn = <button className="btn btn-default btn-block btn-sm"
+                                  onClick={ ()=> this.getFlux().actions.loadMoreCandidate() }>load more</button>;
         }
         return (
             <div className="fh-column">
-                <JobCandidatesActions disabled={ !this.state.selected.length } />
+                <JobCandidatesActions disabled={ !this.state.selected.length }/>
+
                 <div className="full-height-scroll">
                     <ul className="list-group elements-list">
                         {this.data.candidates.map(this.renderCandidate)}
@@ -95,9 +103,9 @@ JobCandidates = React.createClass({
     },
     renderCandidate(candidate, key) {
         var selected = false;
-        if(candidate.application.entryId == this.data.currentEntryId)
+        if (candidate.application.entryId == this.data.currentEntryId)
             selected = true;
 
-        return <JobCandidate key={key} candidate={candidate} selected={selected} isSelectAll={this.state.isSelectAll} />;
+        return <JobCandidate key={key} candidate={candidate} selected={selected} isSelectAll={this.state.isSelectAll}/>;
     }
 })

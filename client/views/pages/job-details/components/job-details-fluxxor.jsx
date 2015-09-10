@@ -91,7 +91,7 @@ AppStores['JobDetails'] = Fluxxor.createStore({
             var _triggerMeteorChanged = self.triggerMeteorChanged.get();
             var params = Router.current().params;
             var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
-            self.currentJobId = +params.jobId;
+            self.currentJobId = params.jobId;
 
 
             if (!stage)
@@ -169,12 +169,12 @@ AppStores['JobDetails'] = Fluxxor.createStore({
     onSearchCandidate: function (keyword) {
         check(keyword, String);
         var self = this;
-        this.candidateSearchId && Meteor.clearTimeout(this.id);
+        this.candidateSearchId && Meteor.clearTimeout(this.candidateSearchId);
         this.candidateSearchId = Meteor.setTimeout(function () {
-            self.candidatesState.search = keyword;
+            self.candidatesState.search = keyword.trim();
             self.candidatesState.limit = self.candidatesState.base;
             self.emit('change');
-        }, 300);
+        }, 500);
 
     },
 

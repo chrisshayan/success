@@ -13,44 +13,39 @@ Job.publications = {
         try {
             if (!this.userId) this.ready();
 
-            /*check(filters, Object);
-             check(options, Match.Optional(Object));*/
+            check(filters, Object);
+            check(options, Match.Optional(Object));
 
-            var DEFAULT_FILTERS = {
-                userId: parseInt(this.userId)
-            };
 
-            filters = _.assign(DEFAULT_FILTERS, filters);
-            options = _.assign(CONFIG.defaultJobOptions, options);
+            filters = _.pick(filters, 'status');
+            options = _.pick(options, 'limit', 'sort');
 
             if (filterEmailAddress)
-                filters['jobEmailTo'] = new RegExp(filterEmailAddress, 'i');
+                filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
 
             if (!options.hasOwnProperty("limit")) {
-                options['limit'] = 10;
+                options['limit'] = 5;
+            } else {
+                options['limit'] += 5;
             }
-
             return Collection.find(filters, options);
         } catch (e) {
-            debuger(e);
+            console.log('Publish getJobs: ',e);
             return this.ready();
         }
     },
 
     getLatestJob: function () {
         if (!this.userId) return [];
-        var query = {
-            userId: +this.userId
-        };
 
-        var options = {
+        var userOptions = {
             fields: {
                 userId: 1, companyId: 1
             }
         };
 
-        var user = User.methods.findOne(query, options); //var user = User.model.collection.findOne();
+        var user = UserApi.methods.getUser(+this.userId, userOptions); //var user = User.model.collection.findOne();
 
         if (!user) return [];
 
@@ -69,6 +64,24 @@ Job.publications = {
         };
 
         return Collection.find(filters, options);
+    },
+
+    addPosition: function() {
+        var cursors = [];
+        var jobLevels = Meteor.job_levels.find();
+        var industries = Meteor.industries.find();
+        var cities = Meteor.cities.find();
+
+        cursors.push(jobLevels);
+        cursors.push(industries);
+        cursors.push(cities);
+        return cursors;
     }
 
 };
+
+Meteor.publish('getJobs', Job.publications.getJobs);
+
+//Meteor.publish('getLatestJob', Job.publications.getLatestJob);
+
+Meteor.publish('addPosition', Job.publications.addPosition);

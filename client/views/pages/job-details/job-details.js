@@ -1,7 +1,7 @@
 Template.jobDetails.onCreated(function () {
     Template.instance().autorun(function () {
         var params = Router.current().params;
-        var jobId = parseInt(params.jobId);
+        var jobId = params.jobId;
         var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
         Session.set("currentJobId", jobId);
         Session.set("currentStage", stage);

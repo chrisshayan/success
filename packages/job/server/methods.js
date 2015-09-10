@@ -3,7 +3,20 @@
  */
 
 Job.methods = {
+    isExist: function (jobId) {
+        if (jobId == void 0) return null;
+        return (Collection.find({jobId: jobId}));
+    },
     updateJob: function (query, data) {
         return !!(Collection.update(query, data));
+    },
+
+    publishPosition: function(doc) {
+        console.log(doc);
     }
 };
+
+
+Meteor.methods({
+    publishPosition: Job.methods.publishPosition
+});

@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'vnw:job',
+    name: 'vnw:city',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -11,28 +11,14 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.use(['vnw:core']);
-
-    api.addFiles(['job.js']);
-
-    api.addFiles([
-        'common/config.js',
-        'common/job-level-model.js',
-        //'common/model.js',
-        //'common/extends.js'
-    ]);
-
-    api.addFiles([
-        //'server/publications.js',
-        //'server/methods.js',
-        'server/startup.js',
-    ], 'server');
-
-    //api.export('Job');
+    api.use("vnw:core");
+    api.addFiles('common/city-model.js');
+    api.addFiles('server/city.js', "server");
+    api.addFiles('server/publications.js', "server");
 });
 
 Package.onTest(function (api) {
     api.use('tinytest');
-    api.use('vnw:job');
-    api.addFiles('job-tests.js');
+    api.use('recruit:city');
+    api.addFiles('city-tests.js');
 });

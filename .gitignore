@@ -11,3 +11,5 @@ packages/*/.npm/
 /**/*.cached
 
 
+
+.meteor/versions
