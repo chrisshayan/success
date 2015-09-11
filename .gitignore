@@ -1,6 +1,5 @@
 .idea
 .meteor/local
-.meteor/versions
 settings/
 
 .settings/settings.json
@@ -8,5 +7,9 @@ settings/
 packages/vnw-apis/.npm/*
 packages/*/.npm/
 
-**/**/*.cached
-**/**/*.map
+/**/*.map
+/**/*.cached
+
+
+
+.meteor/versions
