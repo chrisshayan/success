@@ -115,6 +115,7 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
     check(jobId, Number);
     check(companyId, Number);
 
+
     var candidates = [];
     var entryIds = [];
     var pullApplicationOnlineSql = sprintf(VNW_QUERIES.pullApplicationOnline, jobId);
@@ -130,6 +131,7 @@ SYNC_VNW.pullApplications = function (jobId, companyId) {
         applicationOnline.source = 1;
         applicationOnline.data = row;
         applicationOnline.createdAt = formatDatetimeFromVNW(row.createddate);
+
         Collections.Applications.insert(applicationOnline);
 
         // Log applied activity
@@ -561,6 +563,8 @@ SYNC_VNW.pullData = function (companyId, items) {
     } catch (e) {
         debuger(e)
     }
+
+    SYNC_VNW.migration();
 };
 
 SYNC_VNW.syncResume = function (resumeId) {
@@ -705,6 +709,7 @@ function pullCompanyData(j, cb) {
     cb();
 }
 
+
 SYNC_VNW.sync = function () {
 
     var isSkill = Collections.SyncQueue.findOne({type: "cronSkills"});
@@ -733,11 +738,14 @@ SYNC_VNW.addQueue = function (type, data) {
 };
 
 SYNC_VNW.migration = function () {
+    console.log('migration start');
     var filter = {
         fields: {
             candidateId: 1,
             'data.firstname': 1,
-            'data.lastname': 1
+            'data.lastname': 1,
+            'data.firstName': 1,
+            'data.lastName': 1
         }
     };
     var num = 0;
@@ -762,7 +770,6 @@ SYNC_VNW.migration = function () {
     });
     console.log('synced %s candidate', num);
 };
-
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;
 Collections.SyncQueue = JobCollection('vnw_sync_queue');
