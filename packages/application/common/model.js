@@ -65,4 +65,4 @@ model.appendSchema({
 
 });
 
-Application.model = model;
+Application = model;

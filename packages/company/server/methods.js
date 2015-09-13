@@ -20,7 +20,7 @@ function updateCompany(query, data) {
 }
 
 
-Company.methods = {
+var methods = {
     updateCompanyInfo: function (company, data) {
         isLoggedIn();
 
@@ -44,9 +44,6 @@ Company.methods = {
         var modifier = setModifier({amountOfTimeCron: numberOfMonth});
 
         return updateCompany(query, modifier);
-    },
-    getConfig: function (name) {
-        return CONFIG[name];
     }
 };
 

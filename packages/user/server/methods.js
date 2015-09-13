@@ -26,7 +26,7 @@ function updateUser(query, data) {
     return !!(Collection.update(query, data));
 }
 
-UserApi.methods = {
+var methods = {
     updateEmailSignature: function (newSignature) {
         isLoggedIn();
         if (!newSignature) return false;
@@ -112,11 +112,8 @@ UserApi.methods = {
 
     getUser: function (userId, filters) {
         return Collection.find({userId: userId}, filters).fetch();
-    },
-    getConfig: function (name) {
-        return CONFIG[name];
     }
 };
 
 
-Meteor.methods(UserApi.methods);
+Meteor.methods(methods);

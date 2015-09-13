@@ -20,12 +20,13 @@ Package.onUse(function (api) {
     api.addFiles(['company.js']);
 
     /* model */
-    api.addFiles(['common/model.js', 'common/extends.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
+    api.imply('vnw:core');
     api.imply('vnw:user');
 
     /* export */

@@ -119,4 +119,4 @@ model.appendSchema({
     }
 });
 
-Job.model = model;
+Job = model;

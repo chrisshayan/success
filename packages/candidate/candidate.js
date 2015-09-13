@@ -3,10 +3,6 @@
  */
 
 
-CONFIG = {};
 
-Candidate = {
-    model: null,
-    methods: null
-};
+Candidate = {};
 

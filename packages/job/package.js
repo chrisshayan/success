@@ -23,6 +23,7 @@ Package.onUse(function (api) {
 
     api.addFiles(['server/publications.js', 'server/methods.js'], ['server']);
 
+    api.imply('vnw:core');
     api.imply('vnw:user');
     api.imply('vnw:company');
 

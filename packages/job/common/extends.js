@@ -4,7 +4,7 @@
 
 
 
-Company.model.prototype.job = function (options) {
+Company.prototype.job = function (options) {
     if (this.companyId == void 0) return [];
     return Collection.find({companyId: this.companyId}, options || {}).fetch();
 };

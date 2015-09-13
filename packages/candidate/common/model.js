@@ -48,5 +48,5 @@ model.appendSchema({
 
 });
 
-Candidate.model = model;
+Candidate = model;
 

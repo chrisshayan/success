@@ -37,3 +37,6 @@ aldeed:autoform
 
 vnw:user
 vnw:company
+vnw:job
+vnw:candidate
+vnw:application

@@ -20,7 +20,7 @@ Package.onUse(function (api) {
     api.addFiles(['user.js']);
 
     /* model */
-    api.addFiles(['common/model.js', 'common/extends.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);

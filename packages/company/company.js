@@ -1,8 +1,6 @@
 // Write your package code here!
 
-CONFIG = {};
+Company = {};
 
-Company = {
-    model: null,
-    methods: null
-};
+
+

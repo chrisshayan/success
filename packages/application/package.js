@@ -18,14 +18,13 @@ Package.onUse(function (api) {
     api.addFiles(['application.js']);
 
     /* model */
-    api.addFiles(['common/model.js', 'common/extends.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
-    api.imply(['vnw:company', 'vnw:job', 'vnw:candidate']);
-
+    api.imply(['vnw:core', 'vnw:company', 'vnw:job', 'vnw:candidate']);
 
     /* export */
     api.export('Application');

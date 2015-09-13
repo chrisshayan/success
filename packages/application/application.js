@@ -3,9 +3,4 @@
  */
 
 
-CONFIG = {};
-
-Application = {
-    model: null,
-    methods: null
-};
+Application = {};

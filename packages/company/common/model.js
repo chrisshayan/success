@@ -59,4 +59,4 @@ model.appendSchema({
     }
 });
 
-Company.model = model;
+Company = model;

@@ -21,7 +21,7 @@ var publications = {
             };
 
             filters = _.extend(DEFAULT_FILTERS, filters);
-            options = _.extend(CONFIG.defaultJobOptions, options);
+            options = _.extend(Core.getConfig('job', 'defaultJobOptions'), options);
 
             if (filterEmailAddress)
                 filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
@@ -58,7 +58,7 @@ var publications = {
             }
         };
 
-        var options = CONFIG.defaultJobOptions;
+        var options = Core.getConfig('job', 'defaultJobOptions');
         options['limit'] = 10;
         options['sort'] = {
             createdAt: -1
@@ -68,6 +68,7 @@ var publications = {
     }
 
 };
+
 
 /*Meteor.publish('getJobs', publications.getJobs);
 

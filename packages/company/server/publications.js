@@ -8,7 +8,7 @@ var publications = {
         console.log('this', this.userId);
         if (this.userId == void 0) return null;
 
-        var user = UserApi.methods.getUser(this.userId);
+        var user = Meteor.call('getUser', this.userId);
         var defaultOptions = {
             limit: 1
         };
