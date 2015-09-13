@@ -33,4 +33,4 @@ model.appendSchema({
 
 });
 
-Activity.model = model;
+Activity = model;
