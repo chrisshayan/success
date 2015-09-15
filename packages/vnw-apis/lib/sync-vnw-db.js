@@ -564,7 +564,7 @@ SYNC_VNW.pullData = function (companyId, items) {
         debuger(e)
     }
 
-    SYNC_VNW.migration();
+    //SYNC_VNW.migration();
 };
 
 SYNC_VNW.syncResume = function (resumeId) {
