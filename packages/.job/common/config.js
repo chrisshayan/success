@@ -2,8 +2,7 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-
-CONFIG = {
+var CONFIG = {
     defaultJobOptions: {
         fields: {
             jobId: 1,
@@ -21,3 +20,5 @@ CONFIG = {
         }
     }
 };
+
+Core.registerConfig('job', CONFIG);

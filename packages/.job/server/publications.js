@@ -3,7 +3,7 @@
  */
 
 
-Job.publications = {
+var publications = {
     getJobByCompanyId: function (companyId, options) {
         if (companyId == void 0) return [];
         return Collection.find({companyId: companyId}, options || {});
@@ -16,22 +16,23 @@ Job.publications = {
             check(filters, Object);
             check(options, Match.Optional(Object));
 
+            var DEFAULT_FILTERS = {
+                userId: parseInt(this.userId)
+            };
 
-            filters = _.pick(filters, 'status');
-            options = _.pick(options, 'limit', 'sort');
+            filters = _.extend(DEFAULT_FILTERS, filters);
+            options = _.extend(Core.getConfig('job', 'defaultJobOptions'), options);
 
             if (filterEmailAddress)
                 filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
 
             if (!options.hasOwnProperty("limit")) {
-                options['limit'] = 5;
-            } else {
-                options['limit'] += 5;
+                options['limit'] = 10;
             }
-            return Collection.find(filters, options);
+            return Collections.Jobs.find(filters, options);
         } catch (e) {
-            console.log('Publish getJobs: ',e);
+            debuger(e);
             return this.ready();
         }
     },
@@ -57,31 +58,18 @@ Job.publications = {
             }
         };
 
-        var options = CONFIG.defaultJobOptions;
+        var options = Core.getConfig('job', 'defaultJobOptions');
         options['limit'] = 10;
         options['sort'] = {
             createdAt: -1
         };
 
         return Collection.find(filters, options);
-    },
-
-    addPosition: function() {
-        var cursors = [];
-        var jobLevels = Meteor.job_levels.find();
-        var industries = Meteor.industries.find();
-        var cities = Meteor.cities.find();
-
-        cursors.push(jobLevels);
-        cursors.push(industries);
-        cursors.push(cities);
-        return cursors;
     }
 
 };
 
-Meteor.publish('getJobs', Job.publications.getJobs);
 
-//Meteor.publish('getLatestJob', Job.publications.getLatestJob);
+/*Meteor.publish('getJobs', publications.getJobs);
 
-Meteor.publish('addPosition', Job.publications.addPosition);
+ Meteor.publish('getLatestJob', publications.getLatestJob);*/
