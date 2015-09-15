@@ -56,4 +56,10 @@ okgrow:analytics
 #vnw:core
 vnw:city
 vnw:industries
-vnw:job
+
+
+#vnw:user
+#vnw:company
+#vnw:job
+#vnw:candidate
+#vnw:application
