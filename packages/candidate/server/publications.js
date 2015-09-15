@@ -3,7 +3,7 @@
  */
 
 
-Candidate.publications = {
+var publications = {
     getById: function (companyId, options) {
         return Collection.find({companyId: companyId}, options);
     },
@@ -14,3 +14,5 @@ Candidate.publications = {
         return Collection.find({}, options);
     }
 };
+
+/* register publications */

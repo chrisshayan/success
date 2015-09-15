@@ -32,6 +32,10 @@ model.appendSchema({
     },
     vnwData: {
         type: Object,
+        blackbox: true
+    },
+    'vnwData.$.username': {
+        type: String,
         optional: true
     },
     createdAt: {
@@ -44,5 +48,5 @@ model.appendSchema({
 
 });
 
-Candidate.model = model;
+Candidate = model;
 

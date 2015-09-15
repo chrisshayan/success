@@ -1,7 +1,11 @@
 // Write your package code here!
 
 
+CONFIG = {};
+
 UserApi = {
-    methods: null,
-    publications: null
+    ROLES: {
+        COMPANY_ADMIN: "company_admin",
+        RECRUITER: "recruiter"
+    }
 };

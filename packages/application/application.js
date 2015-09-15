@@ -3,9 +3,4 @@
  */
 
 
-
-Application = {
-    model: null,
-    publications: null,
-    methods: null
-};
+Application = {};

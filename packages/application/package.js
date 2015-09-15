@@ -12,20 +12,19 @@ Package.describe({
 
 Package.onUse(function (api) {
     api.versionsFrom('1.1.0.3');
-    api.use(["vnw:core"]);
-    api.use(["vnw:job"]);
+    api.use(['vnw:core', 'vnw:company', 'vnw:job', 'vnw:candidate']);
 
     /* namespace */
-    api.addFiles(['application.js'], ['server']);
+    api.addFiles(['application.js']);
 
     /* model */
-    api.addFiles(['common/model.js', 'common/extends.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
-    api.imply('vnw:user');
+    api.imply(['vnw:core', 'vnw:company', 'vnw:job', 'vnw:candidate']);
 
     /* export */
     api.export('Application');
