@@ -281,7 +281,7 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
         return {
             type: "job",
             typeId: doc.jobId,
-            updatedAt: doc.data.lastupdateddate
+            updatedAt: doc.vnwData.lastupdateddate
         }
     });
 
@@ -355,14 +355,30 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
         var rows = fetchVNWData(pullJobSql);
 
         _.each(rows, function (row) {
-            var job = new Schemas.Job();
-            job.jobId = row.jobid;
-            job.companyId = companyId;
-            job.userId = row.userid;
-            job.data = row;
-            job.expiredAt = formatDatetimeFromVNW(row.expireddate);
-            job.createdAt = formatDatetimeFromVNW(row.createddate);
-            job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
+            var expiredAt = formatDatetimeFromVNW(row.expireddate);
+            var job = {
+                companyId: companyId,
+                jobId: row.jobid,
+                userId: row.userid,
+                source: 'vnw',
+                title: row.jobtitle,
+                level: '',
+                categories: [],
+                locations: [],
+                salaryMin: row.salarymin,
+                salaryMax: row.salarymax,
+                showSalary: true,
+                description: row.jobdescription,
+                requirements: row.skillexperience,
+                benifits: '',
+                recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+                skills: [],
+                vnwData: row,
+                status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
+                createdAt: formatDatetimeFromVNW(row.createddate),
+                updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+                expiredAt: expiredAt
+            };
             Collections.Jobs.insert(job);
 
             //SYNC_VNW.pullApplications(jobId, companyId);
@@ -382,9 +398,26 @@ SYNC_VNW.updateVNWJob = function (jobId, companyId) {
             var criteria = {
                 jobId: jobId
             };
+            var expiredAt = formatDatetimeFromVNW(row.expireddate);
             var modifier = {
                 $set: {
-                    data: row
+                    title: row.jobtitle,
+                    level: '',
+                    categories: [],
+                    locations: [],
+                    salaryMin: row.salarymin,
+                    salaryMax: row.salarymax,
+                    showSalary: true,
+                    description: row.jobdescription,
+                    requirements: row.skillexperience,
+                    benifits: '',
+                    recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+                    skills: [],
+                    vnwData: row,
+                    status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
+                    createdAt: formatDatetimeFromVNW(row.createddate),
+                    updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+                    expiredAt: expiredAt
                 }
             };
             Collections.Jobs.update(criteria, modifier);
