@@ -21,6 +21,11 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager",
         "reywood:publish-composite"
     ]);
+
+    api.addFiles('utils/common.js', ['server', 'client']);
+    api.addFiles('utils/server.js', 'server');
+    api.addFiles('utils/client.js', 'client');
+
     /* public modules */
     api.imply([
         "socialize:user-model",
@@ -28,7 +33,7 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager"
     ]);
 
-    api.export('Core');
+    api.export(['Core','Utils']);
 
 });
 

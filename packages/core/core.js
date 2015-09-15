@@ -8,6 +8,8 @@ var CONFIG = {};
 
 Core = {};
 
+Utils = {};
+
 Core.imported = function () {
     return 'Core is imported!';
 };
