@@ -52,28 +52,13 @@ JobInfo = BlazeComponent.extendComponent({
         var filters = {
             jobId: {
                 $nin: [this.job.jobId]
-            }
+            },
+            source: this.job.source,
+            status: this.job.status
         };
-        if(this.job.source != "recruit") {
-            var today = new Date();
-            today.setHours(0);
-            today.setMinutes(0);
-            today.setMilliseconds(0);
-            if (this.job.status == 1) {
-                filters['data.expireddate'] = {
-                    $gte: today
-                }
-            } else {
-                filters['data.expireddate'] = {
-                    $lt: today
-                }
-            }
-        } else {
-            filters['source'] = "recruit";
-        }
 
         if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
-            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
+            filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
 
         var options = {
@@ -87,7 +72,7 @@ JobInfo = BlazeComponent.extendComponent({
     },
 
     currentJobTitle: function () {
-        return this.job.data.jobtitle || this.job.title || "";
+        return this.job.title || "";
     },
 
     otherJobs: function () {
@@ -100,9 +85,7 @@ JobInfo = BlazeComponent.extendComponent({
 
 
 Template.JobInfoItem.helpers({
-    jobTitle: function () {
-        return this.data.jobtitle || this.title || "";
-    }
+
 });
 
 

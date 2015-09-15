@@ -76,17 +76,10 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             requirements: 1,
             benifits: 1,
             source: 1,
-            //status: 1,
+            status: 1,
             createdAt: 1,
             createdBy: 1,
-            "data.jobtitle": 1,
-            "data.iscompleted": 1,
-            "data.salarymin": 1,
-            "data.salarymax": 1,
-            "data.skillexperience": 1,
-            "data.expireddate": 1,
-            "data.emailaddress": 1,
-            'data.isactive': 1
+            recruiterEmails: 1
         }
     },
     DEFAULT_APPLICATION_OPTIONS = {
@@ -143,16 +136,11 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
         check(filters, Object);
         check(options, Match.Optional(Object));
 
-        var DEFAULT_FILTERS = {
-            userId: parseInt(this.userId)
-        };
+        filters = _.pick(filters, 'status', 'source', 'recruiterEmails');
+        filters['userId'] = +this.userId;
 
-        filters = _.defaults(filters, DEFAULT_FILTERS);
-        options = _.defaults(options, DEFAULT_JOB_OPTIONS);
-
-        if (filterEmailAddress)
-            filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
-
+        options = _.pick(options, 'limit', 'sort');
+        options['fields'] = DEFAULT_JOB_OPTIONS['fields'];
 
         if (!options.hasOwnProperty("limit")) {
             options['limit'] = 5;
@@ -442,8 +430,8 @@ Meteor.publish('staticModels', function () {
         , Collections.Cities.find(query)];
 });
 
-Meteor.publish('addPositionPage', function() {
-    if(!this.userId) return null;
+Meteor.publish('addPositionPage', function () {
+    if (!this.userId) return null;
     var cursors = [];
     var jobLevels = Meteor.job_levels.find();
     var industries = Meteor.industries.find();

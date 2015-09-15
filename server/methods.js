@@ -744,14 +744,14 @@ Meteor.methods({
         };
         var options = {
             fields: {
-                'data.emailaddress': 1
+                'recruiterEmails': 1
             }
         };
 
 
         Collections.Jobs.find(query, options).map(function (obj) {
-            if (obj.data.emailaddress)
-                listEmail = listEmail.concat(obj.data.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
+            if(obj.recruiterEmails)
+                listEmail = listEmail.concat(obj.recruiterEmails);
         });
 
         return _.unique(listEmail);

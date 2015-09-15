@@ -9,26 +9,23 @@ Job.publications = {
         return Collection.find({companyId: companyId}, options || {});
     },
 
-    getJobs: function (filters, options, filterEmailAddress) {
+    getJobs: function (filters, options) {
         try {
             if (!this.userId) this.ready();
 
             check(filters, Object);
             check(options, Match.Optional(Object));
 
-
-            filters = _.pick(filters, 'status');
+            filters = _.pick(filters, 'status', 'source', 'recruiterEmails');
             options = _.pick(options, 'limit', 'sort');
-
-            if (filterEmailAddress)
-                filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
-
 
             if (!options.hasOwnProperty("limit")) {
                 options['limit'] = 5;
             } else {
                 options['limit'] += 5;
             }
+
+            console.log(filters, options)
             return Collection.find(filters, options);
         } catch (e) {
             console.log('Publish getJobs: ',e);

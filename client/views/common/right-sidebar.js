@@ -203,17 +203,12 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
         this.job = this.data();
     },
 
-
-    jobTitle: function () {
-        return this.job.data.jobtitle;
-    },
-
     timeago: function () {
         return moment(this.job.createdAt).fromNow();
     },
 
     expiredAt: function () {
-        return moment(this.job.data.expireddate).format("ll");
+        return moment(this.expiredAt).format("ll");
     },
 
     location: function () {
@@ -229,8 +224,8 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
         return nl2br(this.job.data.skillexperience);
     },
     salaryRange: function () {
-        var minSalary = (this.job.data.salarymin) ? '$' + this.job.data.salarymin + ' - ' : ''
-            , maxSalary = (this.job.data.salarymax) ? '$' + this.job.data.salarymax : '';
+        var minSalary = (this.job.salaryMin) ? '$' + this.job.salaryMin + ' - ' : ''
+            , maxSalary = (this.job.salaryMax) ? '$' + this.job.salaryMax : '';
 
         return minSalary + maxSalary;
     },

@@ -134,29 +134,24 @@ Collections.Users = new Mongo.Collection("vnw_users");
 Collections.CompanySettings = new Mongo.Collection("vnw_company_settings");
 
 Collections.Jobs = new Mongo.Collection("vnw_jobs", {
-    transform: function (doc) {
-        if (!doc.hasOwnProperty("data") || !doc.data.hasOwnProperty("expireddate")) return doc;
-
-        var today = new Date(moment().format("YYYY-MM-DD 00:00:00")).getTime();
-        var expired = new Date(doc.data.expireddate).getTime();
-        if (expired >= today) {
-            doc.status = 1;
-        } else {
-            doc.status = 0;
-        }
-        return doc;
-    }
+    //transform: function (doc) {
+    //    if (!doc.hasOwnProperty("data") || !doc.data.hasOwnProperty("expireddate")) return doc;
+    //
+    //    var today = new Date(moment().format("YYYY-MM-DD 00:00:00")).getTime();
+    //    var expired = new Date(doc.data.expireddate).getTime();
+    //    if (expired >= today) {
+    //        doc.status = 1;
+    //    } else {
+    //        doc.status = 0;
+    //    }
+    //    return doc;
+    //}
 });
 function transformVNWId(id) {
     if (_.isNaN(+id))
         return id;
     return +id;
 }
-Collections.Jobs.before.find(function(userId, filter, option) {
-    if(filter.hasOwnProperty('jobId')) {
-        filter.jobId = transformVNWId(filter.jobId);
-    }
-});
 
 Collections.Candidates = new Mongo.Collection("vnw_candidates", {
     transform: function (doc) {

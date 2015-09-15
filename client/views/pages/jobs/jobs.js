@@ -20,12 +20,8 @@ Jobs = BlazeComponent.extendComponent({
             this.isLoading.set(true);
 
         instance.autorun(function () {
-            var filterEmailAddress = null;
-            if (self.filters()['data.emailaddress'])
-                filterEmailAddress = Meteor.currentRecruiter().email;
-
-            self.subscribe('jobCounter', 'jobs_status_' + self.status, self.filters(), filterEmailAddress);
-            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options(), filterEmailAddress);
+            self.subscribe('jobCounter', self.counterName(), self.filters());
+            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options());
             if (trackSub.ready()) {
                 self.isLoading.set(false);
                 self.isLoadingMore.set(false);
@@ -33,118 +29,24 @@ Jobs = BlazeComponent.extendComponent({
         });
     },
 
-    filters: function () {
-        var filters = {};
-        var today = new Date();
-        today.setHours(0);
-        today.setMinutes(0);
-        today.setMilliseconds(0);
+    counterName: function() {
+        var data = this.data();
+        return ['jobs_status', data.source, data.status].join('_');
+    },
 
-        if (this.status == 1) {
-            filters['data.expireddate'] = {
-                $gte: today
-            };
-            filters['data.isactive'] = 1;
-        } else {
-            filters['data.expireddate'] = {
-                $lt: today
-            }
+    filters: function () {
+        var data = this.data();
+        var filters = {
+            status: data.status
+        };
+
+        if(data.source) {
+            filters['source'] = data.source;
         }
 
         if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
-            filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
+            filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
-
-        return filters;
-    },
-
-    options: function () {
-        return {
-            limit: this.limit(),
-            sort: {
-                "data.createddate": -1
-            }
-        };
-    },
-
-    limit: function () {
-        return this.page.get() * this.inc;
-    },
-
-    fetch: function () {
-        return Collections.Jobs.find(this.filters(), this.options());
-    },
-
-    events: function () {
-        return [{
-            'click [data-load-more="true"]': this.loadMore
-        }];
-    },
-
-    loadMore: function () {
-        var currentPage = this.page.get();
-        this.page.set(currentPage + 1);
-        this.isLoadingMore.set(true);
-    },
-
-    /**
-     * Helpers
-     */
-    items: function () {
-        return this.fetch();
-    },
-
-    total: function () {
-        var counter = Collections.Counts.findOne("jobs_status_" + this.status);
-        if (!counter) return 0;
-        return counter.count;
-    },
-
-    loadMoreAbility: function () {
-        return this.total() - this.limit() > 0;
-    }
-
-}).register('Jobs');
-
-CustomJobs = BlazeComponent.extendComponent({
-    onCreated: function () {
-        var self = this;
-
-        var instance = Template.instance();
-        var data = this.data();
-
-        //properties
-        this.inc = 5;
-        this.page = new ReactiveVar(1);
-
-        this.isLoading = new ReactiveVar(false);
-        this.isLoadingMore = new ReactiveVar(false);
-
-        if (Collections.Jobs.find({}, {limit: 1}).count() !== 1)
-            this.isLoading.set(true);
-
-        instance.autorun(function () {
-            var filterEmailAddress = null;
-            if (self.filters()['data.emailaddress'])
-                filterEmailAddress = Meteor.currentRecruiter().email;
-
-            self.subscribe('jobCounter', 'jobs_source_recruit', self.filters(), filterEmailAddress);
-            var trackSub = DashboardSubs.subscribe('getJobs', self.filters(), self.options(), filterEmailAddress);
-            if (trackSub.ready()) {
-                self.isLoading.set(false);
-                self.isLoadingMore.set(false);
-            }
-        });
-    },
-
-    filters: function () {
-        var filters = {
-            source: "recruit"
-        };
-
-        //if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {
-        //    filters['data.emailaddress'] = new RegExp(Meteor.currentRecruiter().email, "i");
-        //}
 
         return filters;
     },
@@ -186,7 +88,7 @@ CustomJobs = BlazeComponent.extendComponent({
     },
 
     total: function () {
-        var counter = Collections.Counts.findOne("jobs_source_" + "recruit");
+        var counter = Collections.Counts.findOne(this.counterName());
         if (!counter) return 0;
         return counter.count;
     },
@@ -195,16 +97,12 @@ CustomJobs = BlazeComponent.extendComponent({
         return this.total() - this.limit() > 0;
     }
 
-}).register('CustomJobs');
-
+}).register('Jobs');
 
 JobItem = BlazeComponent.extendComponent({
     onCreated: function () {
         var job = this.data();
         this.jobId = job.jobId;
-        this.title = job.data.jobtitle;
-        this.createdAt = moment(job.createdAt).format("DD-MM-YYYY");
-        this.expiredAt = moment(job.data.expireddate).format("DD-MM-YYYY");
 
         this.stages = new ReactiveDict;
         this.counting = new ReactiveVar(false);
@@ -234,6 +132,10 @@ JobItem = BlazeComponent.extendComponent({
         var counter = Collections.Counts.findOne("job_stages_" + this.jobId);
         if (!counter) return "-";
         return counter.count[id] || "-";
+    },
+
+    timeago: function(d) {
+        return moment(d).format("DD-MM-YYYY");
     }
 }).register('JobItem');
 
