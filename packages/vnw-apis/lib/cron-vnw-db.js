@@ -173,7 +173,7 @@ function processJob(item, companyId) {
                 updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
                 expiredAt: expiredAt
             };
-
+            
             if (!row.isactive)
                 job.status = 2;
             else if (moment(expiredAt).valueOf() < Date.now())
@@ -189,7 +189,10 @@ function processJob(item, companyId) {
 
                 console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);
                 console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
-                Collections.Jobs.update(query, job);
+                var modifier = {
+                    '$set': job
+                };
+                Collections.Jobs.update(query, modifier);
 
                 // add new
             } else if (!mongoJob) {
