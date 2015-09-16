@@ -174,7 +174,7 @@ function processJob(item, companyId) {
                 expiredAt: expiredAt
             };
 
-            if (row.isactive)
+            if (!row.isactive)
                 job.status = 2;
             else if (moment(expiredAt).valueOf() < Date.now())
                 job.status = 0;

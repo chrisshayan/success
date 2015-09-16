@@ -392,7 +392,7 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
                 expiredAt: expiredAt
             };
 
-            if (row.isactive)
+            if (!row.isactive)
                 job.status = 2;
             else if (moment(expiredAt).valueOf() < Date.now())
                 job.status = 0;
@@ -441,7 +441,7 @@ SYNC_VNW.updateVNWJob = function (jobId, companyId) {
             };
 
 
-            if (row.isactive)
+            if (!row.isactive)
                 updateData.status = 2;
             else if (moment(expiredAt).valueOf() < Date.now())
                 updateData.status = 0;
