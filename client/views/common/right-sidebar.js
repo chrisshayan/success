@@ -142,7 +142,7 @@ var LastCandidateItem = BlazeComponent.extendComponent({
     applicationDetailsUrl: function () {
         var params = {
             jobId: this.application.jobId,
-            stage: Recruit.APPLICATION_STAGES[this.application.stage].alias
+            stage: Success.APPLICATION_STAGES[this.application.stage].alias
         };
         var query = {
             query: {
@@ -233,7 +233,7 @@ var LastOpenJobItem = BlazeComponent.extendComponent({
     jobDetailsUrl: function () {
         var params = {
             jobId: this.job.jobId,
-            stage: Recruit.APPLICATION_STAGES[1].alias
+            stage: Success.APPLICATION_STAGES[1].alias
         };
         return Router.routes['jobDetails'].url(params);
     }

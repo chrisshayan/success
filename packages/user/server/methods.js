@@ -57,14 +57,14 @@ var methods = {
         check(email, String);
         check(password, String);
         /**
-         * 1) user existing in Recruit -> return true -> client will call login with password
-         * 2) user does not exists in Recruit -> get account from vnw -> client call login with password
+         * 1) user existing in Success -> return true -> client will call login with password
+         * 2) user does not exists in Success -> get account from vnw -> client call login with password
          * 3) Email exists but password invalid -> update data from vnw -> client call login with password
          */
         var user = Meteor.users.findOne({"emails.address": email});
         var sql, query, vnwData;
         if (!user) {
-            // pull vnw user -> if exists -> create account in Recruit
+            // pull vnw user -> if exists -> create account in Success
             sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
             query = fetchVNWData(sql);
             if (query.length == 1) {
@@ -91,7 +91,7 @@ var methods = {
 
         } else {
             // pull vnw user -> if exists -> update password
-            // pull vnw user -> if exists -> create account in Recruit
+            // pull vnw user -> if exists -> create account in Success
             sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
             query = fetchVNWData(sql);
             if (query.length == 1) {

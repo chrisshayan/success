@@ -1,10 +1,10 @@
-Recruit = {};
+Success = {};
 
 /**
  *
  * @type {{0: string, 1: string, 2: string, 3: string, 4: string, 5: string}}
  */
-Recruit.APPLICATION_STAGES = {
+Success.APPLICATION_STAGES = {
     0: {
         id: 0,
         alias: "sourced",
@@ -41,7 +41,7 @@ Recruit.APPLICATION_STAGES = {
  * Initial data after first time user login
  * @param userId {Number}
  */
-Recruit.initialEmployerData = function(userId, username, companyId) {
+Success.initialEmployerData = function(userId, username, companyId) {
     check(userId, Number);
     check(username, String);
 

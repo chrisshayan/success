@@ -115,7 +115,7 @@ ApplicationTransform.prototype = {
     link: function() {
         var params = {
             jobId: this.jobId,
-            stage: Recruit.APPLICATION_STAGES[this.stage].alias
+            stage: Success.APPLICATION_STAGES[this.stage].alias
         };
         var queryParams = {
             query: {

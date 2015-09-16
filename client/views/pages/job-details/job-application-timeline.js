@@ -130,7 +130,7 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
             case 1: // moved stage action
                 var from = this.data().data.fromStage;
                 var to = this.data().data.toStage;
-                var stage = Recruit.APPLICATION_STAGES[to];
+                var stage = Success.APPLICATION_STAGES[to];
                 if (from > to) {
                     if (from - to > 1)
                         this.icon = " fa-long-arrow-left ";

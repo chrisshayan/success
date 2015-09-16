@@ -27,7 +27,7 @@ Package.onUse(function (api) {
     ], 'server');
 
     api.addFiles('namespace.js');
-    api.export('Recruit');
+    api.export('Success');
 
     api.addFiles([
         'lib/debuger.js',

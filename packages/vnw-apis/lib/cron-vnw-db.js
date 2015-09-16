@@ -125,7 +125,7 @@ function processJob(item, companyId) {
             job.jobId = jRow.jobid;
             job.companyId = companyId;
             job.userId = jRow.userid;
-            job.data = jRow;
+            job.vnwData = jRow;
             job.expiredAt = formatDatetimeFromVNW(jRow.expireddate);
             job.createdAt = formatDatetimeFromVNW(jRow.createddate);
             job.updatedAt = formatDatetimeFromVNW(jRow.lastupdateddate);

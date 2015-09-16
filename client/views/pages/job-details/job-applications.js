@@ -8,7 +8,7 @@ JobApplications = BlazeComponent.extendComponent({
 
         // check is loading data
         var params = Router.current().params;
-        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+        var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
         this.jobId = new ReactiveVar(parseInt(params.jobId));
         this.stage = new ReactiveVar(stage);
         this.inc = 20;
@@ -26,10 +26,10 @@ JobApplications = BlazeComponent.extendComponent({
 
         var tracker = instance.autorun(function () {
             var params = Router.current().params;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
             self.jobId.set(params.jobId);
             if(!stage)
-                self.stage.set(Recruit.APPLICATION_STAGES[1]);
+                self.stage.set(Success.APPLICATION_STAGES[1]);
             else
                 self.stage.set(stage);
             // Send subscribe request

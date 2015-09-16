@@ -20,7 +20,7 @@ HiringProcess = BlazeComponent.extendComponent({
         var self = this;
         var stages = [];
         var counter = Collections.Counts.findOne("job_stages_" + self.jobId);
-        _.each(Recruit.APPLICATION_STAGES, function (stage) {
+        _.each(Success.APPLICATION_STAGES, function (stage) {
             stage.jobId = self.jobId;
             stage.total = "";
             if(counter)

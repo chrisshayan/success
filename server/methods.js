@@ -102,7 +102,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 /**
- * Recruit methods
+ * Success methods
  */
 Meteor.methods({
     /**

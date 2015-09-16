@@ -45,7 +45,7 @@ SYNC_VNW.syncUser = function (userInfo) {
 
         //Intitial user data
         Meteor.defer(function () {
-            Recruit.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
+            Success.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
             SYNC_VNW.pullCompanyInfo(userInfo.companyid);
             var jobData = {
                 userId: _user.userId,
@@ -220,6 +220,9 @@ SYNC_VNW.pullCandidates = function (candidates) {
                     });
                 }
             }
+
+            SYNC_VNW.migration(row);
+
         });
 
     } catch (e) {
@@ -275,7 +278,7 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
     var oldItems = Collections.Jobs.find({jobId: {$in: elseIds}}, {
         fields: {
             jobId: 1,
-            "data.lastupdateddate": 1
+            "vnwData.lastupdateddate": 1
         }
     }).map(function (doc) {
         return {
@@ -770,38 +773,22 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
-SYNC_VNW.migration = function () {
-    console.log('migration start');
-    var filter = {
-        fields: {
-            candidateId: 1,
-            'data.firstname': 1,
-            'data.lastname': 1,
-            'data.firstName': 1,
-            'data.lastName': 1
+SYNC_VNW.migration = function (candidate) {
+    console.log('migration :', candidate.userid);
+
+    var fullname = [candidate.lastname, candidate.firstname].join(' ').trim();
+
+    var query = {candidateId: candidate.userid};
+    var update = {
+        '$set': {
+            fullname: fullname
         }
     };
-    var num = 0;
-    Collections.Candidates.find({}, filter).forEach(function (can) {
-        num++;
-        var fullname = '';
-        if (can.data.lastname != void 0 && can.data.firstname != void 0)
-            fullname = [can.data.lastname, can.data.firstname].join(' ').trim();
-        else
-            fullname = [can.data.lastName, can.data.firstName].join(' ').trim();
 
-        var query = {candidateId: can.candidateId};
-        var update = {
-            '$set': {
-                fullname: fullname
-            }
-        };
-        var options = {
-            multi: true
-        };
-        Collections.Applications.update(query, update, options);
-    });
-    console.log('synced %s candidate', num);
+    var options = {
+        multi: true
+    };
+    Collections.Applications.update(query, update, options);
 };
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;

@@ -94,7 +94,7 @@ AccountsVNW.loginAsJobSeeker = function (username, password, callback) {
  */
 AccountsVNW.user = function () {
     var _user = AccountsVNW._store.get('user');
-    return _user ? EJSON.parse(_user) : undefined;
+    return (_user && _user !== 'undefined')  ? EJSON.parse(_user) : undefined;
 };
 
 AccountsVNW.userId = function () {

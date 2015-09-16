@@ -90,12 +90,12 @@ AppStores['JobDetails'] = Fluxxor.createStore({
         Tracker.autorun(function () {
             var _triggerMeteorChanged = self.triggerMeteorChanged.get();
             var params = Router.current().params;
-            var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: params.stage});
+            var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
             self.currentJobId = Utils.transformVNWId(params.jobId);
 
 
             if (!stage)
-                self.stage = Recruit.APPLICATION_STAGES[1];
+                self.stage = Success.APPLICATION_STAGES[1];
             else
                 self.stage = stage;
 

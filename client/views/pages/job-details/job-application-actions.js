@@ -52,7 +52,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var app = this.props.get('application');
         if (app.stage == 0 && toStage == 1) return;
 
-        var stage = Recruit.APPLICATION_STAGES[toStage];
+        var stage = Success.APPLICATION_STAGES[toStage];
         if (stage) {
             //call update stage request
             var data = {
@@ -147,7 +147,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
         var next = stage.id + 1;
         if (stage.id == 0)
             next = stage.id + 2;
-        var nextStage = Recruit.APPLICATION_STAGES[next];
+        var nextStage = Success.APPLICATION_STAGES[next];
         return nextStage;
     },
     nextStageAbility: function () {
@@ -158,7 +158,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
     stages: function () {
         var self = this;
         var items = [];
-        _.each(Recruit.APPLICATION_STAGES, function (stage) {
+        _.each(Success.APPLICATION_STAGES, function (stage) {
             var currentStage = self.props.get("stage");
             var html = "";
             if (stage.id > currentStage.id) {

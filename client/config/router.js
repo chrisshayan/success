@@ -109,7 +109,7 @@ Router.route('/job/:jobId/stage/:stage', {
     },
     action: function () {
         var self = this;
-        var stage = _.findWhere(Recruit.APPLICATION_STAGES, {alias: this.params.stage});
+        var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: this.params.stage});
         if (!this.params.query.hasOwnProperty('application')) {
 
             var options = {
