@@ -382,7 +382,7 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
                 showSalary: true,
                 description: row.jobdescription,
                 requirements: row.skillexperience,
-                benifits: '',
+                benefits: '',
                 recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
                 skills: [],
                 vnwData: row,
@@ -391,6 +391,15 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
                 updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
                 expiredAt: expiredAt
             };
+
+            if (row.isactive)
+                job.status = 2;
+            else if (moment(expiredAt).valueOf() < Date.now())
+                job.status = 0;
+            else
+                job.status = 1;
+
+
             Collections.Jobs.insert(job);
 
             //SYNC_VNW.pullApplications(jobId, companyId);
@@ -411,26 +420,37 @@ SYNC_VNW.updateVNWJob = function (jobId, companyId) {
                 jobId: jobId
             };
             var expiredAt = formatDatetimeFromVNW(row.expireddate);
+
+            var updateData = {
+                title: row.jobtitle,
+                level: '',
+                categories: [],
+                locations: [],
+                salaryMin: row.salarymin,
+                salaryMax: row.salarymax,
+                showSalary: true,
+                description: row.jobdescription,
+                requirements: row.skillexperience,
+                benifits: '',
+                recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+                skills: [],
+                vnwData: row,
+                createdAt: formatDatetimeFromVNW(row.createddate),
+                updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+                expiredAt: expiredAt
+            };
+
+
+            if (row.isactive)
+                updateData.status = 2;
+            else if (moment(expiredAt).valueOf() < Date.now())
+                updateData.status = 0;
+            else
+                updateData.status = 1;
+
+
             var modifier = {
-                $set: {
-                    title: row.jobtitle,
-                    level: '',
-                    categories: [],
-                    locations: [],
-                    salaryMin: row.salarymin,
-                    salaryMax: row.salarymax,
-                    showSalary: true,
-                    description: row.jobdescription,
-                    requirements: row.skillexperience,
-                    benifits: '',
-                    recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
-                    skills: [],
-                    vnwData: row,
-                    status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
-                    createdAt: formatDatetimeFromVNW(row.createddate),
-                    updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
-                    expiredAt: expiredAt
-                }
+                $set: updateData
             };
             Collections.Jobs.update(criteria, modifier);
         });
@@ -715,6 +735,7 @@ function pullCompanyData(j, cb) {
 
     console.log('pulling from user : ', userId);
     try {
+        // GET ALL JOB IDS
         // GET ALL JOB IDS
 
         var jSql = sprintf(VNW_QUERIES.checkJobsUpdate, userId);

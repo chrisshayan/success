@@ -11,24 +11,21 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.use(['vnw:core']);
+    api.use(["vnw:core"]);
+    api.use('vnw:user');
+    api.use('vnw:company');
 
     api.addFiles(['job.js']);
 
-    api.addFiles([
-        'common/config.js',
-        'common/job-level-model.js'
-        //'common/model.js',
-        //'common/extends.js'
-    ]);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js', 'common/job-level-model.js']);
 
-    api.addFiles([
-        //'server/publications.js',
-        //'server/methods.js',
-        'server/startup.js'
-    ], 'server');
+    api.addFiles(['server/publications.js', 'server/methods.js', 'server/startup.js'], ['server']);
 
-    //api.export('Job');
+    api.imply('vnw:core');
+    api.imply('vnw:user');
+    api.imply('vnw:company');
+
+    api.export('Job');
 });
 
 Package.onTest(function (api) {

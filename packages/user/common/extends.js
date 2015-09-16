@@ -23,7 +23,6 @@ User.prototype.updateEmailSignature = function (newSignature, cb) {
     return Meteor.call('updateEmailSignature', newSignature, cb);
 };
 
-
 User.prototype.updateUserInfo = function (data, cb) {
     return Meteor.call('updateUserInfo', data, cb);
 };

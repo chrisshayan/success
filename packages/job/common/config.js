@@ -3,7 +3,7 @@
  */
 
 
-CONFIG = {
+var CONFIG = {
     defaultJobOptions: {
         fields: {
             jobId: 1,
@@ -21,3 +21,5 @@ CONFIG = {
         }
     }
 };
+
+Core.registerConfig('job', CONFIG);

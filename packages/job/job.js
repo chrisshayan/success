@@ -5,7 +5,4 @@
 
 
 Job = {
-    model: null,
-    publications: null,
-    methods: null
 };

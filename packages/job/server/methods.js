@@ -2,21 +2,25 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-Job.methods = {
-    isExist: function (jobId) {
-        if (jobId == void 0) return null;
-        return (Collection.find({jobId: jobId}));
-    },
-    updateJob: function (query, data) {
-        return !!(Collection.update(query, data));
+
+var methods = {
+    updateJob: function (job, data) {
+        if (Core.isLoggedIn()) return false;
+
+        if (!data) return false;
+
+        var query = {
+            _id: job._id
+        };
+        var modifier = Core.setModifier(data);
+
+        return Core.doUpdate(Collection, query, modifier);
     },
 
-    publishPosition: function(doc) {
+    publishPosition: function (doc) {
         console.log(doc);
     }
 };
 
 
-Meteor.methods({
-    publishPosition: Job.methods.publishPosition
-});
+Meteor.methods(methods);

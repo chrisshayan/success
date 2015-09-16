@@ -61,7 +61,7 @@ vnw:job
 vnw:migration
 
 #vnw:user
-#vnw:company
+vnw:company
 #vnw:job
 #vnw:candidate
 #vnw:application

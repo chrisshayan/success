@@ -1,12 +1,18 @@
 /**
  * Created by HungNguyen on 8/21/15.
  */
-var model = BaseModel.extendAndSetupCollection("vnw_jobs");
+var model = BaseModel.extendAndSetupCollection("jobs");
 Collection = model.collection;
 
 SimpleSchema.messages({
     salaryMaxInvalid: "Max salary must greater than min salary"
 });
+
+model.prototype.updateJob = function (data, cb) {
+    if (data == void 0 || typeof data === 'function') data = this;
+
+    return Meteor.call('updateJob', this, data, cb);
+};
 
 model.appendSchema({
     companyId: {
@@ -16,8 +22,7 @@ model.appendSchema({
 
     source: {
         type: String,
-        defaultValue: "recruit", // from recruit|vietnamworks|some sources
-        optional: true
+        defaultValue: "vietnamworks" // from recruit|vietnamworks|some sources
     },
 
     title: {
@@ -178,7 +183,7 @@ model.appendSchema({
         }
     },
 
-    benifits: {
+    benefits: {
         type: String,
         optional: true,
         autoform: {
@@ -230,7 +235,7 @@ model.appendSchema({
     }
 });
 
-Job.model = model;
+Job = model;
 
 
 /**

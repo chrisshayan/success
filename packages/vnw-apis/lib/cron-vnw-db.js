@@ -143,18 +143,43 @@ function processJob(item, companyId) {
         var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.typeId);
         //console.log(getJobQuery);
         var cJobs = fetchVNWData(getJobQuery);
-        cJobs.forEach(function (jRow) {
+        cJobs.forEach(function (row) {
             var query = {
                 jobId: item.typeId
             };
-            var job = new Schemas.Job();
-            job.jobId = jRow.jobid;
-            job.companyId = companyId;
-            job.userId = jRow.userid;
-            job.vnwData = jRow;
-            job.expiredAt = formatDatetimeFromVNW(jRow.expireddate);
-            job.createdAt = formatDatetimeFromVNW(jRow.createddate);
-            job.updatedAt = formatDatetimeFromVNW(jRow.lastupdateddate);
+
+            var expiredAt = formatDatetimeFromVNW(row.expireddate);
+
+            var job = {
+                companyId: companyId,
+                jobId: row.jobid,
+                userId: row.userid,
+                source: 'vnw',
+                title: row.jobtitle,
+                level: '',
+                categories: [],
+                locations: [],
+                salaryMin: row.salarymin,
+                salaryMax: row.salarymax,
+                showSalary: true,
+                description: row.jobdescription,
+                requirements: row.skillexperience,
+                benefits: '',
+                recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+                skills: [],
+                vnwData: row,
+                status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
+                createdAt: formatDatetimeFromVNW(row.createddate),
+                updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+                expiredAt: expiredAt
+            };
+
+            if (row.isactive)
+                job.status = 2;
+            else if (moment(expiredAt).valueOf() < Date.now())
+                job.status = 0;
+            else
+                job.status = 1;
 
             // update
             if (mongoJob
