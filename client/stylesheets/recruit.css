@@ -28,6 +28,10 @@
     clear: both;
 }
 
+.jobs-list .job .job-stages .row {
+    margin: 0 !important;
+}
+
 .jobs-list .job .job-stages .stage {
     display: block;
     border-right: 1px solid #ddd;
@@ -396,4 +400,56 @@
 
 .row-contents {
     padding: 0 20px;
+}
+
+.job-tags-box {
+    padding: 5px 15px !important;
+    background-color: rgba(221, 221, 221, 0.17) !important;
+}
+
+.bootstrap-tagsinput {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.twitter-typeahead {
+    width: 250px;
+}
+
+.tt-menu{
+    z-index: 100;
+    width: 95%;
+    margin-bottom: 20px;
+    overflow: hidden;
+    background-color: #FFF;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 0px 1px #008000;
+    -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+    box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.tt-suggestion {
+    border-top: 1px solid #CCD6DD;
+    position: relative;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.tt-suggestion:first-child {
+    border-top: none;
+}
+
+.tt-suggestion:hover {
+    background: #CCD6DD;
+}
+
+.tag.label.label-white {
+    background: #fff !important;
+    color: #777 !important;
 }

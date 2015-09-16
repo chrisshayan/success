@@ -750,7 +750,7 @@ Meteor.methods({
 
 
         Collections.Jobs.find(query, options).map(function (obj) {
-            if(obj.recruiterEmails)
+            if (obj.recruiterEmails)
                 listEmail = listEmail.concat(obj.recruiterEmails);
         });
 
@@ -784,5 +784,44 @@ Meteor.methods({
             }
         }
         return false;
+    },
+
+    searchSkill: function (keyword) {
+        check(keyword, String);
+        var result = [];
+        var searchCond = {
+            $regex: keyword,
+            $options: 'i'
+        };
+        var fields = {
+            _id: 1,
+            skillName: 1
+        };
+        var mapResult = function (doc) {
+            doc.char = doc.skillName.length;
+            return doc;
+        }
+        var search1 = Collections.SkillTerms.find({
+            skillName: searchCond,
+            $where: 'this.skillName.length > 0 && this.skillName.split().length < 5'
+        }, {fields: fields, limit: 20});
+        result = result.concat(search1.map(mapResult));
+        if (search1.count() < 20) {
+            var search2 = Collections.SkillTerms.find({
+                skillName: searchCond,
+                $where: 'this.skillName.length > 0 && this.skillName.split().length < 10'
+            }, {fields: fields, limit: 20 - search1.count()});
+            result = result.concat(search2.map(mapResult))
+        }
+        return result;
+    },
+
+    updateJobTags: function (jobId, tags) {
+        check(jobId, Match.Any);
+        check(tags, [String]);
+        if (!this.userId) return false;
+        var job = Collections.Jobs.findOne({jobId: jobId});
+        if (!job) return false;
+        return Collections.Jobs.update({_id: job._id}, {$set: {tags: tags}});
     }
 });

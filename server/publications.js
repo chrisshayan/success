@@ -79,7 +79,8 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             status: 1,
             createdAt: 1,
             createdBy: 1,
-            recruiterEmails: 1
+            recruiterEmails: 1,
+            tags: 1
         }
     },
     DEFAULT_APPLICATION_OPTIONS = {

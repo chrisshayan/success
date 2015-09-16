@@ -1,20 +1,32 @@
 <template name="JobInfo">
     <div class="row wrapper border-bottom" id="job-info">
-        <div class="dropdown pull-left">
-            <a id="drop3" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true" style="font-size: 22px; color: #666">
-                <i class="fa fa-cloud" style="color: #1ab394"></i>&nbsp;{{currentJobTitle}}
-                <span class="caret"></span>
-            </a>
-            <ul class="dropdown-menu" aria-labelledby="drop3">
-                {{#each otherJobs}}
-                    {{> JobInfoItem}}
-                {{/each}}
-            </ul>
-        </div>
+        <div class="" style="clear: both">
+            <div class="dropdown pull-left">
+                <a id="drop3" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                   aria-expanded="true" style="font-size: 22px; color: #666">
+                    <i class="fa fa-cloud" style="color: #1ab394"></i>&nbsp;{{job.title}}
+                    <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="drop3">
+                    {{#each otherJobs}}
+                        {{> JobInfoItem}}
+                    {{/each}}
+                </ul>
+            </div>
 
-        <div class="pull-right" style="padding-right: 30px;">
-            {{> addCandidate}}
+            <div class="pull-right" style="padding-right: 30px;">
+                {{> addCandidate}}
+            </div>
+
         </div>
+        <div style="clear: both;padding-bottom: 3px">
+            {{> jobTagsInput jobId=job.jobId }}
+        </div>
+        {{#with job.recruiterEmails}}
+            <div style="clear: both;padding-bottom: 3px">
+                {{> jobRecruiterInput jobId=job.jobId}}
+            </div>
+        {{/with}}
     </div>
 </template>
 
@@ -30,7 +42,9 @@
 
 <template name="addCandidate">
     <div class="btn-group" id="add-candidate-area">
-        <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><i class="fa fa-plus"></i>&nbsp;Add candidate</button>
+        <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><i class="fa fa-plus"></i>&nbsp;Add
+            candidate
+        </button>
         <div class="dropdown-menu add-candidate-box">
 
             <div class="col-sm-12">
@@ -48,7 +62,9 @@
                         {{> afQuickField name="profileLink"}}
                         {{> afQuickField name="comment"}}
                         {{> afQuickField name="skills"}}
-                        <button type="submit" class="btn btn-primary btn-block btn-block btn-sm"><i class="fa fa-user-plus"></i>&nbsp;Add new candidate</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-block btn-sm"><i
+                                class="fa fa-user-plus"></i>&nbsp;Add new candidate
+                        </button>
                     </fieldset>
                 {{/autoForm}}
             </div>

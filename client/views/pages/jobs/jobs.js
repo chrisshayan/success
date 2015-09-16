@@ -29,7 +29,7 @@ Jobs = BlazeComponent.extendComponent({
         });
     },
 
-    counterName: function() {
+    counterName: function () {
         var data = this.data();
         return ['jobs_status', data.source, data.status].join('_');
     },
@@ -40,7 +40,7 @@ Jobs = BlazeComponent.extendComponent({
             status: data.status
         };
 
-        if(data.source) {
+        if (data.source) {
             filters['source'] = data.source;
         }
 
@@ -113,6 +113,8 @@ JobItem = BlazeComponent.extendComponent({
 
     onRendered: function () {
         var self = this;
+        var instance = Template.instance();
+        self.searchId = null;
         this.trackers.push(Template.instance().autorun(function () {
             DashboardSubs.subscribe("jobStagesCounter", "job_stages_" + self.jobId, self.jobId);
         }));
@@ -134,7 +136,7 @@ JobItem = BlazeComponent.extendComponent({
         return counter.count[id] || "-";
     },
 
-    timeago: function(d) {
+    timeago: function (d) {
         return moment(d).format("DD-MM-YYYY");
     }
 }).register('JobItem');
@@ -201,5 +203,4 @@ filterByEmail = BlazeComponent.extendComponent({
      return counter.count[id] || "-";
      }*/
 }).register('filterByEmail');
-
 

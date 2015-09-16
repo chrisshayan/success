@@ -196,6 +196,13 @@ model.appendSchema({
             type: "tags"
         }
     },
+    tags: {
+        type: [String],
+        optional: true,
+        autoform: {
+            type: "tags"
+        }
+    },
 
     vnwData: {
         type: Object,

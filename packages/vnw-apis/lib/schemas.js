@@ -632,11 +632,14 @@ Schemas.addPositionForm = new SimpleSchema({
         }
     },
 
-    skills: {
+    tags: {
         type: [String],
         optional: true,
         autoform: {
-            type: "tags"
+            type: "tags",
+            afFieldInput: {
+                placeholder: "Click to add tag"
+            }
         }
     }
 });

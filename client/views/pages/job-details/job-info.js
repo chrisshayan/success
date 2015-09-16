@@ -38,10 +38,19 @@ JobInfo = BlazeComponent.extendComponent({
 
         this.job = this.data().job;
 
-        Template.instance().subscribe('jobs', {
-            limit: this.limit(),
-            except: [this.job.jobId]
-        });
+        var filters = {
+            jobId: {
+                $nin: [this.job.jobId]
+            },
+            source: this.job.source,
+            status: this.job.status
+        };
+
+        var options = {
+            limit: this.limit()
+        };
+
+        Template.instance().subscribe('getJobs', filters, options);
     },
 
     limit: function () {
@@ -71,9 +80,6 @@ JobInfo = BlazeComponent.extendComponent({
         return [{}];
     },
 
-    currentJobTitle: function () {
-        return this.job.title || "";
-    },
 
     otherJobs: function () {
         return this.fetchOtherJobs();
