@@ -64,7 +64,7 @@ function cronData(j, cb) {
     var userId = info.userId
         , companyId = info.companyId
         , lastRunObj = moment(info.lastUpdated || j.doc.created)
-       // , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss')
+    // , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss')
         , lastRunApplication = moment(info.lastUpdatedApplication || j.doc.created).format('YYYY-MM-DD HH:mm:ss');
 
     //get latest syncTime
@@ -97,27 +97,28 @@ function cronData(j, cb) {
                 var candidates = _.pluck(appRows, 'candidateId');
                 processCandidates(candidates);
             }
+
+            var jobQuery = {companyId: companyId};
+            var data = {};
+            var options = {'sort': {updatedAt: -1}, 'limit': 1};
+            var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
+
+            var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
+            var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
+
+            if (lastApp && lastApp.length)
+                data['data.lastUpdatedApplication'] = lastApp[0].createdAt;
+
+            if (lastJob && lastJob.length)
+                data['data.lastUpdated'] = lastJob[0].updatedAt;
+
+            console.log(data);
+
+            Collections.SyncQueue.update({_id: j.doc._id}, {
+                '$set': data
+            });
         }
 
-        var jobQuery = {companyId: companyId};
-        var data = {};
-        var options = {'sort': {updatedAt: -1}, 'limit': 1};
-        var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
-
-        var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
-        var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
-
-        if (lastApp && lastApp.length)
-            data['data.lastUpdatedApplication'] = formatDatetimeToVNW(lastApp[0].createdAt);
-
-        if (lastJob && lastJob.length)
-            data['data.lastUpdated'] = formatDatetimeToVNW(lastJob[0].updatedAt);
-
-        console.log(data);
-
-        Collections.SyncQueue.update({_id: j.doc._id}, {
-            '$set': data
-        });
 
         j.done();
 

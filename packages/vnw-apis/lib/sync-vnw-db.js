@@ -748,12 +748,12 @@ function pullCompanyData(j, cb) {
         var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
 
         if (lastJob && lastJob.length)
-            cronData.lastUpdated = formatDatetimeToVNW(lastJob[0].updatedAt);
+            cronData.lastUpdated = lastJob[0].updatedAt;
 
         var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
         var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
         if (lastApp && lastApp.length)
-            cronData.lastUpdatedApplication = formatDatetimeToVNW(lastApp[0].createdAt);
+            cronData.lastUpdatedApplication = lastApp[0].createdAt;
 
         console.log('create cron: ', cronData);
         SYNC_VNW.addQueue('cronData', cronData);
