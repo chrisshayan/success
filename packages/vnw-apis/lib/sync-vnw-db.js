@@ -7,6 +7,15 @@ function formatDatetimeFromVNW(datetime) {
     return d.toDate();
 }
 
+function formatDatetimeToVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = -420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
+
 function parseTimeToString(date) {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
 }
@@ -221,9 +230,9 @@ SYNC_VNW.pullCandidates = function (candidates) {
                 }
             }
 
-            SYNC_VNW.migration(row);
-
         });
+
+        SYNC_VNW.migration(rows);
 
     } catch (e) {
         debuger(e)
@@ -699,6 +708,7 @@ function pullCompanyData(j, cb) {
 
     var cronData = {
         lastUpdated: new Date(),
+        lastUpdatedApplication: new Date(),
         userId: userId,
         companyId: companyId
     };
@@ -732,8 +742,20 @@ function pullCompanyData(j, cb) {
             }
 
         }
+        var jobQuery = {companyId: companyId};
+        var options = {'sort': {updatedAt: -1}, 'limit': 1};
 
-        console.log('create cron');
+        var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
+
+        if (lastJob && lastJob.length)
+            cronData.lastUpdated = formatDatetimeToVNW(lastJob[0].updatedAt);
+
+        var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
+        var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
+        if (lastApp && lastApp.length)
+            cronData.lastUpdatedApplication = formatDatetimeToVNW(lastApp[0].createdAt);
+
+        console.log('create cron: ', cronData);
         SYNC_VNW.addQueue('cronData', cronData);
 
         j.done();
@@ -773,22 +795,26 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
-SYNC_VNW.migration = function (candidate) {
-    console.log('migration :', candidate.userid);
+SYNC_VNW.migration = function (candidates) {
 
-    var fullname = [candidate.lastname, candidate.firstname].join(' ').trim();
+    candidates.forEach(function (candidate) {
 
-    var query = {candidateId: candidate.userid};
-    var update = {
-        '$set': {
-            fullname: fullname
-        }
-    };
+        var fullname = [candidate.lastname, candidate.firstname].join(' ').trim();
 
-    var options = {
-        multi: true
-    };
-    Collections.Applications.update(query, update, options);
+        var query = {candidateId: candidate.userid};
+        var update = {
+            '$set': {
+                fullname: fullname
+            }
+        };
+
+        var options = {
+            multi: true
+        };
+        Collections.Applications.update(query, update, options);
+    });
+
+
 };
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;

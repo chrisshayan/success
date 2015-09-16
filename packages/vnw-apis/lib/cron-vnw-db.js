@@ -13,6 +13,15 @@ function formatDatetimeFromVNW(datetime) {
     return d.toDate();
 }
 
+function formatDatetimeToVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = -420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
+
 function parseTimeToString(date) {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
 }
@@ -55,8 +64,9 @@ function cronData(j, cb) {
     var userId = info.userId
         , companyId = info.companyId
         , lastRunObj = moment(info.lastUpdated || j.doc.created)
-        , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss');
-    console.log('last sync: ', lastRunFormat);
+       // , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss')
+        , lastRunApplication = moment(info.lastUpdatedApplication || j.doc.created).format('YYYY-MM-DD HH:mm:ss');
+
     //get latest syncTime
 
     try {
@@ -77,7 +87,7 @@ function cronData(j, cb) {
             // - Check new application of this job if available.
             // - Then insert / update / remove
 
-            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, lastRunFormat, jobIds, lastRunFormat);
+            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, lastRunApplication, jobIds, lastRunApplication);
             //console.log('appSql', appSql);
 
             var appRows = fetchVNWData(appSql);
@@ -87,18 +97,33 @@ function cronData(j, cb) {
                 var candidates = _.pluck(appRows, 'candidateId');
                 processCandidates(candidates);
             }
-
         }
 
+        var jobQuery = {companyId: companyId};
+        var data = {};
+        var options = {'sort': {updatedAt: -1}, 'limit': 1};
+        var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
+
+        var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
+        var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
+
+        if (lastApp && lastApp.length)
+            data['data.lastUpdatedApplication'] = formatDatetimeToVNW(lastApp[0].createdAt);
+
+        if (lastJob && lastJob.length)
+            data['data.lastUpdated'] = formatDatetimeToVNW(lastJob[0].updatedAt);
+
+        console.log(data);
+
         Collections.SyncQueue.update({_id: j.doc._id}, {
-            '$set': {
-                'data.lastUpdated': j.doc.updated
-            }
+            '$set': data
         });
 
         j.done();
 
-    } catch (e) {
+    }
+    catch
+        (e) {
         j.fail();
         throw e;
     }
@@ -173,10 +198,6 @@ function processApp(appRows, companyId) {
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
 
-            var candidateInfo = Collections.Candidates.findOne({candidateId: row.userid}, filter);
-            var fullname = (candidateInfo) ? [candidateInfo.data.lastname, candidateInfo.data.firstname].join(' ') : '';
-            application.fullname = fullname;
-
             console.log('insert application:', application.entryId);
             Collections.Applications.insert(application);
         }
@@ -186,6 +207,8 @@ function processApp(appRows, companyId) {
 function processCandidates(candidateList) {
     var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
     var candidateRows = fetchVNWData(getCandidatesSQL);
+
+    SYNC_VNW.migration(candidateRows);
 
     candidateRows.forEach(function (row) {
         var candidate = Collections.Candidates.findOne({candidateId: row.userid});

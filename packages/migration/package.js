@@ -20,8 +20,8 @@ Package.onUse(function (api) {
     api.use(['percolate:migrations'], 'server');
     api.imply(['percolate:migrations'], 'server');
     var files = [];
-    for(i in migrationFiles) {
-        files.push(['migrations', migrationFiles[i]].join('/') );
+    for (var i in migrationFiles) {
+        files.push(['migrations', migrationFiles[i]].join('/'));
     }
     api.addFiles(files, 'server');
     api.export('Migrations', 'server');
