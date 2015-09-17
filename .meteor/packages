@@ -57,7 +57,7 @@ sergeyt:typeahead
 #vnw:core
 vnw:city
 vnw:industries
-#vnw:job
+vnw:job
 vnw:migration
 
 #vnw:user

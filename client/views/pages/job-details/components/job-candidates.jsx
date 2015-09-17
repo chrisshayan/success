@@ -63,8 +63,6 @@ JobCandidates = React.createClass({
             if (candidate) {
                 candidate.application = app;
                 items.push(candidate);
-            } else {
-                console.log(app)
             }
         });
         return items;
@@ -91,7 +89,7 @@ JobCandidates = React.createClass({
             loadmoreBtn = <button className="btn btn-default btn-block btn-sm"
                                   onClick={ ()=> this.getFlux().actions.loadMoreCandidate() }>load more</button>;
         }
-        console.log(loadmoreBtn);
+
         return (
             <div className="fh-column">
                 <JobCandidatesActions disabled={ !this.state.selected.length }/>
