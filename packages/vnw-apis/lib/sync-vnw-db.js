@@ -120,86 +120,6 @@ SYNC_VNW.pullCompanyInfo = function (companyId) {
     }
 };
 
-SYNC_VNW.pullApplications = function (jobId, companyId) {
-    check(jobId, Number);
-    check(companyId, Number);
-
-
-    var candidates = [];
-    var entryIds = [];
-    var pullApplicationOnlineSql = sprintf(VNW_QUERIES.pullApplicationOnline, jobId);
-
-    var rows = fetchVNWData(pullApplicationOnlineSql);
-
-    _.each(rows, function (row) {
-        var applicationOnline = new Schemas.Application();
-        applicationOnline.entryId = row.entryid;
-        applicationOnline.companyId = companyId;
-        applicationOnline.jobId = row.jobid;
-        applicationOnline.candidateId = row.userid;
-        applicationOnline.source = 1;
-        applicationOnline.data = row;
-        applicationOnline.createdAt = formatDatetimeFromVNW(row.createddate);
-
-        Collections.Applications.insert(applicationOnline);
-
-        // Log applied activity
-        var activity = new Activity();
-        activity.companyId = companyId;
-        activity.data = {
-            applicationId: applicationOnline.entryId,
-            source: 1,
-            userId: row.userid
-        };
-        activity.createdAt = formatDatetimeFromVNW(row.createddate);
-        activity.appliedJob();
-
-        // Push to pull candidates
-        candidates.push(row.userid);
-        entryIds.push(row.entryid);
-    });
-
-    // PULL applications that sent directly
-    var pullApplicationDirectlySql = sprintf(VNW_QUERIES.pullApplicationDirectly, jobId);
-
-    fetchVNWData(pullApplicationDirectlySql);
-
-    _.each(rows1, function (row) {
-        var applicationDirect = new Schemas.Application();
-        applicationDirect.entryId = row.sdid;
-        applicationDirect.jobId = row.jobid;
-        applicationDirect.companyId = companyId;
-        applicationDirect.candidateId = row.userid;
-        applicationDirect.source = 2;
-        applicationDirect.data = row;
-        applicationDirect.createdAt = formatDatetimeFromVNW(row.createddate);
-        Collections.Applications.insert(applicationDirect);
-
-        // Log applied activity
-        var activity = new Activity();
-        activity.companyId = companyId;
-        activity.data = {
-            applicationId: applicationDirect.entryId,
-            source: 2,
-            userId: row.userid
-        };
-        activity.createdAt = formatDatetimeFromVNW(row.createddate);
-        activity.appliedJob();
-
-        // Push to pull candidates and application scores
-        candidates.push(row.userid);
-        entryIds.push(row.sdid);
-    });
-
-    Meteor.defer(function () {
-        SYNC_VNW.pullCandidates(candidates);
-    });
-
-    Meteor.defer(function () {
-        SYNC_VNW.pullApplicationScores(entryIds);
-    });
-};
-
 
 SYNC_VNW.pullCandidates = function (candidates) {
     check(candidates, Array);
@@ -247,6 +167,7 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
     var pullApplicationScoreSql = sprintf(VNW_QUERIES.pullApplicationScores, entryIds.join(","));
     try {
         var rows = fetchVNWData(pullApplicationScoreSql);
+
         _.each(rows, function (row) {
             var application = Collections.Applications.findOne({entryId: row.applicationId});
             if (application) {
@@ -307,6 +228,41 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
     return result;
 };
 
+SYNC_VNW.syncApplication = function (companyId, applications) {
+    check(companyId, Number);
+    check(applications, Array);
+    var mongoApps = Collections.Applications.find({companyId: companyId}).fetch();
+
+    applications.forEach(function (app) {
+        var query = {entryId: app.typeId};
+        var indexApp = _.findKey(mongoApps, query);
+
+        if (indexApp >= 0) {
+            if (mongoApps[indexApp].isDeleted === app.isDeleted)
+                return;
+            var modifier = {
+                'isDeleted': app.isDeleted
+            };
+            console.log('update: ', app.typeId);
+
+            Collections.Applications.update(query, {
+                '$set': modifier
+            })
+
+        } else if (!app.isDeleted) {
+            console.log('insert');
+            SYNC_VNW.insertVNWApplication(app, companyId);
+
+            Meteor.defer(function () {
+                if (app.source === 1) {
+                    app.resumeId && SYNC_VNW.syncResume(app.resumeId);
+                }
+            });
+        }
+
+    });
+};
+
 SYNC_VNW.analyticApplications = function (companyId, items) {
     check(companyId, Number);
     check(items, Array);
@@ -328,13 +284,12 @@ SYNC_VNW.analyticApplications = function (companyId, items) {
     var oldItems = Collections.Applications.find({entryId: {$in: elseIds}}, {
         fields: {
             entryId: 1,
-            "data.savedate": 1
+            "createdAt": 1
         }
     }).map(function (doc) {
         return {
             type: "application",
-            typeId: doc.entryId,
-            updatedAt: doc.data.savedate
+            typeId: doc.entryId
         }
     });
 
@@ -495,6 +450,7 @@ SYNC_VNW.insertVNWApplication = function (data, companyId) {
             app.companyId = companyId;
             app.candidateId = row.userid;
             app.source = data.source;
+            app.isDeleted = data.isDeleted;
             app.data = row;
             app.matchingScore = data.matchingScore;
 
@@ -596,26 +552,21 @@ SYNC_VNW.pullData = function (companyId, items) {
                 break;
 
             case "application":
+                console.log('sync app');
 
-                Meteor.defer(function () {
-                    items.forEach(function (item) {
-                        if (item.source === 1) {
-                            item.resumeId && SYNC_VNW.syncResume(item.resumeId);
-                        }
-                    });
-                });
+                SYNC_VNW.syncApplication(companyId, items);
 
-                result = SYNC_VNW.analyticApplications(companyId, items);
-                // Insert new job
-                _.each(result.added, function (app) {
-                    SYNC_VNW.insertVNWApplication(app, companyId);
-                });
-                // Update new job
-                _.each(result.changed, function (app) {
-                    SYNC_VNW.updateVNWApplication(app, companyId);
-                });
-                // Delete new jobs
-                SYNC_VNW.deleteVNWApplications(result.removed);
+                /*result = SYNC_VNW.analyticApplications(companyId, items);
+                 // Insert new job
+                 _.each(result.added, function (app) {
+                 SYNC_VNW.insertVNWApplication(app, companyId);
+                 });
+                 // Update new job
+                 _.each(result.changed, function (app) {
+                 SYNC_VNW.updateVNWApplication(app, companyId);
+                 });
+                 // Delete new jobs
+                 SYNC_VNW.deleteVNWApplications(result.removed);*/
                 break;
 
 
@@ -631,6 +582,7 @@ SYNC_VNW.pullData = function (companyId, items) {
 
     //SYNC_VNW.migration();
 };
+
 
 SYNC_VNW.syncResume = function (resumeId) {
     var generalQuery = sprintf(VNW_QUERIES.general, resumeId);
@@ -728,7 +680,6 @@ function pullCompanyData(j, cb) {
 
     var cronData = {
         lastUpdated: new Date(),
-        lastUpdatedApplication: new Date(),
         userId: userId,
         companyId: companyId
     };
@@ -770,11 +721,6 @@ function pullCompanyData(j, cb) {
 
         if (lastJob && lastJob.length)
             cronData.lastUpdated = lastJob[0].updatedAt;
-
-        var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
-        var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
-        if (lastApp && lastApp.length)
-            cronData.lastUpdatedApplication = lastApp[0].createdAt;
 
         console.log('create cron: ', cronData);
         SYNC_VNW.addQueue('cronData', cronData);

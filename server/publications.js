@@ -164,6 +164,7 @@ Meteor.publishComposite('getApplications', function (filters, options) {
             var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
             if (!user) return;
             filters['companyId'] = user.companyId;
+            filters['isDeleted'] = 0;
 
             options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
             if (!options.hasOwnProperty("limit")) {
@@ -230,6 +231,7 @@ Meteor.publish("jobCounter", function (counterName, filters, filterEmailAddress)
         filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
     filters['companyId'] = user.companyId;
+
     var handle = Collections.Jobs.find(filters).observeChanges({
         added: function (id) {
             count++;
@@ -269,7 +271,8 @@ Meteor.publish("jobStagesCounter", function (counterName, jobId) {
     if (!user) return;
     var filters = {
         companyId: user.companyId,
-        jobId: jobId
+        jobId: jobId,
+        isDeleted: 0
     };
     var options = {
         fields: {

@@ -63,9 +63,9 @@ function cronData(j, cb) {
     var info = j.data;
     var userId = info.userId
         , companyId = info.companyId
-        , lastRunObj = moment(info.lastUpdated || j.doc.created)
+        , lastRunObj = moment(info.lastUpdated || j.doc.created);
     // , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss')
-        , lastRunApplication = moment(info.lastUpdatedApplication || j.doc.created).format('YYYY-MM-DD HH:mm:ss');
+
 
     //get latest syncTime
 
@@ -87,15 +87,15 @@ function cronData(j, cb) {
             // - Check new application of this job if available.
             // - Then insert / update / remove
 
-            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, lastRunApplication, jobIds, lastRunApplication);
+            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
             //console.log('appSql', appSql);
 
             var appRows = fetchVNWData(appSql);
 
             if (appRows.length) {
                 cronApps(appRows, companyId);
-                var candidates = _.pluck(appRows, 'candidateId');
-                processCandidates(candidates);
+                /*var candidates = _.pluck(appRows, 'candidateId');
+                 processCandidates(candidates);*/
             }
 
             var jobQuery = {companyId: companyId};
@@ -103,16 +103,9 @@ function cronData(j, cb) {
             var options = {'sort': {updatedAt: -1}, 'limit': 1};
             var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
 
-            var aOptions = {'sort': {createdAt: -1}, 'limit': 1};
-            var lastApp = Collections.Applications.find(jobQuery, aOptions).fetch();
-
-            if (lastApp && lastApp.length)
-                data['data.lastUpdatedApplication'] = lastApp[0].createdAt;
 
             if (lastJob && lastJob.length)
                 data['data.lastUpdated'] = lastJob[0].updatedAt;
-
-            console.log(data);
 
             Collections.SyncQueue.update({_id: j.doc._id}, {
                 '$set': data
@@ -173,7 +166,7 @@ function processJob(item, companyId) {
                 updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
                 expiredAt: expiredAt
             };
-            
+
             if (!row.isactive)
                 job.status = 2;
             else if (moment(expiredAt).valueOf() < Date.now())
@@ -203,7 +196,10 @@ function processJob(item, companyId) {
     }
 }
 
+
 function processApp(appRows, companyId) {
+    var mongoApps = Collections.Applications.find({companyId: companyId}).fetch();
+
     var filter = {
         fields: {
             candidateId: 1,
@@ -214,21 +210,40 @@ function processApp(appRows, companyId) {
 
     appRows.forEach(function (row) {
         var appId = row.entryid || row.sdid;
-        if (row.deleted_by_employer !== 0 || row.deleted_by_jobseeker !== 0) {
-            Collections.Applications.remove({entryId: appId});
 
-        } else if (!Collections.Applications.findOne({entryId: appId})) {
+        var query = {entryId: appId};
+        var indexApp = _.findKey(mongoApps, query);
+
+        if (indexApp >= 0) {
+            if (mongoApps[indexApp].isDeleted === row['deleted_by_employer'])
+                return;
+            console.log('update: ', appId);
+            var modifier = {
+                'isDeleted': row['deleted_by_employer']
+            };
+
+            Collections.Applications.update(query, {
+                '$set': modifier
+            })
+
+        } else if (!row['deleted_by_employer']) {
             var application = new Schemas.Application();
             application.entryId = appId;
             application.companyId = companyId;
             application.jobId = row.jobid;
             application.candidateId = row.userid;
             application.source = 1;
+            application.isDeleted = row['deleted_by_employer'];
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
 
             console.log('insert application:', application.entryId);
             Collections.Applications.insert(application);
+
+            Meteor.defer(function () {
+                row.resumeid && processCandidates([row.resumeid]);
+            });
+
         }
     });
 }
@@ -276,12 +291,6 @@ function cronApps(appRows, companyId) {
         if (appOnlineRows.length > 0) {
             processApp(appOnlineRows, companyId);
         }
-        Meteor.defer(function () {
-            _.each(appOnlineRows, function (item) {
-                console.log('cron resume: ', item.resumeid);
-                item.resumeid && SYNC_VNW.syncResume(item.resumeid);
-            });
-        })
 
 
     }
