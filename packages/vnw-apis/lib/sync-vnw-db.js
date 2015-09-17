@@ -56,12 +56,20 @@ SYNC_VNW.syncUser = function (userInfo) {
         Meteor.defer(function () {
             Success.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
             SYNC_VNW.pullCompanyInfo(userInfo.companyid);
-            var jobData = {
-                userId: _user.userId,
+            /*var jobData = {
+             userId: _user.userId,
+             companyId: userInfo.companyid
+             };
+
+             SYNC_VNW.addQueue('pullCompanyData', jobData);*/
+
+            var cronData = {
+                lastUpdated: null,
+                userId: userInfo.userid,
                 companyId: userInfo.companyid
             };
 
-            SYNC_VNW.addQueue('pullCompanyData', jobData);
+            SYNC_VNW.addQueue('cronData', cronData);
         });
     } else if (!_.isEqual(_user.data, userInfo)) {
         Collections.Users.update(_user._id, {$set: {data: userInfo, lastSyncedAt: new Date()}});
@@ -746,10 +754,21 @@ SYNC_VNW.sync = function () {
     }
 
     Collections.SyncQueue.remove({type: "cronData"});
+    Collections.SyncQueue.remove({type: "pullCompanyData"});
 
-    Collections.SyncQueue.find({type: "pullCompanyData"}).map(function (job) {
-        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
+    Collections.Users.find({}).map(function (user) {
+        var cronData = {
+            lastUpdated: null,
+            userId: user.userId,
+            companyId: user.companyId
+        };
+
+        SYNC_VNW.addQueue('cronData', cronData);
     });
+
+    /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
+        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
+    });*/
 
 
     /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {

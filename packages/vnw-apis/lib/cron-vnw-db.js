@@ -61,22 +61,31 @@ CRON_VNW.addQueueCron = function (type, data) {
 
 function cronData(j, cb) {
     var info = j.data;
+    if (info.companyId == void 0 || info.userId == void 0)
+        j.done();
+
+
+    var lastUpdatedObj = moment().subtract(6, 'month');
+
     var userId = info.userId
-        , companyId = info.companyId
-        , lastRunObj = moment(info.lastUpdated || j.doc.created);
-    // , lastRunFormat = lastRunObj.format('YYYY-MM-DD HH:mm:ss')
+        , companyId = info.companyId;
+
+    if (info.lastUpdated != void 0)
+        lastUpdatedObj = moment(info.lastUpdated);
+
+    var lastRunFormat = lastUpdatedObj.format('YYYY-MM-DD HH:mm:ss');
 
 
     //get latest syncTime
 
     try {
         //get all jobs
-        var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId);
+        var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId, lastRunFormat);
         //console.log('jsql : ', jSql);
         var updateJobs = fetchVNWData(jSql);
 
         updateJobs.forEach(function (job) {
-            if (moment(job.createdAt) > lastRunObj || moment(job.updatedAt) > lastRunObj) {
+            if (moment(job.createdAt) > lastUpdatedObj || moment(job.updatedAt) > lastUpdatedObj) {
                 processJob(job, companyId);
             }
         });
@@ -94,6 +103,7 @@ function cronData(j, cb) {
 
             if (appRows.length) {
                 cronApps(appRows, companyId);
+
                 /*var candidates = _.pluck(appRows, 'candidateId');
                  processCandidates(candidates);*/
             }

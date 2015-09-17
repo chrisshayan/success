@@ -97,7 +97,8 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             fullname: 1,
             "data.appSubject": 1,
             "data.coverletter": 1,
-            "data.resumeid": 1
+            "data.resumeid": 1,
+            "isDeleted": 1
         }
     },
     DEFAULT_CANDIDATE_OPTIONS = {
