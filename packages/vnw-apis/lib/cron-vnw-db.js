@@ -240,11 +240,14 @@ function processApp(appRows, companyId) {
             console.log('insert application:', application.entryId);
             Collections.Applications.insert(application);
 
-            Meteor.defer(function () {
-                row.resumeid && processCandidates([row.resumeid]);
-            });
-
         }
+    });
+
+    var candidateLists = _.pluck(appRows, 'userid');
+
+    Meteor.defer(function () {
+        console.log('id', candidateLists);
+        candidateLists.length && processCandidates(candidateLists);
     });
 }
 
@@ -253,10 +256,12 @@ function processCandidates(candidateList) {
     var candidateRows = fetchVNWData(getCandidatesSQL);
 
     SYNC_VNW.migration(candidateRows);
+    console.log('cron can: ', candidateRows.length);
 
     candidateRows.forEach(function (row) {
         var candidate = Collections.Candidates.findOne({candidateId: row.userid});
         if (!candidate) {
+            console.log('new can: ', row.userid);
             //console.log('new', row.userid, row.firstname);
             candidate = new Schemas.Candidate();
             candidate.candidateId = row.userid;
@@ -286,7 +291,7 @@ function cronApps(appRows, companyId) {
 
     if (groupedApp['1']) {
         var appOnlineSQL = sprintf(VNW_QUERIES.pullAllAppsOnline, _.pluck(groupedApp['1'], 'typeId').join(','));
-        //    console.log('appOnline', appOnlineSQL);
+        console.log('appOnline', appOnlineSQL);
         var appOnlineRows = fetchVNWData(appOnlineSQL);
         if (appOnlineRows.length > 0) {
             processApp(appOnlineRows, companyId);
@@ -296,7 +301,7 @@ function cronApps(appRows, companyId) {
     }
     if (groupedApp['2']) {
         var appDirectSQL = sprintf(VNW_QUERIES.pullAllAppsDirect, _.pluck(groupedApp['2'], 'typeId').join(','));
-        //     console.log('appDirect', appDirectSQL);
+        console.log('appDirect', appDirectSQL);
         var appDirectRows = fetchVNWData(appDirectSQL);
 
         if (appDirectRows.length > 0) {

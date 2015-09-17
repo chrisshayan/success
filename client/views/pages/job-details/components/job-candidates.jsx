@@ -14,27 +14,32 @@ JobCandidates = React.createClass({
         var self = this;
         var candidates = [];
         var isLoading = true;
+        var total = 0;
         //JobDetailsSubs.subscribe('applicationCounter', self.counterName(), self.filters());
         var sub = Meteor.subscribe('getApplications', this.filter(), this.options());
         if (sub.ready()) {
             isLoading = false;
             candidates = this.fetch();
+            total = Collections.Applications.find(this.filter()).count();
         }
+
         return {
             isLoading: isLoading,
             candidates: candidates,
-            currentEntryId: Router.current().params.query.application || null
+            currentEntryId: Router.current().params.query.application || null,
+            isLoadMore: this.state.limit < total
         }
     },
 
     filter: function () {
         var filter = {
             jobId: this.state.jobId,
-            stage: this.state.stage.id
+            stage: this.state.stage.id,
+            isDeleted: 0
         };
         if (this.state.search.length > 0) {
             filter.fullname = {
-                $regex: this.state.search.replace(/\s+/g,'|'),
+                $regex: this.state.search.replace(/\s+/g, '|'),
                 $options: 'i'
             }
         }
@@ -58,6 +63,8 @@ JobCandidates = React.createClass({
             if (candidate) {
                 candidate.application = app;
                 items.push(candidate);
+            } else {
+                console.log(app)
             }
         });
         return items;
@@ -80,10 +87,11 @@ JobCandidates = React.createClass({
     },
     render() {
         var loadmoreBtn = null;
-        if (this.state.isLoadMore) {
+        if (this.data.isLoadMore) {
             loadmoreBtn = <button className="btn btn-default btn-block btn-sm"
                                   onClick={ ()=> this.getFlux().actions.loadMoreCandidate() }>load more</button>;
         }
+        console.log(loadmoreBtn);
         return (
             <div className="fh-column">
                 <JobCandidatesActions disabled={ !this.state.selected.length }/>
@@ -91,10 +99,13 @@ JobCandidates = React.createClass({
                 <div className="full-height-scroll">
                     <ul className="list-group elements-list">
                         {this.data.candidates.map(this.renderCandidate)}
+                        <li className="list-group-item clear">
+                            {loadmoreBtn}
+                        </li>
                     </ul>
                     <Row>
-                        <Col md={10} mdOffset={1} style={{paddingBottom: "50px"}}>
-                            {loadmoreBtn}
+                        <Col md={10} mdOffset={1} style={{height : '60px'}}>
+
                         </Col>
                     </Row>
                 </div>

@@ -129,7 +129,7 @@ SYNC_VNW.pullCandidates = function (candidates) {
 
     try {
         var rows = fetchVNWData(pullCandidatesSql);
-
+        console.log('sync can: ', rows.length);
         _.each(rows, function (row) {
             var can = Collections.Candidates.findOne({candidateId: row.userid});
 
@@ -472,8 +472,11 @@ SYNC_VNW.insertVNWApplication = function (data, companyId) {
             });
 
             // Pull candidates
-            SYNC_VNW.pullCandidates([app.candidateId]);
+
         });
+
+        var candidateLists = _.pluck(rows, 'userid');
+        candidateLists.length && SYNC_VNW.pullCandidates(candidateLists);
 
     } catch (e) {
         debuger(e)

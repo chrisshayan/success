@@ -377,7 +377,8 @@ Meteor.publishComposite('lastApplications', function () {
 
             var filters = {
                 source: {$ne: 3},
-                companyId: user.companyId
+                companyId: user.companyId,
+                isDeleted: 0
             };
 
             var options = DEFAULT_APPLICATION_OPTIONS;
