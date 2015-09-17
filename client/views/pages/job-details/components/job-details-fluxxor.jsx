@@ -245,8 +245,6 @@ AppStores['JobDetails'] = Fluxxor.createStore({
     getState: function () {
 
         var candidateState = this.candidatesState;
-        console.log(candidateState)
-        console.log(this.total())
         candidateState.isLoadMore = this.candidatesState.limit < this.total();
         var appState = {
             jobId: this.currentJobId,

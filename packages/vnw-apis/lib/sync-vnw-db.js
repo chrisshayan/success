@@ -129,7 +129,7 @@ SYNC_VNW.pullCandidates = function (candidates) {
 
     try {
         var rows = fetchVNWData(pullCandidatesSql);
-        console.log('sync can: ', rows.length);
+
         _.each(rows, function (row) {
             var can = Collections.Candidates.findOne({candidateId: row.userid});
 
