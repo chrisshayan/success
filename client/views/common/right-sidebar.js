@@ -168,11 +168,8 @@ var LastOpenJobs = BlazeComponent.extendComponent({
     },
 
     filters: function () {
-        var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
         var filters = {
-            'data.expireddate': {
-                $gte: today
-            }
+            status: 1
         };
         return filters;
     },

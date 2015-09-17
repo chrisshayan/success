@@ -406,12 +406,9 @@ Meteor.publish('lastOpenJobs', function () {
     var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return [];
 
-    var today = new Date(moment().format("YYYY-MM-DD 00:00:00"));
     var filters = {
         companyId: user.companyId,
-        'data.expireddate': {
-            $gte: today
-        }
+        status: 1
     };
 
     var options = DEFAULT_JOB_OPTIONS;
