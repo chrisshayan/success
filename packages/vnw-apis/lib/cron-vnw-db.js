@@ -73,7 +73,7 @@ function cronData(j, cb) {
     if (info.lastUpdated != void 0)
         lastUpdatedObj = moment(info.lastUpdated);
 
-    var lastRunFormat = lastUpdatedObj.format('YYYY-MM-DD HH:mm:ss');
+    var lastRunFormat = lastUpdatedObj.format('YYYY-MM-DD');
 
 
     //get latest syncTime
@@ -81,7 +81,7 @@ function cronData(j, cb) {
     try {
         //get all jobs
         var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId, lastRunFormat);
-        //console.log('jsql : ', jSql);
+        console.log('jsql : ', jSql);
         var updateJobs = fetchVNWData(jSql);
 
         updateJobs.forEach(function (job) {
@@ -109,17 +109,19 @@ function cronData(j, cb) {
             }
 
             var jobQuery = {companyId: companyId};
-            var data = {};
+
             var options = {'sort': {updatedAt: -1}, 'limit': 1};
             var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
 
 
-            if (lastJob && lastJob.length)
-                data['data.lastUpdated'] = lastJob[0].updatedAt;
+            if (lastJob && lastJob.length) {
+                Collections.SyncQueue.update({_id: j.doc._id}, {
+                    '$set': {
+                        'data.lastUpdated': lastJob[0].updatedAt
+                    }
+                });
+            }
 
-            Collections.SyncQueue.update({_id: j.doc._id}, {
-                '$set': data
-            });
         }
 
 
