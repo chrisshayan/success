@@ -59,7 +59,8 @@ Jobs = BlazeComponent.extendComponent({
                 },
                 {
                     tags: {
-                        $in: jobFilter
+                        $regex: '(' + jobFilter.join('|') + ')',
+                        $options: 'i'
                     }
                 }
             ];

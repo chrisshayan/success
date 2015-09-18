@@ -21,8 +21,11 @@ Meteor.startup(function () {
             }
         });
 
-    Migrations.migrateTo('latest');
     SYNC_VNW.sync();
     CRON_VNW.cronCity();
     CRON_VNW.cronDegree();
+
+    if(Meteor.settings.migration) {
+        Migrations.migrateTo(Meteor.settings.migration);
+    }
 });

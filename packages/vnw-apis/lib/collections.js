@@ -147,6 +147,20 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
     //    return doc;
     //}
 });
+
+function transformTags(userId, doc) {
+    if(doc.tags) {
+        var tags = [];
+        _.each(doc.tags, function(t) {
+            tags.push(t.toLowerCase());
+        });
+        doc.tags = tags;
+    }
+}
+
+Collections.Jobs.before.insert(transformTags);
+Collections.Jobs.before.update(transformTags);
+
 function transformVNWId(id) {
     if (_.isNaN(+id))
         return id;

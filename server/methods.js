@@ -823,6 +823,10 @@ Meteor.methods({
         if (!this.userId) return false;
         var job = Collections.Jobs.findOne({jobId: jobId});
         if (!job) return false;
-        return Collections.Jobs.update({_id: job._id}, {$set: {tags: tags}});
+        var newTags = [];
+        _.each(tags, function(t) {
+            newTags.push(t.toLowerCase());
+        });
+        return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
     }
 });
