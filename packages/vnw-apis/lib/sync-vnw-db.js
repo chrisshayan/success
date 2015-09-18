@@ -753,6 +753,7 @@ SYNC_VNW.sync = function () {
         SYNC_VNW.addQueue('cronSkills', {});
     }
 
+/* // No need to run at firsttime.
     Collections.SyncQueue.remove({type: "cronData"});
     Collections.SyncQueue.remove({type: "pullCompanyData"});
 
@@ -765,10 +766,12 @@ SYNC_VNW.sync = function () {
 
         SYNC_VNW.addQueue('cronData', cronData);
     });
+*/
 
-    /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
+    // restart the cronData.
+    Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
         Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
-    });*/
+    });
 
 
     /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {

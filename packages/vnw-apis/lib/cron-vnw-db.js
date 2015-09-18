@@ -3,6 +3,7 @@
  */
 
 CRON_VNW = {};
+var _ = lodash;
 
 function formatDatetimeFromVNW(datetime) {
     var d = moment(datetime);
@@ -81,7 +82,7 @@ function cronData(j, cb) {
     try {
         //get all jobs
         var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId, lastRunFormat);
-        console.log('jsql : ', jSql);
+        //console.log('jsql : ', jSql);
         var updateJobs = fetchVNWData(jSql);
 
         updateJobs.forEach(function (job) {
@@ -209,7 +210,7 @@ function processJob(item, companyId) {
 }
 
 
-function processApp(appRows, companyId) {
+function processApp(appRows, companyId, sourceId) {
     var mongoApps = Collections.Applications.find({companyId: companyId}).fetch();
 
     var filter = {
@@ -229,7 +230,7 @@ function processApp(appRows, companyId) {
         if (indexApp >= 0) {
             if (mongoApps[indexApp].isDeleted === row['deleted_by_employer'])
                 return;
-            console.log('update: ', appId);
+            console.log('update application: ', appId);
             var modifier = {
                 'isDeleted': row['deleted_by_employer']
             };
@@ -244,7 +245,7 @@ function processApp(appRows, companyId) {
             application.companyId = companyId;
             application.jobId = row.jobid;
             application.candidateId = row.userid;
-            application.source = 1;
+            application.source = sourceId;
             application.isDeleted = row['deleted_by_employer'];
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
@@ -297,25 +298,28 @@ function cronApps(appRows, companyId) {
     //appRows.source 1 : online, appRows.source 2 : direct
     var groupedApp = _.groupBy(appRows, 'source');
     //console.log('online : %s, direct : %s', groupedApp['1'], groupedApp['2']);
-    var conn;
 
     if (groupedApp['1']) {
         var appOnlineSQL = sprintf(VNW_QUERIES.pullAllAppsOnline, _.pluck(groupedApp['1'], 'typeId').join(','));
         //console.log('appOnline', appOnlineSQL);
         var appOnlineRows = fetchVNWData(appOnlineSQL);
         if (appOnlineRows.length > 0) {
-            processApp(appOnlineRows, companyId);
+            processApp(appOnlineRows, companyId, 1);
+            var resumeIds = _.pluck(appOnlineRows, 'resumeid');
+
+            Meteor.defer(function () {
+                cronResume(resumeIds);
+            });
         }
-
-
     }
+
     if (groupedApp['2']) {
         var appDirectSQL = sprintf(VNW_QUERIES.pullAllAppsDirect, _.pluck(groupedApp['2'], 'typeId').join(','));
         //console.log('appDirect', appDirectSQL);
         var appDirectRows = fetchVNWData(appDirectSQL);
 
         if (appDirectRows.length > 0) {
-            processApp(appDirectRows, companyId);
+            processApp(appDirectRows, companyId, 2);
         }
     }
 
@@ -368,6 +372,130 @@ CRON_VNW.cronDegree = function () {
     });
     //console.log(degreeRows);
     console.log('CronDegree : Done!');
+};
+
+
+function cronResume(resumeIds) {
+    if (resumeIds == void 0 || !resumeIds.length) return false;
+
+    resumeIds.forEach(function (resumeId) {
+
+        var generalQuery = sprintf(VNW_QUERIES.general, resumeId);
+        var resumeRows = fetchVNWData(generalQuery);
+
+        _.each(resumeRows, function (row) {
+            var resume = Collections.Resumes.findOne({resumeId: resumeId});
+            var formatLastUpdated = formatDatetimeFromVNW(row.lastdateupdated);
+
+            if (!resume || parseTimeToString(formatLastUpdated) != parseTimeToString(resume.updatedAt)) {
+                if (resume)
+                    Collections.Resumes.remove({resumeId: resumeId});
+
+                resume = new Schemas.resume();
+
+                resume.resumeId = resumeId;
+                resume.resumeTitle = row.resumetitle;
+                resume.userId = row.userid;
+                resume.fullName = row.fullname;
+                resume.highestDegreeId = row.highestdegreeid;
+                resume.mostRecentPosition = row.mostrecentposition;
+                resume.mostRecentEmployer = row.mostrecentemployer;
+                resume.yearOfExperience = row.yearsexperienceid || 0;
+                resume.suggestedSalary = row.suggestedsalary;
+                resume.careerObjective = row.jobdescription;
+                resume.address = row.address;
+                resume.emailAddress = row.emailaddress;
+                resume.desireJobTitle = row.desiredjobtitle;
+                resume.cellphone = row.cellphone;
+                resume.updatedAt = formatLastUpdated;
+                resume.data = row;
+                resume.createdAt = formatDatetimeFromVNW(row.createddate);
+
+                // get Education
+                var educationQuery = sprintf(VNW_QUERIES.education, resumeId);
+
+                var educationRows = fetchVNWData(educationQuery);
+
+                _.each(educationRows, function (row) {
+                    resume.education.push({
+                        highestDegreeId: row.highestdegreeid,
+                        schoolName: row.schoolname,
+                        major: row.major,
+                        startDate: row.startdate,
+                        endDate: row.enddate,
+                        description: row.description,
+                        educationOrder: row.educationorder
+                    });
+                });
+
+                var experienceQuery = sprintf(VNW_QUERIES.experience, resumeId);
+
+                var experienceRows = fetchVNWData(experienceQuery);
+
+                _.each(experienceRows, function (row) {
+                    resume.experience.push({
+                        jobTitle: row.jobtitle,
+                        companyName: row.companyname,
+                        startDate: row.startdate,
+                        endDate: row.enddate,
+                        description: row.description,
+                        experienceOrder: row.experienceorder,
+                        isCurrent: row.iscurrent
+
+                    })
+                });
+
+                var referenceQuery = sprintf(VNW_QUERIES.reference, resumeId);
+                var referenceRows = fetchVNWData(referenceQuery);
+
+                _.each(referenceRows, function (row) {
+                    resume.reference.push({
+                        name: row.name,
+                        title: row.title,
+                        companyName: row.companyname,
+                        phone: row.phone,
+                        email: row.email,
+                        description: row.description,
+                        referenceType: row.referencetype,
+                        referenceOrder: row.referenceorther,
+                        isAvailable: row.isavailable
+                    })
+                });
+                Collections.Resumes.insert(resume);
+
+            }
+        });
+    })
+}
+
+
+CRON_VNW.integration = function () {
+    // integration go here;
+    var directApplication = Collections.Applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
+        fields: {source: 1}
+    }).fetch();
+    var directIds = _.pluck(directApplication, '_id');
+
+    Collections.Applications.update({_id: {$in: directIds}}, {
+        '$set': {
+            source: 2
+        }
+    }, {multi: true});
+
+    var resumeIds = [];
+
+    Collections.Applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
+        Collections.Applications.update({_id: application._id},
+            {
+                '$set': {
+                    'resumeId': application.data.resumeid
+                }
+            });
+
+        resumeIds.push(application.data.resumeid);
+    });
+
+    cronResume(resumeIds);
 };
 
 

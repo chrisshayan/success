@@ -19,7 +19,8 @@ Package.onUse(function (api) {
         "momentjs:moment@2.10.6",
         "accounts-password",
         "lab:mysql-connection-manager",
-        "reywood:publish-composite"
+        "reywood:publish-composite",
+        "stevezhu:lodash"
     ]);
 
     api.addFiles('utils/common.js', ['server', 'client']);
@@ -33,7 +34,7 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager"
     ]);
 
-    api.export(['Core','Utils']);
+    api.export(['Core', 'Utils']);
 
 });
 

@@ -16,7 +16,8 @@ Package.onUse(function (api) {
         'matb33:collection-hooks',
         'aldeed:simple-schema',
         'aldeed:autoform',
-        'vsivsi:job-collection@1.2.0'
+        'vsivsi:job-collection@1.2.0',
+        'stevezhu:lodash'
     ], both);
 
     api.use([
@@ -45,6 +46,6 @@ Package.onUse(function (api) {
     /**
      * Export namespace
      */
-    api.export(['Collections', 'Schemas','debuger'], both);
-    api.export(['APIS', 'SYNC_VNW','CRON_VNW'], 'server');
+    api.export(['Collections', 'Schemas', 'debuger'], both);
+    api.export(['APIS', 'SYNC_VNW', 'CRON_VNW'], 'server');
 });
