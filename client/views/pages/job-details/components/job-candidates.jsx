@@ -37,10 +37,20 @@ JobCandidates = React.createClass({
             isDeleted: 0
         };
         if (this.state.search.length > 0) {
-            filter.fullname = {
-                $regex: this.state.search.replace(/\s+/g, '|'),
-                $options: 'i'
-            }
+            filter['$or'] = [
+                {
+                    fullname: {
+                        $regex: this.state.search.replace(/\s+/g, '|'),
+                        $options: 'i'
+                    }
+                },
+                {
+                    email: {
+                        $regex: this.state.search.replace(/\s+/g, '|'),
+                        $options: 'i'
+                    }
+                }
+            ];
         }
         return filter;
     },

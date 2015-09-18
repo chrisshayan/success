@@ -17,7 +17,7 @@ var migrationDir = path.join(base, '/packages/migration/migrations');
 var migrationFiles = fs.readdirSync(migrationDir);
 
 Package.onUse(function (api) {
-    api.use(['percolate:migrations'], 'server');
+    api.use(['percolate:migrations', 'lab:vnw-apis'], 'server');
     api.imply(['percolate:migrations'], 'server');
     var files = [];
     for (var i in migrationFiles) {

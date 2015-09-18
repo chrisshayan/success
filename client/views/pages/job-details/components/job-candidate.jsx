@@ -1,4 +1,3 @@
-let { Input } = ReactBootstrap;
 let cx = React.addons.classSet;
 var FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;

@@ -632,6 +632,7 @@ Meteor.methods({
 
     addCandidate: function (data, jobId) {
         try {
+            console.log(data, jobId);
             if (!this.userId) return false;
             check(data, Object);
             check(jobId, Match.Any);

@@ -312,7 +312,7 @@ function cronApps(appRows, companyId) {
             var resumeIds = _.pluck(appOnlineRows, 'resumeid');
 
             Meteor.defer(function () {
-                cronResume(resumeIds);
+                CRON_VNW.cronResume(resumeIds);
             });
         }
     }
@@ -379,7 +379,7 @@ CRON_VNW.cronDegree = function () {
 };
 
 
-function cronResume(resumeIds) {
+CRON_VNW.cronResume = function (resumeIds) {
     if (resumeIds == void 0 || !resumeIds.length) return false;
 
     resumeIds.forEach(function (resumeId) {
@@ -475,31 +475,31 @@ function cronResume(resumeIds) {
 
 CRON_VNW.integration = function () {
     // integration go here;
-    var directApplication = Collections.Applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
-        fields: {source: 1}
-    }).fetch();
-    var directIds = _.pluck(directApplication, '_id');
-
-    Collections.Applications.update({_id: {$in: directIds}}, {
-        '$set': {
-            source: 2
-        }
-    }, {multi: true});
-
-    var resumeIds = [];
-
-    Collections.Applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
-        Collections.Applications.update({_id: application._id},
-            {
-                '$set': {
-                    'resumeId': application.data.resumeid
-                }
-            });
-
-        resumeIds.push(application.data.resumeid);
-    });
-
-    cronResume(resumeIds);
+    //var directApplication = Collections.Applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
+    //    fields: {source: 1}
+    //}).fetch();
+    //var directIds = _.pluck(directApplication, '_id');
+    //
+    //Collections.Applications.update({_id: {$in: directIds}}, {
+    //    '$set': {
+    //        source: 2
+    //    }
+    //}, {multi: true});
+    //
+    //var resumeIds = [];
+    //
+    //Collections.Applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
+    //    Collections.Applications.update({_id: application._id},
+    //        {
+    //            '$set': {
+    //                'resumeId': application.data.resumeid
+    //            }
+    //        });
+    //
+    //    resumeIds.push(application.data.resumeid);
+    //});
+    //
+    //CRON_VNW.cronResume(resumeIds);
 };
 
 
