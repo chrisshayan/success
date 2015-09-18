@@ -251,6 +251,10 @@ function processApp(appRows, companyId, sourceId) {
             application.createdAt = formatDatetimeFromVNW(row.createddate);
 
             console.log('insert application:', application.entryId);
+
+            if (sourceId == '1')
+                application.resumeId = row.resumeid;
+            
             Collections.Applications.insert(application);
 
         }
