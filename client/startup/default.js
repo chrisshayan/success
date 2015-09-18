@@ -6,4 +6,8 @@ Meteor.startup(function () {
     }, 1000);
 
     Event = new EventEmitter();
+
+    if(!ReactiveCookie.get('jobFilter')) {
+        ReactiveCookie.set('jobFilter', EJSON.stringify([]));
+    }
 });
