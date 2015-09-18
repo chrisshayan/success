@@ -453,3 +453,7 @@
     background: #fff !important;
     color: #777 !important;
 }
+
+.navbar-form-custom {
+    width: 50% !important;
+}

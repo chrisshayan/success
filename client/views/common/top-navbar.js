@@ -43,3 +43,10 @@ Template.topNavbar.events({
         $('#right-sidebar').toggleClass('sidebar-open');
     }
 });
+
+Template.topNavbar.helpers({
+    isDashboardPage: function() {
+        var url = Router.current().url;
+        return !!url.match(/dashboard/i);
+    }
+});

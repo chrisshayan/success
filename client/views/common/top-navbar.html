@@ -3,12 +3,10 @@
         <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
                 <a id="navbar-minimalize" class="minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-                <form role="search" class="navbar-form-custom hidden" action="search_results">
-                    <div class="form-group">
-                        <input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">
-                    </div>
-                </form>
             </div>
+            {{#if isDashboardPage}}
+                {{> jobFilter}}
+            {{/if}}
             <ul class="nav navbar-top-links navbar-right">
                 <li class="hidden">
                     <span class="m-r-sm text-muted welcome-message"> Welcome to INSPINIA+ Admin Theme.</span>
