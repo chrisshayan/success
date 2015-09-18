@@ -19,13 +19,12 @@ JobCandidates = React.createClass({
         var sub = Meteor.subscribe('getApplications', this.filter(), this.options());
         if (sub.ready()) {
             isLoading = false;
-            candidates = this.fetch();
             total = Collections.Applications.find(this.filter()).count();
         }
 
         return {
             isLoading: isLoading,
-            candidates: candidates,
+            candidates: this.fetch(),
             currentEntryId: Router.current().params.query.application || null,
             isLoadMore: this.state.limit < total
         }
@@ -47,6 +46,7 @@ JobCandidates = React.createClass({
     },
 
     options: function () {
+        console.log(this.state.limit);
         var sort = {};
         sort[this.state.sortBy] = (this.state.sortType == "asc") ? 1 : -1;
         return {
@@ -97,15 +97,12 @@ JobCandidates = React.createClass({
                 <div className="full-height-scroll">
                     <ul className="list-group elements-list">
                         {this.data.candidates.map(this.renderCandidate)}
-                        <li className="list-group-item clear">
-                            {loadmoreBtn}
+                        <li className="clear">
+                            <div style={{height: "120px", padding: "10px 20px 20px 20px"}}>
+                                {loadmoreBtn}
+                            </div>
                         </li>
                     </ul>
-                    <Row>
-                        <Col md={10} mdOffset={1} style={{height : '60px'}}>
-
-                        </Col>
-                    </Row>
                 </div>
             </div>
         );
