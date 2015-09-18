@@ -46,7 +46,6 @@ JobCandidates = React.createClass({
     },
 
     options: function () {
-        console.log(this.state.limit);
         var sort = {};
         sort[this.state.sortBy] = (this.state.sortType == "asc") ? 1 : -1;
         return {
@@ -84,7 +83,15 @@ JobCandidates = React.createClass({
         });
     },
     render() {
+        var loading = null;
         var loadmoreBtn = null;
+        if(this.data.isLoading) {
+            loading = (
+                <div style={{marginBottom: "10px", textAlign: "center"}}>
+                    <img src="/ring.svg" />
+                </div>
+            );
+        }
         if (this.data.isLoadMore) {
             loadmoreBtn = <button className="btn btn-default btn-block btn-sm"
                                   onClick={ ()=> this.getFlux().actions.loadMoreCandidate() }>load more</button>;
@@ -99,6 +106,7 @@ JobCandidates = React.createClass({
                         {this.data.candidates.map(this.renderCandidate)}
                         <li className="clear">
                             <div style={{height: "120px", padding: "10px 20px 20px 20px"}}>
+                                {loading}
                                 {loadmoreBtn}
                             </div>
                         </li>
