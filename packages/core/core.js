@@ -47,4 +47,4 @@ Core.doUpdate = function (collection, query, data) {
         console.log(e);
         return false;
     }
-}
+};

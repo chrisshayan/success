@@ -30,7 +30,7 @@ var methods = {
         var query = {_id: _id};
         var modifier = setModifier({amountOfTimeCron: numberOfMonth});
 
-        return updateCompany(query, modifier);
+        return Core.doUpdate(Collection, query, modifier);
     }
 };
 

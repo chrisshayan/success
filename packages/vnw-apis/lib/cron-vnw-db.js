@@ -204,6 +204,7 @@ function processJob(item, companyId) {
             } else if (!mongoJob) {
                 console.log('create Job :', job.jobId);
                 Collections.Jobs.insert(job);
+
             }
         });
     }
@@ -249,13 +250,29 @@ function processApp(appRows, companyId, sourceId) {
             application.isDeleted = row['deleted_by_employer'];
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
+            application.matchingScore = row.matchingScore;
 
             console.log('insert application:', application.entryId);
 
             if (sourceId == '1')
                 application.resumeId = row.resumeid;
-            
+
             Collections.Applications.insert(application);
+
+            /* Log activity */
+            Meteor.defer(function () {
+                // Log applied activity
+                var activity = new Activity();
+                activity.companyId = companyId;
+                activity.data = {
+                    applicationId: appId,
+                    source: sourceId,
+                    userId: row.userid
+                };
+                activity.createdAt = formatDatetimeFromVNW(row.createddate);
+                activity.appliedJob();
+
+            });
 
         }
     });
@@ -283,6 +300,9 @@ function processCandidates(candidateList) {
             candidate.data = row;
             candidate.createdAt = formatDatetimeFromVNW(row.createddate);
             Collections.Candidates.insert(candidate);
+
+
+
         } else {
             //TODO : in the future, the 3rd job will care this one
             if (!_.isEqual(candidate.data, row)) {
