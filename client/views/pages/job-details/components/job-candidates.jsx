@@ -39,16 +39,13 @@ JobCandidates = React.createClass({
         if (this.state.search.length > 0) {
             filter['$or'] = [
                 {
-                    fullname: {
+                    "candidateInfo.fullname": {
                         $regex: this.state.search.replace(/\s+/g, '|'),
                         $options: 'i'
                     }
                 },
                 {
-                    email: {
-                        $regex: this.state.search.replace(/\s+/g, '|'),
-                        $options: 'i'
-                    }
+                    "candidateInfo.emails": this.state.search
                 }
             ];
         }
@@ -65,16 +62,17 @@ JobCandidates = React.createClass({
     },
 
     fetch: function () {
-        var items = [];
-        var applications = Collections.Applications.find(this.filter(), this.options()).fetch();
-        _.each(applications, function (app) {
-            var candidate = Collections.Candidates.findOne({candidateId: app.candidateId});
-            if (candidate) {
-                candidate.application = app;
-                items.push(candidate);
-            }
-        });
-        return items;
+        return Collections.Applications.find(this.filter(), this.options()).fetch();
+        //var items = [];
+        //var applications = Collections.Applications.find(this.filter(), this.options()).fetch();
+        //_.each(applications, function (app) {
+        //    var candidate = Collections.Candidates.findOne({candidateId: app.candidateId});
+        //    if (candidate) {
+        //        candidate.application = app;
+        //        items.push(candidate);
+        //    }
+        //});
+        //return items;
     },
 
     componentDidMount() {
@@ -125,11 +123,11 @@ JobCandidates = React.createClass({
             </div>
         );
     },
-    renderCandidate(candidate, key) {
+    renderCandidate(app, key) {
         var selected = false;
-        if (candidate.application.entryId == this.data.currentEntryId)
+        if (app.entryId == this.data.currentEntryId)
             selected = true;
 
-        return <JobCandidate key={key} candidate={candidate} selected={selected} isSelectAll={this.state.isSelectAll}/>;
+        return <JobCandidate key={key} application={app} selected={selected} isSelectAll={this.state.isSelectAll}/>;
     }
 })

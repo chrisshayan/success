@@ -3,24 +3,24 @@ var FluxMixin = Fluxxor.FluxMixin(React),
     StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 JobCandidate = React.createClass({
-    mixins: [FluxMixin, StoreWatchMixin("JobDetailsStore")],
-    getStateFromFlux() {
-        return this.getFlux().store("JobDetailsStore").getCandidateState(this.props.candidate);
-    },
+    //mixins: [FluxMixin, StoreWatchMixin("JobDetailsStore")],
+    //getStateFromFlux() {
+    //    return this.getFlux().store("JobDetailsStore").getCandidateState(this.props.candidate);
+    //},
 
     componentDidMount() {
 
     },
 
     render() {
-        var can = this.props.candidate;
-        var app = can.application;
-        var fullname = can.fullname();
+        var app = this.props.application;
+        var can = app.candidateInfo;
+        var fullname = can.fullname;
         var appliedDate = moment(app.createdAt).fromNow();
         var coverLetter = app.shortCoverLetter();
         var matchingScore = app.matchingScore;
         var disqualified = app.disqualified;
-        var city = can.city();
+        var city = can.city;
         var link = app.link();
 
         var matchingScoreLabel = null;
@@ -37,7 +37,7 @@ JobCandidate = React.createClass({
 
         return (
             <li className={containerClass} style={ styles.jobCandidate.container }>
-                <CandidateCheckbox id={app._id} checked={this.state.selected}/>
+                <CandidateCheckbox id={app._id} checked={this.props.selected}/>
 
                 <a href={link} style={ styles.jobCandidate.candidateInfo }>
                     <small className="pull-right text-muted">{ appliedDate }</small>

@@ -102,10 +102,14 @@ Router.route('/job/:jobId/stage/:stage', {
     waitOn: function () {
         if (!this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage'))
             throw Meteor.Error(404);
-        return [
+        var subs = [
             Meteor.subscribe('jobDetails', {jobId: this.params.jobId}),
             Meteor.subscribe('mailTemplates')
         ];
+        if(this.params.query.hasOwnProperty('application')) {
+            subs.push(Meteor.subscribe('applicationDetails', {application: this.params.query.application}));
+        }
+        return subs;
     },
     action: function () {
         var self = this;

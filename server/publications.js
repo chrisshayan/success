@@ -95,6 +95,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
             disqualified: 1,
             createdAt: 1,
             fullname: 1,
+            candidateInfo: 1,
             "data.appSubject": 1,
             "data.coverletter": 1,
             "data.resumeid": 1,
@@ -173,6 +174,38 @@ Meteor.publishComposite('getApplications', function (filters, options) {
             } else {
                 options['limit'] += 10;
             }
+            return Collections.Applications.find(filters, options);
+        },
+        children: [
+            //{
+            //    find: function (application) {
+            //        var cond = {
+            //            candidateId: application.candidateId
+            //        };
+            //        var options = DEFAULT_CANDIDATE_OPTIONS;
+            //        options.limit = 1;
+            //        return Collections.Candidates.find(cond, options)
+            //    }
+            //}
+        ]
+    }
+});
+Meteor.publishComposite('applicationDetails', function (data) {
+    return {
+
+        find: function () {
+            if (!this.userId) return this.ready();
+            check(data.application, Match.Any);
+
+            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+            if (!user) return;
+            var filters = {
+                entryId: transformVNWId(data.application)
+            };
+            filters['companyId'] = user.companyId;
+            var options = {};
+            options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
+            options['limit'] = 1;
             return Collections.Applications.find(filters, options);
         },
         children: [
@@ -391,16 +424,16 @@ Meteor.publishComposite('lastApplications', function () {
             return Collections.Applications.find(filters, options);
         },
         children: [
-            {
-                find: function (application) {
-                    var cond = {
-                        candidateId: application.candidateId
-                    };
-                    var options = DEFAULT_CANDIDATE_OPTIONS;
-                    options.limit = 1;
-                    return Collections.Candidates.find(cond, options)
-                }
-            }
+            //{
+            //    find: function (application) {
+            //        var cond = {
+            //            candidateId: application.candidateId
+            //        };
+            //        var options = DEFAULT_CANDIDATE_OPTIONS;
+            //        options.limit = 1;
+            //        return Collections.Candidates.find(cond, options)
+            //    }
+            //}
         ]
     }
 });

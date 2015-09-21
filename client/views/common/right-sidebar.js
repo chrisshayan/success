@@ -70,18 +70,12 @@ var LastCandidateItem = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
         this.application = this.data();
-        this.candidate = new ReactiveVar(null);
-
-        Template.instance().autorun(function () {
-            self.candidate.set(Collections.Candidates.findOne({candidateId: self.application.candidateId}));
-        });
     },
 
 
     fullname: function () {
-        if (!this.candidate.get()) return "";
-        var data = this.candidate.get().data;
-        return data.lastname + " " + data.firstname;
+        var data = this.application;
+        return data.candidateInfo.fullname;
     },
 
     matchingScoreLabel: function () {
@@ -103,9 +97,8 @@ var LastCandidateItem = BlazeComponent.extendComponent({
     },
 
     tel: function () {
-        if (!this.candidate.get()) return "";
-        var data = this.candidate.get().data;
-        return data.cellphone || data.homephone || "";
+        var can = this.application.candidateInfo;
+        return can.emails.length > 0 ? can.emails[0] : '';
     },
 
     stageLabel: function () {
