@@ -241,8 +241,6 @@ function processApp(appRows, companyId, sourceId) {
             })
 
         } else if (!row['deleted_by_employer']) {
-            var can = Collections.Candidates.findOne({candidateId: row.userid});
-            if (can == void 0) return;
 
             var application = new Schemas.Application();
             application.entryId = appId;
@@ -255,18 +253,23 @@ function processApp(appRows, companyId, sourceId) {
             application.createdAt = formatDatetimeFromVNW(row.createddate);
             application.matchingScore = row.matchingScore;
 
-            var candidateInfo = {
-                "firstName": can.data.firstname || can.data.firstName || '',
-                "lastName": can.data.lastname || can.data.lastName || '',
-                "emails": [
-                    can.data.username, can.data.email, can.data.email1, can.data.email2
-                ]
-            };
 
-            candidateInfo.fullname = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
-            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
+            var can = Collections.Candidates.findOne({candidateId: row.userid});
 
-            application.candidateInfo = candidateInfo;
+            if (can) {
+                var candidateInfo = {
+                    "firstName": can.data.firstname || can.data.firstName || '',
+                    "lastName": can.data.lastname || can.data.lastName || '',
+                    "emails": [
+                        can.data.username, can.data.email, can.data.email1, can.data.email2
+                    ]
+                };
+
+                candidateInfo.fullname = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
+                candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
+
+                application.candidateInfo = candidateInfo;
+            }
             console.log('insert application:', application.entryId);
 
             if (sourceId == '1')
@@ -300,35 +303,33 @@ function processApp(appRows, companyId, sourceId) {
 }
 
 function processCandidates(candidateList) {
-    var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-    var candidateRows = fetchVNWData(getCandidatesSQL);
+        var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
+        var candidateRows = fetchVNWData(getCandidatesSQL);
 
-    SYNC_VNW.migration(candidateRows);
-
-    candidateRows.forEach(function (row) {
-        var candidate = Collections.Candidates.findOne({candidateId: row.userid});
-        if (!candidate) {
-            console.log('new candidate: ', row.userid);
-            //console.log('new', row.userid, row.firstname);
-            candidate = new Schemas.Candidate();
-            candidate.candidateId = row.userid;
-            candidate.data = row;
-            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            Collections.Candidates.insert(candidate);
+        candidateRows.forEach(function (row) {
+            var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+            if (!candidate) {
+                console.log('new candidate: ', row.userid);
+                //console.log('new', row.userid, row.firstname);
+                candidate = new Schemas.Candidate();
+                candidate.candidateId = row.userid;
+                candidate.data = row;
+                candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+                Collections.Candidates.insert(candidate);
 
 
-        } else {
-            //TODO : in the future, the 3rd job will care this one
-            if (!_.isEqual(candidate.data, row)) {
-                Collections.Jobs.update(candidate._id, {
-                    $set: {
-                        data: row,
-                        lastSyncedAt: new Date()
-                    }
-                });
+            } else {
+                //TODO : in the future, the 3rd job will care this one
+                if (!_.isEqual(candidate.data, row)) {
+                    Collections.Jobs.update(candidate._id, {
+                        $set: {
+                            data: row,
+                            lastSyncedAt: new Date()
+                        }
+                    });
+                }
             }
-        }
-    })
+        })
 }
 
 

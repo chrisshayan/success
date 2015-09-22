@@ -787,27 +787,6 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
-SYNC_VNW.migration = function (candidates) {
-
-    candidates.forEach(function (candidate) {
-
-        var fullname = [candidate.lastname, candidate.firstname].join(' ').trim();
-
-        var query = {candidateId: candidate.userid};
-        var update = {
-            '$set': {
-                fullname: fullname
-            }
-        };
-
-        var options = {
-            multi: true
-        };
-        Collections.Applications.update(query, update, options);
-    });
-
-
-};
 
 Mongo.Collection.prototype.constructor = Mongo.Collection;
 Collections.SyncQueue = JobCollection('vnw_sync_queue');
