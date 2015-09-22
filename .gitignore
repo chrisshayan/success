@@ -13,3 +13,4 @@ packages/*/.npm/
 
 
 .meteor/versions
+.DS_Store

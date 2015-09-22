@@ -103,10 +103,10 @@ function cronData(j, cb) {
             var appRows = fetchVNWData(appSql);
 
             if (appRows.length) {
-                cronApps(appRows, companyId);
+                var candidates = _.pluck(appRows, 'candidateId');
+                processCandidates(candidates);
 
-                /*var candidates = _.pluck(appRows, 'candidateId');
-                 processCandidates(candidates);*/
+                cronApps(appRows, companyId);
             }
 
             var jobQuery = {companyId: companyId};
@@ -241,6 +241,9 @@ function processApp(appRows, companyId, sourceId) {
             })
 
         } else if (!row['deleted_by_employer']) {
+            var can = Collections.Candidates.findOne({candidateId: row.userid});
+
+
             var application = new Schemas.Application();
             application.entryId = appId;
             application.companyId = companyId;
@@ -252,6 +255,18 @@ function processApp(appRows, companyId, sourceId) {
             application.createdAt = formatDatetimeFromVNW(row.createddate);
             application.matchingScore = row.matchingScore;
 
+            var candidateInfo = {
+                "firstName": can.data.firstname || can.data.firstName || '',
+                "lastName": can.data.lastname || can.data.lastName || '',
+                "emails": [
+                    can.data.username, can.data.email, can.data.email1, can.data.email2
+                ]
+            };
+
+            candidateInfo.fullName = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
+            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
+
+            application.candidateInfo = candidateInfo;
             console.log('insert application:', application.entryId);
 
             if (sourceId == '1')
@@ -277,11 +292,11 @@ function processApp(appRows, companyId, sourceId) {
         }
     });
 
-    var candidateLists = _.pluck(appRows, 'userid');
+    /*    var candidateLists = _.pluck(appRows, 'userid');
 
-    Meteor.defer(function () {
-        candidateLists.length && processCandidates(candidateLists);
-    });
+     Meteor.defer(function () {
+     candidateLists.length && processCandidates(candidateLists);
+     });*/
 }
 
 function processCandidates(candidateList) {
@@ -300,7 +315,6 @@ function processCandidates(candidateList) {
             candidate.data = row;
             candidate.createdAt = formatDatetimeFromVNW(row.createddate);
             Collections.Candidates.insert(candidate);
-
 
 
         } else {
