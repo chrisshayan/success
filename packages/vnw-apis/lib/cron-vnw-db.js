@@ -263,7 +263,7 @@ function processApp(appRows, companyId, sourceId) {
                 ]
             };
 
-            candidateInfo.fullName = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
+            candidateInfo.fullname = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
             candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
             application.candidateInfo = candidateInfo;
