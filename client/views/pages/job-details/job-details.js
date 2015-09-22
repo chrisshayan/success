@@ -49,8 +49,7 @@ Template.jobDetails.onRendered(function () {
             slimScrollClass: '.slimScrollBar'
         }
     };
-
-    Event.on('slideToForm', function (form, isShow) {
+    Template.instance().slideToForm = function (form, isShow) {
         var $details = $(selectors.details);
         var $mailContainer = $(formContainer[form]);
 
@@ -62,7 +61,8 @@ Template.jobDetails.onRendered(function () {
             $details.siblings(selectors.slimScroll.slimScrollClass)
                 .css({'top': height / 2 + 'px'});
         });
-    });
+    }
+    Event.on('slideToForm', Template.instance().slideToForm);
 })
 ;
 
@@ -91,6 +91,8 @@ Template.jobDetails.onDestroyed(function () {
 
     // Remove inline style form slimScroll
     $('.sidebar-collapse').removeAttr("style");
+
+    Event.removeListener('slideToForm', Template.instance().slideToForm)
 });
 
 Template.jobDetails.helpers({
