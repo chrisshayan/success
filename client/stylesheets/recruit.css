@@ -457,3 +457,7 @@
 .navbar-form-custom {
     width: 50% !important;
 }
+
+.full-height-layout #page-wrapper {
+    overflow: hidden;
+}

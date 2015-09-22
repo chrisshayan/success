@@ -48,7 +48,7 @@ Jobs = BlazeComponent.extendComponent({
             filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
 
-        var jobFilter = EJSON.parse(ReactiveCookie.get('jobFilter')) || [];
+        var jobFilter = EJSON.parse(ReactiveCookie.get('jobFilter') || '[]');
         if (jobFilter.length > 0) {
             filters['$or'] = [
                 {

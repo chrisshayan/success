@@ -37,6 +37,6 @@ Template.jobFilter.onRendered(function() {
 
 Template.jobFilter.helpers({
     currentFilter: function() {
-        return EJSON.parse(ReactiveCookie.get('jobFilter')) || [];
+        return EJSON.parse(ReactiveCookie.get('jobFilter') || '[]');
     }
 })

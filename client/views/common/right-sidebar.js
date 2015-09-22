@@ -75,7 +75,7 @@ var LastCandidateItem = BlazeComponent.extendComponent({
 
     fullname: function () {
         var data = this.application;
-        return data.candidateInfo.fullname;
+        return data.candidateInfo && data.candidateInfo.fullname || '';
     },
 
     matchingScoreLabel: function () {
@@ -98,7 +98,7 @@ var LastCandidateItem = BlazeComponent.extendComponent({
 
     tel: function () {
         var can = this.application.candidateInfo;
-        return can.emails.length > 0 ? can.emails[0] : '';
+        return can && can.emails.length > 0 ? can.emails[0] : '';
     },
 
     stageLabel: function () {

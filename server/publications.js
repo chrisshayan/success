@@ -405,23 +405,28 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 Meteor.publishComposite('lastApplications', function () {
     return {
         find: function () {
-            if (!this.userId) return this.ready();
-            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-            if (!user) return [];
+            if (!this.userId) return null;
+            try {
+                var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+                if (!user) return [];
 
-            var filters = {
-                source: {$ne: 3},
-                companyId: user.companyId,
-                isDeleted: 0
-            };
+                var filters = {
+                    source: {$ne: 3},
+                    companyId: user.companyId,
+                    isDeleted: 0
+                };
 
-            var options = DEFAULT_APPLICATION_OPTIONS;
-            options['limit'] = 10;
-            options['sort'] = {
-                createdAt: -1
-            };
+                var options = DEFAULT_APPLICATION_OPTIONS;
+                options['limit'] = 10;
+                options['sort'] = {
+                    createdAt: -1
+                };
 
-            return Collections.Applications.find(filters, options);
+                return Collections.Applications.find(filters, options);
+            } catch (e) {
+                console.log('Last applications:', e);
+                return false;
+            }
         },
         children: [
             //{
