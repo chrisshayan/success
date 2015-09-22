@@ -242,7 +242,7 @@ function processApp(appRows, companyId, sourceId) {
 
         } else if (!row['deleted_by_employer']) {
             var can = Collections.Candidates.findOne({candidateId: row.userid});
-
+            if (can == void 0) return;
 
             var application = new Schemas.Application();
             application.entryId = appId;
