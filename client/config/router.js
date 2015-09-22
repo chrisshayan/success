@@ -106,9 +106,7 @@ Router.route('/job/:jobId/stage/:stage', {
             Meteor.subscribe('jobDetails', {jobId: this.params.jobId}),
             Meteor.subscribe('mailTemplates')
         ];
-        if(this.params.query.hasOwnProperty('application')) {
-            subs.push(Meteor.subscribe('applicationDetails', {application: this.params.query.application}));
-        }
+
         return subs;
     },
     action: function () {

@@ -25,6 +25,8 @@ JobApplicationProfile = BlazeComponent.extendComponent({
             self.props.set('isLoading', false);
             self.props.set('isViewResume', false);
             self.props.set('isViewFullscreen', false);
+
+            JobDetailsSubs.subscribe('applicationDetails', {application: applicationId});
         });
 
         // Bind empty event
