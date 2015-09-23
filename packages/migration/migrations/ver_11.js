@@ -83,7 +83,9 @@ Migrations.add({
                 candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
                 var modifier = {
-                    '$set': candidateInfo
+                    '$set': {
+                        candidateInfo: candidateInfo
+                    }
                 };
 
                 Collections.Applications.update({candidateId: app.candidateId}, modifier);
