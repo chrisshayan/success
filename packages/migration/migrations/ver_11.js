@@ -40,7 +40,7 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 
 function processCandidates(candidateList) {
     var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-    console.log(getCandidatesSQL)
+    
     var candidateRows = fetchVNWData(getCandidatesSQL);
 
     console.log('row', candidateRows);
@@ -76,7 +76,10 @@ Migrations.add({
     version: 11,
     name: "Fix missing candidates",
     up: function () {
-        var emptyScoreApplication = Collections.Applications.find({source: {$ne: 3}, candidateInfo: {'$exists': false}}, {
+        var emptyScoreApplication = Collections.Applications.find({
+            source: {$ne: 3},
+            candidateInfo: {'$exists': false}
+        }, {
             fields: {
                 source: 1,
                 entryId: 1,
