@@ -92,7 +92,8 @@ Schemas.Application = function () {
         modifiedAt: null,
         modifiedBy: null,
         fullname: null,
-        lastSyncedAt: new Date()
+        lastSyncedAt: new Date(),
+        isDeleted: 0
     }
 };
 
@@ -310,7 +311,13 @@ Schemas.CandidateSource = new SimpleSchema({
         custom: function () {
             if (Meteor.isClient && this.isSet) {
                 var self = this;
-                Meteor.call("checkCandidateExists", this.value, function (err, result) {
+                var urlParams = Router.current().params;
+                var checkData = {
+                    jobId: urlParams.jobId,
+                    email: this.value
+                };
+
+                Meteor.call("checkCandidateExists", checkData, function (err, result) {
                     if (err) throw err;
                     if (result)
                         Schemas.CandidateSource.namedContext("addCandidateForm").addInvalidKeys([{

@@ -14,7 +14,7 @@ function replacePlaceholder(userId, application, candidate, mail) {
 
                 case "position":
                     var job = Collections.Jobs.findOne({jobId: application.jobId});
-                    replaces[p1] = job.data.jobtitle;
+                    replaces[p1] = job.title;
                     break;
 
                 case "company":
@@ -463,7 +463,7 @@ Meteor.methods({
 
             Meteor.defer(function () {
                 mail = replacePlaceholder(self.userId, application, candidate, mail);
-                Meteor.Mandrill.send(mail);
+                Email.send(mail);
                 var activity = new Activity();
 
                 mail.applicationId = data.application;
@@ -636,6 +636,7 @@ Meteor.methods({
             if (!this.userId) return false;
             check(data, Object);
             check(jobId, Match.Any);
+            var isCandidateExists = false;
 
             if (data.email) {
                 var criteria = {
@@ -647,16 +648,19 @@ Meteor.methods({
                     ]
                 };
                 if (Collections.Candidates.find(criteria).count() > 0)
-                    return false;
+                    isCandidateExists = true
+            }
+
+            if(!isCandidateExists) {
+                can = new Schemas.Candidate();
+                can.candidateId = null;
+                can.data = data;
+                can.createdAt = new Date();
+                var candidateId = Collections.Candidates.insert(can);
+                Collections.Candidates.update({_id: candidateId}, {$set: {candidateId: candidateId}});
             }
 
             var user = getUserInfo(+this.userId);
-            can = new Schemas.Candidate();
-            can.candidateId = null;
-            can.data = data;
-            can.createdAt = new Date();
-            var candidateId = Collections.Candidates.insert(can);
-            Collections.Candidates.update({_id: candidateId}, {$set: {candidateId: candidateId}});
 
             var application = new Schemas.Application();
             application.source = 3;
@@ -665,10 +669,18 @@ Meteor.methods({
             application.jobId = jobId;
             application.candidateId = candidateId;
             application.data = {};
-            application.fullname = [data.lastName, data.firstName].join(' ').trim();
+            var candidateInfo = {
+                firstName: can.data.firstname || can.data.firstName || '',
+                lastName: can.data.lastname || can.data.lastName || '',
+                emails: [can.data.username, can.data.email, can.data.email1, can.data.email2],
+                city: can.data.city || ''
+            };
+            candidateInfo['fullname'] = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
+            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined,'');
+            application.candidateInfo = candidateInfo;
+
             var appId = Collections.Applications.insert(application);
             Collections.Applications.update({_id: appId}, {$set: {entryId: appId}});
-
             // Log applied activity
             var activity = new Activity();
             activity.companyId = user.companyId;
@@ -704,7 +716,7 @@ Meteor.methods({
                         var content = JSON.parse(result.content);
                         console.log("Add account vnw: ", content);
                     } catch (e) {
-                        throw new Meteor.Error("rest-api-failed", "Failed to call the REST api on VietnamWorks");
+                        console.log("rest-api-failed", "Failed to call the REST api on VietnamWorks", e);
                     }
                 })
             }
@@ -716,22 +728,21 @@ Meteor.methods({
         return {candidateId: candidateId};
     },
 
-    checkCandidateExists: function (email) {
-        check(email, String);
-        email = email.trim();
+    checkCandidateExists: function (data) {
+        check(data, {
+            jobId: Match.Any,
+            email: String
+        });
+        email = data.email.trim();
 
         var criteria = {
-            $or: [
-                {"data.username": email},
-                {"data.email": email},
-                {"data.email1": email},
-                {"data.email2": email}
-            ]
+            jobId: transformEntryId(data.jobId),
+            "candidateInfo.emails": data.email
         };
         var options = {
             limit: 1
         };
-        return Collections.Candidates.find(criteria, options).count() > 0;
+        return Collections.Applications.find(criteria, options).count() > 0;
     }
 
 });

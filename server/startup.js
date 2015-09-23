@@ -26,6 +26,7 @@ Meteor.startup(function () {
     CRON_VNW.cronDegree();
 
     if(Meteor.settings.migration) {
+        Migrations.unlock();
         Migrations.migrateTo(Meteor.settings.migration);
     }
 });
