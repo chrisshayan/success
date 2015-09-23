@@ -82,8 +82,15 @@ Migrations.add({
                 candidateInfo.fullname = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
                 candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
-                application.candidateInfo = candidateInfo;
+                var modifier = {
+                    '$set': candidateInfo
+                };
+
+                Collections.Applications.update({candidateId: app.candidateId}, modifier);
+
             }
+
+
         });
 
 
