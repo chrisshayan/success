@@ -5,6 +5,29 @@
 
 var VNW_QUERIES = Meteor.settings.cronQueries;
 
+function formatDatetimeFromVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = 420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
+
+function formatDatetimeToVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = -420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
+
+function parseTimeToString(date) {
+    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+}
+
+
 var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     var conn = mysqlManager.getPoolConnection();
 
