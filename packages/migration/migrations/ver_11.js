@@ -40,7 +40,7 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 
 function processCandidates(candidateList) {
     var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-    
+
     var candidateRows = fetchVNWData(getCandidatesSQL);
 
     console.log('row', candidateRows);
@@ -91,6 +91,7 @@ Migrations.add({
 
         var canLists = _.pluck(emptyScoreApplication, 'candidateId');
         console.log(canLists);
+        if (canLists.length == 0) return;
         processCandidates(canLists);
 
         emptyScoreApplication.forEach(function (app) {
