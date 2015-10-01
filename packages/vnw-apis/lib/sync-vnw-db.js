@@ -753,28 +753,30 @@ SYNC_VNW.sync = function () {
         SYNC_VNW.addQueue('cronSkills', {});
     }
 
-/* // No need to run at firsttime.
-    Collections.SyncQueue.remove({type: "cronData"});
-    Collections.SyncQueue.remove({type: "pullCompanyData"});
+    /* // No need to run at firsttime.
+     Collections.SyncQueue.remove({type: "cronData"});
+     Collections.SyncQueue.remove({type: "pullCompanyData"});
 
-    Collections.Users.find({}).map(function (user) {
-        var cronData = {
-            lastUpdated: null,
-            userId: user.userId,
-            companyId: user.companyId
-        };
+     Collections.Users.find({}).map(function (user) {
+     var cronData = {
+     lastUpdated: null,
+     userId: user.userId,
+     companyId: user.companyId
+     };
 
-        SYNC_VNW.addQueue('cronData', cronData);
-    });
-*/
+     SYNC_VNW.addQueue('cronData', cronData);
+     });
+     */
 
     // restart the cronData.
-    Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
-        Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
-    });
 
 
-    /*Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
+    /*
+     Collections.SyncQueue.find({type: "cronClosedJob"}).map(function (job) {
+     Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null, logs: []}});
+     });
+
+     Collections.SyncQueue.find({type: "cronData"}).map(function (job) {
      Collections.SyncQueue.update({_id: job._id}, {$set: {status: "ready", runId: null}});
      });
 
@@ -787,16 +789,26 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
-Mongo.Collection.prototype.constructor = Mongo.Collection;
-Collections.SyncQueue = JobCollection('vnw_sync_queue');
 
-Collections.SyncQueue.allow({
-    admin: function(userId) {
-        console.log('check permisson:', userId);
-        return !!Meteor.users.find({_id: userId}).count();
-    }
-});
-Collections.SyncQueue.processJobs('pullCompanyData', {concurrency: 20, payload: 1}, pullCompanyData);
+/*Mongo.Collection.prototype.constructor = Mongo.Collection;
+
+ Collections.SyncQueue = JobCollection('vnw_sync_queue');
+
+ Collections.SyncQueue.allow({
+ admin: function(userId) {
+ console.log('check permisson:', userId);
+ return !!Meteor.users.find({_id: userId}).count();
+ }
+ });
+ Collections.SyncQueue.processJobs('pullCompanyData', {concurrency: 20, payload: 1}, pullCompanyData);
+
+
+ Collections.SyncQueue.allow({
+ admin: function(userId) {
+ console.log('check permisson:', userId);
+ return !!Meteor.users.find({_id: userId}).count();
+ }
+ });*/
 
 Meteor.startup(function () {
     return Collections.SyncQueue.startJobServer();

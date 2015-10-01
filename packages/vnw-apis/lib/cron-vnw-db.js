@@ -61,112 +61,125 @@ CRON_VNWddQueueCron = function (type, data) {
 
 
 function cronData(j, cb) {
-    var info = j.data;
-    if (info.companyId == void 0 || info.userId == void 0)
+    var data = j.data;
+    if (data.companyId == void 0 || data.userId == void 0)
         j.done();
 
+    else {
 
-    var lastUpdatedObj = moment().subtract(6, 'month');
+        var userId = data.userId
+            , companyId = data.companyId;
 
-    var userId = info.userId
-        , companyId = info.companyId;
-
-    if (info.lastUpdated != void 0)
-        lastUpdatedObj = moment(info.lastUpdated);
-
-    var lastRunFormat = lastUpdatedObj.format('YYYY-MM-DD');
+        /*if (info.lastUpdated != void 0)
+         lastUpdatedObj = moment(info.lastUpdated);*/
 
 
-    //get latest syncTime
+        //get latest syncTime
 
-    try {
-        //get all jobs
-        var jSql = sprintf(VNW_QUERIES.cronJobsUpdate, userId, lastRunFormat);
-        //console.log('jsql : ', jSql);
-        var updateJobs = fetchVNWData(jSql);
+        try {
+            //get all jobs
+            var jSql = sprintf(VNW_QUERIES.pullJobIdFromUser, userId);
+            //console.log('jsql : ', jSql);
+            var updateJobs = fetchVNWData(jSql);
+            console.log('all job :', updateJobs.length);
 
-        updateJobs.forEach(function (job) {
-            if (moment(job.createdAt) > lastUpdatedObj || moment(job.updatedAt) > lastUpdatedObj) {
-                processJob(job, companyId);
-            }
-        });
+            var onlineJob = _.filter(updateJobs, function (job) {
+                return moment(job.expiredAt) > moment().subtract(1, 'day');
+            });
 
-        if (updateJobs.length) {
-            var jobIds = _.pluck(updateJobs, 'typeId');
-
-            // - Check new application of this job if available.
-            // - Then insert / update / remove
-
-            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
-            //console.log('appSql', appSql);
-
-            var appRows = fetchVNWData(appSql);
-
-            if (appRows.length) {
-                var candidates = _.pluck(appRows, 'candidateId');
-                processCandidates(candidates);
-
-                cronApps(appRows, companyId);
-            }
-
-            var jobQuery = {companyId: companyId};
-
-            var options = {'sort': {updatedAt: -1}, 'limit': 1};
-            var lastJob = Collections.Jobs.find(jobQuery, options).fetch();
+            console.log('onlinejob : ', onlineJob.length);
+            processJob(onlineJob, companyId);
 
 
-            if (lastJob && lastJob.length) {
-                Collections.SyncQueue.update({_id: j.doc._id}, {
-                    '$set': {
-                        'data.lastUpdated': lastJob[0].updatedAt
-                    }
-                });
-            }
+            var closedJobIds = _.difference(updateJobs, onlineJob);
+
+            var closedJobData = {
+                userId: userId,
+                companyId: companyId,
+                closedJobIds: closedJobIds
+            };
+
+            CRON_VNW.addQueueCron('cronClosedJob', closedJobData);
+
+            console.log('onlinejob of %s company is done', companyId);
+
+            /*updateJobs.forEach(function (job) {
+             if (moment(job.expiredAt) > moment().subtract(1, 'day')) {
+             processJob(job, companyId);
+             }
+             /!*if (moment(job.createdAt) > lastUpdatedObj || moment(job.updatedAt) > lastUpdatedObj) {
+
+             }*!/
+             });*/
+
+
+            j.done();
 
         }
-
-
-        j.done();
-
+        catch
+            (e) {
+            j.fail();
+            throw e;
+        }
     }
-    catch
-        (e) {
-        j.fail();
-        throw e;
-    }
-
 
     cb();
 }
 
-function processJob(item, companyId) {
-    var mongoJob = Collections.Jobs.findOne({jobId: item.typeId});
-    //remove
-    if (mongoJob && item.isdeleted) {
-        Collections.Jobs.remove({jobId: item.typeId});
-        console.log("processJob")
-    } else {
-        var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.typeId);
+function cronClosedJob(jb, cb) {
+    var info = jb.data;
+    if (info.companyId == void 0 || info.userId == void 0 || info.closedJobIds == void 0)
+        jb.done();
+
+    else {
+        try {
+
+
+            console.log('company : %s closeJob: ', info.companyId, info.closedJobIds.length);
+
+            processJob(info.closedJobIds, info.companyId);
+            jb.done();
+            console.log('closedJob of company %s is done', info.companyId);
+
+        } catch (e) {
+            console.log('error');
+            jb.fail();
+            throw e;
+        }
+    }
+    cb();
+}
+
+
+function processJob(items, companyId) {
+    items.forEach(function (item) {
+        var mongoJob = Collections.Jobs.findOne({jobId: item.jobId});
+        //remove
+        /*if (mongoJob && item.isdeleted) {
+         Collections.Jobs.remove({jobId: item.jobId});
+         console.log("processJob")
+         } else {*/
+        var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.jobId);
         //console.log(getJobQuery);
         var cJobs = fetchVNWData(getJobQuery);
         cJobs.forEach(function (row) {
             var query = {
-                jobId: item.typeId
+                jobId: +item.jobId
             };
 
             var expiredAt = formatDatetimeFromVNW(row.expireddate);
 
             var job = {
-                companyId: companyId,
-                jobId: row.jobid,
-                userId: row.userid,
+                companyId: +companyId,
+                jobId: +row.jobid,
+                userId: +row.userid,
                 source: 'vnw',
                 title: row.jobtitle,
                 level: '',
                 categories: [],
                 locations: [],
-                salaryMin: row.salarymin,
-                salaryMax: row.salarymax,
+                salaryMin: +row.salarymin,
+                salaryMax: +row.salarymax,
                 showSalary: true,
                 description: row.jobdescription,
                 requirements: row.skillexperience,
@@ -207,12 +220,45 @@ function processJob(item, companyId) {
 
             }
         });
+    });
+
+    processAfterSyncJob(items, companyId);
+    //}
+}
+
+
+function processAfterSyncJob(jobs, companyId) {
+    if (jobs.length) {
+        while (jobs.length > 0) {
+            var chunk = jobs.splice(0, 5);
+
+            var jobIds = _.pluck(chunk, 'jobId');
+
+            console.log('chunk: ', jobIds);
+
+            // - Check new applicatiocn of this job if available.
+            // - Then insert / update / remove
+
+            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
+            //console.log('appSql', appSql);
+
+            var appRows = fetchVNWData(appSql);
+            console.log(appRows.length);
+
+            if (appRows.length) {
+                var candidates = _.pluck(appRows, 'candidateId');
+                processCandidates(candidates);
+
+                cronApps(appRows, companyId);
+            }
+
+        }
     }
 }
 
 
 function processApp(appRows, companyId, sourceId) {
-    var mongoApps = Collections.Applications.find({companyId: companyId}).fetch();
+    var mongoApps = companyId ? Collections.Applications.find({companyId: companyId}).fetch() : [];
 
     var filter = {
         fields: {
@@ -243,11 +289,11 @@ function processApp(appRows, companyId, sourceId) {
         } else if (!row['deleted_by_employer']) {
 
             var application = new Schemas.Application();
-            application.entryId = appId;
-            application.companyId = companyId;
-            application.jobId = row.jobid;
-            application.candidateId = row.userid;
-            application.source = sourceId;
+            application.entryId = +appId;
+            application.companyId = +companyId;
+            application.jobId = +row.jobid;
+            application.candidateId = +row.userid;
+            application.source = +sourceId;
             application.isDeleted = row['deleted_by_employer'];
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
@@ -270,7 +316,7 @@ function processApp(appRows, companyId, sourceId) {
 
                 application.candidateInfo = candidateInfo;
             }
-            console.log('insert application:', application.entryId);
+            //console.log('insert application:', application.entryId);
 
             if (sourceId == '1')
                 application.resumeId = row.resumeid;
@@ -303,37 +349,38 @@ function processApp(appRows, companyId, sourceId) {
 }
 
 function processCandidates(candidateList) {
-        var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-        var candidateRows = fetchVNWData(getCandidatesSQL);
+    var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
+    var candidateRows = fetchVNWData(getCandidatesSQL);
 
-        candidateRows.forEach(function (row) {
-            var candidate = Collections.Candidates.findOne({candidateId: row.userid});
-            if (!candidate) {
-                console.log('new candidate: ', row.userid);
-                //console.log('new', row.userid, row.firstname);
-                candidate = new Schemas.Candidate();
-                candidate.candidateId = row.userid;
-                candidate.data = row;
-                candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-                Collections.Candidates.insert(candidate);
+    candidateRows.forEach(function (row) {
+        var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+        if (!candidate) {
+            //console.log('new candidate: ', row.userid);
+            //console.log('new', row.userid, row.firstname);
+            candidate = new Schemas.Candidate();
+            candidate.candidateId = row.userid;
+            candidate.data = row;
+            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+            Collections.Candidates.insert(candidate);
 
 
-            } else {
-                //TODO : in the future, the 3rd job will care this one
-                if (!_.isEqual(candidate.data, row)) {
-                    Collections.Jobs.update(candidate._id, {
-                        $set: {
-                            data: row,
-                            lastSyncedAt: new Date()
-                        }
-                    });
-                }
+        } else {
+            //TODO : in the future, the 3rd job will care this one
+            if (!_.isEqual(candidate.data, row)) {
+                Collections.Jobs.update(candidate._id, {
+                    $set: {
+                        data: row,
+                        lastSyncedAt: new Date()
+                    }
+                });
             }
-        })
+        }
+    })
 }
 
 
 function cronApps(appRows, companyId) {
+    console.log('start cron app');
     //appRows.source 1 : online, appRows.source 2 : direct
     var groupedApp = _.groupBy(appRows, 'source');
     //console.log('online : %s, direct : %s', groupedApp['1'], groupedApp['2']);
@@ -554,7 +601,8 @@ function cronSkills(j, cb) {
                 if (!existSkill) {
                     var skill = new Schemas.skill();
                     skill.skillId = row.skillId;
-                    skill.skillName = row.skillName;
+                    skill.skillName = row.skillName.trim().toLowerCase();
+                    skill.skillLength = row.skillName.length;
                     Collections.SkillTerms.insert(skill);
                 }
 
@@ -569,5 +617,87 @@ function cronSkills(j, cb) {
     cb();
 }
 
+
+var cronApplications = function () {
+    var lastOnlineAppliation = Collections.Applications.findOne({source: 1}, {
+        fields: {candidateId: 1},
+        sort: {candidateId: -1}
+    });
+
+    var newOnlineAppQuery = sprintf(VNW_QUERIES.pullNewOnlineApplications, lastOnlineAppliation);
+
+    var newOnlineAppRows = fetchVNWData(newOnlineAppQuery);
+
+
+    if (newOnlineAppRows.length) {
+        var candidates = _.pluck(newOnlineAppRows, 'candidateId');
+        processCandidates(candidates);
+
+        processApp(newOnlineAppRows, null, 1);
+
+        var resumeIds = _.pluck(newOnlineAppRows, 'resumeid');
+
+        Meteor.defer(function () {
+            CRON_VNW.cronResume(resumeIds);
+        });
+
+    }
+
+
+    var lastDirectAppliation = Collections.Applications.findOne({source: 2}, {
+        fields: {candidateId: 1},
+        sort: {candidateId: -1}
+    });
+
+    var newDirectAppQuery = sprintf(VNW_QUERIES.pullNewDirectApplications, lastDirectAppliation);
+
+    var newDirectAppRows = fetchVNWData(newDirectAppQuery);
+
+    if (newDirectAppRows) {
+        var resumeIds = _.pluck(newOnlineAppRows, 'resumeid');
+
+        Meteor.defer(function () {
+            CRON_VNW.cronResume(resumeIds);
+        });
+
+        processApp(newDirectAppRows, null, 2);
+    }
+
+
+};
+
+CRON_VNW.sync = function () {
+    // remove old sync job
+    Collections.SyncQueue.remove({type: 'cronData'});
+
+    // add new sync job
+    Collections.Users.find().map(function (user) {
+        var data = {
+            userId: user.userId,
+            companyId: user.companyId
+        };
+
+        CRON_VNW.addQueueCron('cronData', data)
+    });
+};
+
+CRON_VNW.addQueueCron = function (type, data) {
+    Job(Collections.SyncQueue, type, data).save();
+};
+
+
+Mongo.Collection.prototype.constructor = Mongo.Collection;
+Collections.SyncQueue = JobCollection('vnw_sync_queue');
+
+
+Collections.SyncQueue.allow({
+    admin: function (userId) {
+        console.log('check permisson:', userId);
+        return !!Meteor.users.find({_id: userId}).count();
+    }
+});
+
+
 Collections.SyncQueue.processJobs('cronData', {concurrency: 20, payload: 1}, cronData);
+Collections.SyncQueue.processJobs('cronClosedJob', {concurrency: 20, payload: 1}, cronClosedJob);
 Collections.SyncQueue.processJobs('cronSkills', {concurrency: 20, payload: 1}, cronSkills);
