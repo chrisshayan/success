@@ -1,7 +1,23 @@
 <template name="jobFilter">
-    <div role="search" class="navbar-form-custom">
-        <div class="form-group" style="margin-left: 5px;margin-top: 17px;">
-            <input type="text" placeholder="Filter by job tags or job name" class="form-control" name="top-search" id="job-filter" value="{{ currentFilter }}">
+    <div role="search" class="navbar-form-custom job-filter-box">
+        <div class="form-group">
+            <div class="job-tag-input clear">
+                <div class="tags pull-left">
+                    {{#each currentFilter}}
+                        {{> jobTagFilter value=this }}
+                    {{/each}}
+                </div>
+                {{> inputAutocomplete settings=settings jobId=jobId class="tag-input" id='job-filter' placeholder='Search job by tag or name'}}
+            </div>
         </div>
     </div>
+</template>
+
+<template name="jobTagFilter">
+    <span class="tag label label-white">{{this.value}} <span class='tag-close'>&nbsp;&nbsp;&times;&nbsp;</span></span>
+</template>
+
+
+<template name="jobFilterItem">
+	<p class="job-filter-name">{{ skillName }}</p>
 </template>

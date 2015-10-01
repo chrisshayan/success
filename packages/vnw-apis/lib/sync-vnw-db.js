@@ -787,9 +787,15 @@ SYNC_VNW.addQueue = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
-
 Mongo.Collection.prototype.constructor = Mongo.Collection;
 Collections.SyncQueue = JobCollection('vnw_sync_queue');
+
+Collections.SyncQueue.allow({
+    admin: function(userId) {
+        console.log('check permisson:', userId);
+        return !!Meteor.users.find({_id: userId}).count();
+    }
+});
 Collections.SyncQueue.processJobs('pullCompanyData', {concurrency: 20, payload: 1}, pullCompanyData);
 
 Meteor.startup(function () {

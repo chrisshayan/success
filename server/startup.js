@@ -1,4 +1,6 @@
 Meteor.startup(function () {
+
+
     Mandrill.config({
         username: Meteor.settings.mandrill.username,
         key: Meteor.settings.mandrill.key
@@ -22,11 +24,20 @@ Meteor.startup(function () {
         });
 
     SYNC_VNW.sync();
-    CRON_VNW.cronCity();
-    CRON_VNW.cronDegree();
+    //CRON_VNW.cronCity();
+    //CRON_VNW.cronDegree();
 
     if(Meteor.settings.migration) {
         Migrations.unlock();
         Migrations.migrateTo(Meteor.settings.migration);
     }
+
+
+    var vnwOplogConnection = new MongoInternals.RemoteCollectionDriver("mongodb://127.0.0.1:4001/vnw_oplog");
+    var VNWOplog = new Mongo.Collection('vnw_oplog', {_driver: vnwOplogConnection});
+    VNWOplog.find({sync: false}).observeChanges({
+        added: function(id, fields) {
+            console.log('added', id, fields)
+        }
+    })
 });

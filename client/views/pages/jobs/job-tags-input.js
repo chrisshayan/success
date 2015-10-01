@@ -1,50 +1,73 @@
-Template.jobTagsInput.onRendered(function() {
-    var self = this;
-    var instance = Template.instance();
-    self.jobId = instance.data.jobId;
-    var updateTags = function (tags) {
-        Meteor.call('updateJobTags', self.jobId, tags);
-    }
-    var jobTags = instance.find(".job-tags");
-
-    $(jobTags).tagsinput({
-        tagClass: this.data.tagClass || "label label-default",
-        maxTags: 5,
-        typeaheadjs: {
-            displayKey: 'skillName',
-            valueKey: 'skillName',
-            source: function (q, sync, async) {
-                self.searchId && Meteor.clearTimeout(self.searchId);
-                self.searchId = Meteor.setTimeout(function () {
-                    Meteor.call("searchSkill", q, function (err, result) {
-                        if (err) throw err;
-                        result = _.sortByOrder(result, ['char', 'asc']);
-                        async(result)
-                    });
-                }, 500);
-            }
-        },
-        freeInput: true
-    });
-
-    $(jobTags).on('itemAdded', function (event) {
-        updateTags($(this).tagsinput('items'))
-        event.preventDefault();
-    });
-    $(jobTags).on('itemRemoved', function (event) {
-        updateTags($(this).tagsinput('items'))
-        event.preventDefault();
-    });
-});
-
 Template.jobTagsInput.helpers({
-    tags: function() {
+    tags: function () {
         var job = Collections.Jobs.findOne({jobId: this.jobId});
         return job && job.tags ? job.tags : [];
     },
-    hint: function() {
+    hint: function () {
         var job = Collections.Jobs.findOne({jobId: this.jobId});
         if (job.tags && job.tags.length > 0) return "";
         return "click to add labels to your job";
+    },
+
+    settings: function () {
+        return {
+            position: "top",
+            limit: 5,
+            rules: [
+                {
+                    collection: 'vnw_skills',
+                    field: "skillName",
+                    options: 'i',
+                    matchAll: false,
+                    subscription: 'searchSkillAutocomplete',
+                    template: Template.jobFilterItem
+                }
+            ]
+        };
     }
 });
+
+
+Template.jobTagsInput.events({
+    'keydown .tag-input': function(e) {
+        if(e.which == 13 || e.which == 188) {
+            var tag = e.target.value.trim().toLowerCase();
+            if(tag.length > 0) {
+                var job = Collections.Jobs.findOne({jobId: this.jobId});
+                if (job) {
+                    e.preventDefault();
+                    var tags = job.tags || [];
+                    tags.push(tag);
+                    Meteor.call('updateJobTags', this.jobId, _.unique(tags));
+                    e.target.value = '';
+                    e.target.focus();
+                }
+            }
+        }
+    },
+
+
+    'autocompleteselect .tag-input': function (e, template, doc) {
+        e.preventDefault();
+        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        if (job) {
+            e.preventDefault();
+            var tags = job.tags || [];
+            tags.push(doc.skillName);
+            Meteor.call('updateJobTags', this.jobId, _.unique(tags));
+            e.target.value = '';
+            e.target.focus();
+        }
+    }
+});
+Template.jobTagItem.events({
+    'click .tag-close': function (e, tmpl) {
+        e.preventDefault();
+        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        if (job) {
+            var tags = job.tags || [];
+            tags = _.without(tags, this.value);
+            Meteor.call('updateJobTags', this.jobId, tags);
+        }
+    }
+})

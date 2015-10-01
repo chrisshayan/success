@@ -48,24 +48,23 @@ Jobs = BlazeComponent.extendComponent({
             filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
 
-        var jobFilter = EJSON.parse(ReactiveCookie.get('jobFilter') || '[]');
-        if (jobFilter.length > 0) {
+        var tags = Session.get('jobFilterTags') || [];
+        if (tags.length > 0) {
             filters['$or'] = [
                 {
                     title: {
-                        $regex: '(' + jobFilter.join('|') + ')',
+                        $regex: '(' + tags.join('|') + ')',
                         $options: 'i'
                     }
                 },
                 {
                     tags: {
-                        $regex: '(' + jobFilter.join('|') + ')',
+                        $regex: '(' + tags.join('|') + ')',
                         $options: 'i'
                     }
                 }
             ];
         }
-
         return filters;
     },
 

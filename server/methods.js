@@ -651,7 +651,7 @@ Meteor.methods({
                     isCandidateExists = true
             }
 
-            if(!isCandidateExists) {
+            if (!isCandidateExists) {
                 can = new Schemas.Candidate();
                 can.candidateId = null;
                 can.data = data;
@@ -676,7 +676,7 @@ Meteor.methods({
                 city: can.data.city || ''
             };
             candidateInfo['fullname'] = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
-            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined,'');
+            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
             application.candidateInfo = candidateInfo;
 
             var appId = Collections.Applications.insert(application);
@@ -818,6 +818,7 @@ Meteor.methods({
             $where: 'this.skillName.length > 0 && this.skillName.split().length < 5'
         }, {fields: fields, limit: 20});
         result = result.concat(search1.map(mapResult));
+
         if (search1.count() < 20) {
             var search2 = Collections.SkillTerms.find({
                 skillName: searchCond,
@@ -835,8 +836,19 @@ Meteor.methods({
         var job = Collections.Jobs.findOne({jobId: jobId});
         if (!job) return false;
         var newTags = [];
-        _.each(tags, function(t) {
+        _.each(tags, function (t) {
             newTags.push(t.toLowerCase());
+        });
+
+        var diff = _.difference(newTags, job.tags || []);
+        _.each(diff, function(newSkill) {
+           Collections.SkillTerms.upsert({skillName: newSkill}, {
+               $set: {
+                   skillId: null,
+                   skillName: newSkill,
+                   skillLength: newSkill.length
+               }
+           });
         });
         return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
     }

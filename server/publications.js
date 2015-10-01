@@ -484,3 +484,12 @@ Meteor.publish('addPositionPage', function () {
     return cursors;
 });
 
+
+Meteor.publish('searchSkillAutocomplete', function(selector, options) {
+    if(!this.userId) return null;
+    if(!options) options = {};
+    options['sort'] = {skillLength: 1};
+    var cursor = Collections.SkillTerms.find(selector, options);
+    Autocomplete.publishCursor(cursor, this);
+    return this.ready();
+});

@@ -45,7 +45,10 @@ JobCandidates = React.createClass({
                     }
                 },
                 {
-                    "candidateInfo.emails": this.state.search
+                    "candidateInfo.emails": {
+                        $regex: this.state.search,
+                        $options: 'i'
+                    }
                 }
             ];
         }

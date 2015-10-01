@@ -32,3 +32,62 @@ Router.route('/downloadresume/:companyId/:entryId/:token', {
         }
     }
 });
+
+Router.route('/webhook/job', {
+    where: 'server',
+    action: function () {
+        this.response.end();
+        try {
+            var token = this.request.headers['x-access-token'];
+            if (!token || !IZToken.decode(token)) return null;
+            var data = this.request.body;
+            check(data, {
+                jobId: Number,
+                userId: Number,
+                companyId: Number
+            });
+            var type = null;
+            switch (this.request.method.toLowerCase()) {
+                case 'post':
+                    type = 'addJob';
+                    break;
+                case 'put':
+                    type = 'updateJob';
+                    break;
+            }
+            type && SYNC_VNW.addQueue(type, data);
+        } catch (e) {
+            console.log('Received request to job hook: ', e);
+        }
+    }
+});
+
+
+Router.route('/webhook/application', {
+    where: 'server',
+    action: function () {
+        this.response.end();
+        try {
+            var token = this.request.headers['x-access-token'];
+            if (!token || !IZToken.decode(token)) return null;
+            var data = this.request.body;
+            check(data, {
+                jobId: Number,
+                entryId: Number,
+                source: Number
+            });
+            var type = null;
+            switch (this.request.method.toLowerCase()) {
+                case 'post':
+                    type = 'addApplication';
+                    break;
+                case 'put':
+                    type = 'updateApplication';
+                    break;
+            }
+            type && SYNC_VNW.addQueue(type, data);
+        } catch (e) {
+            console.log('Received request to application hook: ', e);
+        }
+    }
+});

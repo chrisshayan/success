@@ -174,7 +174,7 @@ AppStores['JobDetails'] = Fluxxor.createStore({
             self.candidatesState.search = keyword.trim();
             self.candidatesState.limit = self.candidatesState.base;
             self.emit('change');
-        }, 500);
+        }, 300);
 
     },
 

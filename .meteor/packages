@@ -3,7 +3,19 @@
 #
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
-
+standard-minifiers
+meteor-base
+mobile-experience
+mongo
+blaze-html-templates
+session
+tracker
+logging
+reload
+random
+ejson
+spacebars
+check
 underscore
 less
 email
@@ -34,8 +46,8 @@ meteorhacks:subs-manager
 #meteorhacks:kadira
 #meteorhacks:kadira-profiler
 #kadira:debug
-vsivsi:queue-async
-cfs:reactive-list
+
+
 cfs:power-queue
 reywood:publish-composite
 lab:vnw-apis
@@ -51,7 +63,7 @@ izzilab:react-bootstrap@0.0.1
 stevezhu:lodash
 thereactivestack:blazetoreact
 okgrow:analytics
-sergeyt:typeahead
+
 #vnw:core
 vnw:city
 vnw:industries
@@ -63,16 +75,5 @@ vnw:migration
 #vnw:job
 #vnw:candidate
 #vnw:application
-standard-minifiers
-meteor-base
-mobile-experience
-mongo
-blaze-html-templates
-session
-tracker
-logging
-reload
-random
-ejson
-spacebars
-check
+
+mizzao:autocomplete

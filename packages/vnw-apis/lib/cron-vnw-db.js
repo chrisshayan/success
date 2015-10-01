@@ -55,7 +55,7 @@ CRON_VNW.cronSkills = function () {
     })
 };
 
-CRON_VNW.addQueueCron = function (type, data) {
+CRON_VNWddQueueCron = function (type, data) {
     Job(Collections.SyncQueue, type, data).save();
 };
 
