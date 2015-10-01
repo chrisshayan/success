@@ -6,15 +6,15 @@ SyncedCron.options = {
 };
 
 var syncData = function () {
-    /*SyncedCron.add({
+    SyncedCron.add({
         name: 'Pull and sync jobs, applications from vietnamworks',
         schedule: function (parser) {
             return parser.text(Meteor.settings.private.cronJobSchedule);
         },
         job: function () {
-            CRON_VNW.cron();
+            CRON_VNW.sync();
         }
-    });*/
+    });
     SyncedCron.add({
         name: 'Pull and sync skill term from VNW',
         schedule: function (parser) {
