@@ -27,6 +27,11 @@ Template.jobTagsInput.helpers({
     },
     tagClass: function() {
         return this.tagClass;
+    },
+
+    jobId: function() {
+        return Template.instance().data.jobId;
+
     }
 });
 
