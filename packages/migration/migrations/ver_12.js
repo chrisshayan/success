@@ -23,21 +23,14 @@ Migrations.add({
         }).forEach(function (doc) {
             var _name = doc.skillName.toLowerCase().trim();
             _name = _name.replace(/["'<>]/gi, '').replace(/\s+/g, ' ');
-            var checkExists = Collections.SkillTerms.find({skillName: _name}).count();
-            if (!checkExists) {
-                // update if not exists
-                Collections.SkillTerms.update({
-                    _id: doc._id
-                }, {
-                    $set: {
-                        skillName: _name,
-                        skillLength: _name.length
-                    }
-                });
-            } else {
-                // remove if existing
-                Collections.SkillTerms.remove({_id: doc._id});
-            }
+            Collections.SkillTerms.update({
+                _id: doc._id
+            }, {
+                $set: {
+                    skillName: _name,
+                    skillLength: _name.length
+                }
+            });
         })
 
     },
