@@ -11,7 +11,7 @@ Template.jobTagsInput.helpers({
 
     settings: function () {
         return {
-            position: "top",
+            position: "bellow",
             limit: 5,
             rules: [
                 {
@@ -24,6 +24,9 @@ Template.jobTagsInput.helpers({
                 }
             ]
         };
+    },
+    tagClass: function() {
+        return this.tagClass;
     }
 });
 
