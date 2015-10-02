@@ -155,7 +155,7 @@ curl -X PUT \
 Name      | Type
 --------- | ---
 jobId     | Number
-entryId   | Number (`entryid` if application applied only, `sdid` if application sent directly)  
+entryId   | Number (`entryid` if application applied online, `sdid` if application sent directly)  
 source    | Number ( `1` is applied online, `2` is sent directly )
 
 - Reponse: 200 and no content
@@ -215,7 +215,7 @@ if ($err) {
 Name      | Type
 --------- | ---
 jobId     | Number
-entryId   | Number (`entryid` if application applied only, `sdid` if application sent directly)  
+entryId   | Number (`entryid` if application applied online, `sdid` if application sent directly)  
 source    | Number ( `1` is applied online, `2` is sent directly )
 
 - Reponse: 200 and no content
