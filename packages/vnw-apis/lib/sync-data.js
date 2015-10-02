@@ -6,8 +6,7 @@
 CRON_VNW = {};
 var _ = lodash;
 
-var VNW_TABLES = Meteor.settings.tables,
-    VNW_QUERIES = Meteor.settings.cronQueries;
+var VNW_QUERIES = Meteor.settings.cronQueries;
 
 
 function formatDatetimeFromVNW(datetime) {

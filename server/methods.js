@@ -695,8 +695,8 @@ Meteor.methods({
             if (data.email) {
                 Meteor.defer(function () {
                     try {
-                        var apiUrl = Meteor.settings.VNW_API.apiUrl + Meteor.settings.VNW_API.registerAccount;
-                        var apiKey = Meteor.settings.VNW_API.apiConsumerKey;
+                        var apiUrl = process.env.VNW_API_URI + Meteor.settings.VNW_API.registerAccount;
+                        var apiKey = process.env.VNW_API_KEY;
                         var result = Meteor.http.call(
                             "POST",
                             apiUrl, {

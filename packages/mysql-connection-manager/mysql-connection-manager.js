@@ -1,6 +1,13 @@
-if(Meteor.settings.hasOwnProperty('mysql')) {
+if(process.env.MYSQL_HOST) {
     mysqlManager = {};
-    var mysqlConfig = Meteor.settings.mysql;
+    var mysqlConfig = {
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
+        password: process.env.MYSQL_PASS,
+        database: process.env.MYSQL_DB,
+        connectionLimit: process.env.MYSQL_CONNECTION_LIMIT
+    };
+
     var mysql = Npm.require('mysql');
     var MySQLConnectionManager = Npm.require('mysql-connection-manager');
 

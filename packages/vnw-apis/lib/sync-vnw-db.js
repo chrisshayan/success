@@ -20,8 +20,7 @@ function parseTimeToString(date) {
     return moment(date).format('YYYY-MM-DD HH:mm:ss');
 }
 
-var VNW_TABLES = Meteor.settings.tables,
-    VNW_QUERIES = Meteor.settings.queries;
+var VNW_QUERIES = Meteor.settings.queries;
 
 
 var fetchVNWData = Meteor.wrapAsync(function (query, callback) {

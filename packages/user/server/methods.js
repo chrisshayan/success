@@ -2,7 +2,6 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-VNW_TABLES = Meteor.settings.tables;
 VNW_QUERIES = Meteor.settings.queries;
 
 function hashVNWPassword(password) {

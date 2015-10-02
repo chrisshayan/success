@@ -14,7 +14,7 @@ Router.route('/downloadresume/:companyId/:entryId/:token', {
                     var fileAlias = application.data.alias;
                     var physicalFolder = application.data.physicalFolder;
                     var mimeType = application.data.fileMime;
-                    var cvLink = sprintf(Meteor.settings.downloadResume, physicalFolder, fileName);
+                    var cvLink = sprintf(process.env.DOWNLOAD_RESUME_URL, physicalFolder, fileName);
 
                     this.response.writeHead(200, {
                         'Content-type': mimeType,

@@ -1,5 +1,14 @@
-Meteor.startup(function () {
+function initENV() {
+    var CUSTOM_ENV = process.env;
+    // share env to public
+    if(CUSTOM_ENV.hasOwnProperty('RESUME_DETAIL_URL')) {
+        Meteor.settings.public['applicationUrl'] = CUSTOM_ENV.RESUME_DETAIL_URL;
+    }
+}
 
+
+Meteor.startup(function () {
+    initENV();
 
     Mandrill.config({
         username: Meteor.settings.mandrill.username,
@@ -23,11 +32,10 @@ Meteor.startup(function () {
             }
         });
 
-    if (Meteor.settings.migration) {
+    if (process.env.MIGRATION) {
         Migrations.unlock();
-        Migrations.migrateTo(Meteor.settings.migration);
+        Migrations.migrateTo(process.env.MIGRATION);
     }
-
 
     CRON_VNW.sync();
     /*

@@ -6,10 +6,11 @@ SyncedCron.options = {
 };
 
 var syncData = function () {
+
     SyncedCron.add({
         name: 'Pull and sync jobs, applications from vietnamworks',
         schedule: function (parser) {
-            return parser.text(Meteor.settings.private.cronJobSchedule);
+            return parser.text(process.env.CRON_SCHEDULE);
         },
         job: function () {
             CRON_VNW.sync();
@@ -28,6 +29,8 @@ var syncData = function () {
 
 
 Meteor.startup(function () {
-    syncData();
-    SyncedCron.start();
+    if(process.env.CRON_SCHEDULE) {
+        syncData();
+        SyncedCron.start();
+    }
 });

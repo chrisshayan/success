@@ -11,8 +11,6 @@ var crypto = Npm.require('crypto');
  debuger('connected as id ' + connection.threadId);
  });
  */
-
-VNW_TABLES = Meteor.settings.tables;
 VNW_QUERIES = Meteor.settings.queries;
 
 /**

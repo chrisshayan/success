@@ -3,8 +3,7 @@
  */
 
 
-var VNW_TABLES = Meteor.settings.tables,
-    VNW_QUERIES = Meteor.settings.queries;
+var VNW_QUERIES = Meteor.settings.queries;
 var pullCompanyInfoSql = sprintf(Utils.VNW_QUERIES.pullCompanyInfo, companyId);
 
 Utils.formatDatetimeFromVNW = function (datetime) {
