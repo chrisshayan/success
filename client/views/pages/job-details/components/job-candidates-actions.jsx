@@ -1,9 +1,9 @@
 let { Input, Label, Button, ButtonGroup, DropdownButton, MenuItem, Modal } = ReactBootstrap;
-var FluxMixin = Fluxxor.FluxMixin(React),
-    StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 JobCandidatesActions = React.createClass({
-    mixins: [FluxMixin, StoreWatchMixin("JobDetailsStore")],
+    contextTypes: {
+        actions: React.PropTypes.object
+    },
 
     getInitialState() {
         return {
@@ -12,34 +12,44 @@ JobCandidatesActions = React.createClass({
         }
     },
 
-    getStateFromFlux: function () {
-        return this.getFlux().store("JobDetailsStore").getCandidateActionsState();
-    },
-
     toggleSearchBox() {
         this.setState({showSearchBox: !this.state.showSearchBox});
     },
+
     toggleSortBox() {
         this.setState({showSortBox: !this.state.showSortBox});
     },
+
     render() {
         return (
             <div style={ {boxShadow: "0px 5px 11px -8px #666"} }>
                 <div className="job-candidate-actions" style={styles.jobCandidates.actions}>
-                    <ActionSelectAll onClick={this.props.onSelectAll}/>
-                    <button onClick={ this.toggleSearchBox } className="btn btn-link btn-md" data-toggle="tooltip"
-                            data-placement="top" title="" data-original-title="Search candidate"><i
-                        className="fa fa-search"></i></button>
 
-                    <button className="btn btn-link btn-md" data-toggle="tooltip" data-placement="top" title=""
-                            data-original-title="Sort" onClick={ this.toggleSortBox }><i
-                        className="fa fa-sort-amount-asc"></i></button>
+                    <ActionSelectAll onToggleSelectAll={this.context.actions.toggleSelectAll}/>
 
-                    <BulkActions disabled={ !this.state.selectedItems.length }/>
+                    <button
+                        onClick={ this.toggleSearchBox }
+                        className="btn btn-link btn-md"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title="" data-original-title="Search candidate">
+                        <i className="fa fa-search"></i>
+                    </button>
+
+                    <button
+                        className="btn btn-link btn-md"
+                        data-toggle="tooltip"
+                        data-placement="top"
+                        title=""
+                        data-original-title="Sort" onClick={ this.toggleSortBox }>
+                        <i className="fa fa-sort-amount-asc"></i>
+                    </button>
+
+                    <BulkActions disabled={ this.props.disabled }/>
                 </div>
 
-                {this.state.showSearchBox ? (<ActionSearch />) : null}
-                {this.state.showSortBox ? (<ActionSort />) : null}
+                {this.state.showSearchBox ? (<ActionSearch onSearch={this.context.actions.search} />) : null}
+                {this.state.showSortBox ? (<ActionSort onSortCandidate={this.context.actions.sort} />) : null}
 
             </div>
         );
@@ -48,7 +58,6 @@ JobCandidatesActions = React.createClass({
 
 
 var ActionSelectAll = React.createClass({
-    mixins: [FluxMixin],
     componentDidMount() {
         var self = this;
         var selectEl = React.findDOMNode(this.refs.checkbox);
@@ -57,28 +66,33 @@ var ActionSelectAll = React.createClass({
         });
 
         $(selectEl).on('ifChanged', function (event) {
-            self.getFlux().actions.toggleSelectAllCandidate();
+            self.props.onToggleSelectAll();
         });
     },
 
     render() {
         return (
-            <div style={styles.jobCandidates.checkallAction} data-toggle="tooltip" data-placement="top"
-                 title="Select all" data-original-title="Select all">
+            <div
+                style={styles.jobCandidates.checkallAction}
+                data-toggle="tooltip"
+                data-placement="top"
+                title="Select all"
+                data-original-title="Select all">
+
                 <input type="checkbox" ref="checkbox" className="action-select-all"/>
+
             </div>
         );
     }
 });
 
 var ActionSearch = React.createClass({
-    mixins: [FluxMixin],
     getInitialState() {
         return {};
     },
 
     onSearch: function (e) {
-        this.getFlux().actions.searchCandidate(e.target.value);
+        this.props.onSearch(e.target.value);
     },
 
     componentDidMount(){
@@ -88,15 +102,18 @@ var ActionSearch = React.createClass({
     render() {
         return (
             <div>
-                <input ref="searchInput" type="text" className="form-control" placeholder="Search candidates"
-                       onKeyUp={this.onSearch}/>
+                <input
+                    ref="searchInput"
+                    type="text"
+                    className="form-control"
+                    placeholder="Search candidates"
+                    onKeyUp={this.onSearch}/>
             </div>
         );
     }
 });
 
 var ActionSort = React.createClass({
-    mixins: [FluxMixin],
     getInitialState() {
 
         var items = [
@@ -120,7 +137,7 @@ var ActionSort = React.createClass({
             this.setState({
                 currentSort: sort
             });
-            this.getFlux().actions.sortCandidate({field: field, type: type});
+            this.props.onSortCandidate(field, type);
         }
     },
 
@@ -148,22 +165,22 @@ var ActionSort = React.createClass({
 });
 
 const BulkActions = React.createClass({
-    mixins: [FluxMixin],
+    contextTypes: {
+        state: React.PropTypes.object,
+        actions: React.PropTypes.object,
+        helpers: React.PropTypes.object
+    },
     getInitialState() {
         return {
             isSendMassEmail: false
         }
     },
-    componentWillMount() {
-        var selectState = this.getFlux().store("JobDetailsStore").getSelectedState();
-        this.setState({
-            isSelectAll: selectState.isSelectAll || false
-        });
-    },
+
     onSendMassEmail(e) {
         e.preventDefault();
-        var mailTo = this.getFlux().store("JobDetailsStore").getSelectedEmails();
-        if (mailTo.emails.length > 0)
+        var emails = this.context.helpers.getEmailsSelected();
+
+        if (emails.length > 0)
             this.setState({isSendMassEmail: true});
         else
             swal({
@@ -174,12 +191,13 @@ const BulkActions = React.createClass({
 
     onHideSendMassModal () {
         this.setState({isSendMassEmail: false});
-        this.getFlux().store("JobDetailsStore").deselectAllCandidates();
+        this.context.actions.deselectAll();
     },
 
     massDisqualify() {
         var self = this;
-        var appState = this.getFlux().store("JobDetailsStore").getCandidatesState();
+        var selectedItems = this.context.state.selectedItems;
+
         swal({
             title: "Are you sure?",
             text: "They don't qualify for this job?",
@@ -190,9 +208,9 @@ const BulkActions = React.createClass({
             closeOnConfirm: false,
             html: false
         }, function () {
-            Meteor.call('disqualifyApplications', appState.selected);
+            Meteor.call('disqualifyApplications', selectedItems);
             swal("Disqualifed!", "", "success");
-            self.getFlux().store("JobDetailsStore").deselectAllCandidates();
+            self.context.actions.deselectAll();
         });
     },
 
@@ -212,20 +230,34 @@ const BulkActions = React.createClass({
 });
 
 MailComposerModal = React.createClass({
-    mixins: [FluxMixin],
+    contextTypes: {
+        state: React.PropTypes.object
+    },
     getInitialState() {
         return {
             to: []
         };
     },
     componentWillMount() {
-        var mailTo = this.getFlux().store("JobDetailsStore").getSelectedEmails();
+        var mailTo = {
+            appIds: [],
+            emails: []
+        };
+        _.each(this.context.state.selectedItems, function(id) {
+            var app = Collections.Applications.findOne({_id: id});
+            if(app && app.candidateInfo && app.candidateInfo.emails.length > 0) {
+                mailTo.appIds.push(id);
+                mailTo.emails.push(app.candidateInfo.emails[0]);
+            }
+        });
         this.setState({to: mailTo});
     },
     render() {
         return (
-            <Modal {...this.props} className="mass-email-modal" bsSize='large' show={this.props.show}
-                                   onHide={this.props.onHide}>
+            <Modal {...this.props}
+                className="mass-email-modal"
+                bsSize='large' show={this.props.show}
+                onHide={this.props.onHide}>
                 <MailComposer onDiscard={this.props.onHide} to={this.state.to}/>
             </Modal>
         );

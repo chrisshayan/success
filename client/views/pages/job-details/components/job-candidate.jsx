@@ -1,12 +1,6 @@
 let cx = React.addons.classSet;
-var FluxMixin = Fluxxor.FluxMixin(React),
-    StoreWatchMixin = Fluxxor.StoreWatchMixin;
 
 JobCandidate = React.createClass({
-    //mixins: [FluxMixin, StoreWatchMixin("JobDetailsStore")],
-    //getStateFromFlux() {
-    //    return this.getFlux().store("JobDetailsStore").getCandidateState(this.props.candidate);
-    //},
 
     componentDidMount() {
 
@@ -37,7 +31,7 @@ JobCandidate = React.createClass({
 
         return (
             <li className={containerClass} style={ styles.jobCandidate.container }>
-                <CandidateCheckbox id={app._id} checked={this.props.selected}/>
+                <CandidateCheckbox id={app._id} checked={this.props.checked}/>
 
                 <a href={link} style={ styles.jobCandidate.candidateInfo }>
                     <small className="pull-right text-muted">{ appliedDate }</small>
@@ -62,10 +56,12 @@ JobCandidate = React.createClass({
 });
 
 CandidateCheckbox = React.createClass({
-    mixins: [FluxMixin],
+    contextTypes: {
+        actions: React.PropTypes.object
+    },
+
     componentDidMount() {
         var self = this;
-        var flux = this.getFlux();
 
         var el = React.findDOMNode(this.refs.checkbox);
         $(el).iCheck({
@@ -76,7 +72,7 @@ CandidateCheckbox = React.createClass({
         }
 
         $(el).on('ifClicked', function (event) {
-            flux.actions.toggleSelectCandidate(self.props.id);
+            self.context.actions.toggleSelectApplication(self.props.id);
         });
     },
 

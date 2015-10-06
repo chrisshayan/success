@@ -25,7 +25,6 @@ reactive-dict
 iron:router
 react
 react-template-helper
-izzilab:fluxxor
 twbs:bootstrap
 fortawesome:fontawesome
 momentjs:moment
@@ -80,3 +79,4 @@ vnw:sync-data
 #vnw:application
 
 mizzao:autocomplete
+vnw:hiring-team
