@@ -18,9 +18,9 @@ Package.onUse(function (api) {
 
     api.addFiles('hiring-team.js');
 
-    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js', 'common/job-level-model.js']);
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
-    api.addFiles(['server/publications.js', 'server/methods.js', 'server/startup.js'], ['server']);
+    api.addFiles(['server/publications.js', 'server/methods.js'], ['server']);
 
     api.export('HiringTeam');
 
