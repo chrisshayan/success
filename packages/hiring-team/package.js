@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'vnw:sync-data',
+    name: 'vnw:hiring-team',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -13,19 +13,22 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(['stevezhu:lodash', 'lab:vnw-apis']);
 
-    api.addFiles(['sync-data.js'], 'server');
-    api.addFiles(['jobs/applications.js', 'jobs/jobs.js', 'jobs/candidates.js'], 'server');
+    api.use(["vnw:core"]);
 
-    api.export('sJobCollections')
+    api.addFiles('hiring-team.js');
 
+    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js', 'common/job-level-model.js']);
+
+    api.addFiles(['server/publications.js', 'server/methods.js', 'server/startup.js'], ['server']);
+
+    api.export('HiringTeam');
 
 });
 
 Package.onTest(function (api) {
     api.use('ecmascript');
     api.use('tinytest');
-    api.use('sync-data');
-    api.addFiles('sync-data-tests.js');
+    api.use('hiring-team');
+    api.addFiles('hiring-team-tests.js');
 });

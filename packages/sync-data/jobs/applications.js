@@ -72,7 +72,7 @@ function processCandidates(candidateId) {
     })
 }
 
-function processupdateApplication() {
+function processUpdateApplication() {
 }
 
 
@@ -140,10 +140,14 @@ var Applications = {
 
                     cApps.forEach(function (row) {
                         processCandidates(row.userid);
+
+                        /*sJobCollections.addJobtoQueue('addCandidate', {candidateId : row.userid});*/
                         var application = processApplication(row, mongoJob.companyId, data.source);
                         var query = {entryId: application.entryId};
-                        Collections.Applications.upsert(query, application);
-
+                        if (Collections.Applications.findOne(query))
+                            sJobCollections.addJobtoQueue('addApplication', data);
+                        else
+                            Collections.Applications.insert(application);
 
                         (data.source == 1) && Meteor.defer(function () {
                             CRON_VNW.cronResume([application.resumeId]);
