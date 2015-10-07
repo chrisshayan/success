@@ -8,7 +8,7 @@ Company.prototype.application = function (options) {
     return Collection.find({companyId: this.companyId}, options || {}).fetch();
 };
 
-Job.prototype.application = function (options) {
+vnwJob.prototype.application = function (options) {
     if (this.jobId == void 0) return [];
     return Collection.find({jobId: this.jobId}, options || {}).fetch();
 };

@@ -75,7 +75,7 @@ var publications = {
 };
 
 
-/*Meteor.publish('getJobs', publications.getJobs);
+Meteor.publish('getJobs', publications.getJobs);
 
- Meteor.publish('getLatestJob', publications.getLatestJob);*/
+Meteor.publish('getLatestJob', publications.getLatestJob);
 

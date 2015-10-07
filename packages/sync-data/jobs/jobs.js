@@ -42,30 +42,30 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 
 function processJob(row, companyId) {
     var expiredAt = formatDatetimeFromVNW(row.expireddate);
+    var job = new vnwJob();
 
-    var job = {
-        companyId: +companyId,
-        jobId: +row.jobid,
-        userId: +row.userid,
-        source: 'vnw',
-        title: row.jobtitle,
-        level: '',
-        categories: [],
-        locations: [],
-        salaryMin: +row.salarymin,
-        salaryMax: +row.salarymax,
-        showSalary: true,
-        description: row.jobdescription,
-        requirements: row.skillexperience,
-        benefits: '',
-        recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
-        skills: [],
-        vnwData: row,
-        status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
-        createdAt: formatDatetimeFromVNW(row.createddate),
-        updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
-        expiredAt: expiredAt
-    };
+    job.companyId = +companyId;
+    job.jobId = +row.jobid;
+    job.userId = +row.userid;
+    job.source = 'vnw';
+    job.title = row.jobtitle;
+    job.level = '';
+    job.categories = [];
+    job.locations = [];
+    job.salaryMin = +row.salarymin;
+    job.salaryMax = +row.salarymax;
+    job.showSalary = true;
+    job.description = row.jobdescription;
+    job.requirements = row.skillexperience;
+    job.benefits = '';
+    job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
+    job.skills = [];
+    job.vnwData = row;
+    job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
+    job.createdAt = formatDatetimeFromVNW(row.createddate);
+    job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
+    job.expiredAt = expiredAt;
+
 
     if (!row.isactive)
         job.status = 2;
@@ -112,9 +112,15 @@ var Jobs = {
 
                 cJobs.forEach(function (row) {
                     var job = processJob(row, data.companyId);
-                    Collections.Jobs.insert(job);
+                    //Collections.Jobs.insert(job);
                     console.log('job', job.jobId);
-                    getApplications(job.jobId);
+                    if (!job.isExist()) {
+                        sJobCollections.addJobtoQueue('updateJob', data);
+                    } else {
+                        job.save();
+                        getApplications(job.jobId);
+                    }
+
                 });
             }
 

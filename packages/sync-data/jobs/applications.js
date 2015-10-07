@@ -47,27 +47,40 @@ function processCandidates(candidateId) {
     var candidateRows = fetchVNWData(getCandidatesSQL);
 
     candidateRows.forEach(function (row) {
-        var candidate = Collections.Candidates.findOne({candidateId: row.userid});
-        if (!candidate) {
-            //console.log('new candidate: ', row.userid);
-            //console.log('new', row.userid, row.firstname);
-            candidate = new Schemas.Candidate();
-            candidate.candidateId = row.userid;
-            candidate.data = row;
-            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            Collections.Candidates.insert(candidate);
+        //var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+        var candidate = new Candidate();
 
+        //console.log('new candidate: ', row.userid);
+        //console.log('new', row.userid, row.firstname);
+        //candidate = new Schemas.Candidate();
+        candidate.candidateId = row.userid;
+        candidate.username = row.username;
+        candidate.password = row.password;
+        candidate.firstname = row.firstname;
+        candidate.lastname = row.lastname;
+        candidate.jobTitle = row.jobTitle;
+        candidate.workingCompany = row.workingCompany;
+        candidate.vnwData = row;
+        candidate.data = row;
+        candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+        candidate.updatedAt = formatDatetimeFromVNW(row.lastdateupdated);
 
+        //Collections.Candidates.insert(candidate);
+        if (!candidate.isExist()) {
+            candidate.save();
         } else {
-            //TODO : in the future, the 3rd job will care this one
-            if (!_.isEqual(candidate.data, row)) {
-                Collections.Jobs.update(candidate._id, {
-                    $set: {
-                        data: row,
-                        lastSyncedAt: new Date()
-                    }
-                });
-            }
+            candidate.updateCandidate();
+
+
+            /*//TODO : in the future, the 3rd job will care this one
+             if (!_.isEqual(candidate.data, row)) {
+             Collections.Jobs.update(candidate._id, {
+             $set: {
+             data: row,
+             lastSyncedAt: new Date()
+             }
+             });
+             }*/
         }
     })
 }
@@ -79,16 +92,19 @@ function processUpdateApplication() {
 function processApplication(row, companyId, sourceId) {
     var appId = row.entryid || row.sdid;
 
-    var application = new Schemas.Application();
+    //var application = new Schemas.Application();
+    var application = new Application();
     application.entryId = +appId;
-    application.companyId = +companyId;
     application.jobId = +row.jobid;
+    application.companyId = +companyId;
     application.candidateId = +row.userid;
     application.source = +sourceId;
+    application.coverLetter = row.coverletter;
+    application.matchingScore = row.matchingScore;
     application.isDeleted = row['deleted_by_employer'];
     application.data = row;
+    application.vnwData = row;
     application.createdAt = formatDatetimeFromVNW(row.createddate);
-    application.matchingScore = row.matchingScore;
 
 
     var can = Collections.Candidates.findOne({candidateId: row.userid});
@@ -143,11 +159,24 @@ var Applications = {
 
                         /*sJobCollections.addJobtoQueue('addCandidate', {candidateId : row.userid});*/
                         var application = processApplication(row, mongoJob.companyId, data.source);
+
                         var query = {entryId: application.entryId};
                         if (Collections.Applications.findOne(query))
                             sJobCollections.addJobtoQueue('addApplication', data);
                         else
                             Collections.Applications.insert(application);
+
+                        /*
+
+                         if (application.isExist()) {
+                         sJobCollections.addJobtoQueue('updateApplication', data);
+                         } else {
+                         application.save();
+                         */
+
+
+//                        Collections.Applications.upsert(query, application);
+
 
                         (data.source == 1) && Meteor.defer(function () {
                             CRON_VNW.cronResume([application.resumeId]);
@@ -168,7 +197,7 @@ var Applications = {
                             activity.appliedJob();
 
                         });
-
+                        //}
                     });
                 }
             }
@@ -210,24 +239,25 @@ var Applications = {
                             var application = processApplication(row, mongoJob.companyId, data.source);
 
                             var query = {entryId: application.entryId};
-                            Collections.Applications.upsert(query, application);
+                            var oldApp = Meteor.applications.findOne(query);
+                            oldApp.update(application);
 
-                            /* Log activity */
-                            Meteor.defer(function () {
-                                // Log applied activity
-                                var activity = new Activity();
-                                activity.companyId = mongoJob.companyId;
-                                activity.data = {
-                                    applicationId: data.entryId,
-                                    source: data.source,
-                                    userId: row.userid
-                                };
+                            /*/!* Log activity *!/
+                             Meteor.defer(function () {
+                             // Log applied activity
+                             var activity = new Activity();
+                             activity.companyId = mongoJob.companyId;
+                             activity.data = {
+                             applicationId: data.entryId,
+                             source: data.source,
+                             userId: row.userid
+                             };
 
-                                activity.createdAt = formatDatetimeFromVNW(row.createddate);
-                                activity.appliedJob();
+                             activity.createdAt = formatDatetimeFromVNW(row.createddate);
+                             activity.appliedJob();
 
-                            });
-
+                             });
+                             */
                         });
                     }
                 }

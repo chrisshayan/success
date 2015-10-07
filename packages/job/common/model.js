@@ -4,14 +4,20 @@
 var model = BaseModel.extendAndSetupCollection("jobs");
 Collection = model.collection;
 
-SimpleSchema.messages({
-    salaryMaxInvalid: "Max salary must greater than min salary"
-});
+///*SimpleSchema.messages({
+//
+// xInvalid: "Max salary must greater than min salary"
+//});*/
 
 model.prototype.updateJob = function (data, cb) {
     if (data == void 0 || typeof data === 'function') data = this;
-
+    console.log('modifier', this.createdAt, this.updatedAt);
     return Meteor.call('updateJob', this, data, cb);
+};
+
+model.prototype.isExist = function (condition) {
+    var query = condition || {jobId: this.jobId};
+    return !!Collection.findOne(query);
 };
 
 model.appendSchema({
@@ -19,7 +25,9 @@ model.appendSchema({
         type: Number,
         optional: true
     },
-
+    jobId: {
+        type: Number
+    },
     source: {
         type: String,
         defaultValue: "vietnamworks" // from recruit|vietnamworks|some sources
@@ -35,6 +43,7 @@ model.appendSchema({
 
     level: {
         type: String,
+        optional: true,
         autoform: {
             type: "select2",
             firstOption: true,
@@ -130,12 +139,12 @@ model.appendSchema({
     salaryMax: {
         type: Number,
         defaultValue: 500,
-        custom: function () {
-            if (this.isSet) {
-                if (this.value < this.field("salaryMin").value)
-                    return "salaryMaxInvalid";
-            }
-        },
+        /*custom: function () {
+         if (this.isSet) {
+         if (this.value < this.field("salaryMin").value)
+         return "salaryMaxInvalid";
+         }
+         },*/
         autoform: {
             type: "select2",
             options: function () {
@@ -224,18 +233,15 @@ model.appendSchema({
     createdAt: {
         type: Date
     },
-    createdBy: {
-        type: String
-    },
     updatedAt: {
         type: Date
     },
-    updatedBy: {
-        type: String
+    expiredAt: {
+        type: Date
     }
 });
 
-Job = model;
+vnwJob = model;
 
 
 /**
@@ -251,10 +257,11 @@ Collection.allow({
     },
     remove: function (userId, doc) {
         return !!userId && doc.createdBy === userId;
-    },
+    }
 });
 
 
+/*
 Collection.before.insert(function (userId, doc) {
     doc.createdAt = doc.updatedAt = new Date();
     doc.createdBy = doc.updatedBy = userId;
@@ -263,4 +270,4 @@ Collection.before.insert(function (userId, doc) {
 Collection.before.update(function (userId, doc) {
     doc.updatedAt = new Date();
     doc.updatedBy = userId;
-});
+});*/

@@ -70,6 +70,8 @@ okgrow:analytics
 vnw:city
 vnw:industries
 vnw:job
+vnw:candidate
+vnw:application
 vnw:migration
 
 vnw:job-criteria

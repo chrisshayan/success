@@ -132,7 +132,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 
-Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
+Meteor.publish('getJobs1', function (filters, options, filterEmailAddress) {
     try {
         if (!this.userId) this.ready();
 
@@ -159,7 +159,7 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
 });
 
 
-Meteor.publishComposite('getApplications', function (filters, options) {
+Meteor.publishComposite('getApplications1', function (filters, options) {
     return {
 
         find: function () {

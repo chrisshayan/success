@@ -8,11 +8,16 @@ Collection = model.collection;
 
 model.prototype.candidate = function (options) {
     if (this.candidateId == void 0) return [];
-    return Candidate.model._collection.find({candidateId: this.candidateId}, options || {});
+    return Meteor.candidates.findOne({candidateId: this.candidateId}, options || {});
+};
+
+model.prototype.isExist = function (condition) {
+    var query = condition || {entryID: this.entryId};
+    return !!Collection.findOne(query);
 };
 
 model.appendSchema({
-    applicationId: {
+    entryId: {
         type: Number
     },
     jobId: {
@@ -29,7 +34,8 @@ model.appendSchema({
         defaultValue: ''
     },
     resumeId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     source: {
         type: Number
@@ -40,11 +46,20 @@ model.appendSchema({
     }, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
     matchingScore: {
         type: Number,
+        decimal: true,
         defaultValue: 0
     },
     disqualified: {
         type: Boolean,
         defaultValue: false
+    },
+    candidateInfo: {
+        type: Object,
+        blackbox: true,
+        optional: true
+    },
+    isDeleted: {
+        type: Number
     },
     vnwData: {
         type: Object,

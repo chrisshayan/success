@@ -6,6 +6,18 @@ var model = BaseModel.extendAndSetupCollection("candidates");
 
 Collection = model.collection;
 
+model.prototype.isExist = function (condition) {
+    var query = condition || {candidateId: this.candidateId};
+    return !!Collection.findOne(query);
+};
+
+
+model.prototype.updateCandidate = function (data, cb) {
+    if (data == void 0 || typeof data === 'function') data = this;
+
+    return Meteor.call('updateCandidate', this, data, cb);
+};
+
 model.appendSchema({
     candidateId: {
         type: Number
@@ -17,10 +29,12 @@ model.appendSchema({
         type: String
     },
     firstname: {
-        type: String
+        type: String,
+        optional: true
     },
     lastname: {
-        type: String
+        type: String,
+        optional: true
     },
     jobTitle: {
         type: String,
