@@ -88,8 +88,32 @@ var methods = {
             console.trace(e);
             return false;
         }
-    }
+    },
 
+    activeAccount(data) {
+        check(data, {
+            email: String,
+            key: String,
+            fullname: String,
+            username: String,
+            password: String
+        });
+
+        var tempName = data.fullname.split(' ');
+        var firstName = tempName.shift();
+        var lastName = tempName.join(' ');
+        var user = {};
+        user.username = data.username;
+        user.email = data.email;
+        user.password = data.password;
+
+        user.profile = {
+            firstname: firstName,
+            lastname: lastName
+        };
+
+        return Accounts.createUser(user);
+    }
 
 };
 
