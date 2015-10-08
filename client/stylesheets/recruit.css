@@ -493,3 +493,25 @@
     cursor: pointer;
 
 }
+
+.recruiter-search-item {
+    position: relative;
+    padding: 8px;
+    cursor: pointer !important;
+    background: #fff;
+    border-bottom: 1px solid #EEE;
+}
+
+.recruiter-search-item:last-child {
+    border-bottom: none;
+}
+
+.recruiter-search-item:hover {
+    background: #5288bb !important;
+    color: #fff !important;
+}
+
+.recruiter-search.loading {
+    background: url("/img/loading-circle-mini.gif") no-repeat 98% center;
+
+}

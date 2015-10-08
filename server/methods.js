@@ -841,15 +841,91 @@ Meteor.methods({
         });
 
         var diff = _.difference(newTags, job.tags || []);
-        _.each(diff, function(newSkill) {
-           Collections.SkillTerms.upsert({skillName: newSkill}, {
-               $set: {
-                   skillId: null,
-                   skillName: newSkill,
-                   skillLength: newSkill.length
-               }
-           });
+        _.each(diff, function (newSkill) {
+            Collections.SkillTerms.upsert({skillName: newSkill}, {
+                $set: {
+                    skillId: null,
+                    skillName: newSkill,
+                    skillLength: newSkill.length
+                }
+            });
         });
         return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
+    },
+
+
+    assignJobRecruiter: function (jobId, role, userId) {
+        if (this.userId) {
+            var job = Collections.Jobs.findOne({jobId: jobId});
+            if (job) {
+                var selector = {},
+                    modifier = {};
+
+                var recruiter = _.findWhere(job.recruiters, {userId: userId});
+                if (recruiter) {
+                    if (recruiter.roles.indexOf(role) < 0) {
+                        selector = {
+                            'recruiters.userId': userId
+                        };
+                        modifier = {
+                            $push: {
+                                'recruiters.$.roles': role
+                            }
+                        };
+                    }
+                } else {
+                    selector['jobId'] = jobId;
+                    modifier['$push'] = {
+                        recruiters: {
+                            userId: userId,
+                            roles: [role]
+                        }
+                    };
+                }
+
+                if (selector && modifier)
+                    return Collections.Jobs.update(selector, modifier);
+            }
+        }
+        return null;
+    },
+
+    unassignJobRecruiter: function (jobId, role, userId) {
+        if (this.userId) {
+            console.log(jobId, role, userId)
+            var job = Collections.Jobs.findOne({jobId: jobId});
+            if (job) {
+                var recruiter = _.findWhere(job.recruiters, {userId: userId});
+                if (recruiter) {
+                    var selector = {
+                            _id: job._id
+                        },
+                        modifier = {};
+
+                    if (recruiter.roles.indexOf(role) >= 0) {
+                        if (recruiter.roles.length > 1) {
+                            selector["recruiters.userId"] = userId;
+                            modifier = {
+                                $pull: {
+                                    'recruiters.$.roles': role
+                                }
+                            };
+                        } else {
+                            modifier = {
+                                $pull: {
+                                    'recruiters': {
+                                        userId: userId
+                                    }
+                                }
+                            };
+                        }
+
+                        return Collections.Jobs.update(selector, modifier);
+                    }
+
+                }
+            }
+        }
+        return null;
     }
 });

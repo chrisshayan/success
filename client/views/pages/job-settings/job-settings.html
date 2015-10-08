@@ -1,6 +1,7 @@
-<template name="AddPosition">
-    {{> pageHeading title="Add new position"}}
-
+<template name="jobSettings">
+    {{#if job}}
+        {{> pageHeading category="Job settings" title=job.title }}
+    {{/if}}
     <div class="wrapper wrapper-content">
         <div class="row">
             <div class="col-sm-12">
@@ -12,10 +13,10 @@
                                 <a data-toggle="tab" href="#hiring-team" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
-                                        <span class="hidden-xs hidden-sm">JOB DETAILS</span>
+                                        <span class="hidden-xs hidden-sm">HIRING TEAM</span>
                                     </h3>
 
-                                    <p class="hidden-xs hidden-sm text-muted">Important for attracting the right job candidates, evaluating employees' performance, and more</p>
+                                    <p class="hidden-xs hidden-sm">Managing the roles and responsibilities for various recruiting tasks across your team</p>
                                 </a>
                             </li>
 
@@ -27,7 +28,7 @@
                                     <div class="col-sm-12 col-md-12">
                                         <div class="animated fadeInRight">
                                             <div class="content">
-                                                {{> quickForm schema="Schemas.addPositionForm" type="method" meteormethod="addPosition" id="addPosition" }}
+                                                {{> React component=HiringTeam}}
                                             </div>
                                         </div>
                                     </div>

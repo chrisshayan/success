@@ -13,6 +13,11 @@ StaticSubs = new SubsManager({
     expireIn: 30
 });
 
+RecruiterSubs = new SubsManager({
+    cacheLimit: 100,
+    expireIn: 30
+});
+
 StaticSubs.subscribe('staticModels');
 
 Router.configure({
@@ -225,7 +230,7 @@ Router.route('/settings/mailtemplates/update/:_id', {
 Router.route('/settings/mailsignature', {
     name: "mailSignature",
     waitOn: function () {
-        return Meteor.subscribe('companySettings')
+        return Meteor.subscribe('companySettings');
     },
     action: function () {
         this.render('mailSignature');
@@ -246,5 +251,22 @@ Router.route('/activites', {
     },
     action: function () {
         this.render('activities');
+    }
+});
+
+
+Router.route('/job-settings/:jobId', {
+    name: 'jobSettings',
+    template: 'jobSettings',
+    waitOn: function() {
+        return [
+            Meteor.subscribe('jobSettings', this.params.jobId)
+        ];
+    },
+    data: function() {
+        var jobId = Utils.transformVNWId(this.params.jobId);
+        return {
+            job: Collections.Jobs.findOne({jobId: jobId})
+        }
     }
 });

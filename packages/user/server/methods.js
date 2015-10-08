@@ -114,5 +114,4 @@ var methods = {
     }
 };
 
-
 Meteor.methods(methods);

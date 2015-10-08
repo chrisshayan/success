@@ -1,7 +1,7 @@
 function initENV() {
     var CUSTOM_ENV = process.env;
     // share env to public
-    if(CUSTOM_ENV.hasOwnProperty('RESUME_DETAIL_URL')) {
+    if (CUSTOM_ENV.hasOwnProperty('RESUME_DETAIL_URL')) {
         Meteor.settings.public['applicationUrl'] = CUSTOM_ENV.RESUME_DETAIL_URL;
     }
 }
@@ -46,4 +46,22 @@ Meteor.startup(function () {
     //CRON_VNW.startupSync();
 
 
+    generateFixtures();
 });
+
+function generateFixtures() {
+    if (Meteor.users.find().count() < 5) {
+        _.each(_.range(0, 20), function (i) {
+            var profile = {
+                firstname: faker.name.firstName(),
+                lastname:faker.name.lastName()
+            };
+            var e = faker.internet.email();
+            var userId = Accounts.createUser({
+                email: e,
+                password: '123456'
+            });
+            Meteor.users.update({_id: userId}, {$set: {profile: profile}});
+        });
+    }
+}

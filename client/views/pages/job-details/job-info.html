@@ -13,6 +13,11 @@
                     {{/each}}
                 </ul>
             </div>
+            <div class="pull-left">
+                <a href="{{pathFor 'jobSettings' jobId=job.jobId}}" class="btn btn-white btn-xs" style="margin: 5px 10px">
+                    <i class="fa fa-cogs"></i> settings
+                </a>
+            </div>
 
             <div class="pull-right" style="padding-right: 30px;">
                 {{> addCandidate}}

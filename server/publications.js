@@ -485,11 +485,35 @@ Meteor.publish('addPositionPage', function () {
 });
 
 
-Meteor.publish('searchSkillAutocomplete', function(selector, options) {
-    if(!this.userId) return null;
-    if(!options) options = {};
+Meteor.publish('searchSkillAutocomplete', function (selector, options) {
+    if (!this.userId) return null;
+    if (!options) options = {};
     options['sort'] = {skillLength: 1};
     var cursor = Collections.SkillTerms.find(selector, options);
     Autocomplete.publishCursor(cursor, this);
     return this.ready();
+});
+
+Meteor.publishComposite('jobSettings', function (jobId) {
+    if (!this.userId) return null;
+    check(jobId, Match.Any);
+    jobId = transformVNWId(jobId);
+    return {
+        find: function () {
+            return Collections.Jobs.find({jobId: jobId}, {limit: 1});
+        },
+        children: [
+            {
+                find: function (job) {
+                    var userIds = _.pluck(job.recruiters || [], 'userId');
+                    return userIds.length > 0 ? Meteor.users.find({_id: {$in: userIds}}) : null;
+                }
+            }
+        ]
+    }
+});
+
+Meteor.publish('recruiterSearch', function (filter, option) {
+    if (!this.userId) return null;
+    return Meteor.users.find(filter, option);
 });
