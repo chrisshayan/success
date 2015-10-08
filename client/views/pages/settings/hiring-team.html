@@ -1,0 +1,83 @@
+<template name="hiringTeam">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>Hiring Team </h5>
+
+        </div>
+        <div class="ibox-content">
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="input-group"><input type="text" placeholder="Search"
+                                                    class="input-sm form-control"> <span class="input-group-btn">
+                                        <button type="button" class="btn btn-sm btn-primary"> Go!</button> </span></div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+
+                        <th></th>
+                        <th>Role</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Date added</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {{#each data}}
+                        {{> memberInfo}}
+                    {{/each}}
+                    </tbody>
+                </table>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="row">
+                {{> sendRequest}}
+            </div>
+        </div>
+    </div>
+</template>
+
+<template name="sendRequest">
+    <form id="send-request" class="form-group">
+        <label class="col-sm-2 control-label">Invite new member</label>
+
+        <div class="col-sm-6">
+            <div class="input-group">
+                <input type="text" name="request-email" placeholder="Enter email address..." class="form-control">
+                <span class="input-group-btn">
+                    <button type="submit" class="btn btn-primary">Send invite</button>
+                </span>
+            </div>
+        </div>
+    </form>
+</template>
+
+<template name="memberInfo">
+    <tr>
+        <td>
+            <input class="icheckbox_square-green" type="checkbox" name="test"/>
+        </td>
+        <td>
+            <span class="label label-primary">{{role}}</span>
+        </td>
+        <td>
+            {{name}}
+        </td>
+        <td>
+            {{email}}
+        </td>
+        <td>@{{userId}}</td>
+        <td>{{formatDate dateAdded}}</td>
+        <td>{{formatStatus status}}</td>
+        <td>
+            <a href="#"><i class="fa fa-muted"></i></a>
+            <a href="#"><i class="fa fa-times text-danger"></i></a>
+        </td>
+    </tr>
+</template>
+
