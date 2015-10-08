@@ -19,7 +19,7 @@ Meteor.loginAsJobSeeker = AccountsVNW.loginAsJobSeeker;
 /**
  *
  */
-UI.registerHelper('username', function() {
+UI.registerHelper('loggedUsername', function() {
     var user = Meteor.user();
     if( user ) {
         if ( user.lastname && user.firstname ) {

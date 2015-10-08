@@ -14,7 +14,7 @@ Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
 
-    api.use(["vnw:core"]);
+    api.use(["vnw:core", "momentjs:moment@2.10.6"]);
 
     api.addFiles('hiring-team.js');
 
@@ -22,7 +22,7 @@ Package.onUse(function (api) {
 
     api.addFiles(['server/publications.js', 'server/methods.js'], ['server']);
 
-    api.export('HiringTeam');
+    api.export(['HiringTeam']);
 
 });
 

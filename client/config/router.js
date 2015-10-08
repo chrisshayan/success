@@ -34,7 +34,7 @@ Router.onBeforeAction(function () {
         else
             this.next();
     }
-    , {except: ['login', 'landing']}
+    , {except: ['login', 'landing', 'activeAccount']}
 );
 /**
  * Redirect to dashboard if user is already logged in
@@ -65,10 +65,21 @@ Router.route('/', {
 Router.route('/login', {
     name: "login",
     action: function () {
-        this.layout('blankLayout')
+        this.layout('blankLayout');
         this.render('login');
     }
 });
+
+Router.route('/active-account/:keyid', {
+    name: "activeAccount",
+    waitOn: function () {
+    },
+    action: function () {
+        this.layout('blankLayout');
+        this.render('active-account');
+    }
+});
+
 
 Router.route('/logout', {
     name: "logout",
@@ -92,10 +103,10 @@ Router.route('/dashboard', {
 
 Router.route('/add-position', {
     name: 'addPosition',
-    waitOn: function() {
+    waitOn: function () {
         return DashboardSubs.subscribe('addPositionPage');
     },
-    action: function() {
+    action: function () {
         this.render('AddPosition');
     }
 });
@@ -201,7 +212,7 @@ Router.route('/settings/mailtemplates/create', {
     name: "createMailTemplate",
     waitOn: function () {
         return [
-            Meteor.subscribe('mailTemplates'),
+            Meteor.subscribe('mailTemplates')
         ];
     },
     action: function () {
@@ -238,7 +249,26 @@ Router.route('/settings/mailsignature', {
     data: function () {
         return Collections.CompanySettings.findOne();
     }
-})
+});
+
+
+Router.route('/settings/hiringTeam', {
+    name: "hiringTeam",
+    waitOn: function () {
+        return [
+            DashboardSubs.subscribe('companyInfo')
+        ];
+    },
+    action: function () {
+        this.render('hiringTeam');
+    },
+
+    data: function () {
+        return {
+            companyInfo: Collections.CompanySettings.findOne()
+        };
+    }
+});
 
 Router.route('/activites', {
     name: "activities",
