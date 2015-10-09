@@ -35,6 +35,11 @@ User.appendSchema({
         type: String,
         optional: true
     },
+    username: {
+        type: String,
+        optional: true
+    },
+
     userId: {
         type: Number,
         optional: true

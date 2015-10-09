@@ -60,7 +60,7 @@ Router.onBeforeAction(function () {
 Router.route('/', {
     name: "landing",
     action: function () {
-        this.layout('blankLayout')
+        this.layout('blankLayout');
         this.render('landing');
     }
 });

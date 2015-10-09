@@ -5,19 +5,27 @@
 AutoForm.hooks({
     activeAccountForm: {
         onSubmit(doc) {
-            Meteor.call('activeAccount', doc, function(err, userId) {
-                if(err) throw err;
-                if(userId) {
-                    Meteor.loginWithPassword(doc.email, doc.password, function(err, result) {
-                        if(err) throw err;
+            Meteor.call('activeAccount', doc, function (err, userId) {
+                if (err) {
+                    console.log(err);
+                    return false;
+                }
+                if (userId) {
+                    Meteor.loginWithPassword(doc.email, doc.password, function (err, result) {
+                        if (err) throw err;
                         Router.go('dashboard');
                     });
                 }
+
             });
             return false;
         }
     }
-})
+});
+
+SimpleSchema.messages({
+    "notAvailableUsername": "This username isn't available."
+});
 
 Template.activeAccount.onCreated(function () {
     var instance = Template.instance();
@@ -26,8 +34,7 @@ Template.activeAccount.onCreated(function () {
     var params = Router.current().params;
     if (params.keyid) {
         Meteor.call('getRequestInfo', params.keyid, function (err, result) {
-            if (err) return false;
-            console.log('key', result);
+            if (err) throw err;
             if (result)
                 instance.props.set('info', result);
 
@@ -39,9 +46,9 @@ Template.activeAccount.onCreated(function () {
 
 
 Template.activeAccount.helpers({
-    schema: function() {
+    schema: function () {
         var data = Template.instance().props.get('info');
-        return new SimpleSchema({
+        var _Schema = new SimpleSchema({
             emailText: {
                 type: String,
                 label: 'Email',
@@ -72,6 +79,20 @@ Template.activeAccount.helpers({
             },
             username: {
                 type: 'string',
+                custom: function () {
+                    if (Meteor.isClient && this.isSet) {
+                        console.log('active username validate', this.value);
+                        Meteor.call("validateUserLoginInfo", this.value, function (error, result) {
+                            //console.log('re user', result);
+                            if (result)
+                                _Schema.namedContext("activeAccountForm").addInvalidKeys([{
+                                    name: "username",
+                                    type: "notAvailableUsername"
+                                }]);
+
+                        });
+                    }
+                },
                 autoform: {
                     value: data.userId
                 }
@@ -83,6 +104,8 @@ Template.activeAccount.helpers({
                 }
             }
         });
+
+        return _Schema;
     },
     info: function () {
         return Template.instance().props.get('info');
@@ -90,15 +113,15 @@ Template.activeAccount.helpers({
 });
 
 Template.activeAccount.events({
-   'submit #requestInvitationForm': function(e) {
-       var self = this;
-       e.preventDefault();
-       var obj = {};
-       $.each($('#requestInvitationForm').serializeArray(), function (index, value) {
-           obj[value.name] = value.value;
-       });
-       console.log(obj);
-   }
+    'submit #requestInvitationForm': function (e) {
+        var self = this;
+        e.preventDefault();
+        var obj = {};
+        $.each($('#requestInvitationForm').serializeArray(), function (index, value) {
+            obj[value.name] = value.value;
+        });
+        //console.log(obj);
+    }
 });
 
 

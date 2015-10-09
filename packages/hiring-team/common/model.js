@@ -6,6 +6,7 @@ var model = BaseModel.extendAndSetupCollection("hiringTeam");
 
 Collection = model.collection;
 
+
 model.appendSchema({
     companyId: {
         type: Number

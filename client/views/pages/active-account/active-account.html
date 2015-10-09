@@ -1,39 +1,7 @@
 <template name="activeAccount">
     <div class="container">
         <div class="row" style="margin-top: 10%">
-            {{#unless info}}
-                <div class="sweet-alert showSweetAlert visible survey-success" data-animation="pop" data-timer="null"
-                     style="display: block;">
-                    <div class="sa-icon sa-error" style="display: none;">
-                            <span class="sa-x-mark">
-                            <span class="sa-line sa-left"></span>
-                            <span class="sa-line sa-right"></span>
-                            </span>
-                    </div>
-                    <div class="sa-icon sa-warning" style="display: none;">
-                        <span class="sa-body"></span>
-                        <span class="sa-dot"></span>
-                    </div>
-                    <div class="sa-icon sa-info" style="display: none;"></div>
-                    <div class="sa-icon sa-success animate" style="display: block;">
-                        <span class="sa-line sa-tip animateSuccessTip"></span>
-                        <span class="sa-line sa-long animateSuccessLong"></span>
-
-                        <div class="sa-placeholder"></div>
-                        <div class="sa-fix"></div>
-                    </div>
-                    <div class="sa-icon sa-custom" style="display: none;"></div>
-                    <h2>Thanks for requesting an invite</h2>
-
-                    <p style="display: block;">We'll send you one as soon as possible.</p>
-
-                    <div class="sa-button-container">
-                        <a class="btn btn-primary" href="{{pathFor 'landing'}}" style="margin: 20px 0;">Back to
-                            homepage</a>
-                    </div>
-                </div>
-
-            {{else}}
+            {{#if info}}
                 <div class="col-md-6 col-md-offset-3 animated fadeInDown">
                     <div class="ibox">
                         <div class="ibox-content">
@@ -42,7 +10,7 @@
                         </div>
                     </div>
                 </div>
-            {{/unless}}
+            {{/if}}
         </div>
     </div>
 </template>
