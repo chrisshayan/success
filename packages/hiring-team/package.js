@@ -18,6 +18,8 @@ Package.onUse(function (api) {
 
     api.addFiles('hiring-team.js');
 
+    api.addAssets('private/hiring-team-invitation.html', 'server');
+
     api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
 
     api.addFiles(['server/publications.js', 'server/methods.js'], ['server']);

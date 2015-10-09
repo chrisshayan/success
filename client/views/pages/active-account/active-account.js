@@ -7,16 +7,16 @@ AutoForm.hooks({
         onSubmit(doc) {
             Meteor.call('activeAccount', doc, function (err, userId) {
                 if (err) {
-                    console.log(err);
+                    console.log('Error %s :  %s', err.err, err.message);
                     return false;
                 }
+
                 if (userId) {
                     Meteor.loginWithPassword(doc.email, doc.password, function (err, result) {
                         if (err) throw err;
                         Router.go('dashboard');
                     });
                 }
-
             });
             return false;
         }
