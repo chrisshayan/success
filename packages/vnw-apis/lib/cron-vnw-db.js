@@ -165,7 +165,7 @@ function processJob(items, companyId) {
             var query = {
                 jobId: +item.jobId
             };
-
+            SYNC_VNW.syncUser
             var expiredAt = formatDatetimeFromVNW(row.expireddate);
 
             var job = {
@@ -670,9 +670,9 @@ CRON_VNW.sync = function () {
     Collections.SyncQueue.remove({type: 'cronData'});
 
     // add new sync job
-    Collections.Users.find().map(function (user) {
+    Meteor.users.find({vnwId: {$exists: true}}).map(function (user) {
         var data = {
-            userId: user.userId,
+            userId: user.vnwId,
             companyId: user.companyId
         };
 

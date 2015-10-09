@@ -21,6 +21,6 @@
 
 <template name="jobStageNav">
     <li class="col-sm-2 {{ activeClass }}">
-        <a aria-expanded="false" role="button" href="{{pathFor 'jobDetails' stage=alias}}">{{ total }} {{ label }}</a>
+        <a aria-expanded="false" role="button" href="{{pathFor 'Job' _id=jobId stage=alias}}">{{ total }} {{ label }}</a>
     </li>
 </template>

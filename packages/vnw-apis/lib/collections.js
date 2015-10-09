@@ -108,21 +108,22 @@ ApplicationTransform.prototype = {
     },
 
     resumeFileUrl: function () {
-        var link = "downloadresume/" + this.companyId + "/" + this.entryId + '/' + Meteor.loginToken();
+        var link = "downloadresume/" + this.companyId + "/" + this._id + '/12345'
         return Meteor.absoluteUrl(link);
     },
 
     link: function() {
+        var job = Collections.Jobs.findOne({jobId: this.jobId});
         var params = {
-            jobId: this.jobId,
+            _id: job._id,
             stage: Success.APPLICATION_STAGES[this.stage].alias
         };
         var queryParams = {
             query: {
-                application: this.entryId
+                application: this._id
             }
         };
-        return Router.url('jobDetails', params, queryParams)
+        return Router.url('Job', params, queryParams)
     }
 };
 

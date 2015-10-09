@@ -5,7 +5,7 @@ CONFIG = {};
 
 UserApi = {
     ROLES: {
-        COMPANY_ADMIN: "company_admin",
+        COMPANY_ADMIN: "company",
         RECRUITER: "recruiter"
     }
 };

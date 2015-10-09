@@ -1,10 +1,10 @@
 Template.jobTagsInput.helpers({
     tags: function () {
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Collections.Jobs.findOne({_id: this.jobId});
         return job && job.tags ? job.tags : [];
     },
     hint: function () {
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Collections.Jobs.findOne({_id: this.jobId});
         if (job.tags && job.tags.length > 0) return "";
         return "click to add labels to your job";
     },
@@ -41,7 +41,7 @@ Template.jobTagsInput.events({
         if(e.which == 13 || e.which == 188) {
             var tag = e.target.value.trim().toLowerCase();
             if(tag.length > 0) {
-                var job = Collections.Jobs.findOne({jobId: this.jobId});
+                var job = Collections.Jobs.findOne({_id: this.jobId});
                 if (job) {
                     e.preventDefault();
                     var tags = job.tags || [];
@@ -57,7 +57,7 @@ Template.jobTagsInput.events({
 
     'autocompleteselect .tag-input': function (e, template, doc) {
         e.preventDefault();
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Collections.Jobs.findOne({_id: this.jobId});
         if (job) {
             e.preventDefault();
             var tags = job.tags || [];
@@ -71,7 +71,7 @@ Template.jobTagsInput.events({
 Template.jobTagItem.events({
     'click .tag-close': function (e, tmpl) {
         e.preventDefault();
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Collections.Jobs.findOne({_id: this.jobId});
         if (job) {
             var tags = job.tags || [];
             tags = _.without(tags, this.value);

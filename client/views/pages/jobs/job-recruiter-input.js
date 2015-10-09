@@ -11,7 +11,7 @@ Template.jobRecruiterInput.onRendered(function() {
 
 Template.jobRecruiterInput.helpers({
     emails: function() {
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Collections.Jobs.findOne({_id: this.jobId});
         return job && job.recruiterEmails ? job.recruiterEmails : [];
     }
 });

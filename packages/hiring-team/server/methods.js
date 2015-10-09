@@ -21,9 +21,11 @@ function generateName(name) {
 
 var methods = {
         'sendRequest': function (obj) {
+            if(!this.userId) return false;
             try {
                 //console.log(obj);
-                if (!obj['request-email'] || !obj.companyId || !obj.fromEmailAddress)
+                var user = Meteor.users.findOne({_id: this.userId});
+                if (!obj['request-email'])
                     return {
                         status: 0,
                         message: 'Missing content.'
@@ -44,18 +46,18 @@ var methods = {
                 var autoName = generateName(name);
 
                 var hiringTeamItem = new HiringTeam();
-                if (Meteor['hiringTeam'].findOne({companyId: obj.companyId, email: email}))
+                if (Meteor['hiringTeam'].findOne({companyId: user.companyId, email: email}))
                     return {
                         status: 0,
                         message: 'This email address is exist in your hiring team already'
                     };
 
-                hiringTeamItem.companyId = obj.companyId;
+                hiringTeamItem.companyId = user.companyId;
                 hiringTeamItem.email = email;
                 hiringTeamItem.userId = autoUserId;
                 hiringTeamItem.name = autoName;
 
-                var company = Collections.CompanySettings.findOne({companyId: obj.companyId});
+                var company = Collections.CompanySettings.findOne({companyId: user.companyId});
 
                 //hiringTeamItem.roleId = [];
                 var result = hiringTeamItem.save();
@@ -83,8 +85,7 @@ var methods = {
                             console.log('mail', mail);
                             Email.send(mail);
                         }
-                    )
-                    ;
+                    );
 
                     //save to hiringTeam
 
@@ -160,7 +161,7 @@ var methods = {
 methods.removeHiringTeamRequest = function (requestId) {
     if (!this.userId) return false;
     this.unblock();
-    var user = Collections.Users.findOne({userId: +this.userId});
+    var user = Meteor.users.findOne({userId: this.userId});
     var request = Meteor['hiringTeam'].findOne({_id: requestId});
     if (!user || !request || request.companyId != user.companyId) return false;
     return request.remove();

@@ -37,7 +37,7 @@ Meteor.startup(function () {
         Migrations.migrateTo(process.env.MIGRATION);
     }
 
-    CRON_VNW.sync();
+    //CRON_VNW.sync();
     /*
      CRON_VNW.cronCity();
      CRON_VNW.cronDegree();*/
@@ -45,23 +45,4 @@ Meteor.startup(function () {
 
     //CRON_VNW.startupSync();
 
-
-    generateFixtures();
 });
-
-function generateFixtures() {
-    if (Meteor.users.find().count() < 5) {
-        _.each(_.range(0, 20), function (i) {
-            var profile = {
-                firstname: faker.name.firstName(),
-                lastname:faker.name.lastName()
-            };
-            var e = faker.internet.email();
-            var userId = Accounts.createUser({
-                email: e,
-                password: '123456'
-            });
-            Meteor.users.update({_id: userId}, {$set: {profile: profile}});
-        });
-    }
-}

@@ -6,7 +6,7 @@ TabularTables.HiringTeam = new Tabular.Table({
     collection: Meteor.hiringTeam,
     selector: function (userId) {
         var f = {};
-        var user = Collections.Users.findOne({userId: +userId});
+        var user = Meteor.users.findOne({_id: userId});
         var company = Collections.CompanySettings.findOne({companyId: user.companyId || null});
         if (company) {
             f['companyId'] = company.companyId;

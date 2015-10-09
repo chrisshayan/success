@@ -25,11 +25,11 @@
 
         </div>
         <div style="clear: both;padding-bottom: 3px">
-            {{> jobTagsInput jobId=job.jobId}}
+            {{> jobTagsInput jobId=job._id}}
         </div>
         {{#with job.recruiterEmails}}
             <div style="clear: both;padding-bottom: 3px">
-                {{> jobRecruiterInput jobId=job.jobId}}
+                {{> jobRecruiterInput jobId=job._id}}
             </div>
         {{/with}}
     </div>

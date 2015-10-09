@@ -32,29 +32,35 @@ AutoForm.hooks({
 JobInfo = BlazeComponent.extendComponent({
     onCreated: function () {
         var self = this;
+        var instance = Template.instance();
 
         this.page = new ReactiveVar(1);
         this.inc = 5;
 
-        this.job = this.data().job;
-
-        var filters = {
-            jobId: {
-                $nin: [this.job.jobId]
-            },
-            source: this.job.source,
-            status: this.job.status
-        };
-
-        var options = {
-            limit: this.limit()
-        };
-
-        Template.instance().subscribe('getJobs', filters, options);
+        instance.autorun(function() {
+            var params = Router.current().params;
+            self.jobId = params._id;
+            var job = Collections.Jobs.findOne({_id: self.jobId});
+            self.job = job;
+            if(self.job) {
+                self.stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
+                instance.subscribe('getJobs', self.filter(), self.option());
+            }
+        });
     },
 
-    limit: function () {
-        return this.page.get() * this.inc;
+    filter() {
+        return {
+            _id: {$ne: this.jobId},
+            source: this.job.source,
+            status: this.job.status
+        }
+    },
+
+    option() {
+        return {
+            limit: this.page.get() * this.inc
+        }
     },
 
     fetchOtherJobs: function () {
@@ -70,10 +76,7 @@ JobInfo = BlazeComponent.extendComponent({
             filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
 
-        var options = {
-            limit: this.limit()
-        };
-        return Collections.Jobs.find(filters, options);
+        return Collections.Jobs.find(this.filter(), this.option());
     },
 
     events: function () {

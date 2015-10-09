@@ -119,7 +119,7 @@ Jobs = BlazeComponent.extendComponent({
 JobItem = BlazeComponent.extendComponent({
     onCreated: function () {
         var job = this.data();
-        this.jobId = job.jobId;
+        this.jobId = job._id;
 
         this.stages = new ReactiveDict;
         this.counting = new ReactiveVar(false);
@@ -183,7 +183,7 @@ filterByEmail = BlazeComponent.extendComponent({
         return [{
             'change .chosen-select': function (e) {
                 var value = $(e.target).val();
-                Meteor.setRecruiterEmail(value);
+                //Meteor.setRecruiterEmail(value);
             },
             'click .select-list-job a': function (e) {
                 e.preventDefault();
@@ -194,7 +194,7 @@ filterByEmail = BlazeComponent.extendComponent({
 
                 var showMine = $this.hasClass('my-job');
                 $('.select-email-list').toggle(showMine);
-                Meteor.setShowMyJob(showMine);
+                //Meteor.setShowMyJob(showMine);
             }
         }]
     },

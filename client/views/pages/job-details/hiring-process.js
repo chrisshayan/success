@@ -1,12 +1,12 @@
 HiringProcess = BlazeComponent.extendComponent({
     onCreated: function() {
         var self = this;
-        this.jobId = Session.get("currentJobId");
-        this.stage = Session.get("currentStage");
         this.trackers = [];
-
         this.trackers.push(Template.instance().autorun(function () {
-            DashboardSubs.subscribe("jobStagesCounter", "job_stages_" + self.jobId, self.jobId);
+            var params = Router.current().params;
+            self.jobId = params._id;
+            self.stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
+            self.subscribe("jobStagesCounter", "job_stages_" + self.jobId, self.jobId);
         }));
     },
 
@@ -34,7 +34,9 @@ HiringProcess = BlazeComponent.extendComponent({
 
 
 jobStageNav = BlazeComponent.extendComponent({
-
+    jobId: function() {
+        return Router.current().params._id;
+    },
     /**
      * Helpers
      */

@@ -8,15 +8,13 @@ JobApplicationActions = BlazeComponent.extendComponent({
         this.props = new ReactiveDict;
         this.props.set("jobId", Session.get("currentJobId"));
         this.props.set("stage", Session.get("currentStage"));
-        this.props.set("applicationId", Session.get("currentApplicationId"));
+        this.props.set("applicationId", null);
 
         this.trackers.push(Template.instance().autorun(function () {
             var params = Router.current().params;
             var applicationId = params.query.application;
-            if (!_.isNaN(+applicationId))
-                applicationId = +applicationId;
             self.props.set('applicationId', applicationId);
-            var application = Collections.Applications.findOne({entryId: applicationId});
+            var application = Collections.Applications.findOne({_id: applicationId});
             self.props.set('application', application);
         }));
     },
@@ -66,7 +64,8 @@ JobApplicationActions = BlazeComponent.extendComponent({
                     // remove application from list
                     // change current application
                     Notification.success(sprintf('Moved to %s successfully', stage.label));
-                    window.stores.JobDetailsStore.triggerMoveApplication();
+
+                    Event.emit('movedApplication');
 
                     var action = 'Change Stage';
                     var info = {
@@ -88,7 +87,6 @@ JobApplicationActions = BlazeComponent.extendComponent({
         Meteor.call('disqualifyApplication', applicationId, function (err, result) {
             if (err) throw err;
             self.props.set('disqualified', true);
-            window.stores.JobDetailsStore.triggerAppChanged();
 
             var action = 'Disqualify Application';
             var info = {
@@ -109,7 +107,6 @@ JobApplicationActions = BlazeComponent.extendComponent({
         Meteor.call('revertApplication', applicationId, function (err, result) {
             if (err) throw err;
             self.props.set('disqualified', false);
-            window.stores.JobDetailsStore.triggerAppChanged();
 
             var action = 'Undo Disqualify Application';
             var info = {
@@ -180,7 +177,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
 
     application: function () {
         var app = Collections.Applications.findOne({
-            entryId: this.props.get("applicationId")
+            _id: this.props.get("applicationId")
         });
         if (app) {
             this.props.set("candidateId", app.candidateId);

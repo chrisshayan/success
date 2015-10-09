@@ -1,0 +1,10 @@
+#job-details-switch {
+    background: #fff;
+    border: none;
+}
+
+#job-details-switch:active {
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+}

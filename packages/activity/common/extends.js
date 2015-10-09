@@ -6,7 +6,7 @@
 User.prototype.activities = function () {
     var query = {
         typeId: 0,
-        userId: this.userId
+        userId: this.vnwId
     };
     return Collection.find(query).fetch();
 };

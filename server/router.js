@@ -91,3 +91,12 @@ Router.route('/webhook/application', {
         }
     }
 });
+
+
+Router.route('/mail/inbox', {
+    where: 'server',
+    action: function () {
+        this.response.end();
+        console.log(this.request.body)
+    }
+});

@@ -16,14 +16,9 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var params = Router.current().params;
             var applicationId = params.query.application;
-            if (!_.isNaN(+applicationId)) {
-                applicationId = +applicationId;
-            }
             self.props.set("applicationId", applicationId);
             self.props.set("isShowMailForm", false);
             self.props.set("isShowCommentForm", false);
-
-            JobDetailsSubs.subscribe('activityCounter', self.counterName(), self.filters());
 
             var trackSub = JobDetailsSubs.subscribe('applicationActivities', self.filters(), self.options());
             if (trackSub.ready()) {
@@ -77,12 +72,6 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         return this.props.get("page") * this.props.get("inc");
     },
 
-    maxLimit: function () {
-        var counter = Collections.Counts.findOne(this.counterName());
-        if (!counter) return 0;
-        return counter.count;
-    },
-
     fetch: function () {
         return Collections.Activities.find(this.filters(), this.options());
     },
@@ -107,7 +96,9 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
     },
 
     loadMoreAbility: function () {
-        return this.maxLimit() - this.total() > 0;
+        var total = Collections.Activities.find(this.filters()).count();
+        var limit = this.total();
+        return total > limit;
     }
 
 }).register('JobApplicationTimeline');

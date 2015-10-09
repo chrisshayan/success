@@ -32,12 +32,10 @@ Template.login.events({
             password = e.target.password.value;
         //
         Meteor.setTimeout(function() {
-            Meteor.loginAsEmployer(username, password, function(result) {
+            Meteor.loginWithVNW(username, password, function(err, result) {
                 loginBtn.button('reset');
-                if( !result.success ) {
-                    Session.set("loginErrorMsg", result.msg);
-                } else {
-                    Session.set("loginErrorMsg", "");
+                if(err) {
+                    Session.set("loginErrorMsg", "Your username/password may be incorrect");
                 }
             });
         }, 100);

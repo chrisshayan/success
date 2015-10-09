@@ -53,7 +53,7 @@ meteorhacks:subs-manager
 cfs:power-queue
 reywood:publish-composite
 lab:vnw-apis
-lab:accounts-vnw
+#lab:accounts-vnw
 lab:notifications
 
 lab:mysql-connection-manager
@@ -75,7 +75,7 @@ vnw:migration
 
 vnw:sync-data
 
-#vnw:user
+vnw:user
 #vnw:company
 #vnw:job
 #vnw:candidate
@@ -86,3 +86,4 @@ vnw:hiring-team
 digilord:faker
 aldeed:tabular
 meteorhacks:ssr
+dburles:mongo-collection-instances
