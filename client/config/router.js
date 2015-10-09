@@ -31,10 +31,12 @@ Router.configure({
  * Check user login
  */
 Router.onBeforeAction(function () {
-        if (!Meteor.userId() || Meteor.loggingIn())
+        if (!Meteor.userId() || Meteor.loggingIn()) {
             this.redirect('login');
-        else
+            this.render(null);
+        } else {
             this.next();
+        }
     }
     , {except: ['login', 'landing', 'activeAccount']}
 );
@@ -42,10 +44,12 @@ Router.onBeforeAction(function () {
  * Redirect to dashboard if user is already logged in
  */
 Router.onBeforeAction(function () {
-        if (Meteor.userId())
+        if (Meteor.userId()) {
+            this.render(null);
             this.redirect('dashboard');
-        else
+        } else {
             this.next();
+        }
     }
     , {only: 'login'}
 );
@@ -86,6 +90,7 @@ Router.route('/active-account/:keyid', {
 Router.route('/logout', {
     name: "logout",
     action: function () {
+        this.render(null);
         DashboardSubs.clear();
         JobDetailsSubs.clear();
         Meteor.logout();
@@ -290,12 +295,12 @@ Router.route('/activites', {
 Router.route('/job-settings/:jobId', {
     name: 'jobSettings',
     template: 'jobSettings',
-    waitOn: function() {
+    waitOn: function () {
         return [
             Meteor.subscribe('jobSettings', this.params.jobId)
         ];
     },
-    data: function() {
+    data: function () {
         var jobId = Utils.transformVNWId(this.params.jobId);
         return {
             job: Collections.Jobs.findOne({jobId: jobId})

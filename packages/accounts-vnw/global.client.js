@@ -1,10 +1,12 @@
 ////////////////////////////////////////////////////////////////////
 // OVERRIDE ACCOUNTS METHODS
 ////////////////////////////////////////////////////////////////////
-Meteor.user = AccountsVNW.user;
-Meteor.userId = AccountsVNW.userId;
-Meteor.loggingIn = AccountsVNW.loggingIn;
-Meteor.logout = AccountsVNW.logout;
+if(AccountsVNW._store.get('user')) {
+    Meteor.user = AccountsVNW.user;
+    Meteor.userId = AccountsVNW.userId;
+    Meteor.loggingIn = AccountsVNW.loggingIn;
+    Meteor.logout = AccountsVNW.logout;
+}
 Meteor.loginToken = AccountsVNW.loginToken;
 Meteor.setRecruiterEmail = AccountsVNW.setRecruiterEmail;
 Meteor.setShowMyJob = AccountsVNW.setShowMyJob;

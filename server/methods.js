@@ -751,6 +751,7 @@ Meteor.methods({
     'getEmailList': function () {
         var listEmail = [];
         var user = Collections.Users.findOne({userId: +this.userId});
+        if(!user) return [];
         var query = {
             companyId: user.companyId
         };

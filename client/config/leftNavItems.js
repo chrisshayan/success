@@ -7,8 +7,11 @@ Meteor.startup(function () {
             route: "dashboard",
             childrens: [],
             dependencies: ['jobTrackingBoard']
-        },
-        {
+        }
+    ];
+
+    if(!_.isNaN(parseInt(Meteor.userId()))) {
+        leftNavItems.push({
             label: "Settings",
             icon: "fa-cogs",
             route: null,
@@ -23,8 +26,8 @@ Meteor.startup(function () {
                 {label: "Mail Signature", icon: "fa-at", route: "mailSignature"},
                 {label: "Hiring Team Manage", icon: "fa-users", route: "hiringTeam"}
             ]
-        }
-    ];
+        });
+    }
 
     UI.registerHelper('leftNavItems', function () {
         return leftNavItems;

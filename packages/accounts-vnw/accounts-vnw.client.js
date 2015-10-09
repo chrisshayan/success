@@ -58,24 +58,31 @@ Meteor.startup(function () {
  * @param callback {Function}
  */
 AccountsVNW.loginAsEmployer = function (username, password, callback) {
-    AccountsVNW._loggingIn.set(true);
 
-    var _account = {username: username, password: password};
-    Meteor.call('loginAsEmployer', _account, function (err, result) {
-        AccountsVNW._loggingIn.set(false);
+    Meteor.loginWithPassword(username, password, function(err, result) {
+        if(err) {
+            AccountsVNW._loggingIn.set(true);
+            var _account = {username: username, password: password};
+            Meteor.call('loginAsEmployer', _account, function (err, result) {
+                AccountsVNW._loggingIn.set(false);
 
-        if (!err) {
-            if (result.success) {
-                AccountsVNW._setUserLogin(result.data);
-                //AccountsVNW._setLoginToken(result.token);
-                callback && callback(result);
-            } else {
-                callback && callback(result);
-            }
+                if (!err) {
+                    if (result.success) {
+                        AccountsVNW._setUserLogin(result.data);
+                        //AccountsVNW._setLoginToken(result.token);
+                        callback && callback(result);
+                    } else {
+                        callback && callback(result);
+                    }
+                } else {
+                    callback && callback(err);
+                }
+            });
         } else {
-            callback && callback(err);
+            Router.go('dashboard');
         }
     });
+
 };
 
 /**

@@ -148,7 +148,10 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
         if (!options.hasOwnProperty("limit")) {
             options['limit'] = 5;
         }
-        return Collections.Jobs.find(filters, options);
+        var recruiterFilter = {
+            "recruiters.userId": this.userId
+        }
+        return Collections.Jobs.find({$or: [filters, recruiterFilter]}, options);
     } catch (e) {
         debuger(e);
         return this.ready();
@@ -402,44 +405,28 @@ Meteor.publish("activityCounter", function (counterName, filters) {
     });
 });
 
-Meteor.publishComposite('lastApplications', function () {
-    return {
-        find: function () {
-            if (!this.userId) return null;
-            try {
-                var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-                if (!user) return [];
+Meteor.publish('lastApplications', function () {
+    if (!this.userId) return null;
+    try {
+        var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+        if (!user) return [];
 
-                var filters = {
-                    source: {$ne: 3},
-                    companyId: user.companyId,
-                    isDeleted: 0
-                };
+        var filters = {
+            source: {$ne: 3},
+            companyId: user.companyId,
+            isDeleted: 0
+        };
 
-                var options = DEFAULT_APPLICATION_OPTIONS;
-                options['limit'] = 10;
-                options['sort'] = {
-                    createdAt: -1
-                };
+        var options = DEFAULT_APPLICATION_OPTIONS;
+        options['limit'] = 10;
+        options['sort'] = {
+            createdAt: -1
+        };
 
-                return Collections.Applications.find(filters, options);
-            } catch (e) {
-                console.log('Last applications:', e);
-                return false;
-            }
-        },
-        children: [
-            //{
-            //    find: function (application) {
-            //        var cond = {
-            //            candidateId: application.candidateId
-            //        };
-            //        var options = DEFAULT_CANDIDATE_OPTIONS;
-            //        options.limit = 1;
-            //        return Collections.Candidates.find(cond, options)
-            //    }
-            //}
-        ]
+        return Collections.Applications.find(filters, options);
+    } catch (e) {
+        console.log('Last applications:', e);
+        return false;
     }
 });
 
@@ -515,6 +502,12 @@ Meteor.publishComposite('jobSettings', function (jobId) {
 
 Meteor.publish('recruiterSearch', function (filter, option) {
     if (!this.userId) return null;
+    if(!_.isNumber(+this.userId)) return null;
+    var user = Collections.Users.findOne({userId: +this.userId});
+    var emails = Meteor['hiringTeam'].find({companyId: user.companyId}).map(function(r){ return r.email; });
+    filter['emails.address'] = {
+        $in: emails
+    };
     return Meteor.users.find(filter, option);
 });
 
