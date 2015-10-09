@@ -3,34 +3,8 @@
  */
 
 
-Template.hiringTeam.onCreated(function () {
-    var instance = Template.instance();
-    instance.props = new ReactiveDict();
-    instance.props.set('limit', 10);
-    var data = this.data;
-
-    this.autorun(function () {
-        var option = {
-            limit: this.limit
-        };
-        console.log('data.companyId ', data);
-        Meteor.subscribe('hiringTeamList', data.companyInfo.companyId, option);
-    })
-});
-
-Template.hiringTeam.helpers({
-    data: function () {
-        return Meteor['hiringTeam'].find({}).fetch();
-    }
-});
-
-
-Template.hiringTeam.onRendered(function () {
-
-});
-
 Template.hiringTeam.events({
-    'submit #send-request': function (e) {
+    'submit #send-request': function (e, tmpl) {
         var self = this;
         e.preventDefault();
         var obj = {};
@@ -47,26 +21,14 @@ Template.hiringTeam.events({
                 console.log(result);
             }
         });
-
-
+        tmpl.find('[name="request-email"]').value = '';
     }
 });
 
-Template.memberInfo.helpers({
-    formatDate: function (date) {
 
-        return moment(date).format('hh:mm A, DD-MM-YYYY');
-    },
-    formatStatus: function (status) {
-        if (status == void 0) return 'unknown';
-
-        switch (status) {
-            case 1 :
-                return 'confirmed';
-            case 0 :
-            default :
-                return 'pending';
-
-        }
+Template.hiringTeamActionsCell.events({
+    'click .remove': function(e) {
+        e.preventDefault();
+        Meteor.call('removeHiringTeamRequest', this._id);
     }
 });

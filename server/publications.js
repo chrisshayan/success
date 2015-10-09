@@ -517,3 +517,24 @@ Meteor.publish('recruiterSearch', function (filter, option) {
     if (!this.userId) return null;
     return Meteor.users.find(filter, option);
 });
+
+
+Meteor.publishComposite('userData', function(){
+    if(!this.userId) return null;
+    var isRecruiter = !_.isNumber(this.userId);
+    return {
+        find: function() {
+            if(isRecruiter)
+                return Meteor.users.find({_id: this.userId}, {limit: 1});
+            return Collections.Users.find({userId: +this.userId}, {limit: 1});
+        },
+        children: [
+            {
+                find: function(user) {
+                    if(isRecruiter) return null;
+                    return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
+                }
+            }
+        ]
+    };
+});

@@ -20,6 +20,8 @@ RecruiterSubs = new SubsManager({
 
 StaticSubs.subscribe('staticModels');
 
+DashboardSubs.subscribe('userData');
+
 Router.configure({
     layoutTemplate: 'mainLayout',
     notFoundTemplate: 'notFound',

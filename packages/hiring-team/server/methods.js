@@ -117,5 +117,13 @@ var methods = {
 
 };
 
+methods.removeHiringTeamRequest = function(requestId) {
+    if(!this.userId) return false;
+    this.unblock();
+    var user = Collections.Users.findOne({userId: +this.userId});
+    var request = Meteor['hiringTeam'].findOne({_id: requestId});
+    if(!user || !request || request.companyId != user.companyId) return false;
+    return request.remove();
+};
 
 Meteor.methods(methods);
