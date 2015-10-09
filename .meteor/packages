@@ -22,6 +22,9 @@ email
 jquery
 reactive-var
 reactive-dict
+ecmascript
+ecmascript-collections
+es5-shim
 iron:router
 react
 react-template-helper
