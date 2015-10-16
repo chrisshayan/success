@@ -9,7 +9,7 @@ Meteor.publish('jobDetails', function (options) {
         jobId: Match.Any
     });
     var cond = {
-        jobId: transformVNWId(options.jobId),
+        jobId: transformVNWId(+options.jobId),
         userId: parseInt(this.userId)
     };
     return Collections.Jobs.find(cond, {limit: 1});

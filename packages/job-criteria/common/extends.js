@@ -3,7 +3,7 @@
  */
 
 
-Job.appendSchema({
+vnwJob.appendSchema({
     criteriaId: {
         type: [String]
     }
