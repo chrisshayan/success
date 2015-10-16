@@ -235,7 +235,7 @@ model.appendSchema({
     }
 });
 
-Job = model;
+vnwJob = model;
 
 
 /**
