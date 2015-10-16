@@ -8,9 +8,7 @@ JobHiringTeam = React.createClass({
         return {
             jobRoles: [
                 {name: 'Managers', alias: 'manager'},
-                {name: 'Recruiters', alias: 'recruiter'},
-                {name: 'Coordinators', alias: 'coordinator'},
-                {name: 'Sourcers', alias: 'sourcer'}
+                {name: 'Recruiters', alias: 'recruiter'}
             ]
         };
     },
@@ -34,14 +32,14 @@ JobHiringTeam = React.createClass({
                 </tr>
                 </thead>
                 <tbody>
-                    {this.state.jobRoles.map( (role, key) => {
-                        return <JobHiringTeamGroup
-                                    key={key}
-                                    jobId={this.props.jobId}
-                                    name={role.name}
-                                    role={role.alias}
-                                    users={this.props.recruiters[role.alias]} />
-                    })}
+                {this.state.jobRoles.map((role, key) => {
+                    return <JobHiringTeamGroup
+                        key={key}
+                        jobId={this.props.jobId}
+                        name={role.name}
+                        role={role.alias}
+                        users={this.props.recruiters[role.alias]}/>
+                })}
                 </tbody>
             </table>
         );

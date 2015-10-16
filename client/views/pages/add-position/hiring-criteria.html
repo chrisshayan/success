@@ -1,0 +1,39 @@
+<template name="hiringCriteria">
+    {{#each criteriaSet}}
+        {{>criteriaCategory this}}
+    {{/each}}
+</template>
+
+<template name="criteriaCategory">
+    <div class="col-sm-3 col-md-3">
+        <div class="ibox">
+            <form class="form-criteria ibox-content">
+                <h3>{{name}}</h3>
+                <input type="hidden" name="catName" value="{{name}}"/>
+                <!--<p class="small"><i class="fa fa-hand-o-up"></i> Drag task between list</p>-->
+
+                <div class="input-group">
+                    <input type="text" placeholder="Add new criteria. " name="criteriaName" class="input input-sm form-control">
+                    <span class="input-group-btn">
+                        <button type="button" class="add-criteria   btn btn-sm btn-white"><i class="fa fa-plus"></i>
+                        </button>
+                    </span>
+                </div>
+
+                <ul class="sortable-list connectList agile-list ui-sortable">
+                    {{#each value}}
+                        <li class="primary-element">
+                            <span>{{this}}</span>
+
+                            <span class="pull-right remove-criteria" data-category-name="{{../name}}"
+                                  data-criteria-value="{{this}}">
+                                <i class="fa fa-minus"></i>
+                            </span>
+
+                        </li>
+                    {{/each}}
+                </ul>
+            </form>
+        </div>
+    </div>
+</template>

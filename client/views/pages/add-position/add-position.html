@@ -9,25 +9,80 @@
                         <ul class="nav nav-tabs">
 
                             <li class="active">
-                                <a data-toggle="tab" href="#hiring-team" aria-expanded="true">
+                                <a data-toggle="tab" href="#job-details" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">JOB DETAILS</span>
                                     </h3>
 
-                                    <p class="hidden-xs hidden-sm text-muted">Important for attracting the right job candidates, evaluating employees' performance, and more</p>
+                                    <p class="hidden-xs hidden-sm text-muted">Important for attracting the right job
+                                        candidates, evaluating employees' performance, and more</p>
+                                </a>
+                            </li>
+
+
+                            <li class="">
+                                <a data-toggle="tab" href="#hiring-criteria" aria-expanded="true">
+                                    <h3>
+                                        <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
+                                        <span class="hidden-xs hidden-sm">HIRING CRITERIA</span>
+                                    </h3>
+
+                                    <p class="hidden-xs hidden-sm text-muted">
+                                        Land your dream candidate is figuring out exactly who you're looking for
+                                    </p>
+                                </a>
+                            </li>
+
+                            <li class="">
+                                <a data-toggle="tab" href="#hiring-team" aria-expanded="true">
+                                    <h3>
+                                        <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
+                                        <span class="hidden-xs hidden-sm">HIRING TEAM</span>
+                                    </h3>
+
+                                    <p class="hidden-xs hidden-sm text-muted">
+                                        Manage the role and responsibilities for various recruiting tasks accross your
+                                        team
+                                    </p>
                                 </a>
                             </li>
 
                         </ul>
                         <div class="tab-content">
 
-                            <div id="hiring-team" role="tabpanel" class="tab-pane active">
+                            <div id="job-details" role="tabpanel" class="tab-pane active">
                                 <div class="panel-body">
                                     <div class="col-sm-12 col-md-12">
                                         <div class="animated fadeInRight">
                                             <div class="content">
                                                 {{> quickForm schema="Schemas.addPositionForm" type="method" meteormethod="addPosition" id="addPosition" }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div id="hiring-criteria" role="tabpanel" class="tab-pane">
+                                <div class="panel-body">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="animated fadeInRight">
+                                            <div class="content">
+                                                {{> hiringCriteria }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="hiring-team" role="tabpanel" class="tab-pane">
+                                <div class="panel-body">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="animated fadeInRight">
+                                            <div class="content">
+                                                test
+                                                {{> hiringTeamTab }}
                                             </div>
                                         </div>
                                     </div>
@@ -40,3 +95,4 @@
         </div>
     </div>
 </template>
+
