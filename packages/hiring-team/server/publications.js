@@ -5,12 +5,11 @@
 
 
 var publications = {
-    hiringTeamSettings: function (companyId, options) {
-        var query = companyId ? {companyId: companyId} : {};
-        console.log(query);
-        return Meteor['hiringTeam'].find(query, options || {});
+    hiringTeam: function (_jId) {
+        return Collection.find({_id: _jId});
     }
 };
 
 
-Meteor.publish('hiringTeamList', publications.hiringTeamSettings);
+Meteor.publish('getHiringTeam', publications.hiringTeam);
+//Meteor.publish('hiringTeamList', publications.hiringTeamSettings);

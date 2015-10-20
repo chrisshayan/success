@@ -18,30 +18,33 @@ JobHiringTeam = React.createClass({
     },
 
     render() {
-        return (
-            <table className="table">
-                <thead>
-                <tr>
-                    <th colSpan="2">
-                        <h2>
-                            <i className="fa fa-users"></i>
-                            &nbsp;
-                            WHO'S RESPONSIBLE FOR THISJOB
-                        </h2>
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                {this.state.jobRoles.map((role, key) => {
-                    return <JobHiringTeamGroup
-                        key={key}
-                        jobId={this.props.jobId}
-                        name={role.name}
-                        role={role.alias}
-                        users={this.props.recruiters[role.alias]}/>
-                })}
-                </tbody>
-            </table>
-        );
+        if (this.props.jobId)
+            return (
+                <table className="table">
+                    <thead>
+                    <tr>
+                        <th colSpan="2">
+                            <h2>
+                                <i className="fa fa-users"></i>
+                                &nbsp;
+                                WHO'S RESPONSIBLE FOR THISJOB
+                            </h2>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.state.jobRoles.map((role, key) => {
+                        return <JobHiringTeamGroup
+                            key={key}
+                            jobId={this.props.jobId}
+                            name={role.name}
+                            role={role.alias}
+                            users={this.props.recruiters[role.alias]}/>
+                    })}
+                    </tbody>
+                </table>
+            );
+        else
+            return null
     }
-})
+});

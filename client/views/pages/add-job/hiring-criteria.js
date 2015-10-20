@@ -6,15 +6,20 @@
 Template.hiringCriteria.onCreated(function () {
     console.log('jobId : ', this.data);
 
-    var jobId = this.data;
+    var jobId = this.data.jobId;
     var instance = Template.instance();
     instance.criteriaSet = new ReactiveVar([]);
 
-    Meteor.call('getCriteria', jobId, function (err, result) {
-        if (err) console.error(err);
-        console.log(result);
-        instance.criteriaSet.set(result.category);
-    });
+    if (this.data.criteriaId)
+        Meteor.subscribe('currentJobCriteria', this.data.criteriaId);
+    else
+        Meteor.call('getCriteria', jobId, function (err, result) {
+            if (err) console.error(err);
+            console.log(result);
+            //instance.criteriaSet.set(result.category);
+            Meteor.subscribe('currentJobCriteria', result._id);
+
+        });
 });
 
 Template.hiringCriteria.events({
@@ -34,8 +39,8 @@ Template.hiringCriteria.events({
 
 Template.hiringCriteria.helpers({
         criteriaSet: function () {
-            var instance = Template.instance();
-            return instance.criteriaSet.get();
+            //var instance = Template.instance();
+            return Meteor['job_criteria'].find();
         }
     }
 );

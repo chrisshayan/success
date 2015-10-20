@@ -21,8 +21,10 @@
                             </li>
 
 
-                            <li class="">
-                                <a class="criteria-tab" data-toggle="tab" href="#hiring-criteria" aria-expanded="true">
+                            <li class="{{#unless _id}}disabled{{/unless}}">
+
+                                <a class="criteria-tab" data-toggle="{{#if _id}}tab{{/if}}"
+                                   href="#{{#if _id}}hiring-criteria{{/if}}" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">HIRING CRITERIA</span>
@@ -34,8 +36,10 @@
                                 </a>
                             </li>
 
-                            <li class="">
-                                <a class="hiring-team-tab" data-toggle="tab" href="#hiring-team" aria-expanded="true">
+                            <li class="{{#unless _id}}disabled{{/unless}}">
+
+                                <a class="hiring-team-tab" data-toggle="{{#if _id}}tab{{/if}}"
+                                   href="#{{#if _id}}hiring-team{{/if}}" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">HIRING TEAM</span>
@@ -74,7 +78,7 @@
                                         <div class="animated fadeInRight">
                                             <div class="content">
                                                 {{#if _id}}
-                                                    {{> hiringCriteria _id}}
+                                                    {{> hiringCriteria jobId=_id criteria = criteriaId}}
                                                 {{/if}}
                                             </div>
                                         </div>

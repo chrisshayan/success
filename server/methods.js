@@ -778,6 +778,7 @@ Meteor.methods({
     addJob: function (data) {
         if (!this.userId) return false;
         var currentUser = getUserInfo(+this.userId);
+
         if (currentUser) {
             data.companyId = currentUser.companyId;
             data.data = {};
@@ -794,6 +795,8 @@ Meteor.methods({
                         jobId: jobId
                     }
                 });
+
+                return jobId;
             }
         }
         return false;
@@ -863,17 +866,21 @@ Meteor.methods({
 
 
     assignJobRecruiter: function (jobId, role, userId) {
+
         if (this.userId) {
-            var job = Collections.Jobs.findOne({jobId: jobId});
+            var job = Collections.Jobs.findOne({_id: jobId});
             if (job) {
                 var selector = {},
                     modifier = {};
 
                 var recruiter = _.findWhere(job.recruiters, {userId: userId});
+                
                 if (recruiter) {
                     if (recruiter.roles.indexOf(role) < 0) {
+
                         selector = {
-                            'recruiters.userId': userId
+                            'recruiters.userId': userId,
+                            'jobId': jobId
                         };
                         modifier = {
                             $push: {
@@ -900,7 +907,6 @@ Meteor.methods({
 
     unassignJobRecruiter: function (jobId, role, userId) {
         if (this.userId) {
-            console.log(jobId, role, userId)
             var job = Collections.Jobs.findOne({jobId: jobId});
             if (job) {
                 var recruiter = _.findWhere(job.recruiters, {userId: userId});

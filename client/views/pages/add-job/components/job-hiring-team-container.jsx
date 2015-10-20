@@ -15,23 +15,29 @@ JobHiringTeamContainer = React.createClass({
             coordinator: [],
             sourcer: []
         };
-        var sub = Meteor.subscribe('teamSettings', jobId);
-        if(sub.ready()) {
-            var job = Collections.Jobs.findOne({jobId: jobId});
-            _.each(job.recruiters, function(recruiter) {
-                _.each(recruiters, function(val, k) {
-                    if(recruiter.roles.indexOf(k) >= 0) {
-                        var user = Meteor.users.findOne({_id: recruiter.userId});
-                        recruiters[k].push(user);
-                    }
+        if (jobId) {
+            var sub = Meteor.subscribe('teamSettings', jobId);
+            if (sub.ready()) {
+                var job = Collections.Jobs.findOne({jobId: jobId});
+                _.each(job.recruiters, function (recruiter) {
+                    _.each(recruiters, function (val, k) {
+                        if (recruiter.roles.indexOf(k) >= 0) {
+                            var user = Meteor.users.findOne({_id: recruiter.userId});
+                            recruiters[k].push(user);
+                        }
+                    });
                 });
-            });
+            }
+
+            return {
+                jobId: jobId,
+                job: Collections.Jobs.findOne({jobId: jobId}),
+                recruiters: recruiters
+            };
         }
-        return {
-            jobId: jobId,
-            job: Collections.Jobs.findOne({jobId: jobId}),
-            recruiters: recruiters
-        };
+
+        return {};
+
     },
 
     childContextTypes: {
@@ -41,9 +47,7 @@ JobHiringTeamContainer = React.createClass({
 
     getChildContext() {
         return {
-            state: {
-
-            },
+            state: {},
             actions: {
                 assign: this.assign,
                 unassign: this.unassign
@@ -52,13 +56,13 @@ JobHiringTeamContainer = React.createClass({
     },
 
     assign(userId, role) {
-        Meteor.call('assignJobRecruiter', this.data.jobId, role, userId, function() {
+        Meteor.call('assignJobRecruiter', this.data.jobId, role, userId, function () {
 
         });
     },
 
     unassign(userId, role) {
-        Meteor.call('unassignJobRecruiter', this.data.jobId, role, userId, function() {
+        Meteor.call('unassignJobRecruiter', this.data.jobId, role, userId, function () {
 
         });
     },
@@ -70,10 +74,10 @@ JobHiringTeamContainer = React.createClass({
             coordinator: [],
             sourcer: []
         };
-        if(this.data.job && this.data.job.recruiters) {
-            _.each(this.data.job.recruiters, function(recruiter) {
-                _.each(recruiters, function(val, k) {
-                    if(recruiter.roles.indexOf(k) >= 0) {
+        if (this.data.job && this.data.job.recruiters) {
+            _.each(this.data.job.recruiters, function (recruiter) {
+                _.each(recruiters, function (val, k) {
+                    if (recruiter.roles.indexOf(k) >= 0) {
                         recruiters[k].push(recruiter.userId);
                     }
                 });
@@ -83,6 +87,6 @@ JobHiringTeamContainer = React.createClass({
     },
 
     render() {
-        return <JobHiringTeam jobId={this.data.jobId} recruiters={this.data.recruiters} />
+        return <JobHiringTeam jobId={this.data.jobId} recruiters={this.data.recruiters}/>
     }
 })

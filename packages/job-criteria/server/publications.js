@@ -8,8 +8,14 @@
  */
 
 
+var publications = {
+    currentJobCriteria: function (_id) {
+        if (!_id) return {};
+        return Collection.find({_id: _id});
+    }
+};
 
-/*Meteor.publish('getJobs', publications.getJobs);
 
- Meteor.publish('getLatestJob', publications.getLatestJob);*/
+Meteor.publish('currentJobCriteria', publications.currentJobCriteria);
+
 
