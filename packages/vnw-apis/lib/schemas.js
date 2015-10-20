@@ -471,7 +471,7 @@ SimpleSchema.messages({
     salaryMaxInvalid: "Max salary must greater than min salary"
 });
 
-Schemas.addPositionForm = new SimpleSchema({
+Schemas.addJobForm = new SimpleSchema({
 
     title: {
         type: String,

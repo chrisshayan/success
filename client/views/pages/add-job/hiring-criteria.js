@@ -4,14 +4,16 @@
 
 
 Template.hiringCriteria.onCreated(function () {
-    var jobId = 0;
+    console.log('jobId : ', this.data);
+
+    var jobId = this.data;
     var instance = Template.instance();
     instance.criteriaSet = new ReactiveVar([]);
 
     Meteor.call('getCriteria', jobId, function (err, result) {
         if (err) console.error(err);
         console.log(result);
-        instance.criteriaSet.set(result);
+        instance.criteriaSet.set(result.category);
     });
 });
 

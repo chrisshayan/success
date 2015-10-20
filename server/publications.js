@@ -458,7 +458,7 @@ Meteor.publish('staticModels', function () {
         , Collections.Cities.find(query)];
 });
 
-Meteor.publish('addPositionPage', function () {
+Meteor.publish('addJobPage', function () {
     if (!this.userId) return null;
     var cursors = [];
     var jobLevels = Meteor.job_levels.find();
@@ -481,7 +481,7 @@ Meteor.publish('searchSkillAutocomplete', function (selector, options) {
     return this.ready();
 });
 
-Meteor.publishComposite('jobSettings', function (jobId) {
+Meteor.publishComposite('teamSettings', function (jobId) {
     if (!this.userId) return null;
     check(jobId, Match.Any);
     jobId = transformVNWId(jobId);

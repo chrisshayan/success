@@ -1,4 +1,4 @@
-Template.jobSettings.helpers({
+Template.teamSettings.helpers({
     HiringTeam: function() {
         return JobHiringTeamContainer;
     }

@@ -48,23 +48,27 @@ var methods = {
                 }
             };
 
-            var job = Meteor.jobs.findOne({jobId: jobId}, options);
+            //var job = Meteor.jobs.findOne({jobId: jobId}, options);
+            var job = Collections.Jobs.findOne({jobId: jobId}, options);
             if (job) {
                 result = Meteor['job_criteria'].findOne({_id: job.criteriaId});
+                console.log(result);
                 if (!result) {
                     var defaultCategory = Core.getConfig('job-criteria', 'DEFAULT_CATEGORY');
                     var criteriaSet = new JobCriteria();
-                    criteriaSet.jobId = jobId;
+                    criteriaSet.jobId = '' + jobId;
                     criteriaSet.category = defaultCategory;
                     criteriaSet.save();
+                    //job.criteriaId = criteriaSet._id;
 
-                    Meteor['jobs']['criteriaId'] = criteriaSet._id;
-
+                    Collections.Jobs.update({jobId: jobId}, {$set: {criteriaId: criteriaSet._id}});
+                    //Meteor['jobs']['criteriaId'] = criteriaSet._id;
+                    result = criteriaSet;
                 }
             }
         }
 
-        return criteriaSet;
+        return result;
     }
 };
 

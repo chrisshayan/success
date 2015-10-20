@@ -112,7 +112,7 @@ ApplicationTransform.prototype = {
         return Meteor.absoluteUrl(link);
     },
 
-    link: function() {
+    link: function () {
         var params = {
             jobId: this.jobId,
             stage: Success.APPLICATION_STAGES[this.stage].alias
@@ -148,10 +148,16 @@ Collections.Jobs = new Mongo.Collection("vnw_jobs", {
     //}
 });
 
+Collections.Jobs.allow({
+    update: function () {
+        return true;
+    }
+});
+
 function transformTags(userId, doc) {
-    if(doc.tags) {
+    if (doc.tags) {
         var tags = [];
-        _.each(doc.tags, function(t) {
+        _.each(doc.tags, function (t) {
             tags.push(t.toLowerCase());
         });
         doc.tags = tags;
@@ -186,12 +192,12 @@ Collections.Applications.allow({
     }
 });
 
-Collections.Applications.before.find(function(userId, filter, option) {
-    if(filter.hasOwnProperty('jobId')) {
+Collections.Applications.before.find(function (userId, filter, option) {
+    if (filter.hasOwnProperty('jobId')) {
         filter.jobId = transformVNWId(filter.jobId);
     }
 
-    if(filter.hasOwnProperty('entryId')) {
+    if (filter.hasOwnProperty('entryId')) {
         filter.entryId = transformVNWId(filter.entryId);
     }
 });

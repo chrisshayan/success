@@ -15,7 +15,7 @@ JobHiringTeamContainer = React.createClass({
             coordinator: [],
             sourcer: []
         };
-        var sub = Meteor.subscribe('jobSettings', jobId);
+        var sub = Meteor.subscribe('teamSettings', jobId);
         if(sub.ready()) {
             var job = Collections.Jobs.findOne({jobId: jobId});
             _.each(job.recruiters, function(recruiter) {

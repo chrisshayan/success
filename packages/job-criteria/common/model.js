@@ -18,7 +18,7 @@ var criteriaSchema = new SimpleSchema({
 
 model.appendSchema({
     jobId: {
-        type: Number
+        type: String
     },
     category: {
         type: [criteriaSchema]

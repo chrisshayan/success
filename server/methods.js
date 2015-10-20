@@ -775,7 +775,7 @@ Meteor.methods({
 });
 
 Meteor.methods({
-    addPosition: function (data) {
+    addJob: function (data) {
         if (!this.userId) return false;
         var currentUser = getUserInfo(+this.userId);
         if (currentUser) {
@@ -797,6 +797,13 @@ Meteor.methods({
             }
         }
         return false;
+    },
+
+    updateJobs: function (modifier, _id) {
+        console.log('modified : ', modifier);
+        console.log('id : ', _id);
+        return Collections.Jobs.update({_id: _id}, modifier);
+
     },
 
     searchSkill: function (keyword) {

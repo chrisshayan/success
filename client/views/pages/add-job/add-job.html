@@ -1,5 +1,5 @@
-<template name="AddPosition">
-    {{> pageHeading title="Add new position"}}
+<template name="AddJob">
+    {{> pageHeading title="Add new job"}}
 
     <div class="wrapper wrapper-content">
         <div class="row">
@@ -9,7 +9,7 @@
                         <ul class="nav nav-tabs">
 
                             <li class="active">
-                                <a data-toggle="tab" href="#job-details" aria-expanded="true">
+                                <a class="job-details-tab" data-toggle="tab" href="#job-details" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">JOB DETAILS</span>
@@ -22,7 +22,7 @@
 
 
                             <li class="">
-                                <a data-toggle="tab" href="#hiring-criteria" aria-expanded="true">
+                                <a class="criteria-tab" data-toggle="tab" href="#hiring-criteria" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">HIRING CRITERIA</span>
@@ -35,7 +35,7 @@
                             </li>
 
                             <li class="">
-                                <a data-toggle="tab" href="#hiring-team" aria-expanded="true">
+                                <a class="hiring-team-tab" data-toggle="tab" href="#hiring-team" aria-expanded="true">
                                     <h3>
                                         <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
                                         <span class="hidden-xs hidden-sm">HIRING TEAM</span>
@@ -56,7 +56,11 @@
                                     <div class="col-sm-12 col-md-12">
                                         <div class="animated fadeInRight">
                                             <div class="content">
-                                                {{> quickForm schema="Schemas.addPositionForm" type="method" meteormethod="addPosition" id="addPosition" }}
+                                                {{#unless jobId}}
+                                                    {{> quickForm schema="Schemas.addJobForm" type="method" meteormethod="addJob" id="addJob" }}
+                                                {{else}}
+                                                    {{> quickForm schema="Schemas.addJobForm" type="method-update" meteormethod="updateJobs" id="updateJobs" doc=this }}
+                                                {{/unless}}
                                             </div>
                                         </div>
                                     </div>
@@ -69,7 +73,9 @@
                                     <div class="col-sm-12 col-md-12">
                                         <div class="animated fadeInRight">
                                             <div class="content">
-                                                {{> hiringCriteria }}
+                                                {{#if _id}}
+                                                    {{> hiringCriteria _id}}
+                                                {{/if}}
                                             </div>
                                         </div>
                                     </div>
@@ -82,7 +88,7 @@
                                         <div class="animated fadeInRight">
                                             <div class="content">
                                                 test
-                                                {{> hiringTeamTab }}
+                                                {{> teamSettings _id }}
                                             </div>
                                         </div>
                                     </div>

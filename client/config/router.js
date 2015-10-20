@@ -108,16 +108,6 @@ Router.route('/dashboard', {
     }
 });
 
-Router.route('/add-position', {
-    name: 'addPosition',
-    waitOn: function () {
-        return DashboardSubs.subscribe('addPositionPage');
-    },
-    action: function () {
-        this.render('AddPosition');
-    }
-});
-
 
 Router.route('/job/:jobId/stage/:stage', {
     name: "jobDetails",
@@ -292,18 +282,42 @@ Router.route('/activites', {
 });
 
 
+/*Router.route('/add-job', {
+ name: 'addJob',
+ waitOn: function () {
+ return DashboardSubs.subscribe('addJobPage');
+ },
+ action: function () {
+ this.render('AddJob');
+ }
+ });*/
+
+
+Router.route('/job-settings', {
+    name: 'addJob',
+    waitOn: function () {
+        return DashboardSubs.subscribe('addJobPage');
+    },
+    action: function () {
+        this.render('AddJob');
+    }
+});
+
 Router.route('/job-settings/:jobId', {
-    name: 'jobSettings',
-    template: 'jobSettings',
+    name: 'teamSettings',
+    /*template: 'teamSettings',*/
     waitOn: function () {
         return [
-            Meteor.subscribe('jobSettings', this.params.jobId)
+            Meteor.subscribe('teamSettings', this.params.jobId),
+            DashboardSubs.subscribe('addJobPage')
         ];
+    },
+    action: function () {
+        this.render('AddJob');
     },
     data: function () {
         var jobId = Utils.transformVNWId(this.params.jobId);
-        return {
-            job: Collections.Jobs.findOne({jobId: jobId})
-        }
+
+        return Collections.Jobs.findOne({jobId: jobId});
     }
 });
