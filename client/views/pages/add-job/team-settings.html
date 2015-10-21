@@ -2,42 +2,8 @@
     {{#if job}}
         {{> pageHeading category="Job settings" title=job.title }}
     {{/if}}
-    <div class="wrapper wrapper-content">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="tabs-container post-job-tabs">
-                    <div class="tabs-left">
-                        <ul class="nav nav-tabs">
-
-                            <li class="active">
-                                <a data-toggle="tab" href="#hiring-team" aria-expanded="true">
-                                    <h3>
-                                        <span class="circle-wrapper"><i class="fa fa-fw fa-users"></i></span>
-                                        <span class="hidden-xs hidden-sm">HIRING TEAM</span>
-                                    </h3>
-
-                                    <p class="hidden-xs hidden-sm">Managing the roles and responsibilities for various recruiting tasks across your team</p>
-                                </a>
-                            </li>
-
-                        </ul>
-                        <div class="tab-content">
-
-                            <div id="hiring-team" role="tabpanel" class="tab-pane active">
-                                <div class="panel-body">
-                                    <div class="col-sm-12 col-md-12">
-                                        <div class="animated fadeInRight">
-                                            <div class="content">
-                                                {{> React component=HiringTeam}}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="content">
+        {{> React component=HiringTeam}}
     </div>
+
 </template>
