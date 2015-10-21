@@ -772,7 +772,7 @@ Meteor.methods({
 Meteor.methods({
     addJob: function (data) {
         if (!this.userId) return false;
-        var currentUser = getUserInfo(+this.userId);
+        var currentUser = Meteor.users.findOne({_id: this.userId});
 
         if (currentUser) {
             data.companyId = currentUser.companyId;
@@ -780,8 +780,8 @@ Meteor.methods({
             data.source = "recruit";
             data.status = 1;
             data.createdAt = new Date();
-            data.createdBy = +this.userId;
-            data.userId = +this.userId;
+            data.createdBy = this.userId;
+            data.userId = this.userId;
 
             var jobId = Collections.Jobs.insert(data);
             if (jobId) {
