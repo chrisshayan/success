@@ -487,10 +487,9 @@ Meteor.publish('searchSkillAutocomplete', function (selector, options) {
 Meteor.publishComposite('teamSettings', function (jobId) {
     if (!this.userId) return null;
     check(jobId, Match.Any);
-    jobId = transformVNWId(jobId);
     return {
         find: function () {
-            return Collections.Jobs.find({jobId: jobId}, {limit: 1});
+            return Collections.Jobs.find({_id: jobId}, {limit: 1});
         },
         children: [
             {

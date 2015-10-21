@@ -18,8 +18,10 @@ JobHiringTeam = React.createClass({
     },
 
     render() {
-        if (this.props.jobId)
-            return (
+        var content = null;
+
+        if(this.props.jobId) {
+            content = (
                 <table className="table">
                     <thead>
                     <tr>
@@ -44,7 +46,7 @@ JobHiringTeam = React.createClass({
                     </tbody>
                 </table>
             );
-        else
-            return null
+        }
+        return content;
     }
 });

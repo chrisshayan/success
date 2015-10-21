@@ -21,7 +21,7 @@ function generateName(name) {
 
 var methods = {
         'sendRequest': function (obj) {
-            if(!this.userId) return false;
+            if (!this.userId) return false;
             try {
                 //console.log(obj);
                 var user = Meteor.users.findOne({_id: this.userId});
@@ -77,7 +77,7 @@ var methods = {
                             });
 
                             var mail = {
-                                from: obj.fromEmailAddress,
+                                from: user.defaultEmail(),
                                 to: email,
                                 subject: subject,
                                 html: html
@@ -161,9 +161,9 @@ var methods = {
 methods.removeHiringTeamRequest = function (requestId) {
     if (!this.userId) return false;
     this.unblock();
-    var user = Meteor.users.findOne({userId: this.userId});
+    var user = Meteor.users.findOne({_id: this.userId});
     var request = Meteor['hiringTeam'].findOne({_id: requestId});
-    if (!user || !request || request.companyId != user.companyId) return false;
+    if (!user || !request) return false;
     return request.remove();
 };
 

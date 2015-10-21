@@ -28,11 +28,12 @@ AutoForm.hooks({
 Template.AddJob.onCreated(function () {
     var instance = Template.instance();
     instance.jobId = new ReactiveVar();
-    var params = Router.current().params;
-    console.log(params.jobId);
-    (params.jobId) && instance.jobId.set(params.jobId);
-
-    Meteor.subscribe('getHiringTeam');
+    instance.autorun(function() {
+        var params = Router.current().params;
+        console.log(params);
+        (params.jobId) && instance.jobId.set(params.jobId);
+        Meteor.subscribe('getHiringTeam');
+    });
 });
 
 

@@ -10,7 +10,7 @@
 
 var publications = {
     currentJobCriteria: function (_id) {
-        if (!_id) return {};
+        if (!_id) return null;
         return Collection.find({_id: _id});
     }
 };
