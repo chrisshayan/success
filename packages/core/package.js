@@ -20,7 +20,8 @@ Package.onUse(function (api) {
         "accounts-password",
         "lab:mysql-connection-manager",
         "reywood:publish-composite",
-        "stevezhu:lodash"
+        "stevezhu:lodash",
+        "ecmascript"
     ]);
 
     api.addFiles('utils/common.js', ['server', 'client']);
@@ -31,7 +32,8 @@ Package.onUse(function (api) {
     api.imply([
         "socialize:user-model",
         "accounts-password",
-        "lab:mysql-connection-manager"
+        "lab:mysql-connection-manager",
+        "ecmascript"
     ]);
 
     api.export(['Core', 'Utils']);

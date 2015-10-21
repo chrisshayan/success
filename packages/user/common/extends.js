@@ -27,7 +27,7 @@ Meteor.currentRecruiter = function() {
 
 
 User.prototype.isCompanyAdmin = function() {
-    return this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0;
+    return this.roles && this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0;
 };
 
 
