@@ -234,8 +234,8 @@ function processJob(items, companyId) {
             //var mongoJob = Meteor['jobs'].findOne({jobId: item.jobId});
             var existJob = job.isExist();
             if (existJob
-                && (parseTimeToString(mongoJob.createdAt) !== parseTimeToString(job.createdAt)
-                || parseTimeToString(mongoJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
+                && (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
+                || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
                 console.log('update Job :', job.jobId);
 
                 console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);

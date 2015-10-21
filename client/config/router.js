@@ -195,7 +195,7 @@ Router.route('/job-details/:_id/stage/:stage', {
             this.render(null);
             Router.go('notFound');
         }
-        if(application) {
+        if (application) {
             var options = {
                 jobId: params._id,
                 stage: stage.id,
@@ -387,8 +387,6 @@ Router.route('/job-settings/:jobId', {
         this.render('AddJob');
     },
     data: function () {
-        var jobId = Utils.transformVNWId(this.params.jobId);
-
-        return Collections.Jobs.findOne({jobId: jobId});
+        return Collections.Jobs.findOne({_id: this.params.jobId});
     }
 });
