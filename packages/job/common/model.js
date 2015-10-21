@@ -17,7 +17,7 @@ model.prototype.updateJob = function (data, cb) {
 
 model.prototype.isExist = function (condition) {
     var query = condition || {jobId: this.jobId};
-    return !!Collection.findOne(query);
+    return Collection.findOne(query);
 };
 
 model.appendSchema({
@@ -262,12 +262,12 @@ Collection.allow({
 
 
 /*
-Collection.before.insert(function (userId, doc) {
-    doc.createdAt = doc.updatedAt = new Date();
-    doc.createdBy = doc.updatedBy = userId;
-});
+ Collection.before.insert(function (userId, doc) {
+ doc.createdAt = doc.updatedAt = new Date();
+ doc.createdBy = doc.updatedBy = userId;
+ });
 
-Collection.before.update(function (userId, doc) {
-    doc.updatedAt = new Date();
-    doc.updatedBy = userId;
-});*/
+ Collection.before.update(function (userId, doc) {
+ doc.updatedAt = new Date();
+ doc.updatedBy = userId;
+ });*/
