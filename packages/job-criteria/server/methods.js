@@ -21,6 +21,34 @@ var methods = {
         }
     },
 
+
+    changeCriteriaInSet: function (_id, setName, criteriaName, isRemove) {
+        if (_id == void 0 || setName == void 0 || criteriaName == void 0)
+            return false;
+
+        console.log('input', _id, setName, criteriaName);
+        try {
+            var query = {};
+            query._id = _id;
+            query['category.name'] = setName;
+
+            var condition = (isRemove) ? '$pull' : '$addToSet';
+
+            var modifier = {};
+
+            modifier[condition] = {'category.$.value': criteriaName};
+
+            return Collection.update(query, modifier);
+
+        } catch (e) {
+            console.log('change Criteria set has some error');
+            console.trace(e);
+            return false;
+
+        }
+    },
+
+
     updateCriteria: function (criteria_id, updateCriteriaSet) {
         try {
             if (Core.isLoggedIn() || typeof company_id != 'string' || typeof criteriaSet != 'object')
