@@ -398,10 +398,10 @@ CRON_VNW.startupSync = function () {
     //syncSkill();
 
 
-    var users = Collections.Users.find({}, {fields: {userId: 1, companyId: 1}}).fetch();
+    var users = Meteors.users.find({}, {fields: {vnwId: 1, companyId: 1}}).fetch();
     users && users.forEach(function (user) {
         console.log('user: ', user);
-        CRON_VNW.syncJob(user.companyId, user.userId);
+        CRON_VNW.syncJob(user.companyId, user.vnwId);
     });
 
     console.log(' sync done!');

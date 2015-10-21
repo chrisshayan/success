@@ -1,25 +1,32 @@
-/**
- * Created by HungNguyen on 8/21/15.
- */
+Meteor.publishComposite('getApplications', function (jobId, filters, options) {
+    return {
 
+        find: function () {
+            if (!this.userId) return this.ready();
+            check(filters, Object);
+            check(options, Object);
 
-var publications = {
-    getApplications: function (filters, options) {
-        if (!this.userId) return this.ready();
-        /*check(filters, Object);
-         check(options, Object);*/
-        var user = Meteor.call('getUser', this.userId);
-        if (!user) return;
+            filters['isDeleted'] = 0;
 
-        filters['companyId'] = user.companyId;
-
-        options = _.extend(Core.getConfig('application', 'defaultActivitiesOptions'), filters);
-
-        if (!options.hasOwnProperty("limit")) {
-            options['limit'] = 20;
-        }
-        return Collection.find(filters, options);
+            options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
+            if (!options.hasOwnProperty("limit")) {
+                options['limit'] = 20;
+            } else {
+                options['limit'] += 10;
+            }
+            return Collections.Applications.find(filters, options);
+        },
+        children: [
+            //{
+            //    find: function (application) {
+            //        var cond = {
+            //            candidateId: application.candidateId
+            //        };
+            //        var options = DEFAULT_CANDIDATE_OPTIONS;
+            //        options.limit = 1;
+            //        return Collections.Candidates.find(cond, options)
+            //    }
+            //}
+        ]
     }
-};
-
-Meteor.publish('getApplications', publications.getApplications);
+});

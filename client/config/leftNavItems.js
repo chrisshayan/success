@@ -10,7 +10,9 @@ Meteor.startup(function () {
         }
     ];
 
-    if(!_.isNaN(parseInt(Meteor.userId()))) {
+    var user = Meteor.user();
+
+    if(user && user.isCompanyAdmin()) {
         leftNavItems.push({
             label: "Settings",
             icon: "fa-cogs",

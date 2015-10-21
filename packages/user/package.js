@@ -14,7 +14,7 @@ Package.onUse(function (api) {
     api.versionsFrom('0.9.0');
 
     api.use(["vnw:core"]);
-    api.use("accounts-password")
+    api.use(["accounts-password", "alanning:roles@1.2.14"]);
 
     /* namespace */
     api.addFiles(['user.js']);

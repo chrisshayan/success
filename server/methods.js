@@ -19,8 +19,8 @@ function replacePlaceholder(userId, application, candidate, mail) {
 
                 case "company":
                 case "mail_signature":
-                    var user = Collections.Users.findOne({userId: parseInt(userId)});
-                    var company = Collections.CompanySettings.findOne({companyId: user.data.companyid});
+                    var user = Meteor.users.findOne({_id: this.userId});
+                    var company = Collections.CompanySettings.findOne({companyId: application.companyId});
                     if (p1 == "company") {
                         replaces[p1] = company.companyName;
                     } else {
@@ -42,9 +42,9 @@ function replacePlaceholder(userId, application, candidate, mail) {
 }
 
 function getUserInfo(userId) {
-    return Collections.Users.findOne({userId: userId}, {
+    return Meteor.users.findOne({_id: userId}, {
         fields: {
-            userId: 1,
+            vnwId: 1,
             companyId: 1,
             username: 1
         }
@@ -116,16 +116,13 @@ Meteor.methods({
             if (!this.userId) return false;
 
             check(option, {
-                application: Match.Any,
+                application: String,
                 stage: Number
             });
-            option.application = transformEntryId(option.application);
-
             check(option.stage, Match.OneOf(0, 1, 2, 3, 4, 5));
-            var user = getUserInfo(+this.userId);
+
             var cond = {
-                companyId: user.companyId,
-                entryId: option.application
+                _id: option.application
             };
 
             var application = Collections.Applications.findOne(cond);
@@ -148,7 +145,6 @@ Meteor.methods({
                     fromStage: application.stage,
                     toStage: option.stage
                 };
-                activity.companyId = user.companyId;
                 activity.createdBy = this.userId;
                 activity.updateApplicationStage();
             }
@@ -166,11 +162,10 @@ Meteor.methods({
         try {
             if (!this.userId) return false;
             // validate client request
-            check(applicationId, Match.Any);
-            applicationId = transformEntryId(applicationId);
+            check(applicationId, String);
 
             var conditions = {
-                entryId: applicationId
+                _id: applicationId
             };
             var options = {
                 fields: {
@@ -227,15 +222,18 @@ Meteor.methods({
             if (!this.userId) return false;
 
             check(opt, {
-                jobId: Match.Any,
+                jobId: String,
                 stage: Number
             });
+            var job = Collections.Jobs.findOne({_id: opt.jobId});
+            if(!job) return false;
+
             var application = Collections.Applications.findOne({
-                jobId: transformEntryId(opt.jobId),
+                jobId: job.jobId,
                 stage: opt.stage
             }, {sort: {createdAt: -1}});
 
-            return application ? application.entryId : null;
+            return application ? application._id : false;
         } catch (e) {
             debuger(e);
         }
@@ -245,26 +243,26 @@ Meteor.methods({
     /**
      * check application exists in job stage
      * @param opt {Object}
-     * opt.jobId: Number,
-     * opt.stage: Number,
-     * opt.application: Number
+     * @param opt.jobId {String}
+     * @param opt.stage {Number}
+     * @param opt.application {String}
      * @returns {boolean}
      */
     checkApplicationInStage: function (opt) {
         if (!this.userId) return false;
         check(opt, {
-            jobId: Match.Any,
+            jobId: String,
             stage: Number,
-            application: Match.Any
+            application: String
         });
-        opt.application = transformEntryId(opt.application);
-        opt.jobId = transformEntryId(opt.jobId);
-        var conditions = {
-            jobId: opt.jobId,
-            stage: opt.stage,
-            entryId: opt.application
+        var job = Collections.Jobs.findOne({_id: opt.jobId});
+        if(!job) return false;
+        var criteria = {
+            _id: opt.application,
+            jobId: job.jobId,
+            stage: opt.stage
         };
-        return !!Collections.Applications.find(conditions).count();
+        return !!Collections.Applications.find(criteria).count();
     },
 
 
@@ -277,15 +275,12 @@ Meteor.methods({
             if (!this.userId) return false;
             this.unblock();
 
-            check(applicationId, Match.Any);
-            applicationId = transformEntryId(applicationId);
-
-            var user = getUserInfo(+this.userId);
+            check(applicationId, String);
             var conditions = {
-                companyId: user.companyId,
-                entryId: applicationId
+                _id: applicationId
             };
-            var application = Collections.Applications.findOne(conditions, {fields: {_id: 1, disqualified: 1}});
+            var application = Collections.Applications.findOne(conditions);
+
             if (!application || application.disqualified == true) return;
 
             var modifier = {
@@ -293,12 +288,12 @@ Meteor.methods({
                     disqualified: true
                 }
             }
-            var result = Collections.Applications.update(application._id, modifier);
+            var result = Collections.Applications.update(conditions, modifier);
             if (result) {
                 // Log activity
                 var activity = new Activity();
-                activity.companyId = user.companyId;
-                activity.createdBy = user.userId;
+                activity.companyId = application.companyId;
+                activity.createdBy = this.userId;
                 activity.data = {
                     applicationId: applicationId
                 };
@@ -313,14 +308,14 @@ Meteor.methods({
     disqualifyApplications: function (ids) {
         try {
             if (!this.userId) return false;
+            var self = this;
             this.unblock();
 
             check(ids, [String]);
 
-            var user = getUserInfo(+this.userId);
             _.each(ids, function (_id) {
                 Meteor.defer(function () {
-                    var application = Collections.Applications.findOne({_id: _id}, {fields: {_id: 1, disqualified: 1}});
+                    var application = Collections.Applications.findOne({_id: _id});
                     if (!application || application.disqualified == true) return;
 
                     var modifier = {
@@ -328,14 +323,14 @@ Meteor.methods({
                             disqualified: true
                         }
                     }
-                    var result = Collections.Applications.update(application._id, modifier);
+                    var result = Collections.Applications.update({_id: application._id}, modifier);
                     if (result) {
                         // Log activity
                         var activity = new Activity();
-                        activity.companyId = user.companyId;
-                        activity.createdBy = user.userId;
+                        activity.companyId = application.companyId;
+                        activity.createdBy = self.userId;
                         activity.data = {
-                            applicationId: application.entryId
+                            applicationId: application._id
                         };
                         activity.disqualifiedApplication();
                     }
@@ -353,14 +348,11 @@ Meteor.methods({
     revertApplication: function (applicationId) {
         try {
             if (!this.userId) return false;
-
-            check(applicationId, Match.Any);
-            applicationId = transformEntryId(applicationId);
-
-            var user = getUserInfo(+this.userId);
+            check(applicationId, String);
+            var application = Collections.Applications.findOne({_id: applicationId});
+            if (!application) return;
             var conditions = {
-                companyId: user.companyId,
-                entryId: applicationId
+                _id: applicationId
             };
             var modifier = {
                 $set: {
@@ -371,8 +363,8 @@ Meteor.methods({
             if (result) {
                 // Log activity
                 var activity = new Activity();
-                activity.companyId = user.companyId;
-                activity.createdBy = user.userId;
+                activity.companyId = application.companyId;
+                activity.createdBy = this.userId;
                 activity.data = {
                     applicationId: applicationId
                 };
@@ -393,7 +385,7 @@ Meteor.methods({
             if (!this.userId) return false;
 
             check(signature, String);
-            var user = Collections.Users.findOne({userId: +this.userId});
+            var user = Meteor.users.findOne({_id: this.userId});
             var cond = {
                 companyId: user.data.companyid
             };
@@ -429,10 +421,8 @@ Meteor.methods({
                 emailFrom: Match.Any
             });
 
-
-            data.application = transformEntryId(data.application);
             var self = this;
-            var user = getUserInfo(+this.userId);
+
             var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
 
             var from = '';
@@ -447,7 +437,7 @@ Meteor.methods({
             }
             console.log('email from : ', from);
 
-            var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
+            var application = Collections.Applications.findOne({_id: data.application});
             if (!application) return false;
             var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
             if (!candidate) return false;
@@ -458,7 +448,8 @@ Meteor.methods({
                 from: from,
                 to: to,
                 subject: data.subject,
-                html: data.content
+                html: data.content,
+                replyTo: 'success-inbound@izzilab.com'
             };
 
             Meteor.defer(function () {
@@ -467,8 +458,8 @@ Meteor.methods({
                 var activity = new Activity();
 
                 mail.applicationId = data.application;
-                activity.companyId = user.companyId;
-                activity.createdBy = user.userId;
+                activity.companyId = application.companyId;
+                activity.createdBy = self.userId;
                 activity.data = mail;
                 activity.sendMailToCandidate();
             });
@@ -491,7 +482,8 @@ Meteor.methods({
 
             this.unblock();
             var self = this;
-            var user = getUserInfo(+this.userId);
+            var user = Meteor.users.findOne({_id: this.userId});
+            console.log(user.defaultEmail());
 
             _.each(data.to, function (appId) {
                 var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
@@ -508,7 +500,7 @@ Meteor.methods({
                 }
                 console.log('email from : ', from);
 
-                var application = Collections.Applications.findOne({_id: appId, companyId: user.companyId});
+                var application = Collections.Applications.findOne({_id: appId});
                 if (!application) return false;
                 var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
                 if (!candidate) return false;
@@ -525,10 +517,10 @@ Meteor.methods({
                 Meteor.defer(function () {
                     mail = replacePlaceholder(self.userId, application, candidate, mail);
 
-                    Meteor.Mandrill.send(mail);
+                    Email.send(mail);
                     var activity = new Activity();
 
-                    mail.applicationId = application.entryId;
+                    mail.applicationId = application._id;
                     activity.companyId = user.companyId;
                     activity.createdBy = user.userId;
                     activity.data = mail;
@@ -551,18 +543,16 @@ Meteor.methods({
     addCommentApplication: function (data) {
         try {
             check(data, {
-                application: Match.Any,
+                application: String,
                 content: String
             });
-            data.application = transformEntryId(data.application);
 
             this.unblock();
-            var user = getUserInfo(+this.userId);
-            var application = Collections.Applications.findOne({entryId: data.application, companyId: user.companyId});
+            var application = Collections.Applications.findOne({_id: data.application});
             if (!application) return false;
             var activity = new Activity();
-            activity.companyId = user.companyId;
-            activity.createdBy = user.userId;
+            activity.companyId = application.companyId;
+            activity.createdBy = this.userId;
             activity.data = {
                 applicationId: data.application,
                 content: data.content
@@ -750,8 +740,13 @@ Meteor.methods({
 Meteor.methods({
     'getEmailList': function () {
         var listEmail = [];
-        var user = Collections.Users.findOne({userId: +this.userId});
-        if (!user) return [];
+
+/*        var user = Collections.Users.findOne({userId: +this.userId});
+        if (!user) return [];*/
+
+        var user = Meteor.users.findOne({_id: this.userId});
+        if(!user) return [];
+
         var query = {
             companyId: user.companyId
         };
@@ -841,10 +836,10 @@ Meteor.methods({
     },
 
     updateJobTags: function (jobId, tags) {
-        check(jobId, Match.Any);
+        check(jobId, String);
         check(tags, [String]);
         if (!this.userId) return false;
-        var job = Collections.Jobs.findOne({jobId: jobId});
+        var job = Collections.Jobs.findOne({_id: jobId});
         if (!job) return false;
         var newTags = [];
         _.each(tags, function (t) {

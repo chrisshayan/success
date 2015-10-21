@@ -62,9 +62,13 @@ JobCandidates = React.createClass({
     },
     renderCandidate(app, key) {
         var checked = false;
+        var selected = false;
         if(this.context.state.selectedItems.indexOf(app._id) >= 0) {
             checked = true;
         }
-        return <JobCandidate key={key} application={app} checked={checked}/>;
+        if(this.context.state.currentApplication == app._id) {
+            selected = true;
+        }
+        return <JobCandidate key={key} application={app} selected={selected} checked={checked}/>;
     }
 })

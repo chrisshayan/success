@@ -19,6 +19,18 @@ Meteor.loginWithVNW = function (email, password, callback) {
     });
 };
 
+Meteor.currentRecruiter = function() {
+    return {
+        email: ""
+    }
+};
+
+
+User.prototype.isCompanyAdmin = function() {
+    return this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0;
+};
+
+
 User.prototype.updateEmailSignature = function (newSignature, cb) {
     return Meteor.call('updateEmailSignature', newSignature, cb);
 };
@@ -26,3 +38,6 @@ User.prototype.updateEmailSignature = function (newSignature, cb) {
 User.prototype.updateUserInfo = function (data, cb) {
     return Meteor.call('updateUserInfo', data, cb);
 };
+
+
+

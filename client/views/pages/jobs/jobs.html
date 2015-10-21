@@ -82,7 +82,7 @@
             <div class="panel-heading">
                 <div class="panel-title clearfix">
                     <h3 class="pull-left job-title">
-                        <a href="{{pathFor 'jobDetails' stage='applied'}}">
+                        <a href="{{pathFor 'Job' stage='applied'}}">
                             {{ title }}
                         </a>
                     </h3>
@@ -92,39 +92,39 @@
             <div class="job-stages">
                 <div class="row">
                     <div class="col-sm-2 stage stage-sourced">
-                        <a href="{{pathFor 'jobDetails' stage='sourced'}}" class="stage-number">{{ counter 0 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='sourced'}}" class="stage-label">Sourced</a>
+                        <a href="{{pathFor 'Job' stage='sourced'}}" class="stage-number">{{ counter 0 }}</a>
+                        <a href="{{pathFor 'Job' stage='sourced'}}" class="stage-label">Sourced</a>
                     </div>
 
                     <div class="col-sm-2 stage stage-applied">
-                        <a href="{{pathFor 'jobDetails' stage='applied'}}" class="stage-number">{{ counter 1 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='applied'}}" class="stage-label">Applied</a>
+                        <a href="{{pathFor 'Job' stage='applied'}}" class="stage-number">{{ counter 1 }}</a>
+                        <a href="{{pathFor 'Job' stage='applied'}}" class="stage-label">Applied</a>
                     </div>
 
                     <div class="col-sm-2 stage stage-phone">
-                        <a href="{{pathFor 'jobDetails' stage='phone'}}" class="stage-number">{{ counter 2 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='phone'}}" class="stage-label">Phone Screen</a>
+                        <a href="{{pathFor 'Job' stage='phone'}}" class="stage-number">{{ counter 2 }}</a>
+                        <a href="{{pathFor 'Job' stage='phone'}}" class="stage-label">Phone Screen</a>
                     </div>
 
                     <div class="col-sm-2 stage stage-interview">
-                        <a href="{{pathFor 'jobDetails' stage='interview'}}" class="stage-number">{{ counter 3 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='interview'}}" class="stage-label">Interview</a>
+                        <a href="{{pathFor 'Job' stage='interview'}}" class="stage-number">{{ counter 3 }}</a>
+                        <a href="{{pathFor 'Job' stage='interview'}}" class="stage-label">Interview</a>
                     </div>
 
                     <div class="col-sm-2 stage stage-offer">
-                        <a href="{{pathFor 'jobDetails' stage='offer'}}" class="stage-number">{{ counter 4 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='offer'}}" class="stage-label">Offer</a>
+                        <a href="{{pathFor 'Job' stage='offer'}}" class="stage-number">{{ counter 4 }}</a>
+                        <a href="{{pathFor 'Job' stage='offer'}}" class="stage-label">Offer</a>
                     </div>
 
                     <div class="col-sm-2 stage stage-hired">
-                        <a href="{{pathFor 'jobDetails' stage='hired'}}" class="stage-number">{{ counter 5 }}</a>
-                        <a href="{{pathFor 'jobDetails' stage='hired'}}" class="stage-label">Hired</a>
+                        <a href="{{pathFor 'Job' stage='hired'}}" class="stage-number">{{ counter 5 }}</a>
+                        <a href="{{pathFor 'Job' stage='hired'}}" class="stage-label">Hired</a>
                     </div>
                 </div>
             </div>
             <div class="panel-footer job-tags-box">
                 <div class="panel-title clearfix">
-                    {{> jobTagsInput jobId=jobId}}
+                    {{> jobTagsInput jobId=_id}}
                 </div>
             </div>
         </div>

@@ -9,7 +9,7 @@ JobApplications = BlazeComponent.extendComponent({
         // check is loading data
         var params = Router.current().params;
         var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
-        this.jobId = new ReactiveVar(parseInt(params.jobId));
+        this.jobId = new ReactiveVar(params._id);
         this.stage = new ReactiveVar(stage);
         this.inc = 20;
         this.page = new ReactiveVar(1);

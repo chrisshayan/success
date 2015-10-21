@@ -5,9 +5,9 @@ var AppState = function () {
         stage = Success.APPLICATION_STAGES[1];
 
     return {
-        jobId: Utils.transformVNWId(params.jobId),
+        jobId: params._id,
         stage: stage,
-        currentApplication: params.query.application ? Utils.transformVNWId(params.query.application) : null,
+        currentApplication: params.query.application || null,
         inc: 10,
         limit: 10,
         search: "",
@@ -26,7 +26,7 @@ var AppActions = {
     },
 
     toggleSelectAll() {
-        if(!this.state.isSelectAll) {
+        if (!this.state.isSelectAll) {
             var ids = _.pluck(this.data.applications, '_id');
             this.setState({selectedItems: ids});
         } else {
@@ -76,9 +76,9 @@ var AppActions = {
 var AppHelpers = {
     getEmailsSelected() {
         var emails = [];
-        _.each(this.state.selectedItems, function(appId) {
+        _.each(this.state.selectedItems, function (appId) {
             var app = Collections.Applications.findOne({_id: appId});
-            if(app) {
+            if (app) {
                 emails.push(app.candidateInfo.emails[0]);
             }
         });
@@ -95,6 +95,10 @@ JobCandidatesContainer = React.createClass({
 
     getMeteorData() {
         var self = this;
+        var params = Router.current().params;
+        var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
+        if (!stage)
+            stage = Success.APPLICATION_STAGES[1];
 
         var isLoading = true;
         var total = 0;
@@ -107,14 +111,16 @@ JobCandidatesContainer = React.createClass({
 
         return {
             isLoading: isLoading,
+            currentApplication: params.query.application,
             applications: this.fetch(),
             hasMore: this.state.limit < total
         }
     },
 
     filter: function () {
+        var job = Collections.Jobs.findOne({_id: this.state.jobId});
         var filter = {
-            jobId: this.state.jobId,
+            jobId: job.jobId,
             stage: this.state.stage.id,
             isDeleted: 0
         };
@@ -163,7 +169,7 @@ JobCandidatesContainer = React.createClass({
             state: {
                 jobId: this.state.jobId,
                 stage: this.state.stage,
-                currentApplication: this.state.currentApplication,
+                currentApplication: this.data.currentApplication,
                 inc: this.state.inc,
                 limit: this.state.limit,
                 search: this.state.search,
@@ -192,6 +198,31 @@ JobCandidatesContainer = React.createClass({
                 getEmailsSelected: this.getEmailsSelected
             }
         };
+    },
+
+    componentDidMount() {
+        Event.on('movedApplication', this.onMovedApplication);
+    },
+
+    componentWillUnmount() {
+        Event.removeListener('movedApplication', this.onMovedApplication);
+    },
+
+    onMovedApplication() {
+        var rest = _.without(this.data.applications, this.data.currentApplication);
+        if (rest.length <= 0) {
+            Router.go('Job', {
+                _id: this.state.jobId,
+                stage: this.state.stage.alias
+            });
+        }
+        var nextApp = rest[0];
+        Router.go('Job', {
+            _id: this.state.jobId,
+            stage: this.state.stage.alias
+        }, {
+            application: nextApp._id
+        })
     },
 
     render() {

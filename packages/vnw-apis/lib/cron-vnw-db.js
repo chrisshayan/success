@@ -166,7 +166,6 @@ function processJob(items, companyId) {
                 jobId: +item.jobId
             };
 
-
             /*var job = {
              companyId: +companyId,
              jobId: +row.jobid,
@@ -753,9 +752,9 @@ CRON_VNW.sync = function () {
     Collections.SyncQueue.remove({type: 'cronData'});
 
     // add new sync job
-    Collections.Users.find().map(function (user) {
+    Meteor.users.find({vnwId: {$exists: true}}).map(function (user) {
         var data = {
-            userId: user.userId,
+            userId: user.vnwId,
             companyId: user.companyId
         };
 

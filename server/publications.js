@@ -4,6 +4,7 @@ function transformVNWId(id) {
     return +id;
 }
 
+
 Meteor.publish('jobDetails', function (options) {
     check(options, {
         jobId: Match.Any
@@ -17,14 +18,16 @@ Meteor.publish('jobDetails', function (options) {
 
 
 Meteor.publish('companyInfo', function () {
-    var user = Collections.Users.findOne({userId: +this.userId});
+    var user = Meteor.users.findOne({_id: this.userId});
     if (!user) return;
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 
 Meteor.publish('mailTemplates', function () {
+    if (!this.userId) return null;
+    var user = Meteor.users.findOne({_id: this.userId});
     var cond = {
-        createdBy: parseInt(this.userId)
+        createdBy: user.vnwId || null
     };
     var options = {
         sort: {createdAt: -1}
@@ -47,11 +50,9 @@ Meteor.publish('mailTemplateDetails', function (_id) {
 /*************************************
  * Publications for job details page *
  *************************************/
-
-
 Meteor.publish('companySettings', function () {
-    var user = Collections.Users.findOne({userId: parseInt(this.userId)});
-    return Collections.CompanySettings.find({companyId: user.data.companyid}, {limit: 1});
+    var user = Meteor.users.findOne({_id: this.userId});
+    return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 
 
@@ -159,18 +160,17 @@ Meteor.publish('getJobs1', function (filters, options, filterEmailAddress) {
 });
 
 
-Meteor.publishComposite('getApplications1', function (filters, options) {
-    return {
+//Meteor.publishComposite('getApplications1', function (filters, options) {
 
+Meteor.publishComposite('getApplications', function (filters, options) {
+
+    return {
         find: function () {
             if (!this.userId) return this.ready();
             check(filters, Object);
             check(options, Object);
-            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-            if (!user) return;
-            filters['companyId'] = user.companyId;
-            filters['isDeleted'] = 0;
 
+            filters['isDeleted'] = 0;
             options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
             if (!options.hasOwnProperty("limit")) {
                 options['limit'] = 20;
@@ -193,19 +193,16 @@ Meteor.publishComposite('getApplications1', function (filters, options) {
         ]
     }
 });
+
 Meteor.publishComposite('applicationDetails', function (data) {
+    if (!this.userId) return this.ready();
     return {
-
         find: function () {
-            if (!this.userId) return this.ready();
-            check(data.application, Match.Any);
-
-            var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-            if (!user) return;
+            console.log(data);
+            check(data.application, String);
             var filters = {
-                entryId: transformVNWId(data.application)
+                _id: data.application
             };
-            filters['companyId'] = user.companyId;
             var options = {};
             options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
             options['limit'] = 1;
@@ -226,50 +223,53 @@ Meteor.publishComposite('applicationDetails', function (data) {
     }
 });
 
-
-Meteor.publish('getApplicationDetails', function (applicationId) {
-    check(applicationId, Number);
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-
-    var appCursor = Collections.Applications.find({
-        companyId: user.companyId,
-        applicationId: applicationId
-    }, DEFAULT_APPLICATION_OPTIONS);
-
-    var canIds = appCursor.map(function (doc) {
-        return doc.candidateId
-    });
-    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}})
-
-    return [appCursor, canCursor];
-});
+//
+//Meteor.publish('getApplicationDetails', function (applicationId) {
+//    if(!this.userId) return this.ready();
+//    check(applicationId, Number);
+//    var appCursor = Collections.Applications.find({
+//        companyId: user.companyId,
+//        applicationId: applicationId
+//    }, DEFAULT_APPLICATION_OPTIONS);
+//
+//    var canIds = appCursor.map(function (doc) {
+//        return doc.candidateId
+//    });
+//    var canCursor = Collections.Candidates.find({candidateId: {$in: canIds}})
+//
+//    return [appCursor, canCursor];
+//});
 
 
 Meteor.publish('applicationActivities', function (filters, options) {
+    if (!this.userId) return null;
     check(filters, Object);
     check(options, Object);
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return;
-
-    filters['companyId'] = user.companyId;
+    if (filters.limit) {
+        filters.limit += 10;
+    }
     return Collections.Activities.find(filters, options);
 });
 
 Meteor.publish("jobCounter", function (counterName, filters, filterEmailAddress) {
+    if (!this.userId) return null;
     var self = this;
     check(counterName, String);
     check(filters, Object);
     var count = 0;
     var initializing = true;
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    var user = Meteor.users.findOne({_id: this.userId}, {fields: {vnwId: 1, companyId: 1}});
     if (!user) return;
+
+    filters['companyId'] = user.companyId || null;
 
     if (filterEmailAddress)
         filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
 
-    filters['companyId'] = user.companyId;
-
-    var handle = Collections.Jobs.find(filters).observeChanges({
+    var recruiterFilter = {
+        "recruiters.userId": user._id
+    };
+    var handle = Collections.Jobs.find({$or: [filters, recruiterFilter]}).observeChanges({
         added: function (id) {
             count++;
             if (!initializing)
@@ -294,7 +294,7 @@ Meteor.publish("jobCounter", function (counterName, filters, filterEmailAddress)
 Meteor.publish("jobStagesCounter", function (counterName, jobId) {
     var self = this;
     check(counterName, String);
-    check(jobId, Match.Any);
+    check(jobId, String);
     var count = {
         0: 0,
         1: 0,
@@ -304,11 +304,14 @@ Meteor.publish("jobStagesCounter", function (counterName, jobId) {
         5: 0
     };
     var initializing = true;
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    var user = Meteor.users.findOne({_id: this.userId});
     if (!user) return;
+    var job = Collections.Jobs.findOne({_id: jobId});
+    if (!job) return;
+
+
     var filters = {
-        companyId: user.companyId,
-        jobId: jobId,
+        jobId: job.jobId,
         isDeleted: 0
     };
     var options = {
@@ -349,7 +352,7 @@ Meteor.publish("applicationCounter", function (counterName, filters) {
 
     var count = 0;
     var initializing = true;
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return;
     filters['companyId'] = user.companyId;
     var handle = Collections.Applications.find(filters).observeChanges({
@@ -380,7 +383,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 
     var count = 0;
     var initializing = true;
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return;
 
     filters['companyId'] = user.companyId;
@@ -408,7 +411,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 Meteor.publish('lastApplications', function () {
     if (!this.userId) return null;
     try {
-        var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+        var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
         if (!user) return [];
 
         var filters = {
@@ -433,7 +436,7 @@ Meteor.publish('lastApplications', function () {
 
 Meteor.publish('lastOpenJobs', function () {
     if (!this.userId) return [];
-    var user = Collections.Users.findOne({userId: +this.userId}, {fields: {userId: 1, companyId: 1}});
+    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
     if (!user) return [];
 
     var filters = {
@@ -502,32 +505,13 @@ Meteor.publishComposite('teamSettings', function (jobId) {
 
 Meteor.publish('recruiterSearch', function (filter, option) {
     if (!this.userId) return null;
-    if(!_.isNumber(+this.userId)) return null;
-    var user = Collections.Users.findOne({userId: +this.userId});
-    var emails = Meteor['hiringTeam'].find({companyId: user.companyId}).map(function(r){ return r.email; });
+    if (!_.isNumber(+this.userId)) return null;
+    var user = Meteor.users.findOne({_id: this.userId});
+    var emails = Meteor['hiringTeam'].find({companyId: user.companyId}).map(function (r) {
+        return r.email;
+    });
     filter['emails.address'] = {
         $in: emails
     };
     return Meteor.users.find(filter, option);
-});
-
-
-Meteor.publishComposite('userData', function(){
-    if(!this.userId) return null;
-    var isRecruiter = !_.isNumber(this.userId);
-    return {
-        find: function() {
-            if(isRecruiter)
-                return Meteor.users.find({_id: this.userId}, {limit: 1});
-            return Collections.Users.find({userId: +this.userId}, {limit: 1});
-        },
-        children: [
-            {
-                find: function(user) {
-                    if(isRecruiter) return null;
-                    return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
-                }
-            }
-        ]
-    };
 });

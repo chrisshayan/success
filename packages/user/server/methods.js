@@ -60,12 +60,17 @@ var methods = {
          * 2) user does not exists in Success -> get account from vnw -> client call login with password
          * 3) Email exists but password invalid -> update data from vnw -> client call login with password
          */
+        var result = {
+            success: false,
+            msg: "Your username/password or security settings may be incorrect",
+            data: null
+        };
         var user = Meteor.users.findOne({"emails.address": email});
         var sql, query, vnwData;
         if (!user) {
             // pull vnw user -> if exists -> create account in Success
             sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
-            query = fetchVNWData(sql);
+            query = mysqlManager.fetchVNWData(sql);
             if (query.length == 1) {
                 vnwData = query[0];
                 var _id = Accounts.createUser({
@@ -79,20 +84,28 @@ var methods = {
                 if (_id) {
                     Meteor.users.update({_id: _id}, {
                         $set: {
-                            userId: vnwData.userid,
+                            vnwId: vnwData.userid,
+                            companyId: vnwData.companyid,
                             vnwData: EJSON.parse(EJSON.stringify(vnwData)),
                             roles: [UserApi.ROLES.COMPANY_ADMIN]
                         }
                     })
                 }
+                Meteor.defer(function() {
+                    SYNC_VNW.syncUser(vnwData);
+                });
+                var tokenData = {
+                    userId: vnwData.userid,
+                    companyId: vnwData.companyid,
+                    expireTime: moment(new Date()).add(5, 'day').valueOf()
+                };
+                return result;
             }
-            return true;
-
         } else {
             // pull vnw user -> if exists -> update password
             // pull vnw user -> if exists -> create account in Success
             sql = sprintf(VNW_QUERIES.checkLogin, email, hashVNWPassword(password), 1);
-            query = fetchVNWData(sql);
+            query = mysqlManager.fetchVNWData(sql);
             if (query.length == 1) {
                 vnwData = query[0];
                 Accounts.setPassword(user._id, password);
@@ -105,8 +118,6 @@ var methods = {
             }
             return true;
         }
-
-
     },
 
     getUser: function (userId, filters) {

@@ -24,7 +24,7 @@ JobCandidate = React.createClass({
         }
 
         var containerClass = cx({
-            active: this.props.selected,
+            "active": this.props.selected,
             "list-group-item": true,
             "clear": true
         });

@@ -16,28 +16,17 @@ JobApplicationProfile = BlazeComponent.extendComponent({
         Template.instance().autorun(function () {
             var params = Router.current().params;
             var applicationId = params.query.application;
-            if (!_.isNaN(+applicationId)) {
-                applicationId = +applicationId;
+            if(applicationId) {
+                self.props.set('applicationId', applicationId);
+
+                self.props.set('isLoading', false);
+                self.props.set('isViewResume', false);
+                self.props.set('isViewFullscreen', false);
+                JobDetailsSubs.subscribe('applicationDetails', {application: applicationId});
             }
-
-            self.props.set('applicationId', applicationId);
-
-            self.props.set('isLoading', false);
-            self.props.set('isViewResume', false);
-            self.props.set('isViewFullscreen', false);
-
-            JobDetailsSubs.subscribe('applicationDetails', {application: applicationId});
         });
 
-        // Bind empty event
-        this.onEmptyProfile = function () {
-
-        };
-        Event.on('emptyProfile', this.onEmptyProfile);
-
         this.resumeInfo = new ReactiveVar([]);
-
-
     },
 
     onRendered: function () {
@@ -55,7 +44,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     },
     onDestroyed: function () {
-        Event.removeListener('emptyProfile', this.onEmptyProfile);
+
     },
 
     scrollTop: function () {
@@ -153,7 +142,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     application: function () {
         var self = this;
-        var app = Collections.Applications.findOne({entryId: this.props.get("applicationId")});
+        var app = Collections.Applications.findOne({_id: this.props.get("applicationId")});
         if (app) {
             this.props.set("candidateId", app.candidateId);
 

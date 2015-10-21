@@ -16,15 +16,15 @@ var syncData = function () {
             CRON_VNW.sync();
         }
     });
-    SyncedCron.add({
-        name: 'Pull and sync skill term from VNW',
-        schedule: function (parser) {
-            return parser.recur().on(0, 12).hour();
-        },
-        job: function () {
-            CRON_VNW.cronSkills();
-        }
-    });
+    //SyncedCron.add({
+    //    name: 'Pull and sync skill term from VNW',
+    //    schedule: function (parser) {
+    //        return parser.recur().on(0, 12).hour();
+    //    },
+    //    job: function () {
+    //        CRON_VNW.cronSkills();
+    //    }
+    //});
 };
 
 

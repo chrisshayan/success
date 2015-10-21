@@ -15,7 +15,7 @@ toastr.options = {
     "hideMethod": "fadeOut"
 }
 
-Template.mainLayout.rendered = function(){
+Template.mainLayout.rendered = function () {
 
     // Minimalize menu when screen is less than 768px
     $(window).bind("resize load", function () {
@@ -27,18 +27,18 @@ Template.mainLayout.rendered = function(){
     });
 
     // Fix height of layout when resize, scroll and load
-    $(window).bind("load resize scroll", function() {
-        if(!$("body").hasClass('body-small')) {
+    $(window).bind("load resize scroll", function () {
+        if (!$("body").hasClass('body-small')) {
 
             var navbarHeigh = $('nav.navbar-default').height();
             var wrapperHeigh = $('#page-wrapper').height();
 
-            if(navbarHeigh > wrapperHeigh){
+            if (navbarHeigh > wrapperHeigh) {
                 $('#page-wrapper').css("min-height", navbarHeigh + "px");
             }
 
-            if(navbarHeigh < wrapperHeigh){
-                $('#page-wrapper').css("min-height", $(window).height()  + "px");
+            if (navbarHeigh < wrapperHeigh) {
+                $('#page-wrapper').css("min-height", $(window).height() + "px");
             }
 
             if ($('body').hasClass('fixed-nav')) {
@@ -67,3 +67,17 @@ Template.mainLayout.rendered = function(){
 
 
 };
+
+
+Template.mainLayout.helpers({
+    isFinish: function() {
+        var user = Meteor.user();
+        console.log(user.setupStep)
+        return user.setupStep == -1;
+    },
+
+    SetupNewAccount: function () {
+
+        return JourneySetup;
+    }
+});
