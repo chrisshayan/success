@@ -109,6 +109,7 @@ var methods = {
 
 
     },
+
     getRequestInfo: function (id) {
         if (!id) return false;
         try {
@@ -118,8 +119,7 @@ var methods = {
             console.trace(e);
             return false;
         }
-    }
-    ,
+    },
 
     activeAccount(data){
         check(data, {
@@ -167,8 +167,8 @@ var methods = {
         }
 
 
-    }
-    ,
+    },
+
     validateUserLoginInfo: function (input) {
         if (typeof input !== 'string') return false;
         return !!(Meteor.users.findOne({'$or': [{username: input}, {'emails.address': input}]}));
