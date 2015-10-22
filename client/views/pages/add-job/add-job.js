@@ -3,6 +3,8 @@ AutoForm.hooks({
         onSuccess: function (type, result) {
             $('.criteria-tab').trigger('click');
             console.log('err, result', type, result);
+            if (!result) return;
+            
             Router.go('teamSettings', {
                 jobId: result
             });
@@ -28,7 +30,7 @@ AutoForm.hooks({
 Template.AddJob.onCreated(function () {
     var instance = Template.instance();
     instance.jobId = new ReactiveVar();
-    instance.autorun(function() {
+    instance.autorun(function () {
         var params = Router.current().params;
         console.log(params);
         (params.jobId) && instance.jobId.set(params.jobId);

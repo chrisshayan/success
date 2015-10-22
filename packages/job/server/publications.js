@@ -69,7 +69,7 @@ Meteor.publish('getJobs', function (filters, options, filterEmailAddress) {
 /**
  * Get current job details and 5 relate jobs
  */
-Meteor.publish('jobDetails', function (options) {
+Meteor.publish('jobDetails1', function (options) {
     if (!this.userId) return null;
     check(options, {
         jobId: String

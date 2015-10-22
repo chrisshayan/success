@@ -226,7 +226,7 @@ Meteor.methods({
                 stage: Number
             });
             var job = Collections.Jobs.findOne({_id: opt.jobId});
-            if(!job) return false;
+            if (!job) return false;
 
             var application = Collections.Applications.findOne({
                 jobId: job.jobId,
@@ -256,7 +256,7 @@ Meteor.methods({
             application: String
         });
         var job = Collections.Jobs.findOne({_id: opt.jobId});
-        if(!job) return false;
+        if (!job) return false;
         var criteria = {
             _id: opt.application,
             jobId: job.jobId,
@@ -741,11 +741,11 @@ Meteor.methods({
     'getEmailList': function () {
         var listEmail = [];
 
-/*        var user = Collections.Users.findOne({userId: +this.userId});
-        if (!user) return [];*/
+        /*        var user = Collections.Users.findOne({userId: +this.userId});
+         if (!user) return [];*/
 
         var user = Meteor.users.findOne({_id: this.userId});
-        if(!user) return [];
+        if (!user) return [];
 
         var query = {
             companyId: user.companyId
@@ -771,7 +771,10 @@ Meteor.methods({
 
 Meteor.methods({
     addJob: function (data) {
+        console.log('add job', data, this.userId);
+
         if (!this.userId) return false;
+
         var currentUser = Meteor.users.findOne({_id: this.userId});
 
         if (currentUser) {
@@ -868,7 +871,7 @@ Meteor.methods({
                     modifier = {};
 
                 var recruiter = _.findWhere(job.recruiters, {userId: userId});
-                
+
                 if (recruiter) {
                     if (recruiter.roles.indexOf(role) < 0) {
 
@@ -891,7 +894,7 @@ Meteor.methods({
                         }
                     };
                 }
-                console.log(selector ,modifier)
+                console.log(selector, modifier)
                 if (selector && modifier)
                     return Collections.Jobs.update(selector, modifier);
             }
@@ -935,5 +938,18 @@ Meteor.methods({
             }
         }
         return null;
+    },
+
+    getCompanyByIds: function (idList) {
+        if (typeof idList !== 'object' || !idList.length)
+            return null;
+
+        var companies = Collections.CompanySettings.find({
+            companyId: {'$in': idList}
+        }).fetch();
+
+        console.log(companies);
+
+        return companies;
     }
 });

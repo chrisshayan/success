@@ -472,6 +472,33 @@ SimpleSchema.messages({
 });
 
 Schemas.addJobForm = new SimpleSchema({
+    companyId: {
+        type: String,
+        autoform: {
+            type: 'select2',
+            firstOption: true,
+            options: function () {
+                Meteor.call('getCompanyListByUser', function (err, results) {
+                    if (err) {
+                        console.error(err);
+                        return [];
+                    }
+                    if (results) {
+                        console.log('comp results : ', results);
+                        var a = results.map(function (comp) {
+                            return {
+                                label: comp.companyName,
+                                value: comp.companyId
+                            }
+                        });
+                        console.log(a);
+                        return a;
+                    }
+
+                })
+            }
+        }
+    },
 
     title: {
         type: String,

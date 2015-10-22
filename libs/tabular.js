@@ -17,7 +17,7 @@ TabularTables.HiringTeam = new Tabular.Table({
         {data: "name", title: "Name"},
         {data: "email", title: "Email"},
         {
-            data: "userId",
+            data: "username",
             title: "Username",
             render: function(val, type, doc) {
                 return '@' + val;

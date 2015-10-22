@@ -82,7 +82,7 @@ Router.route('/active-account/:keyid', {
     },
     action: function () {
         this.layout('blankLayout');
-        this.render('active-account');
+        this.render('activeAccount');
     }
 });
 

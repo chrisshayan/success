@@ -94,7 +94,7 @@ Template.activeAccount.helpers({
                     }
                 },
                 autoform: {
-                    value: data.userId
+                    value: data.username
                 }
             },
             password: {

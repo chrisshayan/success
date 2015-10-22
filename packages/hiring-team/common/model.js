@@ -15,6 +15,10 @@ model.appendSchema({
         type: String
     },
     userId: {
+        type: String,
+        optional: true
+    },
+    username: {
         type: String
     },
 
