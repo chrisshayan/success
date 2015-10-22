@@ -472,7 +472,7 @@ SimpleSchema.messages({
 });
 
 Schemas.addJobForm = new SimpleSchema({
-    companyId: {
+    /*companyId: {
         type: String,
         autoform: {
             type: 'select2',
@@ -498,7 +498,7 @@ Schemas.addJobForm = new SimpleSchema({
                 })
             }
         }
-    },
+    },*/
 
     title: {
         type: String,

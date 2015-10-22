@@ -581,7 +581,7 @@ Meteor.methods({
             var isCandidateExists = false;
             var user = Meteor.users.findOne({_id: this.userId});
             var job = Collections.Jobs.findOne({_id: jobId});
-            if(!job) return false;
+            if (!job) return false;
 
             if (data.email) {
                 var criteria = {
@@ -678,7 +678,7 @@ Meteor.methods({
             email: String
         });
         var job = Meteor.jobs.findOne({_id: data.jobId});
-        if(!job) return false;
+        if (!job) return false;
         email = data.email.trim();
 
         var criteria = {
@@ -733,8 +733,16 @@ Meteor.methods({
 
         var currentUser = Meteor.users.findOne({_id: this.userId});
 
+        if (!currentUser.companyId) {
+            var listCompanyByUser = Meteor.call('getCompanyListByUser');
+
+            if (listCompanyByUser.length) {
+                data.companyId = listCompanyByUser[0].companyId
+            }
+        }
+
         if (currentUser) {
-            data.companyId = currentUser.companyId;
+            data.companyId = data.companyId || currentUser.companyId || -1;
             data.data = {};
             data.source = "recruit";
             data.status = 1;
