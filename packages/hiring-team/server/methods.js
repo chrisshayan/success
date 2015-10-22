@@ -101,12 +101,9 @@ var methods = {
     },
 
     getCompanyListByUser: function () {
-        console.log('ii', this.userId);
-
         var companyIdList = Collection.find({userId: this.userId}).map(function (comp) {
             return comp.companyId
         });
-        console.log('id list', companyIdList);
 
         return Meteor.call('getCompanyByIds', companyIdList);
 

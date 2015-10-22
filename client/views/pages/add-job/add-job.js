@@ -4,7 +4,7 @@ AutoForm.hooks({
             $('.criteria-tab').trigger('click');
             console.log('err, result', type, result);
             if (!result) return;
-            
+
             Router.go('teamSettings', {
                 jobId: result
             });
@@ -40,6 +40,10 @@ Template.AddJob.onCreated(function () {
 
 
 Template.AddJob.helpers({
+    pageTitle: function () {
+        var params = Router.current().params;
+        return (params.jobId) ? "Edit job settings" : "Add new job";
+    }
     /*jobId: function () {
      var instance = Template.instance();
      console.log('id', instance.jobId.get());
