@@ -32,7 +32,7 @@ Template.AddJob.onCreated(function () {
     instance.jobId = new ReactiveVar();
     instance.autorun(function () {
         var params = Router.current().params;
-        console.log(params);
+
         (params.jobId) && instance.jobId.set(params.jobId);
         Meteor.subscribe('getHiringTeam');
     });
