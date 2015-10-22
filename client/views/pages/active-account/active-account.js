@@ -112,18 +112,6 @@ Template.activeAccount.helpers({
     }
 });
 
-Template.activeAccount.events({
-    'submit #requestInvitationForm': function (e) {
-        var self = this;
-        e.preventDefault();
-        var obj = {};
-        $.each($('#requestInvitationForm').serializeArray(), function (index, value) {
-            obj[value.name] = value.value;
-        });
-        //console.log(obj);
-    }
-});
-
 
 /*
  Meteor.call('getRequestInfo', params.keyid, function (err, userInfo) {

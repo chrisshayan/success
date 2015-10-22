@@ -1,4 +1,3 @@
-
 TabularTables = {};
 
 TabularTables.HiringTeam = new Tabular.Table({
@@ -7,6 +6,9 @@ TabularTables.HiringTeam = new Tabular.Table({
     selector: function (userId) {
         var f = {};
         var user = Meteor.users.findOne({_id: userId});
+        if (!user || !user.companyId)
+            return false;
+
         var company = Collections.CompanySettings.findOne({companyId: user.companyId || null});
         if (company) {
             f['companyId'] = company.companyId;
@@ -19,21 +21,21 @@ TabularTables.HiringTeam = new Tabular.Table({
         {
             data: "username",
             title: "Username",
-            render: function(val, type, doc) {
+            render: function (val, type, doc) {
                 return '@' + val;
             }
         },
         {
             data: "dateAdded",
             title: "Date added",
-            render: function(val, type, doc) {
+            render: function (val, type, doc) {
                 return moment(val).calendar();
             }
         },
         {
             data: "status",
             title: "Status",
-            render: function(val, type, doc) {
+            render: function (val, type, doc) {
                 if (val == void 0) return 'unknown';
 
                 switch (val) {

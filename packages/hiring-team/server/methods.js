@@ -152,7 +152,8 @@ var methods = {
                 '$set': {
                     status: 1,
                     username: user.username,
-                    userId: result
+                    userId: result,
+                    name: data.fullname
                 }
             };
 
