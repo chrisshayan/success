@@ -308,7 +308,7 @@ Meteor.publishComposite('teamSettings', function (jobId) {
     check(jobId, Match.Any);
     return {
         find: function () {
-            return Meteor.jobs.find({_id: jobId}, {limit: 1});
+            return Collections.Jobs.find({_id: jobId}, {limit: 1});
         },
         children: [
             {

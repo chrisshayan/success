@@ -61,11 +61,12 @@ Template.hiringCriteria.events({
 
         Meteor.call('changeCriteriaInSet', _cId, params.catName, params.criteriaName, function (err, result) {
             if (err) console.error(err);
-            if (!result) {
+            if (!result)
                 console.log('action failed');
-            }
-        })
+            else
+                $element.find('input[name="criteriaName"]').val('');
 
+        })
     }
 });
 
