@@ -112,7 +112,6 @@ ApplicationTransform.prototype = {
         return Meteor.absoluteUrl(link);
     },
 
-
     link: function() {
         var job = Collections.Jobs.findOne({jobId: this.jobId});
 
