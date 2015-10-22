@@ -10,7 +10,7 @@ Activity = function Activity() {
  * ENUM ACTION TYPE
  * @type {{UPDATE_APPLICATION_STAGE: number, APPLIED_JOB: number}}
  */
-Activity.prototype.ACTION_TYPE = {
+Activity.ACTION_TYPE = {
     UPDATE_APPLICATION_STAGE: 1,
     APPLIED_JOB: 2,
     DISQUALIFIED_APPLICATION: 3,
@@ -31,12 +31,11 @@ Activity.prototype.save = function() {
     _.each(Object.keys(self), function(k) {
         data[k] = self[k];
     });
-
     return Collections.Activities.insert(data);
 };
 
 Activity.prototype.updateApplicationStage = function() {
-    this.actionType = this.ACTION_TYPE.UPDATE_APPLICATION_STAGE;
+    this.actionType = Activity.ACTION_TYPE.UPDATE_APPLICATION_STAGE;
     this.save();
 };
 

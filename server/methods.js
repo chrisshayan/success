@@ -105,54 +105,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
  * Success methods
  */
 Meteor.methods({
-    /**
-     * Update application state
-     * @param entryId {Number}
-     * @param toStage {Number} in range 1,2,3,4,5
-     * @returns {Boolean} the update result
-     */
-    updateApplicationStage: function (option) {
-        try {
-            if (!this.userId) return false;
 
-            check(option, {
-                application: String,
-                stage: Number
-            });
-            check(option.stage, Match.OneOf(0, 1, 2, 3, 4, 5));
-
-            var cond = {
-                _id: option.application
-            };
-
-            var application = Collections.Applications.findOne(cond);
-            if (!application) return false;
-            if ((application.stage == 0 && option.stage == 1) || (application.stage == 1 && option.stage == 0)) return false;
-
-            var data = {
-                $set: {
-                    stage: option.stage
-                }
-            }
-            var result = Collections.Applications.update(application._id, data);
-            if (result) {
-                // log to activities
-                var activity = new Activity();
-                activity.data = {
-                    jobId: application.jobId,
-                    applicationId: option.application,
-                    candidateId: application.userId,
-                    fromStage: application.stage,
-                    toStage: option.stage
-                };
-                activity.createdBy = this.userId;
-                activity.updateApplicationStage();
-            }
-        } catch (e) {
-            debuger(e);
-        }
-        return result;
-    },
 
     /**
      * Get application details
@@ -622,11 +575,13 @@ Meteor.methods({
 
     addCandidate: function (data, jobId) {
         try {
-            console.log(data, jobId);
             if (!this.userId) return false;
             check(data, Object);
             check(jobId, Match.Any);
             var isCandidateExists = false;
+            var user = Meteor.users.findOne({_id: this.userId});
+            var job = Collections.Jobs.findOne({_id: jobId});
+            if(!job) return false;
 
             if (data.email) {
                 var criteria = {
@@ -650,12 +605,10 @@ Meteor.methods({
                 Collections.Candidates.update({_id: candidateId}, {$set: {candidateId: candidateId}});
             }
 
-            var user = getUserInfo(+this.userId);
-
             var application = new Schemas.Application();
             application.source = 3;
             application.stage = 0;
-            application.companyId = user.companyId;
+            application.companyId = job.companyId;
             application.jobId = jobId;
             application.candidateId = candidateId;
             application.data = {};
@@ -666,20 +619,21 @@ Meteor.methods({
                 city: can.data.city || ''
             };
             candidateInfo['fullname'] = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
-            candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
+            candidateInfo.emails = _.filter(candidateInfo.emails, (email) => email != void 0);
             application.candidateInfo = candidateInfo;
 
             var appId = Collections.Applications.insert(application);
             Collections.Applications.update({_id: appId}, {$set: {entryId: appId}});
             // Log applied activity
             var activity = new Activity();
-            activity.companyId = user.companyId;
+            activity.companyId = job.companyId;
             activity.data = {
                 applicationId: appId,
                 source: 3,
                 userId: candidateId
             };
             activity.createdAt = application.createdAt;
+            activity.createdBy = this.userId;
             activity.addCandidateToSourced();
 
             if (data.email) {
@@ -723,10 +677,12 @@ Meteor.methods({
             jobId: Match.Any,
             email: String
         });
+        var job = Meteor.jobs.findOne({_id: data.jobId});
+        if(!job) return false;
         email = data.email.trim();
 
         var criteria = {
-            jobId: transformEntryId(data.jobId),
+            jobId: job.jobId,
             "candidateInfo.emails": data.email
         };
         var options = {

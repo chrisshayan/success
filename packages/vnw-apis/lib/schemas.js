@@ -313,7 +313,7 @@ Schemas.CandidateSource = new SimpleSchema({
                 var self = this;
                 var urlParams = Router.current().params;
                 var checkData = {
-                    jobId: urlParams.jobId,
+                    jobId: urlParams._id,
                     email: this.value
                 };
 

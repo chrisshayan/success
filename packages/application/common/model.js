@@ -18,10 +18,12 @@ model.prototype.isExist = function (condition) {
 
 model.appendSchema({
     entryId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     jobId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     candidateId: {
         type: Number

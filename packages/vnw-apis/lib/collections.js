@@ -194,15 +194,7 @@ Collections.Applications.allow({
     }
 });
 
-Collections.Applications.before.find(function (userId, filter, option) {
-    if (filter.hasOwnProperty('jobId')) {
-        filter.jobId = transformVNWId(filter.jobId);
-    }
 
-    if (filter.hasOwnProperty('entryId')) {
-        filter.entryId = transformVNWId(filter.entryId);
-    }
-});
 
 Collections.Activities = new Mongo.Collection("vnw_activities");
 

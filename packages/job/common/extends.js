@@ -17,3 +17,17 @@ User.prototype.job = function (options) {
 User.prototype.callUpdateCustomJob = function (data, cb) {
     return Meteor.call('updateCustomJob', this.jobId, data, cb);
 };
+
+
+User.prototype.jobPermissions = function () {
+    var cond = [];
+    cond.push({
+        "recruiters.userId": this._id
+    });
+    if (this.companyId) {
+        cond.push({
+            companyId: this.companyId
+        });
+    }
+    return cond;
+};

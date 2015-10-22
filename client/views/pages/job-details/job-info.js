@@ -1,8 +1,9 @@
 AutoForm.hooks({
     addCandidateForm: {
         onSubmit: function (doc) {
-            var jobId = Utils.transformVNWId(Router.current().params.jobId) || null;
-            var currentApplication = Router.current().params.query.application;
+            var params = Router.current().params;
+            var jobId = params._id;
+            var currentApplication = params.query.application;
             Meteor.call("addCandidate", doc, jobId, function (err, result) {
                 if (err) throw err;
                 if (result) {

@@ -11,4 +11,54 @@ var methods = {
     }
 };
 
+/**
+ * Update application state
+ * @param entryId {Number}
+ * @param toStage {Number} in range 1,2,3,4,5
+ * @returns {Boolean} the update result
+ */
+methods.updateApplicationStage = function (option) {
+    try {
+        if (!this.userId) return false;
+
+        check(option, {
+            application: String,
+            stage: Number
+        });
+        check(option.stage, Match.OneOf(0, 1, 2, 3, 4, 5));
+
+        var cond = {
+            _id: option.application
+        };
+
+        var application = Collections.Applications.findOne(cond);
+        if (!application) return false;
+        if ((application.stage == 0 && option.stage == 1) || (application.stage == 1 && option.stage == 0)) return false;
+
+        var data = {
+            $set: {
+                stage: option.stage
+            }
+        }
+        var result = Collections.Applications.update({_id: application._id}, data);
+        if (result) {
+            // log to activities
+            var activity = new Activity();
+            activity.data = {
+                jobId: application.jobId,
+                applicationId: application._id,
+                candidateId: application.candidateId,
+                fromStage: application.stage,
+                toStage: option.stage
+            };
+            activity.companyId = application.companyId;
+            activity.createdBy = this.userId;
+            activity.updateApplicationStage();
+        }
+    } catch (e) {
+        debuger(e);
+    }
+    return result;
+},
+
 Meteor.methods(methods);

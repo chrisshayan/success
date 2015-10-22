@@ -5,17 +5,6 @@ function transformVNWId(id) {
 }
 
 
-Meteor.publish('jobDetails', function (options) {
-    check(options, {
-        jobId: Match.Any
-    });
-    var cond = {
-        jobId: transformVNWId(+options.jobId),
-        userId: parseInt(this.userId)
-    };
-    return Collections.Jobs.find(cond, {limit: 1});
-});
-
 
 Meteor.publish('companyInfo', function () {
     var user = Meteor.users.findOne({_id: this.userId});
@@ -133,34 +122,6 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 
-Meteor.publish('getJobs1', function (filters, options, filterEmailAddress) {
-    try {
-        if (!this.userId) this.ready();
-
-        check(filters, Object);
-        check(options, Match.Optional(Object));
-
-        filters = _.pick(filters, 'status', 'source', 'recruiterEmails');
-        filters['userId'] = +this.userId;
-
-        options = _.pick(options, 'limit', 'sort');
-        options['fields'] = DEFAULT_JOB_OPTIONS['fields'];
-
-        if (!options.hasOwnProperty("limit")) {
-            options['limit'] = 5;
-        }
-        var recruiterFilter = {
-            "recruiters.userId": this.userId
-        }
-        return Collections.Jobs.find({$or: [filters, recruiterFilter]}, options);
-    } catch (e) {
-        debuger(e);
-        return this.ready();
-    }
-});
-
-
-//Meteor.publishComposite('getApplications1', function (filters, options) {
 
 //Meteor.publishComposite('getApplications', function (filters, options) {
 //
@@ -194,34 +155,6 @@ Meteor.publish('getJobs1', function (filters, options, filterEmailAddress) {
 //    }
 //});
 
-Meteor.publishComposite('applicationDetails', function (data) {
-    if (!this.userId) return this.ready();
-    return {
-        find: function () {
-            console.log(data);
-            check(data.application, String);
-            var filters = {
-                _id: data.application
-            };
-            var options = {};
-            options = _.defaults(options, DEFAULT_APPLICATION_OPTIONS);
-            options['limit'] = 1;
-            return Collections.Applications.find(filters, options);
-        },
-        children: [
-            {
-                find: function (application) {
-                    var cond = {
-                        candidateId: application.candidateId
-                    };
-                    var options = DEFAULT_CANDIDATE_OPTIONS;
-                    options.limit = 1;
-                    return Collections.Candidates.find(cond, options)
-                }
-            }
-        ]
-    }
-});
 
 //
 //Meteor.publish('getApplicationDetails', function (applicationId) {
@@ -249,100 +182,6 @@ Meteor.publish('applicationActivities', function (filters, options) {
         filters.limit += 10;
     }
     return Collections.Activities.find(filters, options);
-});
-
-Meteor.publish("jobCounter", function (counterName, filters, filterEmailAddress) {
-    if (!this.userId) return null;
-    var self = this;
-    check(counterName, String);
-    check(filters, Object);
-    var count = 0;
-    var initializing = true;
-    var user = Meteor.users.findOne({_id: this.userId}, {fields: {vnwId: 1, companyId: 1}});
-    if (!user) return;
-
-    filters['companyId'] = user.companyId || null;
-
-    if (filterEmailAddress)
-        filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
-
-    var recruiterFilter = {
-        "recruiters.userId": user._id
-    };
-    var handle = Collections.Jobs.find({$or: [filters, recruiterFilter]}).observeChanges({
-        added: function (id) {
-            count++;
-            if (!initializing)
-                self.changed("vnw_counts", counterName, {count: count});
-        },
-        removed: function (id) {
-            count--;
-            self.changed("vnw_counts", counterName, {count: count});
-        }
-    });
-
-    initializing = false;
-    self.added("vnw_counts", counterName, {count: count});
-    self.ready();
-
-    self.onStop(function () {
-        handle.stop();
-    });
-});
-
-
-Meteor.publish("jobStagesCounter", function (counterName, jobId) {
-    var self = this;
-    check(counterName, String);
-    check(jobId, String);
-    var count = {
-        0: 0,
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-    };
-    var initializing = true;
-    var user = Meteor.users.findOne({_id: this.userId});
-    if (!user) return;
-    var job = Collections.Jobs.findOne({_id: jobId});
-    if (!job) return;
-
-
-    var filters = {
-        jobId: job.jobId,
-        isDeleted: 0
-    };
-    var options = {
-        fields: {
-            stage: 1
-        }
-    }
-    var handle = Collections.Applications.find(filters, options).observe({
-        added: function (doc) {
-            count[doc.stage]++;
-            if (!initializing)
-                self.changed("vnw_counts", counterName, {count: count});
-        },
-        changed: function (newDoc, oldDoc) {
-            count[oldDoc.stage]--;
-            count[newDoc.stage]++;
-            self.changed("vnw_counts", counterName, {count: count});
-        },
-        removed: function (doc) {
-            count[doc.stage]--;
-            self.changed("vnw_counts", counterName, {count: count});
-        }
-    });
-
-    initializing = false;
-    self.added("vnw_counts", counterName, {count: count});
-    self.ready();
-
-    self.onStop(function () {
-        handle.stop();
-    });
 });
 
 Meteor.publish("applicationCounter", function (counterName, filters) {
@@ -408,51 +247,31 @@ Meteor.publish("activityCounter", function (counterName, filters) {
     });
 });
 
-Meteor.publish('lastApplications', function () {
-    if (!this.userId) return null;
-    try {
-        var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
-        if (!user) return [];
+//Meteor.publish('lastApplications', function () {
+//    if (!this.userId) return null;
+//    try {
+//        var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
+//        if (!user) return [];
+//
+//        var filters = {
+//            source: {$ne: 3},
+//            companyId: user.companyId,
+//            isDeleted: 0
+//        };
+//
+//        var options = DEFAULT_APPLICATION_OPTIONS;
+//        options['limit'] = 10;
+//        options['sort'] = {
+//            createdAt: -1
+//        };
+//
+//        return Collections.Applications.find(filters, options);
+//    } catch (e) {
+//        console.log('Last applications:', e);
+//        return false;
+//    }
+//});
 
-        var filters = {
-            source: {$ne: 3},
-            companyId: user.companyId,
-            isDeleted: 0
-        };
-
-        var options = DEFAULT_APPLICATION_OPTIONS;
-        options['limit'] = 10;
-        options['sort'] = {
-            createdAt: -1
-        };
-
-        return Collections.Applications.find(filters, options);
-    } catch (e) {
-        console.log('Last applications:', e);
-        return false;
-    }
-});
-
-
-Meteor.publish('lastOpenJobs', function () {
-    if (!this.userId) return [];
-    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return [];
-
-    var filters = {
-        companyId: user.companyId,
-        status: 1
-    };
-
-    var options = DEFAULT_JOB_OPTIONS;
-    options['limit'] = 10;
-    options['sort'] = {
-        createdAt: -1
-    };
-
-
-    return Collections.Jobs.find(filters, options);
-});
 
 Meteor.publish('staticModels', function () {
     var query = {languageId: 2};
@@ -489,7 +308,7 @@ Meteor.publishComposite('teamSettings', function (jobId) {
     check(jobId, Match.Any);
     return {
         find: function () {
-            return Collections.Jobs.find({_id: jobId}, {limit: 1});
+            return Meteor.jobs.find({_id: jobId}, {limit: 1});
         },
         children: [
             {

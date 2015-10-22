@@ -810,5 +810,5 @@ SYNC_VNW.addQueue = function (type, data) {
  });*/
 
 Meteor.startup(function () {
-    return Collections.SyncQueue.startJobServer();
+    //return Collections.SyncQueue.startJobServer();
 });
