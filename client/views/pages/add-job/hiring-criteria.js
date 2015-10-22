@@ -55,6 +55,8 @@ Template.hiringCriteria.events({
         $.each($element.serializeArray(), function (index, value) {
             params[value.name] = value.value.trim();
         });
+        if (params.catName.length === 0 || params.criteriaName.length === 0)
+            return false;
 
         var instance = Template.instance();
         var _cId = instance.criteriaId.get();

@@ -23,10 +23,10 @@ var methods = {
 
 
     changeCriteriaInSet: function (_id, setName, criteriaName, isRemove) {
-        if (_id == void 0 || setName == void 0 || criteriaName == void 0)
+        if (_id == void 0 || setName == void 0 || criteriaName == void 0
+            || ('' + setName.trim()).length === 0 || ('' + criteriaName).trim().length === 0)
             return false;
 
-        console.log('input', _id, setName, criteriaName);
         try {
             var query = {};
             query._id = _id;
