@@ -113,18 +113,21 @@ publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
         find: function() {
             var count = 0;
             var initializing = true;
-            var user = Meteor.users.findOne({_id: this.userId}, {fields: {vnwId: 1, companyId: 1}});
+            var user = Meteor.users.findOne({_id: self.userId});
             if (!user) return;
+            var permissions = user.jobPermissions();
+            console.log(filters)
+            //filters['companyId'] = user.companyId || null;
 
-            filters['companyId'] = user.companyId || null;
+            //if (filterEmailAddress)
+            //    filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
+            //
+            //var recruiterFilter = {
+            //    "recruiters.userId": user._id
+            //};
 
-            if (filterEmailAddress)
-                filters['data.emailaddress'] = new RegExp(filterEmailAddress, 'i');
-
-            var recruiterFilter = {
-                "recruiters.userId": user._id
-            };
-            var handle = Collections.Jobs.find({$or: [filters, recruiterFilter]}).observeChanges({
+            filters['$or'] = permissions;
+            var handle = Collections.Jobs.find(filters).observeChanges({
                 added: function (id) {
                     count++;
                     if (!initializing)

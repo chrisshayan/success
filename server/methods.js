@@ -609,7 +609,7 @@ Meteor.methods({
             application.source = 3;
             application.stage = 0;
             application.companyId = job.companyId;
-            application.jobId = jobId;
+            application.jobId = job.jobId;
             application.candidateId = candidateId;
             application.data = {};
             var candidateInfo = {

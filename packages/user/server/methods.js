@@ -17,7 +17,7 @@ var setModifier = function (obj) {
     delete obj._id;
     delete obj.userId;
 
-    return {'$set ': obj};
+    return {'$set': obj};
 };
 
 

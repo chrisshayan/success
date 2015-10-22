@@ -3,12 +3,15 @@
 Template.navigation.onCreated(function () {
     var instance = Template.instance();
     instance.company = new ReactiveVar();
-    if(!Meteor.user()) return;
-    var companyId = Meteor.user().companyid;
-    Meteor.call('getCompanyInfo', companyId, function (err, info) {
-        if (err) console.error(err);
-        else instance.company.set(info);
-    });
+    instance.autorun(function () {
+        var user = Meteor.user();
+        if (user && user.companyId) {
+            Meteor.call('getCompanyInfo', user.companyId, function (err, info) {
+                if (err) console.error(err);
+                else instance.company.set(info);
+            });
+        }
+    })
 });
 
 Template.navigation.events({
@@ -27,7 +30,11 @@ Template.navigation.helpers({
         return "";
     },
     displayName: function () {
-        return Meteor.currentRecruiter().email;
+        var user = Meteor.user();
+        if (user && user.profile) {
+            return [user.profile.firstname, user.profile.lastname].join(' ');
+        }
+        return '';
     }
 });
 
