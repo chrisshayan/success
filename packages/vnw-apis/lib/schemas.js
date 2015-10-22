@@ -222,6 +222,12 @@ Schemas.Template = new SimpleSchema({
         autoform: {
             omit: true
         }
+    },
+    companyId: {
+        type: Number,
+        autoform: {
+            omit: true
+        }
     }
 });
 
@@ -326,20 +332,6 @@ Schemas.CandidateSource = new SimpleSchema({
                         }]);
 
                 });
-            } else {
-                email = this.value;
-                if (!email) return;
-                var criteria = {
-                    $or: [
-                        {"data.username": email},
-                        {"data.email": email},
-                        {"data.email1": email},
-                        {"data.email2": email}
-                    ]
-                };
-                if (Collections.Candidates.find(criteria).count() > 0) {
-                    return "exists";
-                }
             }
         },
         autoform: {
@@ -473,32 +465,32 @@ SimpleSchema.messages({
 
 Schemas.addJobForm = new SimpleSchema({
     /*companyId: {
-        type: String,
-        autoform: {
-            type: 'select2',
-            firstOption: true,
-            options: function () {
-                Meteor.call('getCompanyListByUser', function (err, results) {
-                    if (err) {
-                        console.error(err);
-                        return [];
-                    }
-                    if (results) {
-                        console.log('comp results : ', results);
-                        var a = results.map(function (comp) {
-                            return {
-                                label: comp.companyName,
-                                value: comp.companyId
-                            }
-                        });
-                        console.log(a);
-                        return a;
-                    }
+     type: String,
+     autoform: {
+     type: 'select2',
+     firstOption: true,
+     options: function () {
+     Meteor.call('getCompanyListByUser', function (err, results) {
+     if (err) {
+     console.error(err);
+     return [];
+     }
+     if (results) {
+     console.log('comp results : ', results);
+     var a = results.map(function (comp) {
+     return {
+     label: comp.companyName,
+     value: comp.companyId
+     }
+     });
+     console.log(a);
+     return a;
+     }
 
-                })
-            }
-        }
-    },*/
+     })
+     }
+     }
+     },*/
 
     title: {
         type: String,

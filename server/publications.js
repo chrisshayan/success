@@ -15,23 +15,23 @@ Meteor.publish('companyInfo', function () {
 Meteor.publish('mailTemplates', function () {
     if (!this.userId) return null;
     var user = Meteor.users.findOne({_id: this.userId});
-    var cond = {
-        createdBy: user.vnwId || null
-    };
-    var options = {
-        sort: {createdAt: -1}
-    };
-    return Collections.MailTemplates.find(cond, options);
+    var company = user.defaultCompany();
+
+    return Collections.MailTemplates.find({
+        companyId: company.companyId
+    }, {
+        sort: {
+            createdAt: -1
+        }
+    });
 });
 
 Meteor.publish('mailTemplateDetails', function (_id) {
+    if(!this.userId) return null;
     check(_id, String);
-
     var cond = {
         _id: _id,
-        createdBy: parseInt(this.userId)
     };
-
     return Collections.MailTemplates.find(cond);
 });
 

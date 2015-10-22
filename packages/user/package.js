@@ -29,7 +29,7 @@ Package.onUse(function (api) {
     api.imply('vnw:core');
     api.imply(["socialize:user-model"]);
 
-    api.export('UserApi')
+    api.export(['UserApi', 'User']);
 });
 
 Package.onTest(function (api) {

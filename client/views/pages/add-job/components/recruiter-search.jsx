@@ -93,6 +93,7 @@ RecruiterSearch = React.createClass({
     },
 
     handleSelect(user) {
+        if(this.state.q.length <= 0) return;
         this.setState({
             q: '',
             itemActive: null

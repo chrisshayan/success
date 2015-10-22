@@ -4,8 +4,6 @@
 
 
 Template.hiringCriteria.onCreated(function () {
-    console.log('jobId : ', this.data);
-
     var jobId = this.data.jobId;
     var instance = Template.instance();
     instance.criteriaId = new ReactiveVar([]);

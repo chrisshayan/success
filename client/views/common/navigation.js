@@ -22,17 +22,21 @@ Template.navigation.events({
 
 Template.navigation.helpers({
     company_logo: function () {
-        var instance = Template.instance();
-        var company = instance.company.get();
-        if (company)
-            return company.logo;
-
-        return "";
+        var user = Meteor.user();
+        if(user) {
+            var company = user.defaultCompany();
+            if(company) return company.logo;
+        }
+        return '';
     },
     displayName: function () {
         var user = Meteor.user();
         if (user && user.profile) {
-            return [user.profile.firstname, user.profile.lastname].join(' ');
+            var name = [user.profile.firstname, user.profile.lastname].join(' ');
+            if(name.trim().length <= 0) {
+                return user.defaultEmail();
+            }
+            return name;
         }
         return '';
     }

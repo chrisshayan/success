@@ -20,7 +20,9 @@ RecruiterSubs = new SubsManager({
 
 StaticSubs.subscribe('staticModels');
 
-Meteor.subscribe('userData');
+Tracker.autorun(function() {
+    Meteor.subscribe('userData');
+});
 
 Router.configure({
     layoutTemplate: 'mainLayout',

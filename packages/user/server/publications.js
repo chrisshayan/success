@@ -1,13 +1,19 @@
 Meteor.publishComposite('userData', function(){
     if(!this.userId) return null;
+    var self = this;
     return {
         find: function() {
-            return Meteor.users.find({_id: this.userId}, {limit: 1});
+            return Meteor.users.find({_id: self.userId}, {limit: 1});
         },
         children: [
             {
                 find: function(user) {
-                    return Collections.CompanySettings.find({companyId: user.companyId || null}, {limit: 1});
+                    var company = user.defaultCompany();
+                    return Collections.CompanySettings.find({companyId: company.companyId || null}, {limit: 1});
+                }
+            }, {
+                find: function(user) {
+                    return Meteor.hiringTeam.find({userId: user._id});
                 }
             }
         ]

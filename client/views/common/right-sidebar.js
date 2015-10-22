@@ -37,12 +37,11 @@ var LastCandidates = BlazeComponent.extendComponent({
     },
 
     filters: function () {
-        if(!Meteor.user() || !Meteor.user().companyid) return {};
         return {
+            status: 1,
             source: {
                 $ne: 3
-            },
-            companyId: Meteor.user().companyid
+            }
         };
     },
 

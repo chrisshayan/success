@@ -108,7 +108,10 @@ ApplicationTransform.prototype = {
     },
 
     resumeFileUrl: function () {
-        var link = "downloadresume/" + this.companyId + "/" + this._id + '/12345'
+        if(Meteor.isClient)
+            link = "downloadresume/" + this.companyId + "/" + this._id + '/' + Session.get('cvToken');
+        else link = '/';
+
         return Meteor.absoluteUrl(link);
     },
 
@@ -207,7 +210,7 @@ Collections.MailTemplates.allow({
         return (userId);
     },
     update: function (userId, doc, fieldNames, modifier) {
-        return (doc.createdBy == userId);
+        return true;
     },
     remove: function (userId, doc) {
 

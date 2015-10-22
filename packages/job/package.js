@@ -25,7 +25,7 @@ Package.onUse(function (api) {
     api.imply('vnw:user');
     api.imply('vnw:company');
 
-    api.export('vnwJob');
+    api.export(['vnwJob', 'User']);
 });
 
 Package.onTest(function (api) {

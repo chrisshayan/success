@@ -39,5 +39,14 @@ User.prototype.updateUserInfo = function (data, cb) {
     return Meteor.call('updateUserInfo', data, cb);
 };
 
-
+User.prototype.defaultCompany = function() {
+    if(this.roles && this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0) {
+        return Collections.CompanySettings.findOne({companyId: this.companyId});
+    }
+    var hiringTeam = Meteor.hiringTeam.findOne({userId: this._id, status: 1});
+    if(hiringTeam) {
+        return Collections.CompanySettings.findOne({companyId: hiringTeam.companyId});
+    }
+    return false;
+};
 

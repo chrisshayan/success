@@ -61,7 +61,7 @@ Publications.lastApplications = function () {
                 options['sort'] = {
                     createdAt: -1
                 };
-
+                console.log(filters)
                 return Collections.Applications.find(filters, options);
             } catch (e) {
                 console.log('Last applications:', e);

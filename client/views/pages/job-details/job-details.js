@@ -1,4 +1,9 @@
 Template.jobDetails.onCreated(function () {
+    Meteor.call('getCVToken', function(err, token) {
+        if(!err && token) {
+            Session.set('cvToken', token);
+        }
+    });
     Template.instance().autorun(function () {
         var params = Router.current().params;
         var jobId = params.jobId;

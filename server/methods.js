@@ -436,22 +436,12 @@ Meteor.methods({
             this.unblock();
             var self = this;
             var user = Meteor.users.findOne({_id: this.userId});
-            console.log(user.defaultEmail());
+            var company = user.defaultCompany();
 
             _.each(data.to, function (appId) {
                 var mailTemplate = Collections.MailTemplates.findOne(data.mailTemplate);
 
-                var from = '';
-                if (data.emailFrom) {
-                    from = data.emailFrom
-                }
-                else if (!mailTemplate) {
-                    from = user.username;
-                }
-                else {
-                    from = mailTemplate.emailFrom;
-                }
-                console.log('email from : ', from);
+                var from = user.defaultEmail();
 
                 var application = Collections.Applications.findOne({_id: appId});
                 if (!application) return false;
@@ -474,8 +464,8 @@ Meteor.methods({
                     var activity = new Activity();
 
                     mail.applicationId = application._id;
-                    activity.companyId = user.companyId;
-                    activity.createdBy = user.userId;
+                    activity.companyId = company.companyId;
+                    activity.createdBy = user._id;
                     activity.data = mail;
                     activity.sendMailToCandidate();
                 });
@@ -578,23 +568,24 @@ Meteor.methods({
             if (!this.userId) return false;
             check(data, Object);
             check(jobId, Match.Any);
+
             var isCandidateExists = false;
             var user = Meteor.users.findOne({_id: this.userId});
+            var company = user.defaultCompany();
             var job = Collections.Jobs.findOne({_id: jobId});
             if (!job) return false;
 
-            if (data.email) {
-                var criteria = {
-                    $or: [
-                        {"data.username": data.email},
-                        {"data.email": data.email},
-                        {"data.email1": data.email},
-                        {"data.email2": data.email}
-                    ]
-                };
-                if (Collections.Candidates.find(criteria).count() > 0)
-                    isCandidateExists = true
-            }
+            email = data.email.trim();
+
+            var criteria = {
+                jobId: job.jobId,
+                "candidateInfo.emails": data.email
+            };
+            var options = {
+                limit: 1
+            };
+            var isAppExists = Collections.Applications.find(criteria, options).count() > 0;
+            if(isAppExists) return false;
 
             if (!isCandidateExists) {
                 can = new Schemas.Candidate();
@@ -677,7 +668,7 @@ Meteor.methods({
             jobId: Match.Any,
             email: String
         });
-        var job = Meteor.jobs.findOne({_id: data.jobId});
+        var job = Collections.Jobs.findOne({_id: data.jobId});
         if (!job) return false;
         email = data.email.trim();
 
@@ -915,5 +906,18 @@ Meteor.methods({
         console.log(companies);
 
         return companies;
+    },
+
+
+    getCVToken() {
+        if(!this.userId) return false;
+        var user = Meteor.users.findOne({_id: this.userId});
+        var company = user.defaultCompany();
+        var tokenData = {
+            userId: user._id,
+            companyId: company.companyId,
+            expireTime: moment(new Date()).add(1, 'day').valueOf()
+        };
+        return IZToken.encode(tokenData);
     }
 });
