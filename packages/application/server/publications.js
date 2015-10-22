@@ -22,7 +22,13 @@ Publications.getApplications = function (filters, options) {
             }
             return Collections.Applications.find(filters, options);
         },
-        children: []
+        children: [
+            {
+                find: function (app) {
+                    return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
+                }
+            }
+        ]
     }
 };
 
@@ -78,10 +84,10 @@ Publications.applicationDetails = function (data) {
     return {
         find: function () {
 
-            if(!user.canViewApplication(data.application))
-            var filters = {
-                _id: data.application
-            };
+            if (!user.canViewApplication(data.application))
+                var filters = {
+                    _id: data.application
+                };
             var options = {};
             options['limit'] = 1;
             return Collections.Applications.find(filters, options);
@@ -100,7 +106,6 @@ Publications.applicationDetails = function (data) {
         ]
     }
 };
-
 
 
 /**

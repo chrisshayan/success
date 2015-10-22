@@ -99,6 +99,28 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
         var total = Collections.Activities.find(this.filters()).count();
         var limit = this.total();
         return total > limit;
+    },
+
+    MailComposer: function() {
+        return MailComposer;
+    },
+
+    mailTo: function() {
+        var to = {
+            appIds: [],
+            emails: []
+        };
+        var app = Collections.Applications.findOne({_id: this.props.get('applicationId')});
+        if(!app) return to;
+        to.appIds.push(app._id);
+        to.emails.push(app.candidateInfo.emails[0]);
+        return to;
+    },
+
+    onHideSendEmailForm: function() {
+        return function() {
+            Event.emit('toggleMailForm', false);
+        }
     }
 
 }).register('JobApplicationTimeline');
@@ -221,7 +243,6 @@ JobApplicationTimelineItem = BlazeComponent.extendComponent({
     timeago: function () {
         return moment(this.createdAt).fromNow()
     }
-
 }).register('JobApplicationTimelineItem');
 
 
@@ -259,7 +280,6 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                 self.applicationId.set(null);
             }
         });
-
         this.editor = undefined;
     },
 

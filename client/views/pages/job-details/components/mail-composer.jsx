@@ -82,6 +82,26 @@ MailComposer = React.createClass({
                 ['insert', ['link', 'hr']]
             ]
         });
+
+
+        var selectors = {
+            details: '.full-height-scroll.white-bg',
+            slimScroll: {
+                slimClass: '',
+                slimScrollClass: '.slimScrollBar'
+            }
+        };
+        var $details = $(selectors.details);
+        var $mailContainer = $(".mail-box:first-child");
+
+        var height = $mailContainer.offset().top - $details.offset().top;
+
+        $details.animate({
+            scrollTop: height
+        }, 'slow', function () {
+            $details.siblings(selectors.slimScroll.slimScrollClass)
+                .css({'top': height / 2 + 'px'});
+        });
     },
 
 

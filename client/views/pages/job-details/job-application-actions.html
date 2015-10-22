@@ -1,7 +1,7 @@
 <template name="JobApplicationActions">
     <button class="btn btn-sm btn-default btn-outline toggle-comment-form" data-toggle="tooltip" data-placement="bottom" title="Add comment"><i class="fa fa-comment"></i></button>
     &nbsp;
-    {{#if candidate.email}}
+    {{#if application.candidateInfo.emails.length}}
         <button class="btn btn-sm btn-warning btn-outline toggle-email-candidate-form"  data-toggle="tooltip" data-placement="bottom" title="Send email to candidate"><i class="fa fa-envelope-o"></i></button>
     &nbsp;
     {{/if}}

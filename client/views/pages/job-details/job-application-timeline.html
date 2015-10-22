@@ -8,7 +8,9 @@
                 <h2>No activity yet</h2>
             {{else}}
                 {{#if props.get "isShowMailForm"}}
-                    {{> SendEmailCandidateForm}}
+                    <div>
+                        {{> React component=MailComposer to=mailTo onDiscard=onHideSendEmailForm}}
+                    </div>
                 {{/if}}
                 {{#if props.get "isShowCommentForm"}}
                     {{> AddCommentCandidateForm}}

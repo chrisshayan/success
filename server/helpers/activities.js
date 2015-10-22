@@ -40,33 +40,33 @@ Activity.prototype.updateApplicationStage = function() {
 };
 
 Activity.prototype.appliedJob = function() {
-    this.actionType = this.ACTION_TYPE.APPLIED_JOB;
+    this.actionType = Activity.ACTION_TYPE.APPLIED_JOB;
     this.save();
 };
 
 
 Activity.prototype.disqualifiedApplication = function() {
-    this.actionType = this.ACTION_TYPE.DISQUALIFIED_APPLICATION;
+    this.actionType = Activity.ACTION_TYPE.DISQUALIFIED_APPLICATION;
     this.save();
 }
 
 
 Activity.prototype.revertApplication = function() {
-    this.actionType = this.ACTION_TYPE.REVERT_APPLICATION;
+    this.actionType = Activity.ACTION_TYPE.REVERT_APPLICATION;
     this.save();
 }
 
 Activity.prototype.sendMailToCandidate = function() {
-    this.actionType = this.ACTION_TYPE.SEND_MAIL_TO_CANDIDATE;
+    this.actionType = Activity.ACTION_TYPE.SEND_MAIL_TO_CANDIDATE;
     this.save();
 }
 
 Activity.prototype.addCommentApplication = function() {
-    this.actionType = this.ACTION_TYPE.ADD_COMMENT_TO_APPLICATION;
+    this.actionType = Activity.ACTION_TYPE.ADD_COMMENT_TO_APPLICATION;
     this.save();
 }
 Activity.prototype.addCandidateToSourced = function() {
-    this.actionType = this.ACTION_TYPE.ADD_CANDIDATE_TO_SOURCED;
+    this.actionType = Activity.ACTION_TYPE.ADD_CANDIDATE_TO_SOURCED;
     this.save();
 }
 
