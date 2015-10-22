@@ -20,8 +20,11 @@ Template.hiringCriteria.onCreated(function () {
                 if (err) console.error(err);
                 //console.log(result);
                 //instance.criteriaSet.set(result.category);
-                instance.criteriaId.set(result._id);
-                Meteor.subscribe('currentJobCriteria', result._id);
+                if (result) {
+                    instance.criteriaId.set(result._id);
+                    console.log('getcriteria result ', result);
+                    Meteor.subscribe('currentJobCriteria', result._id);
+                }
 
             });
     });
