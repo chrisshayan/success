@@ -26,6 +26,16 @@ accept         | `application/json`
 content-type   | `application/json`
 x-access-token | [REQUEST_TOKEN]
 
+Response format
+=======================
+Http code      | body (json)
+-------------- | ---
+200            | {success: true, msg: ''}
+400            | {success: false, msg: 'Access token invalid'}
+400            | {success: false, msg: 'Parameters invalid'}
+
+------
+
 Job
 ===
 ### Insert Job
@@ -100,6 +110,7 @@ userId    | Number
 jobId     | Number
 
 - Reponse: 200 and no content
+
 
 #### Example
 ##### PHP
