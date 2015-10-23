@@ -1,5 +1,3 @@
-//Router.onBeforeAction(Iron.Router.bodyParser.json({}));
-
 Router.route('/downloadresume/:companyId/:entryId/:token', {
     name: 'downloadResume',
     where: 'server',
@@ -35,15 +33,31 @@ Router.route('/downloadresume/:companyId/:entryId/:token', {
     }
 });
 
+/**
+ * Implement webhooks
+ */
+Router.onBeforeAction(Iron.Router.bodyParser.json({limit: '50mb'}));
+function authWebhookToken() {
+    try {
+        var token = this.request.headers['x-access-token'];
+        if(!token || !IZToken.decode(token)) {
+            this.response.writeHead(400);
+            this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
+        } else {
+            this.next();
+        }
+    }  catch (e) {
+        console.trace('Received request to application hook: ', e);
+        this.response.writeHead(400);
+        this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
+    }
+}
+
 Router.route('/webhook/job', {
     where: 'server',
+    onBeforeAction: authWebhookToken,
     action: function () {
-        this.response.writeHead(200);
-        this.response.end();
         try {
-            var token = this.request.headers['x-access-token'];
-            if (!token || !IZToken.decode(token)) return null;
-            console.debug(this.request.body)
             var data = this.request.body;
             check(data, {
                 jobId: Number,
@@ -60,8 +74,12 @@ Router.route('/webhook/job', {
                     break;
             }
             type && SYNC_VNW.addQueue(type, data);
+            this.response.writeHead(200);
+            this.response.end(EJSON.stringify({success: true, msg: ''}));
         } catch (e) {
-            console.log('Received request to job hook: ', e);
+            console.trace('Received request to job hook: ', e);
+            this.response.writeHead(400);
+            this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
         }
     }
 });
@@ -69,16 +87,10 @@ Router.route('/webhook/job', {
 
 Router.route('/webhook/application', {
     where: 'server',
+    onBeforeAction: authWebhookToken,
     action: function () {
-        //this.response.writeHead(200);
-        this.response.end(EJSON.stringify({success: true}));
-
         try {
-            var token = this.request.headers['x-access-token'];
-            if (!token || !IZToken.decode(token)) return null;
             var data = this.request.body;
-            console.log(data)
-            console.log(typeof data)
             check(data, {
                 jobId: Number,
                 entryId: Number,
@@ -94,17 +106,14 @@ Router.route('/webhook/application', {
                     break;
             }
             type && SYNC_VNW.addQueue(type, data);
+
+            this.response.writeHead(200);
+            this.response.end(EJSON.stringify({success: true, msg: ''}));
         } catch (e) {
-            console.log('Received request to application hook: ', e);
+            console.trace('Received request to application hook: ', e);
+            this.response.writeHead(400);
+            this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
         }
-    }
-});
-
-
-Router.route('/mail/inbox', {
-    where: 'server',
-    action: function () {
-        this.response.end();
-        console.log(this.request.body)
+        return true;
     }
 });

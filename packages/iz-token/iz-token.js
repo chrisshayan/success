@@ -23,13 +23,8 @@ IZToken.encode = function (data) {
 
 
 IZToken.decode = function (data) {
-    try {
-        var secret = getSecretKey();
-        return jwt.decode(data, secret);
-    } catch(e) {
-        console.log("Decode failed: ", e);
-        return false;
-    }
+    var secret = getSecretKey();
+    return jwt.decode(data, secret);
 }
 
 /**
