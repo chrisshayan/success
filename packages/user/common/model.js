@@ -90,7 +90,7 @@ User.appendSchema({
 
 Collection.allow({
     update: function (userId, doc, fieldNames, modifier) {
-        var fieldNamesAllow = ['setupStep', 'profile'];
+        var fieldNamesAllow = ['setupStep', 'profile', 'emailSignature', 'services'];
         return userId && doc._id === userId && _.difference(fieldNames, fieldNamesAllow).length === 0;
     }
 });

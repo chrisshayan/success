@@ -19,12 +19,13 @@ function replacePlaceholder(userId, application, candidate, mail) {
 
                 case "company":
                 case "mail_signature":
-                    var user = Meteor.users.findOne({_id: this.userId});
-                    var company = Collections.CompanySettings.findOne({companyId: application.companyId});
+                    var user = Meteor.users.findOne({_id: userId});
+                    console.log(user.emailSignature)
+                    var company = user.defaultCompany();
                     if (p1 == "company") {
                         replaces[p1] = company.companyName;
                     } else {
-                        replaces[p1] = company.mailSignature;
+                        replaces[p1] = user.emailSignature;
                     }
 
                     break;

@@ -116,7 +116,6 @@ publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
             var user = Meteor.users.findOne({_id: self.userId});
             if (!user) return;
             var permissions = user.jobPermissions();
-            console.log(filters)
             //filters['companyId'] = user.companyId || null;
 
             //if (filterEmailAddress)

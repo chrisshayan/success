@@ -1,3 +1,5 @@
+//Router.onBeforeAction(Iron.Router.bodyParser.json({}));
+
 Router.route('/downloadresume/:companyId/:entryId/:token', {
     name: 'downloadResume',
     where: 'server',
@@ -36,10 +38,12 @@ Router.route('/downloadresume/:companyId/:entryId/:token', {
 Router.route('/webhook/job', {
     where: 'server',
     action: function () {
+        this.response.writeHead(200);
         this.response.end();
         try {
             var token = this.request.headers['x-access-token'];
             if (!token || !IZToken.decode(token)) return null;
+            console.debug(this.request.body)
             var data = this.request.body;
             check(data, {
                 jobId: Number,
@@ -66,11 +70,15 @@ Router.route('/webhook/job', {
 Router.route('/webhook/application', {
     where: 'server',
     action: function () {
-        this.response.end();
+        //this.response.writeHead(200);
+        this.response.end(EJSON.stringify({success: true}));
+
         try {
             var token = this.request.headers['x-access-token'];
             if (!token || !IZToken.decode(token)) return null;
             var data = this.request.body;
+            console.log(data)
+            console.log(typeof data)
             check(data, {
                 jobId: Number,
                 entryId: Number,

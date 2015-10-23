@@ -17,4 +17,10 @@ Template.mailSignature.events({
         }
         return false;
     }
-})
+});
+
+Template.mailSignature.helpers({
+    MailSignatureEditor: function() {
+        return MailSignatureEditor;
+    }
+});

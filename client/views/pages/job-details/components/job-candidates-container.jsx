@@ -217,12 +217,19 @@ JobCandidatesContainer = React.createClass({
             });
         }
         var nextApp = rest[0];
-        Router.go('Job', {
-            _id: this.state.jobId,
-            stage: this.state.stage.alias
-        }, {
-            application: nextApp._id
-        })
+        if(nextApp) {
+            Router.go('Job', {
+                _id: this.state.jobId,
+                stage: this.state.stage.alias
+            }, {
+                application: nextApp._id
+            })
+        } else {
+            Router.go('Job', {
+                _id: this.state.jobId,
+                stage: this.state.stage.alias
+            });
+        }
     },
 
     render() {

@@ -19,6 +19,7 @@ RecruiterSubs = new SubsManager({
 });
 
 StaticSubs.subscribe('staticModels');
+StaticSubs.subscribe('mailTemplates');
 
 Tracker.autorun(function() {
     Meteor.subscribe('userData');
