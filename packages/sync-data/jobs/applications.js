@@ -199,9 +199,11 @@ var Applications = {
                         });
                         //}
                     });
+
+                    console.log('application added');
                 }
             }
-
+            console.log('end add application');
             jc.done();
             cb();
         } catch (e) {

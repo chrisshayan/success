@@ -132,8 +132,6 @@ function cronClosedJob(jb, cb) {
 
     else {
         try {
-
-
             console.log('company : %s closeJob: ', info.companyId, info.closedJobIds.length);
 
             processJob(info.closedJobIds, info.companyId);
@@ -667,14 +665,17 @@ var cronApplications = function () {
 
 CRON_VNW.sync = function () {
     // remove old sync job
-    Collections.SyncQueue.remove({type: 'cronData'});
+    Collections.SyncQueue.remove({type: {$in: ['cronData', 'cronClosedJob']}});
 
     // add new sync job
-    Collections.Users.find().map(function (user) {
+    Meteor.users.find().map(function (user) {
+
         var data = {
-            userId: user.userId,
+            userId: user.vnwId,
             companyId: user.companyId
         };
+
+        if (data.companyId == void 0 || data.userId == void 0) return false;
 
         CRON_VNW.addQueueCron('cronData', data)
     });

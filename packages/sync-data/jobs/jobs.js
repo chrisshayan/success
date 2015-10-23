@@ -122,7 +122,9 @@ var Jobs = {
                     }
 
                 });
+                console.log('job added');
             }
+            console.log('end add job');
 
 
             jc.done();
