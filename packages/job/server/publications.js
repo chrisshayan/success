@@ -36,8 +36,8 @@ var publications = {};
  * @returns {Cursor}
  */
 publications.getJobs = function (filters, options, filterEmailAddress) {
+    if (!this.userId) return this.ready();
     var self = this;
-    if (!this.userId) this.ready();
     return {
         find: function() {
             try {
@@ -105,7 +105,7 @@ publications.jobDetails =  function (opt) {
 };
 
 publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
     check(filters, Object);
@@ -157,6 +157,7 @@ publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
  * @returns {Cursor}
  */
 publications.jobStagesCounter = function (counterName, jobId) {
+    if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
     check(jobId, String);

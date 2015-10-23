@@ -7,13 +7,14 @@ function transformVNWId(id) {
 
 
 Meteor.publish('companyInfo', function () {
+    if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
     if (!user) return;
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 
 Meteor.publish('mailTemplates', function () {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
     var company = user.defaultCompany();
 
@@ -175,7 +176,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
 
 
 Meteor.publish('applicationActivities', function (filters, options) {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     check(filters, Object);
     check(options, Object);
     if (filters.limit) {
@@ -185,6 +186,7 @@ Meteor.publish('applicationActivities', function (filters, options) {
 });
 
 Meteor.publish("applicationCounter", function (counterName, filters) {
+    if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
     check(filters, Object);
@@ -216,6 +218,7 @@ Meteor.publish("applicationCounter", function (counterName, filters) {
 });
 
 Meteor.publish("activityCounter", function (counterName, filters) {
+    if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
     check(filters, Object);
@@ -274,6 +277,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 
 
 Meteor.publish('staticModels', function () {
+    if (!this.userId) return this.ready();
     var query = {languageId: 2};
 
     return [Collections.Degrees.find(query)
@@ -281,7 +285,7 @@ Meteor.publish('staticModels', function () {
 });
 
 Meteor.publish('addJobPage', function () {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     var cursors = [];
     var jobLevels = Meteor.job_levels.find();
     var industries = Meteor.industries.find();
@@ -295,7 +299,7 @@ Meteor.publish('addJobPage', function () {
 
 
 Meteor.publish('searchSkillAutocomplete', function (selector, options) {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     if (!options) options = {};
     options['sort'] = {skillLength: 1};
     var cursor = Collections.SkillTerms.find(selector, options);
@@ -304,7 +308,7 @@ Meteor.publish('searchSkillAutocomplete', function (selector, options) {
 });
 
 Meteor.publishComposite('teamSettings', function (jobId) {
-    if (!this.userId) return null;
+    if (!this.userId) return this.ready();
     check(jobId, Match.Any);
     return {
         find: function () {
@@ -322,14 +326,14 @@ Meteor.publishComposite('teamSettings', function (jobId) {
 });
 
 Meteor.publish('recruiterSearch', function (filter, option) {
-    if (!this.userId) return null;
-    if (!_.isNumber(+this.userId)) return null;
+    if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
-    var emails = Meteor['hiringTeam'].find({companyId: user.companyId}).map(function (r) {
-        return r.email;
+    var company = user.defaultCompany();
+    var userIds = Meteor['hiringTeam'].find({companyId: company.companyId}).map(function (r) {
+        return r.userId;
     });
-    filter['emails.address'] = {
-        $in: emails
+    filter['_id'] = {
+        $in: userIds
     };
     return Meteor.users.find(filter, option);
 });

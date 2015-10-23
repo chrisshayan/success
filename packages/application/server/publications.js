@@ -7,10 +7,9 @@ Publications = {};
  * @returns {{find: Function, children: Array}}
  */
 Publications.getApplications = function (filters, options) {
+    if (!this.userId) return this.ready();
     return {
-
         find: function () {
-            if (!this.userId) return this.ready();
             check(filters, Object);
             check(options, Object);
 
@@ -61,10 +60,9 @@ Publications.lastApplications = function () {
                 options['sort'] = {
                     createdAt: -1
                 };
-                console.log(filters)
                 return Collections.Applications.find(filters, options);
             } catch (e) {
-                console.log('Last applications:', e);
+                console.trace('Last applications:', e);
                 return null;
             }
         }

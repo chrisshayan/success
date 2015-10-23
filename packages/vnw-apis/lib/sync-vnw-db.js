@@ -40,41 +40,16 @@ SYNC_VNW = {};
 
 //Namespace to share methods to manual sync data from VietnamSYNC_VNW
 SYNC_VNW.syncUser = function (userInfo) {
-    var _user = Collections.Users.findOne({userId: userInfo.userid});
+    Success.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
+    SYNC_VNW.pullCompanyInfo(userInfo.companyid);
 
-    if (!_user) {
-        _user = new Schemas.User();
-        _user.data = userInfo;
-        _user.companyId = userInfo.companyid;
-        _user.userId = userInfo.userid;
-        _user.username = userInfo.username;
-        _user.createdAt = userInfo.createddate;
-        Collections.Users.insert(_user);
+    var cronData = {
+        lastUpdated: null,
+        userId: userInfo.userid,
+        companyId: userInfo.companyid
+    };
 
-        //Intitial user data
-        Meteor.defer(function () {
-            Success.initialEmployerData(userInfo.userid, userInfo.username, userInfo.companyid);
-            SYNC_VNW.pullCompanyInfo(userInfo.companyid);
-            /*var jobData = {
-             userId: _user.userId,
-             companyId: userInfo.companyid
-             };
-
-             SYNC_VNW.addQueue('pullCompanyData', jobData);*/
-
-            var cronData = {
-                lastUpdated: null,
-                userId: userInfo.userid,
-                companyId: userInfo.companyid
-            };
-
-            SYNC_VNW.addQueue('cronData', cronData);
-        });
-    } else if (!_.isEqual(_user.data, userInfo)) {
-        Collections.Users.update(_user._id, {$set: {data: userInfo, lastSyncedAt: new Date()}});
-    }
-
-    return _user;
+    SYNC_VNW.addQueue('cronData', cronData);
 };
 
 
@@ -810,5 +785,5 @@ SYNC_VNW.addQueue = function (type, data) {
  });*/
 
 Meteor.startup(function () {
-    //return Collections.SyncQueue.startJobServer();
+    return Collections.SyncQueue.startJobServer();
 });

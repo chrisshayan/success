@@ -123,6 +123,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     toggleSendEmailForm: function () {
         Event.emit('toggleMailForm');
+        Event.emit('toggleCommentForm', false);
     },
 
     /**
@@ -130,6 +131,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
      */
     toggleCommentForm: function () {
         Event.emit('toggleCommentForm');
+        Event.emit('toggleMailForm', false);
     },
 
 

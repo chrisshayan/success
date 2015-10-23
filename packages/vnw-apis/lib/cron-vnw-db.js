@@ -320,7 +320,7 @@ function processApp(appRows, companyId, sourceId) {
             if (sourceId == '1')
                 application.resumeId = row.resumeid;
 
-            Collections.Applications.insert(application);
+            var aId = Collections.Applications.insert(application);
 
             /* Log activity */
             Meteor.defer(function () {
@@ -328,9 +328,9 @@ function processApp(appRows, companyId, sourceId) {
                 var activity = new Activity();
                 activity.companyId = companyId;
                 activity.data = {
-                    applicationId: appId,
+                    applicationId: aId,
                     source: sourceId,
-                    userId: row.userid
+                    userId: can._id || row.userid
                 };
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();

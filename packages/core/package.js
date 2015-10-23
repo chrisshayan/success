@@ -30,13 +30,13 @@ Package.onUse(function (api) {
 
     /* public modules */
     api.imply([
-        "socialize:user-model",
+        "socialize:user-model@0.1.4",
         "accounts-password",
         "lab:mysql-connection-manager",
         "ecmascript"
     ]);
 
-    api.export(['Core', 'Utils']);
+    api.export(['Core', 'Utils', 'User']);
 
 });
 
