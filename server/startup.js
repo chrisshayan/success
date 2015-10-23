@@ -33,8 +33,8 @@ Meteor.startup(function () {
         });
     //
     if (process.env.MIGRATION) {
-        //Migrations.unlock();
-        //Migrations.migrateTo(process.env.MIGRATION);
+        Migrations.unlock();
+        Migrations.migrateTo(process.env.MIGRATION);
     }
 
     CRON_VNW.sync();
