@@ -18,6 +18,11 @@ RecruiterSubs = new SubsManager({
     expireIn: 30
 });
 
+SkillsSubs = new SubsManager({
+    cacheLimit: 1000,
+    expireIn: 30
+});
+
 StaticSubs.subscribe('staticModels');
 StaticSubs.subscribe('mailTemplates');
 

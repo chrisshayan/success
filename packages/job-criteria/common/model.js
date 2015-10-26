@@ -1,28 +1,81 @@
 /**
- * Created by HungNguyen on 8/21/15.
+ * JobCriteriaSetTemplate
  */
-var model = BaseModel.extendAndSetupCollection("job_criteria");
-Collection = model.collection;
+JobCriteriaSetTemplate = BaseModel.extendAndSetupCollection("job_criteria_set_templates");
+JobCriteriaSetTemplate.appendSchema({
+    companyId: {
+        type: Number,
+        optional: true
+    },
 
-
-var criteriaSchema = new SimpleSchema({
     name: {
         type: String
     },
-    value: {
-        type: [String],
+
+    hint: {
+        type: String,
+        optional: true
+    },
+
+    description: {
+        type: String,
         optional: true
     }
 });
 
+/**
+ * JobCriteriaSet
+ */
+JobCriteriaSet = BaseModel.extendAndSetupCollection("job_criteria_set");
+JobCriteriaSet.appendSchema({
+    templateId: {
+        type: String,
+        optional: true
+    },
+    companyId: {
+        type: String,
+        optional: true
+    },
 
-model.appendSchema({
     jobId: {
         type: String
     },
-    category: {
-        type: [criteriaSchema]
+
+    name: {
+        type: String
+    },
+
+    hint: {
+        type: String,
+        optional: true
+    },
+
+    description: {
+        type: String,
+        optional: true
     }
+
 });
 
-JobCriteria = model;
+/**
+ * contains criteria of criteria set
+ */
+JobCriteria = BaseModel.extendAndSetupCollection("job_criteria");
+JobCriteria.appendSchema({
+    companyId: {
+        type: Number
+    },
+
+    jobId: {
+        type: String
+    },
+
+    criteriaSetId: {
+        type: String
+    },
+
+    label: {
+        type: String
+    }
+
+});

@@ -4,16 +4,32 @@
 
 
 var methods = {
-    addCriteria: function (company_id, criteriaSet) {
+    addJobCriteria(jobId, criteriaSetId, criteria) {
+        if(!this.userId) return false;
+        this.unblock();
+        var job = Collections.Jobs.findOne({_id: jobId});
+        if(!job) return false;
+        var criteriaSet = Meteor.job_criteria_set.findOne({_id: criteriaSetId});
+        if(!criteriaSet) return false;
+
         try {
-            if (Core.isLoggedIn() || typeof company_id != 'string' || typeof criteriaSet != 'object')
-                return false;
+            Meteor.defer(function() {
+                var condCheck = {skillName: {$regex: '^' + criteria + '$', $options:'i'}};
+                if(Collections.SkillTerms.find(condCheck).count() <= 0) {
+                    Collections.SkillTerms.insert({
+                        skillId: null,
+                        skillName: criteria,
+                        skillLength: criteria.length
+                    });
+                }
+            });
 
-            var criteria = new JobCriteria();
-            criteria.company_id = company_id;
-            criteria.category = criteriaSet;
-
-            return criteria.save();
+            return new JobCriteria({
+                jobId: job._id,
+                companyId: job.companyId,
+                criteriaSetId: criteriaSet._id,
+                label: criteria
+            }).save();
         } catch (e) {
             console.log('add Criteria error');
             console.trace(e);
@@ -21,86 +37,13 @@ var methods = {
         }
     },
 
-
-    changeCriteriaInSet: function (_id, setName, criteriaName, isRemove) {
-        if (_id == void 0 || setName == void 0 || criteriaName == void 0
-            || ('' + setName.trim()).length === 0 || ('' + criteriaName).trim().length === 0)
-            return false;
-
-        try {
-            var query = {};
-            query._id = _id;
-            query['category.name'] = setName;
-
-            var condition = (isRemove) ? '$pull' : '$addToSet';
-
-            var modifier = {};
-
-            modifier[condition] = {'category.$.value': criteriaName};
-
-            return Collection.update(query, modifier);
-
-        } catch (e) {
-            console.log('change Criteria set has some error');
-            console.trace(e);
-            return false;
-
-        }
-    },
-
-
-    updateCriteria: function (criteria_id, updateCriteriaSet) {
-        try {
-            if (Core.isLoggedIn() || typeof company_id != 'string' || typeof criteriaSet != 'object')
-                return false;
-
-            var query = {_id: criteria_id};
-            var modifier = Core.setModifier(updateCriteriaSet);
-
-            return Core.doUpdate(Collection, query, modifier);
-
-        }
-        catch (e) {
-            console.log('add Criteria error');
-            console.trace(e);
-            return false;
-
-        }
-    },
-    getCriteria: function (jobId) {
-        var result = false;
-
-        if (jobId != void 0) {
-            var options = {
-                fields: {
-                    criteriaId: 1
-                }
-            };
-
-            //var job = Meteor.jobs.findOne({jobId: jobId}, options);
-            var job = Collections.Jobs.findOne({_id: jobId}, options);
-
-            if (job) {
-                result = Meteor['job_criteria'].findOne({_id: job.criteriaId});
-
-                if (!result) {
-                    var defaultCategory = Core.getConfig('job-criteria', 'DEFAULT_CATEGORY');
-                    var criteriaSet = new JobCriteria();
-                    criteriaSet.jobId = '' + jobId;
-                    criteriaSet.category = defaultCategory;
-                    criteriaSet.save();
-                    //job.criteriaId = criteriaSet._id;
-
-                    Collections.Jobs.update({_id: jobId}, {$set: {criteriaId: criteriaSet._id}});
-                    //Meteor['jobs']['criteriaId'] = criteriaSet._id;
-                    result = criteriaSet;
-                }
-            }
-        }
-
-        return result;
+    removeJobCriteria(_id) {
+        if(!this.userId) return false;
+        var criteria = Meteor.job_criteria.findOne({_id: _id});
+        if(!criteria) return false;
+        return criteria.remove();
     }
-};
 
+};
 
 Meteor.methods(methods);

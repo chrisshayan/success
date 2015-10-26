@@ -18,6 +18,9 @@ User.prototype.callUpdateCustomJob = function (data, cb) {
     return Meteor.call('updateCustomJob', this.jobId, data, cb);
 };
 
+User.prototype.checkOwnership = function(jobId) {
+
+};
 
 User.prototype.jobPermissions = function () {
     var cond = [];

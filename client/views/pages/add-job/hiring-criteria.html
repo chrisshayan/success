@@ -1,4 +1,10 @@
 <template name="hiringCriteria">
+    <div>
+        {{> React component=HiringCriteriaContainer}}
+    </div>
+</template>
+
+<template name="hiringCriteria1">
     {{#each criteriaSet}}
         {{>criteriaCategory this}}
     {{/each}}
