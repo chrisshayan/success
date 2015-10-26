@@ -39,6 +39,17 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
+function getSkills(jobId) {
+    var skillByJobSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobId, jobId);
+
+    var skillRows = fetchVNWData(skillByJobSql);
+
+}
+
+function getBenefits(jobId) {
+
+}
+
 
 function processJob(row, companyId) {
     var expiredAt = formatDatetimeFromVNW(row.expireddate);
@@ -57,14 +68,16 @@ function processJob(row, companyId) {
     job.showSalary = true;
     job.description = row.jobdescription;
     job.requirements = row.skillexperience;
-    job.benefits = '';
+
     job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
-    job.skills = [];
+
     job.vnwData = row;
     job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
     job.createdAt = formatDatetimeFromVNW(row.createddate);
     job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
     job.expiredAt = expiredAt;
+    job.benefits = getBenefits(job.jobId);
+    job.skills = getSkills(job.jobId);
 
 
     if (!row.isactive)
@@ -117,7 +130,7 @@ var Jobs = {
                     if (!job.isExist()) {
                         sJobCollections.addJobtoQueue('updateJob', data);
                     } else {
-                        job.save();
+                        Collections.Jobs.insert(job);
                         getApplications(job.jobId);
                     }
 

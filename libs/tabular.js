@@ -17,6 +17,7 @@ TabularTables.HiringTeam = new Tabular.Table({
     },
     columns: [
         {data: "name", title: "Name"},
+        {data: "roleId", title: "Role"},
         {data: "email", title: "Email"},
         {
             data: "username",

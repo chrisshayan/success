@@ -368,7 +368,7 @@ SYNC_VNW.updateVNWJob = function (jobId, companyId) {
                 showSalary: true,
                 description: row.jobdescription,
                 requirements: row.skillexperience,
-                benifits: '',
+                benefits: '',
                 recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
                 skills: [],
                 vnwData: row,

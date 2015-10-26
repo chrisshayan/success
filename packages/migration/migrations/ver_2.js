@@ -20,7 +20,7 @@ Migrations.add({
                 showSalary: true,
                 description: old.data.jobdescription,
                 requirements: old.data.skillexperience,
-                benifits: '',
+                benefits: '',
                 recruiterEmails: _.unique(old.data.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
                 skills: [],
                 vnwData: old.data,

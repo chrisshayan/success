@@ -31,8 +31,8 @@ model.appendSchema({
         defaultValue: 0 // 0 : pending, 1 accepted
     },
     roleId: {
-        type: [String],
-        defaultValue: []
+        type: String,
+        optional: true
     },
     dateAdded: {
         type: Date,

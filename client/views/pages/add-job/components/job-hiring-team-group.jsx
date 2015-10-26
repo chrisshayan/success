@@ -14,10 +14,12 @@ JobHiringTeamGroup = React.createClass({
                 <td>
                     <table className="table table-striped">
                         <tbody>
-                        {this.props.users.map((user, key) => <JobHiringTeamGroupItem key={key} user={user} role={this.props.role}/>)}
+                        {this.props.users.map((user, key) => <JobHiringTeamGroupItem key={key} user={user}
+                                                                                     role={this.props.role}/>)}
                         <tr>
                             <td colSpan="2">
-                                <JobHiringTeamAssignForm role={this.props.role} except={_.pluck(this.props.users, '_id')}/>
+                                <JobHiringTeamAssignForm role={this.props.role}
+                                                         except={_.pluck(this.props.users, '_id')}/>
                             </td>
                         </tr>
                         </tbody>
@@ -41,7 +43,9 @@ JobHiringTeamGroupItem = React.createClass({
     name() {
         if (!this.props.user) return '';
         var profile = this.props.user.profile;
-        return [profile.firstname, profile.lastname].join(' ');
+        var displayname = [profile.firstname, profile.lastname].join(' ').trim();
+
+        return (displayname.length) ? displayname : this.props.user.emails[0].address;
     },
 
     handleTrashClick(user) {

@@ -167,7 +167,6 @@ var Applications = {
                             Collections.Applications.insert(application);
 
                         /*
-
                          if (application.isExist()) {
                          sJobCollections.addJobtoQueue('updateApplication', data);
                          } else {

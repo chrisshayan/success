@@ -59,6 +59,33 @@ CRON_VNWddQueueCron = function (type, data) {
 };
 
 
+CRON_VNW.setupHiringTeamOnwerInfo = function (data) {
+    var user = Meteor.users.findOne({vnwId: data.userId});
+
+    var email = user.emails[0].address;
+
+    var hiringTeamItem = new HiringTeam();
+    if (Meteor['hiringTeam'].findOne({companyId: data.companyId, email: email}))
+        return {
+            status: 0,
+            message: 'This email address is exist in your hiring team already'
+        };
+
+    hiringTeamItem.companyId = data.companyId;
+    hiringTeamItem.email = email;
+    hiringTeamItem.username = 'admin' + user.companyId;
+    hiringTeamItem.roleId = 'admin';
+    hiringTeamItem.status = 1;
+    hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
+
+    if (!hiringTeamItem.name.length)
+        hiringTeamItem.name = 'admin';
+
+    //hiringTeamItem.roleId = [];
+    hiringTeamItem.save();
+};
+
+
 function cronData(j, cb) {
     var data = j.data;
     if (data.companyId == void 0 || data.userId == void 0)
@@ -76,6 +103,9 @@ function cronData(j, cb) {
         //get latest syncTime
 
         try {
+
+            CRON_VNW.setupHiringTeamOnwerInfo(data);
+
             //get all jobs
             var jSql = sprintf(VNW_QUERIES.pullJobIdFromUser, userId);
             //console.log('jsql : ', jSql);

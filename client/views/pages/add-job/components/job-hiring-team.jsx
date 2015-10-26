@@ -29,7 +29,7 @@ JobHiringTeam = React.createClass({
                             <h2>
                                 <i className="fa fa-users"></i>
                                 &nbsp;
-                                WHO'S RESPONSIBLE FOR THISJOB
+                                WHO'S RESPONSIBLE FOR THIS JOB
                             </h2>
                         </th>
                     </tr>

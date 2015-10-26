@@ -55,3 +55,10 @@ Template.hiringTeamActionsCell.events({
         Meteor.call('removeHiringTeamRequest', this._id);
     }
 });
+
+Template.hiringTeamActionsCell.helpers({
+    isOwner: function () {
+        console.log('roleID', this.roleId);
+        return (this.roleId === 'admin');
+    }
+});

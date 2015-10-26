@@ -199,7 +199,7 @@ model.appendSchema({
             type: "textarea",
             rows: 7,
             cols: 30,
-            placeholder: "Enter benifits"
+            placeholder: "Enter benefits"
         }
     },
 

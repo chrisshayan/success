@@ -16,7 +16,9 @@
 </template>
 
 <template name="hiringTeamActionsCell">
+{{#unless isOwner}}
     <a href="#" class="btn btn-danger btn-xs remove btn-outline remove"><i class="fa fa-trash text-danger"></i></a>
+{{/unless}}
 </template>
 
 <template name="sendRequest">

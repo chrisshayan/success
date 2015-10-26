@@ -647,14 +647,14 @@ Schemas.addJobForm = new SimpleSchema({
         }
     },
 
-    benifits: {
+    benefits: {
         type: String,
         optional: true,
         autoform: {
             type: "textarea",
             rows: 7,
             cols: 30,
-            placeholder: "Enter benifits"
+            placeholder: "Enter benefits"
         }
     },
 

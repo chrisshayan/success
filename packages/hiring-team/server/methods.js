@@ -56,6 +56,7 @@ var methods = {
             hiringTeamItem.email = email;
             hiringTeamItem.username = autoUsername;
             hiringTeamItem.name = autoName;
+            hiringTeamItem.roleId = 'recruiter';
 
             var company = Collections.CompanySettings.findOne({companyId: user.companyId});
 

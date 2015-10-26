@@ -42,7 +42,11 @@ Template.AddJob.onCreated(function () {
 Template.AddJob.helpers({
     pageTitle: function () {
         var params = Router.current().params;
-        return (params.jobId) ? "Edit job settings" : "Add new job";
+
+        if (params.jobId)
+            var job = Collections.Jobs.findOne({_id: params.jobId});
+
+        return (job) ? job.title : "Add new job";
     }
     /*jobId: function () {
      var instance = Template.instance();
