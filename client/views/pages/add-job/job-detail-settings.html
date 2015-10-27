@@ -51,7 +51,7 @@
 
             <label class="control-label">Description</label>
 
-            <p class="form-control-static">{{ description}} </p>
+            <p class="form-control-static">{{{formatParagraph description}}} </p>
         </div>
 
 
@@ -59,7 +59,7 @@
 
             <label class="control-label">Requirements</label>
 
-            <p class="form-control-static">{{requirements}} </p>
+            <p class="form-control-static">{{{formatParagraph requirements}}} </p>
         </div>
 
 
@@ -67,7 +67,7 @@
 
             <label class="control-label">Benefits</label>
 
-            <p class="form-control-static">{{benefits}} </p>
+            <p class="form-control-static">{{{formatParagraph benefits}}} </p>
         </div>
 
 
@@ -75,7 +75,12 @@
 
             <label class="control-label">Tags</label>
 
-            <p class="form-control-static">{{skills}} </p>
+            <p class="form-control-static">
+                {{#each skills}}
+                    <small class="label label-info">{{this}}</small>
+                {{/each}}
+            </p>
+
         </div>
 
 

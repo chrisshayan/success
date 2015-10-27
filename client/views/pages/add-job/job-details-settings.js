@@ -4,11 +4,14 @@
 
 /*
 
-Template.jobDetailSettings.onCreated({
+ Template.jobDetailSettings.onCreated({
 
-});
+ });
 
+ */
 
 Template.jobDetailSettings.helpers({
-
-});*/
+    formatParagraph: function (text) {
+        return text.replace(/\n/g, '<br/>');
+    }
+});

@@ -39,17 +39,6 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
-function getSkills(jobId) {
-    var skillByJobSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobId, jobId);
-
-    var skillRows = fetchVNWData(skillByJobSql);
-
-}
-
-function getBenefits(jobId) {
-
-}
-
 
 function processJob(row, companyId) {
     var expiredAt = formatDatetimeFromVNW(row.expireddate);
@@ -76,8 +65,8 @@ function processJob(row, companyId) {
     job.createdAt = formatDatetimeFromVNW(row.createddate);
     job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
     job.expiredAt = expiredAt;
-    job.benefits = getBenefits(job.jobId);
-    job.skills = getSkills(job.jobId);
+    job.benefits = CRON_VNW.getBenefits(job.jobId);
+    job.skills = CRON_VNW.getJobTags(job.jobId);
 
 
     if (!row.isactive)

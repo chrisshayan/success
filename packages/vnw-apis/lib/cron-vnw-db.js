@@ -41,6 +41,62 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 });
 
 
+CRON_VNW.getJobTags = function (jobId) {
+    if (jobId == void 0 || typeof jobId === 'string') return [];
+
+    var getTagByJobSql = sprintf(VNW_QUERIES.getJobTags, jobId);
+    var tagRows = fetchVNWData(getTagByJobSql);
+
+    Meteor.defer(function () {
+        //skillid, skillName
+        tagRows.forEach(function (tag) {
+
+            var skill = new Schemas.skill();
+            skill.skillId = tag.skillId;
+            skill.skillName = tag.skillName.trim().toLowerCase();
+            skill.skillLength = tag.skillName.length;
+            Collections.SkillTerms.upsert(
+                {skillId: tag.skillId},
+                {'$set': skill}
+            );
+        });
+    });
+
+    var tags = _.pluck(tagRows, 'skillName');
+
+    console.log('skill tags : ', tags);
+    var modifier = {
+        '$set': {
+            skills: tags
+        }
+    };
+
+    //Collections.Jobs.update({jobId: jobId}, modifier);
+    return tags;
+
+};
+
+CRON_VNW.getBenefits = function (jobId) {
+    if (jobId == void 0 || typeof jobId === 'string') return '';
+
+    var getBenefitByJobSql = sprintf(VNW_QUERIES.getBenefits, jobId);
+    console.log('jid', jobId);
+    var benefitRows = fetchVNWData(getBenefitByJobSql);
+    var list = _.pluck(benefitRows, 'benefitValue');
+    console.log('benefits : ', list);
+    var benefits = list.join('\n');
+
+    var modifier = {
+        '$set': {
+            benefits: benefits
+        }
+    };
+
+    return benefits;
+
+};
+
+
 CRON_VNW.cron = function () {
     Collections.SyncQueue.update({type: "cronData", status: "completed"}, {$set: {status: "ready", runId: null}})
 };
@@ -210,9 +266,7 @@ function processJob(items, companyId) {
                 showSalary: true,
                 description: row.jobdescription,
                 requirements: row.skillexperience,
-                benefits: '',
                 recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
-                skills: [],
                 vnwData: row,
                 status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
                 createdAt: formatDatetimeFromVNW(row.createddate),
@@ -235,14 +289,21 @@ function processJob(items, companyId) {
 
                 console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);
                 console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
+                job.skills = CRON_VNW.getJobTags(+row.jobid);
+                job.benefits = CRON_VNW.getBenefits(+row.jobid);
+
                 var modifier = {
                     '$set': job
                 };
+
                 Collections.Jobs.update(query, modifier);
 
                 // add new
             } else if (!mongoJob) {
                 console.log('create Job :', job.jobId);
+
+                job.skills = CRON_VNW.getJobTags(+row.jobid);
+                job.benefits = CRON_VNW.getBenefits(+row.jobid);
                 Collections.Jobs.insert(job);
 
             }
