@@ -50,13 +50,13 @@ CRON_VNW.getJobTags = function (jobId) {
     Meteor.defer(function () {
         //skillid, skillName
         tagRows.forEach(function (tag) {
-
             var skill = new Schemas.skill();
+
             skill.skillId = tag.skillId;
-            skill.skillName = tag.skillName.trim().toLowerCase();
+            skill.skillName = (tag.skillName) ? tag.skillName.trim().toLowerCase() : '';
             skill.skillLength = tag.skillName.length;
-            Collections.SkillTerms.upsert(
-                {skillId: tag.skillId},
+
+            Collections.SkillTerms.upsert({skillId: tag.skillId},
                 {'$set': skill}
             );
         });
@@ -64,7 +64,7 @@ CRON_VNW.getJobTags = function (jobId) {
 
     var tags = _.pluck(tagRows, 'skillName');
 
-   // console.log('skill tags : ', tags);
+    // console.log('skill tags : ', tags);
 
     return tags;
 
@@ -74,13 +74,29 @@ CRON_VNW.getBenefits = function (jobId) {
     if (jobId == void 0 || typeof jobId === 'string') return '';
 
     var getBenefitByJobSql = sprintf(VNW_QUERIES.getBenefits, jobId);
- //   console.log('jid', jobId);
+    //   console.log('jid', jobId);
     var benefitRows = fetchVNWData(getBenefitByJobSql);
     var list = _.pluck(benefitRows, 'benefitValue');
- //   console.log('benefits : ', list);
+    //   console.log('benefits : ', list);
     var benefits = list.join('\n');
 
     return benefits;
+
+};
+
+
+CRON_VNW.getLocations = function (jobId) {
+    if (jobId == void 0 || typeof jobId === 'string') return '';
+
+    var locationByJobIdQuery = sprintf(VNW_QUERIES.getLocations, jobId);
+    //   console.log('jid', jobId);
+    var locationRows = fetchVNWData(locationByJobIdQuery);
+    var list = _.pluck(locationRows, 'cityid');
+    //   console.log('benefits : ', list);
+    var cities = Meteor.cities.find({vnwId: {$in: list}}).fetch();
+    cities = _.pluck(cities, '_id');
+
+    return cities;
 
 };
 
@@ -248,7 +264,6 @@ function processJob(items, companyId) {
                 title: row.jobtitle,
                 level: '',
                 categories: [],
-                locations: [],
                 salaryMin: +row.salarymin,
                 salaryMax: +row.salarymax,
                 showSalary: true,
@@ -279,6 +294,7 @@ function processJob(items, companyId) {
                 console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
+                job.locations = CRON_VNW.getLocations(+row.jobid);
 
                 var modifier = {
                     '$set': job
@@ -292,6 +308,7 @@ function processJob(items, companyId) {
 
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
+                job.locations = CRON_VNW.getLocations(+row.jobid);
                 Collections.Jobs.insert(job);
 
             }
@@ -319,7 +336,7 @@ function processAfterSyncJob(jobs, companyId) {
             //console.log('appSql', appSql);
 
             var appRows = fetchVNWData(appSql);
-         //   console.log(appRows.length);
+            //   console.log(appRows.length);
 
             if (appRows.length) {
                 var candidates = _.pluck(appRows, 'candidateId');
@@ -353,7 +370,7 @@ function processApp(appRows, companyId, sourceId) {
         if (indexApp >= 0) {
             if (mongoApps[indexApp].isDeleted === row['deleted_by_employer'])
                 return;
-        //    console.log('update application: ', appId);
+            //    console.log('update application: ', appId);
             var modifier = {
                 'isDeleted': row['deleted_by_employer']
             };
@@ -456,7 +473,7 @@ function processCandidates(candidateList) {
 
 
 function cronApps(appRows, companyId) {
- //   console.log('start cron app');
+    //   console.log('start cron app');
     //appRows.source 1 : online, appRows.source 2 : direct
     var groupedApp = _.groupBy(appRows, 'source');
     //console.log('online : %s, direct : %s', groupedApp['1'], groupedApp['2']);
@@ -771,7 +788,7 @@ Collections.SyncQueue = JobCollection('vnw_sync_queue');
 
 Collections.SyncQueue.allow({
     admin: function (userId) {
-    //    console.log('check permisson:', userId);
+        //    console.log('check permisson:', userId);
         return !!Meteor.users.find({_id: userId}).count();
     }
 });
