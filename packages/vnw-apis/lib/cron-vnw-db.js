@@ -93,7 +93,7 @@ CRON_VNW.getLocations = function (jobId) {
     var locationRows = fetchVNWData(locationByJobIdQuery);
     var list = _.pluck(locationRows, 'cityid');
     //   console.log('benefits : ', list);
-    var cities = Meteor.cities.find({vnwId: {$in: list}}).fetch();
+    var cities = Meteor.cities.find({languageId: 2, vnwId: {$in: list}}).fetch();
     cities = _.pluck(cities, '_id');
 
     return cities;
