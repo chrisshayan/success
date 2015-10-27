@@ -73,6 +73,18 @@
 
         <div class="form-group">
 
+            <label class="control-label">Locations</label>
+
+            <p class="form-control-static">
+                {{#each locations}}
+                    <small class="label label-info">{{this}}</small>
+                {{/each}}
+            </p>
+
+        </div>
+
+        <div class="form-group">
+
             <label class="control-label">Tags</label>
 
             <p class="form-control-static">

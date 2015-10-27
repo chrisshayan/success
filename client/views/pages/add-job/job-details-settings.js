@@ -13,5 +13,10 @@
 Template.jobDetailSettings.helpers({
     formatParagraph: function (text) {
         return text.replace(/\n/g, '<br/>');
+    },
+
+    locations: function() {
+        var cities = Meteor.cities.find({_id: {$in: this.locations}}).fetch();
+        return _.pluck(cities, 'name')
     }
 });
