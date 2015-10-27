@@ -405,7 +405,7 @@ Router.route('/job-settings/:jobId', {
 });
 
 
-Router.route('/update-profile', {
+Router.route('/profile', {
     name: 'updateProfile',
     waitOn: function () {
         return [];

@@ -12,6 +12,10 @@ var profile = new SimpleSchema({
     lastname: {
         type: String,
         optional: true
+    },
+    avatar: {
+        type: String,
+        optional: true
     }
 });
 
