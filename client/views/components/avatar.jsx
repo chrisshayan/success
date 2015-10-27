@@ -97,7 +97,7 @@ Avatar = React.createClass({
                     uploadContent = (
                         <div style={styles.uploadOverlay} className="animated fadeIn">
                             <button className="btn btn-xs btn-outline btn-white" onClick={this.openUploadWidget}>
-                                <i className="fa fa-camera"></i>
+                                <i className="fa fa-camera"></i>&nbsp;
                                 change
                             </button>
                         </div>
@@ -106,7 +106,7 @@ Avatar = React.createClass({
             } else {
                 uploadContent = (
                     <button className="btn btn-xs btn-outline btn-primary" onClick={this.openUploadWidget}>
-                        <i className="fa fa-camera"></i>
+                        <i className="fa fa-camera"></i>&nbsp;
                         upload
                     </button>
                 )

@@ -63,12 +63,12 @@ MailSignatureEditor = React.createClass({
         let buttons = [];
 
         if (this.state.isEditing) {
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
+            buttons.push(<button key={0} style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
                 Discard</button>);
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleSaveClick}>
+            buttons.push(<button key={1} style={styles.button} className="btn btn-white" onClick={this.handleSaveClick}>
                 Save</button>);
         } else {
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
+            buttons.push(<button key={0} style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
                 Edit</button>);
         }
         return (

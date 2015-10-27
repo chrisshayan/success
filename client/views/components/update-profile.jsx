@@ -18,19 +18,6 @@ UpdateProfileForm = React.createClass({
         };
     },
 
-    componentDidMount() {
-        if (this.state.isEditing) {
-
-        }
-    },
-
-    componentWillUpdate(nextProps, nextState) {
-        if (nextState.isEditing) {
-
-        } else {
-
-        }
-    },
 
     email() {
         var user = this.data.user;
@@ -73,15 +60,7 @@ UpdateProfileForm = React.createClass({
         this.setState({
             isEditing: false
         });
-    },
-
-    handleSubmit(e) {
-        e.preventDefault();
-    },
-
-    componentDidMount() {
-        var self = this;
-
+        return;
     },
 
     render() {
@@ -100,30 +79,25 @@ UpdateProfileForm = React.createClass({
         let buttons = [];
 
         if (this.state.isEditing) {
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
-                Discard</button>);
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleSaveClick}>
-                Save</button>);
+            buttons.push(<a key={0} style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>Discard</a>);
+            buttons.push(<button  key={1} style={styles.button} className="btn btn-white" type="submit">Save</button >);
         } else {
-            buttons.push(<button style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>
-                Edit</button>);
+            buttons.push(<a key={2} style={styles.button} className="btn btn-white" onClick={this.handleToggleClick}>Edit</a>);
         }
 
         return (
 
             <div style={styles.container}>
-                <form onSubmit={this.handleSubmit} className="form-horizontal">
+                <div className="form-group">
+                    <label className="col-lg-2 control-label"></label>
 
-                    <div className="form-group">
-                        <label className="col-lg-2 control-label"></label>
-
-                        <div className="col-lg-10">
-                            <p className="form-control-static">
-                                <Avatar userId={this.data.userId} upload={true}/>
-                            </p>
-                        </div>
+                    <div className="col-lg-10">
+                        <p className="form-control-static">
+                            <Avatar userId={this.data.userId} upload={true}/>
+                        </p>
                     </div>
-
+                </div>
+                <form onSubmit={this.handleSaveClick} className="form-horizontal">
                     <div className="hr-line-dashed"></div>
 
                     <div className="form-group">
