@@ -586,7 +586,7 @@ Meteor.methods({
                 limit: 1
             };
             var isAppExists = Collections.Applications.find(criteria, options).count() > 0;
-            if(isAppExists) return false;
+            if (isAppExists) return false;
 
             if (!isCandidateExists) {
                 can = new Schemas.Candidate();
@@ -757,7 +757,7 @@ Meteor.methods({
     },
 
     updateJobs: function (modifier, _id) {
-        console.log('modified : ', modifier);
+        //console.log('modified : ', modifier);
         console.log('id : ', _id);
         return Collections.Jobs.update({_id: _id}, modifier);
 
@@ -911,7 +911,7 @@ Meteor.methods({
 
 
     getCVToken() {
-        if(!this.userId) return false;
+        if (!this.userId) return false;
         var user = Meteor.users.findOne({_id: this.userId});
         var company = user.defaultCompany();
         var tokenData = {

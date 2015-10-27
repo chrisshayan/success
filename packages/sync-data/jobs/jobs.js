@@ -87,7 +87,6 @@ function getApplications(jobId) {
 
     var appRows = fetchVNWData(appSql);
 
-    console.log(appRows.length);
     appRows.forEach(function (row) {
         var data = {
             jobId: jobId,
@@ -115,7 +114,7 @@ var Jobs = {
                 cJobs.forEach(function (row) {
                     var job = processJob(row, data.companyId);
                     //Collections.Jobs.insert(job);
-                    console.log('job', job.jobId);
+
                     if (!job.isExist()) {
                         sJobCollections.addJobtoQueue('updateJob', data);
                     } else {
@@ -148,7 +147,7 @@ var Jobs = {
             if (mongoJob) {
                 var getJobQuery = sprintf(VNW_QUERIES.pullJob, data.jobId);
                 var cJobs = fetchVNWData(getJobQuery);
-                console.log('jobs : ', cJobs.length);
+
                 if (cJobs.length) {
 
                     cJobs.forEach(function (row) {

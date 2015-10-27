@@ -64,14 +64,8 @@ CRON_VNW.getJobTags = function (jobId) {
 
     var tags = _.pluck(tagRows, 'skillName');
 
-    console.log('skill tags : ', tags);
-    var modifier = {
-        '$set': {
-            skills: tags
-        }
-    };
+   // console.log('skill tags : ', tags);
 
-    //Collections.Jobs.update({jobId: jobId}, modifier);
     return tags;
 
 };
@@ -80,17 +74,11 @@ CRON_VNW.getBenefits = function (jobId) {
     if (jobId == void 0 || typeof jobId === 'string') return '';
 
     var getBenefitByJobSql = sprintf(VNW_QUERIES.getBenefits, jobId);
-    console.log('jid', jobId);
+ //   console.log('jid', jobId);
     var benefitRows = fetchVNWData(getBenefitByJobSql);
     var list = _.pluck(benefitRows, 'benefitValue');
-    console.log('benefits : ', list);
+ //   console.log('benefits : ', list);
     var benefits = list.join('\n');
-
-    var modifier = {
-        '$set': {
-            benefits: benefits
-        }
-    };
 
     return benefits;
 
@@ -166,13 +154,13 @@ function cronData(j, cb) {
             var jSql = sprintf(VNW_QUERIES.pullJobIdFromUser, userId);
             //console.log('jsql : ', jSql);
             var updateJobs = fetchVNWData(jSql);
-            console.log('all job :', updateJobs.length);
+            //console.log('all job :', updateJobs.length);
 
             var onlineJob = _.filter(updateJobs, function (job) {
                 return moment(job.expiredAt) > moment().subtract(1, 'day');
             });
 
-            console.log('onlinejob : ', onlineJob.length);
+            //console.log('onlinejob : ', onlineJob.length);
             processJob(onlineJob, companyId);
 
 
@@ -186,7 +174,7 @@ function cronData(j, cb) {
 
             CRON_VNW.addQueueCron('cronClosedJob', closedJobData);
 
-            console.log('onlinejob of %s company is done', companyId);
+            //console.log('onlinejob of %s company is done', companyId);
 
             /*updateJobs.forEach(function (job) {
              if (moment(job.expiredAt) > moment().subtract(1, 'day')) {
@@ -218,7 +206,7 @@ function cronClosedJob(jb, cb) {
 
     else {
         try {
-            console.log('company : %s closeJob: ', info.companyId, info.closedJobIds.length);
+            //console.log('company : %s closeJob: ', info.companyId, info.closedJobIds.length);
 
             processJob(info.closedJobIds, info.companyId);
             jb.done();
@@ -285,7 +273,7 @@ function processJob(items, companyId) {
             if (mongoJob
                 && (parseTimeToString(mongoJob.createdAt) !== parseTimeToString(job.createdAt)
                 || parseTimeToString(mongoJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
-                console.log('update Job :', job.jobId);
+                //console.log('update Job :', job.jobId);
 
                 console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);
                 console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
@@ -300,7 +288,7 @@ function processJob(items, companyId) {
 
                 // add new
             } else if (!mongoJob) {
-                console.log('create Job :', job.jobId);
+                //console.log('create Job :', job.jobId);
 
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
@@ -322,7 +310,7 @@ function processAfterSyncJob(jobs, companyId) {
 
             var jobIds = _.pluck(chunk, 'jobId');
 
-            console.log('chunk: ', jobIds);
+            //console.log('chunk: ', jobIds);
 
             // - Check new applicatiocn of this job if available.
             // - Then insert / update / remove
@@ -331,7 +319,7 @@ function processAfterSyncJob(jobs, companyId) {
             //console.log('appSql', appSql);
 
             var appRows = fetchVNWData(appSql);
-            console.log(appRows.length);
+         //   console.log(appRows.length);
 
             if (appRows.length) {
                 var candidates = _.pluck(appRows, 'candidateId');
@@ -365,7 +353,7 @@ function processApp(appRows, companyId, sourceId) {
         if (indexApp >= 0) {
             if (mongoApps[indexApp].isDeleted === row['deleted_by_employer'])
                 return;
-            console.log('update application: ', appId);
+        //    console.log('update application: ', appId);
             var modifier = {
                 'isDeleted': row['deleted_by_employer']
             };
@@ -468,7 +456,7 @@ function processCandidates(candidateList) {
 
 
 function cronApps(appRows, companyId) {
-    console.log('start cron app');
+ //   console.log('start cron app');
     //appRows.source 1 : online, appRows.source 2 : direct
     var groupedApp = _.groupBy(appRows, 'source');
     //console.log('online : %s, direct : %s', groupedApp['1'], groupedApp['2']);
@@ -783,7 +771,7 @@ Collections.SyncQueue = JobCollection('vnw_sync_queue');
 
 Collections.SyncQueue.allow({
     admin: function (userId) {
-        console.log('check permisson:', userId);
+    //    console.log('check permisson:', userId);
         return !!Meteor.users.find({_id: userId}).count();
     }
 });

@@ -43,7 +43,6 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 var Candidates = {
     addCandidate: function (jb, cb) {
         var data = jb.data;
-        console.log('job');
         try {
             if (data.candidateId) {
                 var candidateId = data.candidateId;
