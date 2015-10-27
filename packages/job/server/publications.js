@@ -16,7 +16,7 @@ DEFAULT_JOB_OPTIONS = {
         showSalary: 1,
         description: 1,
         requirements: 1,
-        benifits: 1,
+        benefits: 1,
         source: 1,
         status: 1,
         createdAt: 1,
