@@ -23,9 +23,8 @@ RecruiterSearch = React.createClass({
     },
 
     filter: function () {
-        return {
-            _id: {$nin: this.props.except || []},
-            $or: [
+        var f = {
+            '$or': [
                 {
                     username: {
                         $regex: '^' + this.state.q,
@@ -51,7 +50,12 @@ RecruiterSearch = React.createClass({
                     }
                 }
             ]
+        };
+        if (!_.isEmpty(this.props.except)) {
+            f['_id'] = {$nin: this.props.except};
         }
+
+        return f;
     },
 
     option() {

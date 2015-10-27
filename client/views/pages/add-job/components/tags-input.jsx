@@ -24,13 +24,17 @@ TagsInput = React.createClass({
     },
 
     filter: function () {
-        return {
-            _id: {$nin: this.props.except || []},
+        var f = {
             skillName: {
                 $regex: this.state.q,
                 $options: 'i'
             }
+        };
+        if (!_.isEmpty(this.props.except)) {
+            f['_id'] = {$nin: this.props.except};
         }
+
+        return f;
     },
 
     option() {
@@ -64,8 +68,8 @@ TagsInput = React.createClass({
                 break;
             case 13: // select
                 var skill = this.data.skills[k];
-                if(!skill) {
-                    if(this.state.q.length > 0) {
+                if (!skill) {
+                    if (this.state.q.length > 0) {
                         skill = {
                             skillName: this.state.q
                         };
@@ -80,12 +84,12 @@ TagsInput = React.createClass({
     },
 
     handleSelect(skill) {
-        if(this.state.q.length <= 0) return;
+        if (this.state.q.length <= 0) return;
         this.setState({
             q: '',
             itemActive: null
         });
-        if(skill)
+        if (skill)
             this.props.onSelect(skill, this.props.id || null);
     },
 
@@ -141,7 +145,8 @@ TagsInput = React.createClass({
             email: {}
         };
         return (
-            <div key={key} style={ styles.recruiter } className='recruiter-search-item' onClick={ () => this.handleSelect(skill) }>
+            <div key={key} style={ styles.recruiter } className='recruiter-search-item'
+                 onClick={ () => this.handleSelect(skill) }>
                 <div style={ styles.name }>{skill.skillName}</div>
             </div>
         );

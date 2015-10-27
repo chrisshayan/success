@@ -342,5 +342,7 @@ Meteor.publish('skillSearch', function (filter, option) {
     if (!this.userId) return this.ready();
     if (!option) option = {};
     option['sort'] = {skillLength: 1};
+    if(!option.limit) option.limit = 5;
+    if(option.limit > 10) option.limit = 10;
     return Collections.SkillTerms.find(filter, option);
 });
