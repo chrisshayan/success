@@ -337,3 +337,10 @@ Meteor.publish('recruiterSearch', function (filter, option) {
     };
     return Meteor.users.find(filter, option);
 });
+
+Meteor.publish('skillSearch', function (filter, option) {
+    if (!this.userId) return this.ready();
+    if (!option) option = {};
+    option['sort'] = {skillLength: 1};
+    return Collections.SkillTerms.find(filter, option);
+});
