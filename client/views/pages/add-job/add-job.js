@@ -2,7 +2,7 @@ AutoForm.hooks({
     addJob: {
         onSuccess: function (type, result) {
             $('.criteria-tab').trigger('click');
-            console.log('err, result', type, result);
+
             if (!result) return;
 
             Router.go('teamSettings', {
