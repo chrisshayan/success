@@ -58,7 +58,6 @@ Template.hiringTeamActionsCell.events({
 
 Template.hiringTeamActionsCell.helpers({
     isOwner: function () {
-        console.log('roleID', this.roleId);
         return (this.roleId === 'admin');
     }
 });
