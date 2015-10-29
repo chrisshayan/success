@@ -16,7 +16,6 @@ Meteor.startup(function () {
         var settingMenu = [];
 
         if(user) {
-            settingMenu.push({label: "Mail Signature", icon: "fa-at", route: "mailSignature"});
             if(user.isCompanyAdmin()) {
                 settingMenu.push({label: "Company Info", icon: "fa-info", route: "companyInfo"});
                 settingMenu.push({
@@ -26,15 +25,37 @@ Meteor.startup(function () {
                     dependencies: ['createMailTemplate', 'updateMailTemplate']
                 });
                 settingMenu.push({label: "Hiring Team Manage", icon: "fa-users", route: "hiringTeam"});
-            }
 
+
+                leftNavItems.push({
+                    label: "Settings",
+                    icon: "fa-cogs",
+                    route: null,
+                    childrens: settingMenu
+                });
+
+
+            }
         }
+
+
         leftNavItems.push({
-            label: "Settings",
-            icon: "fa-cogs",
+            label: "My account",
+            icon: "fa-user",
             route: null,
-            childrens: settingMenu
+            childrens: [
+                {label: "Profile", icon: "fa-user", route: "updateProfile"},
+                {label: "Mail Signature", icon: "fa-at", route: "mailSignature"}
+            ]
         });
+
+        leftNavItems.push({
+            label: "Logout",
+            icon: "fa-sign-out ",
+            route: 'logout',
+            childrens: []
+        });
+
         return leftNavItems;
     });
     

@@ -64,7 +64,12 @@ ApplicationTransform.prototype = {
     },
 
     coverLetter: function () {
-        return this.data.coverletter;
+        var cover = '';
+        if(this.data.coverletter) {
+            cover = this.data.coverletter.replace(/(\r\n|\n)/gi,'<br/>');
+            cover = cover.replace(/\<br\/\>\s?\<br\/\>/g, '<br/>');
+        }
+        return cover;
     },
 
     /**
