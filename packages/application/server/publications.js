@@ -44,7 +44,8 @@ Publications.lastApplications = function () {
                 var user = Meteor.users.findOne({_id: self.userId});
                 if (!user) return [];
                 var jobPermissions = user.jobPermissions();
-                var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
+                //var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
+                var jobIds = Meteor['jobs'].find({status: 1, $or: jobPermissions}).map(function (r) {
                     return r.jobId
                 });
                 jobIds = _.filter(jobIds, (v) => v != void 0);

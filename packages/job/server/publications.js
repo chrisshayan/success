@@ -39,7 +39,7 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
     if (!this.userId) return this.ready();
     var self = this;
     return {
-        find: function() {
+        find: function () {
             try {
                 check(filters, Object);
                 check(options, Match.Optional(Object));
@@ -56,7 +56,8 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
                 if (!options.hasOwnProperty("limit")) {
                     options['limit'] = 5;
                 }
-                return Collections.Jobs.find(filters, options);
+                //return Collections.Jobs.find(filters, options);
+                return Meteor['jobs'].find(filters, options);
             } catch (e) {
                 debuger(e);
                 return self.ready();
@@ -72,23 +73,24 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
  * @param options.jobId {String}
  * @returns {Cursor}
  */
-publications.jobDetails =  function (opt) {
-    if(!this.userId) return this.ready();
+publications.jobDetails = function (opt) {
+    if (!this.userId) return this.ready();
     check(opt, {
         jobId: Match.Any
     });
 
     var self = this;
     return {
-        find: function() {
+        find: function () {
             var user = Meteor.users.findOne({_id: self.userId});
             var permissions = user.jobPermissions();
             var curJobCond = {
                 _id: opt.jobId,
                 $or: permissions
             };
-            var job = Collections.Jobs.findOne(curJobCond);
-            if(!job) return null;
+            //var job = Collections.Jobs.findOne(curJobCond);
+            var job = Meteor['jobs'].findOne(curJobCond);
+            if (!job) return null;
             var cond = {
                 $or: [
                     {_id: job._id},
@@ -98,19 +100,20 @@ publications.jobDetails =  function (opt) {
                     }
                 ]
             };
-            return Collections.Jobs.find(cond, {limit: 6});
+            //return Collections.Jobs.find(cond, {limit: 6});
+            return Meteor['jobs'].find(cond, {limit: 6});
         },
         children: []
     }
 };
 
-publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
+publications.jobCounter = function (counterName, filters, filterEmailAddress) {
     if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
     check(filters, Object);
     return {
-        find: function() {
+        find: function () {
             var count = 0;
             var initializing = true;
             var user = Meteor.users.findOne({_id: self.userId});
@@ -126,7 +129,8 @@ publications.jobCounter =  function (counterName, filters, filterEmailAddress) {
             //};
 
             filters['$or'] = permissions;
-            var handle = Collections.Jobs.find(filters).observeChanges({
+            //var handle = Collections.Jobs.find(filters).observeChanges({
+            var handle = Meteor['jobs'].find(filters).observeChanges({
                 added: function (id) {
                     count++;
                     if (!initializing)
@@ -162,7 +166,7 @@ publications.jobStagesCounter = function (counterName, jobId) {
     check(counterName, String);
     check(jobId, String);
     return {
-        find: function() {
+        find: function () {
             var count = {
                 0: 0,
                 1: 0,
@@ -174,7 +178,8 @@ publications.jobStagesCounter = function (counterName, jobId) {
             var initializing = true;
             var user = Meteor.users.findOne({_id: this.userId});
             if (!user) return;
-            var job = Collections.Jobs.findOne({_id: jobId});
+            //var job = Collections.Jobs.findOne({_id: jobId});
+            var job = Meteor['jobs'].findOne({_id: jobId});
             if (!job) return;
 
 
@@ -220,10 +225,10 @@ publications.jobStagesCounter = function (counterName, jobId) {
  * @returns {*}
  */
 publications.lastOpenJobs = function () {
-    if(!this.userId) return this.ready();
+    if (!this.userId) return this.ready();
     var self = this;
     return {
-        find: function() {
+        find: function () {
             var user = Meteor.users.findOne({_id: self.userId});
             var permissions = user.jobPermissions();
             var filters = {
@@ -236,10 +241,46 @@ publications.lastOpenJobs = function () {
             options['sort'] = {
                 createdAt: -1
             };
-            return Collections.Jobs.find(filters, options);
+            //return Collections.Jobs.find(filters, options);
+            return Meteor['jobs'].find(filters, options);
         }
     }
 };
+
+
+/**
+ * addjobPage
+ */
+
+
+/*publications.addJobPage = function () {
+    console.log('this userid', this.userI);
+    if (!this.userId) return this.ready();
+    var cursors = [];
+    var jobLevels = Meteor.job_levels.find();
+    var industries = Meteor.industries.find();
+    var cities = Meteor.cities.find();
+    console.log('cur : ', jobLevels, industries);
+    cursors.push(jobLevels);
+    cursors.push(industries);
+    cursors.push(cities);
+    return cursors;
+}*/
+
+
+Meteor.publish('addJobPage', function () {
+    if (!this.userId) return this.ready();
+    var cursors = [];
+    var jobLevels = Meteor.job_levels.find();
+    var industries = Meteor.industries.find();
+    var cities = Meteor.cities.find();
+
+    cursors.push(jobLevels);
+    cursors.push(industries);
+    cursors.push(cities);
+    return cursors;
+});
+
 
 /**
  * Map job's publications to Meteor

@@ -118,7 +118,8 @@ JobCandidatesContainer = React.createClass({
     },
 
     filter: function () {
-        var job = Collections.Jobs.findOne({_id: this.state.jobId});
+        //var job = Collections.Jobs.findOne({_id: this.state.jobId});
+        var job = Meteor['jobs'].findOne({_id: this.state.jobId});
         var filter = {
             jobId: job.jobId,
             stage: this.state.stage.id,

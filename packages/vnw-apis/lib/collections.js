@@ -116,7 +116,8 @@ ApplicationTransform.prototype = {
     },
 
     link: function() {
-        var job = Collections.Jobs.findOne({jobId: this.jobId});
+        //var job = Collections.Jobs.findOne({jobId: this.jobId});
+        var job = Meteor['jobs'].findOne({jobId: this.jobId});
 
         var params = {
             _id: job._id,

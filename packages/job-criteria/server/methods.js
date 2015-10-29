@@ -7,7 +7,8 @@ var methods = {
     addJobCriteria(jobId, criteriaSetId, criteria) {
         if(!this.userId) return false;
         this.unblock();
-        var job = Collections.Jobs.findOne({_id: jobId});
+        //var job = Collections.Jobs.findOne({_id: jobId});
+        var job = Meteor['jobs'].findOne({_id: jobId});
         if(!job) return false;
         var criteriaSet = Meteor.job_criteria_set.findOne({_id: criteriaSetId});
         if(!criteriaSet) return false;

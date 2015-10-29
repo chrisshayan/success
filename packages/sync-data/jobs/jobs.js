@@ -105,7 +105,8 @@ var Jobs = {
             var data = jc.data; // userId, companyId, jobId
 
             console.log('start add job: ', data);
-            var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+            //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+            var mongoJob = Meteor.jobs.findOne({jobId: data.jobId});
 
             if (!mongoJob) {
                 var getJobQuery = sprintf(VNW_QUERIES.pullJob, data.jobId);
@@ -118,7 +119,9 @@ var Jobs = {
                     if (!job.isExist()) {
                         sJobCollections.addJobtoQueue('updateJob', data);
                     } else {
-                        Collections.Jobs.insert(job);
+                        //Collections.Jobs.insert(job);
+                        job.save();
+                        Meteor.jobs.insert(job);
                         getApplications(job.jobId);
                     }
 
@@ -142,7 +145,8 @@ var Jobs = {
 
             console.log('start update job: ', data);
 
-            var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+            //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+            var mongoJob = Meteor.jobs.findOne({jobId: data.jobId});
 
             if (mongoJob) {
                 var getJobQuery = sprintf(VNW_QUERIES.pullJob, data.jobId);
@@ -153,11 +157,12 @@ var Jobs = {
                     cJobs.forEach(function (row) {
                         var job = processJob(row, data.companyId);
 
-                        var query = {jobId: data.jobId};
-                        var modifier = {
-                            '$set': job
-                        };
-                        Collections.Jobs.update(query, modifier);
+                        /*var query = {jobId: data.jobId};
+                         var modifier = {
+                         '$set': job
+                         };
+                         Collections.Jobs.update(query, modifier);*/
+                        job.save();
 
                     });
                 }

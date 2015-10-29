@@ -18,7 +18,8 @@ JobHiringTeamContainer = React.createClass({
         if (jobId) {
             var sub = Meteor.subscribe('teamSettings', jobId);
             if (sub.ready()) {
-                var job = Collections.Jobs.findOne({_id: jobId});
+                //var job = Collections.Jobs.findOne({_id: jobId});
+                var job = Meteor['jobs'].findOne({_id: jobId});
                 _.each(job.recruiters, function (recruiter) {
                     _.each(recruiters, function (val, k) {
                         if (recruiter.roles.indexOf(k) >= 0) {
@@ -31,7 +32,8 @@ JobHiringTeamContainer = React.createClass({
 
             return {
                 jobId: jobId,
-                job: Collections.Jobs.findOne({_id: jobId}),
+                //job: Collections.Jobs.findOne({_id: jobId}),
+                job: Meteor['jobs'].findOne({_id: jobId}),
                 recruiters: recruiters
             };
         }

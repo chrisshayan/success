@@ -142,7 +142,8 @@ var Applications = {
 
             if (data.jobId) {
 
-                var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+                //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+                var mongoJob = Meteor['jobs'].findOne({jobId: data.jobId});
 
                 var mongoApp = Collections.Applications.findOne({entryId: data.entryId});
 
@@ -220,7 +221,8 @@ var Applications = {
             console.log('start update Application: ', data);
             if (data.jobId) {
 
-                var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+                //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
+                var mongoJob = Meteor['jobs'].findOne({jobId: data.jobId});
 
                 var mongoApp = Collections.Applications.findOne({entryId: data.entryId});
 

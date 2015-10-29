@@ -26,7 +26,8 @@ model.appendSchema({
         optional: true
     },
     jobId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     source: {
         type: String,
@@ -229,15 +230,27 @@ model.appendSchema({
         defaultValue: 1, // 1: open (or publish or active), 0: close
         optional: true
     },
+    recruiters: {
+        type: [Object],
+        blackbox: true,
+        defaultValue: []
+    },
 
     createdAt: {
-        type: Date
+        type: Date,
+        defaultValue: Date.now()
     },
     updatedAt: {
-        type: Date
+        type: Date,
+        defaultValue: Date.now()
     },
     expiredAt: {
-        type: Date
+        type: Date,
+        defaultValue: Date.now()
+    },
+    createdBy: {
+        type: String,
+        optional: true
     }
 });
 

@@ -16,7 +16,8 @@ Jobs = BlazeComponent.extendComponent({
         this.isLoading = new ReactiveVar(false);
         this.isLoadingMore = new ReactiveVar(false);
 
-        if (Collections.Jobs.find({}, {limit: 1}).count() !== 1)
+        //if (Collections.Jobs.find({}, {limit: 1}).count() !== 1)
+        if (Meteor['jobs'].find({}, {limit: 1}).count() !== 1)
             this.isLoading.set(true);
 
         instance.autorun(function () {
@@ -82,7 +83,8 @@ Jobs = BlazeComponent.extendComponent({
     },
 
     fetch: function () {
-        return Collections.Jobs.find(this.filters(), this.options());
+        //return Collections.Jobs.find(this.filters(), this.options());
+        return Meteor['jobs'].find(this.filters(), this.options());
     },
 
     events: function () {

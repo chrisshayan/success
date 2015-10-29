@@ -26,7 +26,8 @@ var publications = {
             jobId: String
         });
 
-        var job = Collections.Jobs.findOne({_id: filter.jobId});
+        //var job = Collections.Jobs.findOne({_id: filter.jobId});
+        var job = Meteor['jobs'].findOne({_id: filter.jobId});
         if (!job) return this.ready();
         return {
             find: function () {

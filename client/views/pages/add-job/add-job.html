@@ -61,11 +61,11 @@
                                     <div class="col-sm-12 col-md-12">
                                         <div class="animated fadeInRight">
                                             <div class="content">
-                                                {{#unless jobId}}
+                                                {{#unless _id}}
                                                     {{> quickForm schema="Schemas.addJobForm" type="method" meteormethod="addJob" id="addJob" }}
                                                 {{else}}
                                                     {{#unless vnwData}}
-                                                        {{> quickForm schema="Schemas.addJobForm" type="method-update" meteormethod="updateJobs" id="updateJobs" doc=this }}
+                                                        {{> quickForm schema="Schemas.addJobForm" type="method-update" meteormethod="updateJobAT" id="updateJob" doc=this }}
                                                     {{else}}
                                                         {{>jobDetailSettings this}}
                                                     {{/unless}}

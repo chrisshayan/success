@@ -240,7 +240,7 @@ function cronClosedJob(jb, cb) {
 
 function processJob(items, companyId) {
     items.forEach(function (item) {
-        var mongoJob = Collections.Jobs.findOne({jobId: item.jobId});
+
         //remove
         /*if (mongoJob && item.isdeleted) {
          Collections.Jobs.remove({jobId: item.jobId});
@@ -254,28 +254,62 @@ function processJob(items, companyId) {
                 jobId: +item.jobId
             };
 
-            var expiredAt = formatDatetimeFromVNW(row.expireddate);
 
-            var job = {
-                companyId: +companyId,
-                jobId: +row.jobid,
-                userId: +row.userid,
-                source: 'vnw',
-                title: row.jobtitle,
-                level: '',
-                categories: [],
-                salaryMin: +row.salarymin,
-                salaryMax: +row.salarymax,
-                showSalary: true,
-                description: row.jobdescription,
-                requirements: row.skillexperience,
-                recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
-                vnwData: row,
-                status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
-                createdAt: formatDatetimeFromVNW(row.createddate),
-                updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
-                expiredAt: expiredAt
-            };
+            /*var job = {
+             companyId: +companyId,
+             jobId: +row.jobid,
+             userId: +row.userid,
+             source: 'vnw',
+             title: row.jobtitle,
+             level: '',
+             categories: [],
+             locations: [],
+             salaryMin: +row.salarymin,
+             salaryMax: +row.salarymax,
+             showSalary: true,
+             description: row.jobdescription,
+             requirements: row.skillexperience,
+             benefits: '',
+             recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+             skills: [],
+             vnwData: row,
+             status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
+             createdAt: formatDatetimeFromVNW(row.createddate),
+             updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+             expiredAt: expiredAt
+             };*/
+
+            var job = Meteor['jobs'].findOne({jobId: item.jobId});
+            if (!job)
+                job = new vnwJob();
+
+            var expiredAt = formatDatetimeFromVNW(row.expireddate);
+            var createdAt = formatDatetimeFromVNW(row.createddate);
+            var updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
+            job.companyId = +companyId;
+            job.jobId = +row.jobid;
+            job.userId = +row.userid;
+            job.source = 'vnw';
+            job.title = row.jobtitle;
+            job.level = '';
+            job.categories = [];
+            job.locations = [];
+            job.salaryMin = +row.salarymin;
+            job.salaryMax = +row.salarymax;
+            job.showSalary = true;
+            job.description = row.jobdescription;
+            job.requirements = row.skillexperience;
+            job.benefits = '';
+            job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
+            job.skills = [];
+            job.vnwData = EJSON.parse(EJSON.stringify(row));
+            job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
+            job.createdAt = createdAt;
+            job.updatedAt = updatedAt;
+            job.expiredAt = expiredAt;
+            //console.log('a', job.createdAt);
+            //console.log('b', job.updatedAt);
+
 
             if (!row.isactive)
                 job.status = 2;
@@ -285,31 +319,37 @@ function processJob(items, companyId) {
                 job.status = 1;
 
             // update
-            if (mongoJob
-                && (parseTimeToString(mongoJob.createdAt) !== parseTimeToString(job.createdAt)
-                || parseTimeToString(mongoJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
-                //console.log('update Job :', job.jobId);
 
-                console.log('previous info create : %s, update :%s', mongoJob.createdAt, mongoJob.updatedAt);
+            //var mongoJob = Meteor['jobs'].findOne({jobId: item.jobId});
+            var existJob = job.isExist();
+            if (existJob
+                && (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
+                || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
+                console.log('update Job :', job.jobId);
+
+                console.log('previous info create : %s, update :%s', existJob.createdAt, existJob.updatedAt);
                 console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
                 job.locations = CRON_VNW.getLocations(+row.jobid);
 
-                var modifier = {
-                    '$set': job
-                };
+                /*var modifier = {
+                 '$set': job
+                 };*/
 
-                Collections.Jobs.update(query, modifier);
+                job.save();
+                //console.log(Meteor.jobs.findOne());
+                //Collections.Jobs.update(query, modifier);
 
                 // add new
-            } else if (!mongoJob) {
-                //console.log('create Job :', job.jobId);
+            } else if (!existJob) {
 
+                //console.log('func ', job.save.toString());
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
                 job.locations = CRON_VNW.getLocations(+row.jobid);
-                Collections.Jobs.insert(job);
+                job.save();
+                //Collections.Jobs.insert(job);
 
             }
         });
@@ -460,7 +500,7 @@ function processCandidates(candidateList) {
         } else {
             //TODO : in the future, the 3rd job will care this one
             if (!_.isEqual(candidate.data, row)) {
-                Collections.Jobs.update(candidate._id, {
+                Collections.Candidates.update(candidate._id, {
                     $set: {
                         data: row,
                         lastSyncedAt: new Date()

@@ -2,7 +2,8 @@ Migrations.add({
     version: 2,
     name: "Transform job to new schema",
     up: function () {
-        var jobs = Collections.Jobs.find({source: {$ne: 'recruit'}}).fetch();
+        //var jobs = Collections.Jobs.find({source: {$ne: 'recruit'}}).fetch();
+        var jobs = Meteor['jobs'].find({source: {$ne: 'recruit'}}).fetch();
         _.each(jobs, function (old) {
             if(!old.hasOwnProperty('data')) return; // skip if transformed
 
@@ -35,7 +36,8 @@ Migrations.add({
             } else {
                 job.status = 1; // open job
             }
-            Collections.Jobs.update({_id: old._id}, job);
+            //Collections.Jobs.update({_id: old._id}, job);
+            Meteor['jobs'].update({_id: old._id}, job);
         });
 
 

@@ -13,7 +13,8 @@ function replacePlaceholder(userId, application, candidate, mail) {
                     break;
 
                 case "position":
-                    var job = Collections.Jobs.findOne({jobId: application.jobId});
+                    //var job = Collections.Jobs.findOne({jobId: application.jobId});
+                    var job = Meteor['jobs'].findOne({jobId: application.jobId});
                     replaces[p1] = job.title;
                     break;
 
@@ -179,7 +180,8 @@ Meteor.methods({
                 jobId: String,
                 stage: Number
             });
-            var job = Collections.Jobs.findOne({_id: opt.jobId});
+            //var job = Collections.Jobs.findOne({_id: opt.jobId});
+            var job = Meteor['jobs'].findOne({_id: opt.jobId});
             if (!job) return false;
 
             var application = Collections.Applications.findOne({
@@ -209,7 +211,8 @@ Meteor.methods({
             stage: Number,
             application: String
         });
-        var job = Collections.Jobs.findOne({_id: opt.jobId});
+        //var job = Collections.Jobs.findOne({_id: opt.jobId});
+        var job = Meteor['jobs'].findOne({_id: opt.jobId});
         if (!job) return false;
         var criteria = {
             _id: opt.application,
@@ -513,30 +516,30 @@ Meteor.methods({
      * REFACTOR NEW METHODS
      */
 
-    jobCounter: function (filters) {
-        this.unblock();
-        check(filters, Object);
-        var user = getUserInfo(+this.userId);
-        var DEFAULT_FILTERS = {
-            companyId: user.companyId
-        };
-        filters = _.defaults(DEFAULT_FILTERS, filters);
-        return Collections.Jobs.find(filters).count();
-    },
+    /*    jobCounter: function (filters) {
+     this.unblock();
+     check(filters, Object);
+     var user = getUserInfo(+this.userId);
+     var DEFAULT_FILTERS = {
+     companyId: user.companyId
+     };
+     filters = _.defaults(DEFAULT_FILTERS, filters);
+     return Collections.Jobs.find(filters).count();
+     },
 
-    getJobs: function (filters, options) {
-        check(filters, Object);
-        check(options, Match.Optional(Object));
-        var user = getUserInfo(+this.userId);
-        var DEFAULT_FILTERS = {
-            companyId: user.companyId
-        };
+     getJobs: function (filters, options) {
+     check(filters, Object);
+     check(options, Match.Optional(Object));
+     var user = getUserInfo(+this.userId);
+     var DEFAULT_FILTERS = {
+     companyId: user.companyId
+     };
 
-        filters = _.defaults(DEFAULT_FILTERS, filters);
-        options = _.extend(DEFAULT_OPTIONS_VALUES, options);
-        options = _.defaults(DEFAULT_JOB_OPTIONS, options);
-        return Collections.Jobs.find(filters, options).fetch();
-    },
+     filters = _.defaults(DEFAULT_FILTERS, filters);
+     options = _.extend(DEFAULT_OPTIONS_VALUES, options);
+     options = _.defaults(DEFAULT_JOB_OPTIONS, options);
+     return Collections.Jobs.find(filters, options).fetch();
+     },*/
 
     getCompanyInfo: function (companyId) {
         return Collections.CompanySettings.findOne({companyId: companyId});
@@ -573,7 +576,8 @@ Meteor.methods({
             var isCandidateExists = false;
             var user = Meteor.users.findOne({_id: this.userId});
             var company = user.defaultCompany();
-            var job = Collections.Jobs.findOne({_id: jobId});
+            //var job = Collections.Jobs.findOne({_id: jobId});
+            var job = Meteor['jobs'].findOne({_id: jobId});
             if (!job) return false;
 
             email = data.email.trim();
@@ -669,7 +673,8 @@ Meteor.methods({
             jobId: Match.Any,
             email: String
         });
-        var job = Collections.Jobs.findOne({_id: data.jobId});
+        //var job = Collections.Jobs.findOne({_id: data.jobId});
+        var job = Meteor['jobs'].findOne({_id: data.jobId});
         if (!job) return false;
         email = data.email.trim();
 
@@ -705,7 +710,8 @@ Meteor.methods({
         };
 
 
-        Collections.Jobs.find(query, options).map(function (obj) {
+        //Collections.Jobs.find(query, options).map(function (obj) {
+        Meteor['jobs'].find(query, options).map(function (obj) {
             if (obj.recruiterEmails)
                 listEmail = listEmail.concat(obj.recruiterEmails);
         });
@@ -718,50 +724,50 @@ Meteor.methods({
 });
 
 Meteor.methods({
-    addJob: function (data) {
-        console.log('add job', data, this.userId);
+    /*addJob: function (data) {
+     console.log('add job', data, this.userId);
 
-        if (!this.userId) return false;
+     if (!this.userId) return false;
 
-        var currentUser = Meteor.users.findOne({_id: this.userId});
+     var currentUser = Meteor.users.findOne({_id: this.userId});
 
-        if (!currentUser.companyId) {
-            var listCompanyByUser = Meteor.call('getCompanyListByUser');
+     if (!currentUser.companyId) {
+     var listCompanyByUser = Meteor.call('getCompanyListByUser');
 
-            if (listCompanyByUser.length) {
-                data.companyId = listCompanyByUser[0].companyId
-            }
-        }
+     if (listCompanyByUser.length) {
+     data.companyId = listCompanyByUser[0].companyId
+     }
+     }
 
-        if (currentUser) {
-            data.companyId = data.companyId || currentUser.companyId || -1;
-            data.data = {};
-            data.source = "recruit";
-            data.status = 1;
-            data.createdAt = new Date();
-            data.createdBy = this.userId;
-            data.userId = this.userId;
+     if (currentUser) {
+     data.companyId = data.companyId || currentUser.companyId || -1;
+     data.data = {};
+     data.source = "recruit";
+     data.status = 1;
+     data.createdAt = new Date();
+     data.createdBy = this.userId;
+     data.userId = this.userId;
 
-            var jobId = Collections.Jobs.insert(data);
-            if (jobId) {
-                Collections.Jobs.update({_id: jobId}, {
-                    $set: {
-                        jobId: jobId
-                    }
-                });
+     var jobId = Collections.Jobs.insert(data);
+     if (jobId) {
+     Collections.Jobs.update({_id: jobId}, {
+     $set: {
+     jobId: jobId
+     }
+     });
 
-                return jobId;
-            }
-        }
-        return false;
-    },
+     return jobId;
+     }
+     }
+     return false;
+     },
 
-    updateJobs: function (modifier, _id) {
-        //console.log('modified : ', modifier);
-        console.log('id : ', _id);
-        return Collections.Jobs.update({_id: _id}, modifier);
+     updateJobs: function (modifier, _id) {
+     //console.log('modified : ', modifier);
+     console.log('id : ', _id);
+     return Collections.Jobs.update({_id: _id}, modifier);
 
-    },
+     },*/
 
     searchSkill: function (keyword) {
         check(keyword, String);
@@ -794,107 +800,107 @@ Meteor.methods({
         return result;
     },
 
-    updateJobTags: function (jobId, tags) {
-        check(jobId, String);
-        check(tags, [String]);
-        if (!this.userId) return false;
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if (!job) return false;
-        var newTags = [];
-        _.each(tags, function (t) {
-            newTags.push(t.toLowerCase());
-        });
+    /*    updateJobTags: function (jobId, tags) {
+     check(jobId, String);
+     check(tags, [String]);
+     if (!this.userId) return false;
+     var job = Collections.Jobs.findOne({_id: jobId});
+     if (!job) return false;
+     var newTags = [];
+     _.each(tags, function (t) {
+     newTags.push(t.toLowerCase());
+     });
 
-        var diff = _.difference(newTags, job.tags || []);
-        _.each(diff, function (newSkill) {
-            Collections.SkillTerms.upsert({skillName: newSkill}, {
-                $set: {
-                    skillId: null,
-                    skillName: newSkill,
-                    skillLength: newSkill.length
-                }
-            });
-        });
-        return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
-    },
+     var diff = _.difference(newTags, job.tags || []);
+     _.each(diff, function (newSkill) {
+     Collections.SkillTerms.upsert({skillName: newSkill}, {
+     $set: {
+     skillId: null,
+     skillName: newSkill,
+     skillLength: newSkill.length
+     }
+     });
+     });
+     return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
+     },*/
 
 
-    assignJobRecruiter: function (jobId, role, userId) {
-        if (this.userId) {
-            var job = Collections.Jobs.findOne({_id: jobId});
-            if (job) {
-                var selector = {},
-                    modifier = {};
+    /*    assignJobRecruiter: function (jobId, role, userId) {
+     if (this.userId) {
+     var job = Collections.Jobs.findOne({_id: jobId});
+     if (job) {
+     var selector = {},
+     modifier = {};
 
-                var recruiter = _.findWhere(job.recruiters, {userId: userId});
+     var recruiter = _.findWhere(job.recruiters, {userId: userId});
 
-                if (recruiter) {
-                    if (recruiter.roles.indexOf(role) < 0) {
+     if (recruiter) {
+     if (recruiter.roles.indexOf(role) < 0) {
 
-                        selector = {
-                            _id: jobId,
-                            'recruiters.userId': userId
-                        };
-                        modifier = {
-                            $push: {
-                                'recruiters.$.roles': role
-                            }
-                        };
-                    }
-                } else {
-                    selector['_id'] = jobId;
-                    modifier['$push'] = {
-                        recruiters: {
-                            userId: userId,
-                            roles: [role]
-                        }
-                    };
-                }
-                console.log(selector, modifier)
-                if (selector && modifier)
-                    return Collections.Jobs.update(selector, modifier);
-            }
-        }
-        return null;
-    },
+     selector = {
+     _id: jobId,
+     'recruiters.userId': userId
+     };
+     modifier = {
+     $push: {
+     'recruiters.$.roles': role
+     }
+     };
+     }
+     } else {
+     selector['_id'] = jobId;
+     modifier['$push'] = {
+     recruiters: {
+     userId: userId,
+     roles: [role]
+     }
+     };
+     }
+     console.log(selector, modifier)
+     if (selector && modifier)
+     return Collections.Jobs.update(selector, modifier);
+     }
+     }
+     return null;
+     },
 
-    unassignJobRecruiter: function (jobId, role, userId) {
-        if (this.userId) {
-            var job = Collections.Jobs.findOne({_id: jobId});
-            if (job) {
-                var recruiter = _.findWhere(job.recruiters, {userId: userId});
-                if (recruiter) {
-                    var selector = {
-                            _id: job._id
-                        },
-                        modifier = {};
+     unassignJobRecruiter: function (jobId, role, userId) {
+     if (this.userId) {
+     var job = Collections.Jobs.findOne({_id: jobId});
+     if (job) {
+     var recruiter = _.findWhere(job.recruiters, {userId: userId});
+     if (recruiter) {
+     var selector = {
+     _id: job._id
+     },
+     modifier = {};
 
-                    if (recruiter.roles.indexOf(role) >= 0) {
-                        if (recruiter.roles.length > 1) {
-                            selector["recruiters.userId"] = userId;
-                            modifier = {
-                                $pull: {
-                                    'recruiters.$.roles': role
-                                }
-                            };
-                        } else {
-                            modifier = {
-                                $pull: {
-                                    'recruiters': {
-                                        userId: userId
-                                    }
-                                }
-                            };
-                        }
+     if (recruiter.roles.indexOf(role) >= 0) {
+     if (recruiter.roles.length > 1) {
+     selector["recruiters.userId"] = userId;
+     modifier = {
+     $pull: {
+     'recruiters.$.roles': role
+     }
+     };
+     } else {
+     modifier = {
+     $pull: {
+     'recruiters': {
+     userId: userId
+     }
+     }
+     };
+     }
 
-                        return Collections.Jobs.update(selector, modifier);
-                    }
+     return Collections.Jobs.update(selector, modifier);
+     }
 
-                }
-            }
-        }
-        return null;
-    },
+     }
+     }
+     }
+     return null;
+     },*/
 
     getCompanyByIds: function (idList) {
         if (typeof idList !== 'object' || !idList.length)

@@ -284,6 +284,7 @@ Meteor.publish('staticModels', function () {
         , Collections.Cities.find(query)];
 });
 
+/*
 Meteor.publish('addJobPage', function () {
     if (!this.userId) return this.ready();
     var cursors = [];
@@ -296,6 +297,7 @@ Meteor.publish('addJobPage', function () {
     cursors.push(cities);
     return cursors;
 });
+*/
 
 
 Meteor.publish('searchSkillAutocomplete', function (selector, options) {
@@ -312,7 +314,8 @@ Meteor.publishComposite('teamSettings', function (jobId) {
     check(jobId, Match.Any);
     return {
         find: function () {
-            return Collections.Jobs.find({_id: jobId}, {limit: 1});
+            //return Collections.Jobs.find({_id: jobId}, {limit: 1});
+            return Meteor['jobs'].find({_id: jobId}, {limit: 1});
         },
         children: [
             {

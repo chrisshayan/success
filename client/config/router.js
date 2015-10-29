@@ -26,7 +26,7 @@ SkillsSubs = new SubsManager({
 StaticSubs.subscribe('staticModels');
 StaticSubs.subscribe('mailTemplates');
 
-Tracker.autorun(function() {
+Tracker.autorun(function () {
     Meteor.subscribe('userData');
 });
 
@@ -173,7 +173,8 @@ Router.route('/job/:jobId/stage/:stage', {
     },
     data: function () {
         return {
-            job: Collections.Jobs.findOne({jobId: Utils.transformVNWId(this.params.jobId)}),
+            //job: Collections.Jobs.findOne({jobId: Utils.transformVNWId(this.params.jobId)}),
+            job: Meteor['jobs'].findOne({jobId: Utils.transformVNWId(this.params.jobId)})
             //isEmpty: !this.params.query.hasOwnProperty('application')
         }
     }
@@ -189,7 +190,7 @@ Router.route('/job-details/:_id/stage/:stage', {
         return [Meteor.subscribe('jobDetails', {jobId: this.params._id}), Meteor.subscribe('mailTemplates')];
     },
     action: function () {
-        if(this.ready()) {
+        if (this.ready()) {
             /**
              * if url contains application, check app exists
              * if url not contains app, find first application of job's stage
@@ -199,7 +200,8 @@ Router.route('/job-details/:_id/stage/:stage', {
 
             var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
             var application = queryParams.application || null;
-            var job = Collections.Jobs.find({_id: this.params._id}).count();
+            //var job = Collections.Jobs.find({_id: this.params._id}).count();
+            var job = Meteor['jobs'].find({_id: this.params._id}).count();
             if (!job) {
                 this.render('notFound');
                 return;
@@ -248,7 +250,8 @@ Router.route('/job-details/:_id/stage/:stage', {
     data: function () {
 
         return {
-            job: Collections.Jobs.findOne({_id: this.params._id}),
+            //job: Collections.Jobs.findOne({_id: this.params._id}),
+            job: Meteor['jobs'].findOne({_id: this.params._id}),
             isEmpty: !this.params.query.hasOwnProperty('application')
         }
     }
@@ -400,7 +403,9 @@ Router.route('/job-settings/:jobId', {
         this.render('AddJob');
     },
     data: function () {
-        return Collections.Jobs.findOne({_id: this.params.jobId});
+        //return Collections.Jobs.findOne({_id: this.params.jobId});
+
+        return Meteor['jobs'].findOne({_id: this.params.jobId});
     }
 });
 

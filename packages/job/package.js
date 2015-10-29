@@ -11,10 +11,10 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.use(["vnw:core"]);
+    api.use(["vnw:core", "stevezhu:lodash"]);
     api.use('vnw:user');
     api.use('vnw:company');
-    api.imply('socialize:user-model')
+    api.imply('socialize:user-model');
 
     api.addFiles(['job.js']);
 

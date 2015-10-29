@@ -2,7 +2,8 @@ Migrations.add({
     version: 16,
     name: "Add benefit and tags",
     up: function () {
-        Collections.Jobs.find({}).map(function (job) {
+        //Collections.Jobs.find({}).map(function (job) {
+        Meteor['jobs'].find({}).map(function (job) {
             if (typeof job.jobId !== 'number') return;
 
             var benefits = CRON_VNW.getBenefits(job.jobId)
@@ -16,7 +17,8 @@ Migrations.add({
                 }
             };
 
-            Collections.Jobs.update({_id: job._id}, modifier);
+            //Collections.Jobs.update({_id: job._id}, modifier);
+            Meteor['jobs'].update({_id: job._id}, modifier);
 
 
         });

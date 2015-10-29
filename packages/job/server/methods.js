@@ -35,19 +35,55 @@ var methods = {
         return Collection.find(filters, options).fetch();
     },
 
-    addJob: function () {
+    addJob: function (data) {
+
+        var data = new vnwJob(data);
+
+        if (!this.userId) return false;
+
+        var currentUser = Meteor.users.findOne({_id: this.userId});
+
+        if (!currentUser.companyId) {
+            var listCompanyByUser = Meteor.call('getCompanyListByUser');
+
+            if (listCompanyByUser.length) {
+                data.companyId = listCompanyByUser[0].companyId
+            }
+        }
+
+        if (currentUser) {
+            data.companyId = data.companyId || currentUser.companyId || -1;
+            data.data = {};
+            data.source = "recruit";
+            data.status = 1;
+            data.createdAt = new Date();
+            data.updatedAt = new Date();
+            data.expiredAt = new Date();
+            data.createdBy = this.userId;
+            data.userId = this.userId;
+
+            //var jobId = Collections.Jobs.insert(data);
+            data.save();
+
+            return data._id;
+
+            /*if (jobId) {
+             Collections.Jobs.update({_id: jobId}, {
+             $set: {
+             jobId: jobId
+             }
+             });
+             }
+             return jobId;*/
+        }
         return false;
     },
 
     updateJobAT: function (modifier, _id) {
-        console.log('modified : ', modifier);
-        console.log('id : ', _id);
         return Collection.update({_id: _id}, modifier);
     },
 
     updateJobsAT: function (modifier, _id) {
-        console.log('modified : ', modifier);
-        console.log('id : ', _id);
         return Collection.update({_id: _id}, modifier, {multi: true});
     },
 
@@ -86,8 +122,68 @@ var methods = {
                 }
             });
         });
-        return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
+        //return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
+        return Meteor['jobs'].update({_id: job._id}, {$set: {tags: newTags}});
 
+    },
+
+
+    assignJobRecruiter: function (jobId, role, userId) {
+
+        if (this.userId) {
+            var job = Collection.findOne({_id: jobId});
+            if (job) {
+                job.recruiters = job.recruiters || [];
+                var recruiterIndex = _.findIndex(job.recruiters, {userId: userId});
+
+                if (recruiterIndex >= 0) {
+                    var roleArray = job.recruiters[recruiterIndex].roles;
+                    if (roleArray.indexOf(role) < 0) {
+                        roleArray.push(role);
+                        job.save();
+                    }
+
+                } else {
+                    var recruiterObj = {
+                        userId: userId,
+                        roles: [role]
+                    };
+                    job.recruiters.push(recruiterObj);
+
+                    job.save();
+                }
+
+                return job._id;
+            }
+        }
+        return null;
+    },
+
+    unassignJobRecruiter: function (jobId, role, userId) {
+
+        if (this.userId) {
+            var job = Collection.findOne({_id: jobId});
+            if (job) {
+                job.recruiters = job.recruiters || [];
+                var recruiterIndex = _.findIndex(job.recruiters, {userId: userId});
+
+                if (recruiterIndex >= 0) {
+                    var roleArray = job.recruiters[recruiterIndex].roles;
+                    var roleIndex = roleArray.indexOf(role);
+                    if (roleIndex >= 0) {
+                        roleArray.splice(roleIndex, 1);
+                        if (roleArray.length == 0) {
+                            job.recruiters.splice(recruiterIndex, 1);
+                        }
+                        job.save();
+                    }
+
+                }
+
+                return job._id;
+            }
+        }
+        return null;
     },
 
     publishPosition: function (doc) {

@@ -15,7 +15,7 @@ AutoForm.hooks({
             console.log(e);
         }
     },
-    updateJobs: {
+    updateJob: {
         onSuccess: function (type, result) {
             if (result)
                 Notification.success("Job's updated!");
@@ -43,7 +43,8 @@ Template.AddJob.helpers({
     pageTitle: function () {
         var params = Router.current().params;
         if(!params.jobId) return "Add new job";
-        var job = Collections.Jobs.findOne({_id: params.jobId});
+        //var job = Collections.Jobs.findOne({_id: params.jobId});
+        var job = Meteor['jobs'].findOne({_id: params.jobId});
         return job ? job.title : "Edit job settings";
     }
     /*jobId: function () {

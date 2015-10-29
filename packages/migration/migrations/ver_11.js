@@ -60,7 +60,8 @@ function processCandidates(candidateList) {
         } else {
             //TODO : in the future, the 3rd job will care this one
             if (!_.isEqual(candidate.data, row)) {
-                Collections.Jobs.update(candidate._id, {
+                //Collections.Jobs.update(candidate._id, {
+                Meteor['jobs'].update(candidate._id, {
                     $set: {
                         data: row,
                         lastSyncedAt: new Date()

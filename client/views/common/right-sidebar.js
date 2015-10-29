@@ -176,7 +176,8 @@ var LastOpenJobs = BlazeComponent.extendComponent({
     },
 
     fetch: function () {
-        return Collections.Jobs.find(this.filters(), this.options());
+        //return Collections.Jobs.find(this.filters(), this.options());
+        return Meteor['jobs'].find(this.filters(), this.options());
     },
 
     items: function () {

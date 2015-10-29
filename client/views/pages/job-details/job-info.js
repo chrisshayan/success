@@ -41,7 +41,8 @@ JobInfo = BlazeComponent.extendComponent({
         instance.autorun(function() {
             var params = Router.current().params;
             self.jobId = params._id;
-            var job = Collections.Jobs.findOne({_id: self.jobId});
+            //var job = Collections.Jobs.findOne({_id: self.jobId});
+            var job = Meteor['jobs'].findOne({_id: self.jobId});
             self.job = job;
             if(self.job) {
                 self.stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
@@ -77,7 +78,8 @@ JobInfo = BlazeComponent.extendComponent({
             filters['recruiterEmails'] = Meteor.currentRecruiter().email;
         }
 
-        return Collections.Jobs.find(this.filter(), this.option());
+        //return Collections.Jobs.find(this.filter(), this.option());
+        return Meteor['jobs'].find(this.filter(), this.option());
     },
 
     events: function () {

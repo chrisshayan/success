@@ -123,7 +123,8 @@ SYNC_VNW.pullCandidates = function (candidates) {
                 Collections.Candidates.insert(can);
             } else {
                 if (!_.isEqual(can.data, row)) {
-                    Collections.Jobs.update(can._id, {
+                    //Collections.Jobs.update(can._id, {
+                    Meteor['jobs'].update(can._id, {
                         $set: {
                             data: row,
                             lastSyncedAt: new Date()
@@ -187,7 +188,8 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
     result.removed = _.difference(oldIds, newIds);
 
     var elseIds = _.difference(newIds, _.union(result.added, result.changed));
-    var oldItems = Collections.Jobs.find({jobId: {$in: elseIds}}, {
+    //var oldItems = Collections.Jobs.find({jobId: {$in: elseIds}}, {
+    var oldItems = Meteor['jobs'].find({jobId: {$in: elseIds}}, {
         fields: {
             jobId: 1,
             "vnwData.lastupdateddate": 1
@@ -337,7 +339,8 @@ SYNC_VNW.insertVNWJob = function (jobId, companyId) {
                 job.status = 1;
 
 
-            Collections.Jobs.insert(job);
+            //Collections.Jobs.insert(job);
+            job.save();
 
             //SYNC_VNW.pullApplications(jobId, companyId);
         });
@@ -511,7 +514,7 @@ SYNC_VNW.deleteVNWApplications = function (items) {
     }
 };
 
-
+/*
 SYNC_VNW.pullData = function (companyId, items) {
     try {
         check(items, Array);
@@ -541,7 +544,7 @@ SYNC_VNW.pullData = function (companyId, items) {
 
                 SYNC_VNW.syncApplication(companyId, items);
 
-                /*result = SYNC_VNW.analyticApplications(companyId, items);
+                /!*result = SYNC_VNW.analyticApplications(companyId, items);
                  // Insert new job
                  _.each(result.added, function (app) {
                  SYNC_VNW.insertVNWApplication(app, companyId);
@@ -551,7 +554,7 @@ SYNC_VNW.pullData = function (companyId, items) {
                  SYNC_VNW.updateVNWApplication(app, companyId);
                  });
                  // Delete new jobs
-                 SYNC_VNW.deleteVNWApplications(result.removed);*/
+                 SYNC_VNW.deleteVNWApplications(result.removed);*!/
                 break;
 
 
@@ -566,7 +569,7 @@ SYNC_VNW.pullData = function (companyId, items) {
     }
 
     //SYNC_VNW.migration();
-};
+};*/
 
 
 SYNC_VNW.syncResume = function (resumeId) {
@@ -658,7 +661,7 @@ SYNC_VNW.syncResume = function (resumeId) {
 }
 
 
-function pullCompanyData(j, cb) {
+/*function pullCompanyData(j, cb) {
     var user = j.data;
     var userId = user.userId;
     var companyId = user.companyId;
@@ -717,7 +720,7 @@ function pullCompanyData(j, cb) {
     }
 
     cb();
-}
+}*/
 
 
 SYNC_VNW.sync = function () {

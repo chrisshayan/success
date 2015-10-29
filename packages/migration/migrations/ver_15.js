@@ -10,7 +10,8 @@ Migrations.add({
             CRON_VNW.setupHiringTeamOnwerInfo(data);
         });
 
-        Collections.Jobs.find({}).map(function (job) {
+        //Collections.Jobs.find({}).map(function (job) {
+        Meteor['jobs'].find({}).map(function (job) {
             var modifier = {
                 '$set': {
                     benefits: ''
@@ -19,7 +20,8 @@ Migrations.add({
                 }
             };
 
-            Collections.Jobs.update({_id: job._id}, modifier);
+            //Collections.Jobs.update({_id: job._id}, modifier);
+            Meteor['jobs'].update({_id: job._id}, modifier);
         });
     },
     down: function () {

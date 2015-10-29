@@ -5,3 +5,5 @@
 
 vnwJob = {};
 
+_ = lodash;
+
