@@ -5,7 +5,7 @@
 
 vnwJob.appendSchema({
     criteriaId: {
-        type: [String],
+        type: String,
         optional: true
     }
 });
