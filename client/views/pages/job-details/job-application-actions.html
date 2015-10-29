@@ -1,14 +1,15 @@
 <template name="JobApplicationActions">
-    <button class="btn btn-sm btn-default btn-outline toggle-comment-form" data-toggle="tooltip" data-placement="bottom" title="Add comment"><i class="fa fa-comment"></i></button>
+    <button class="btn btn-sm btn-default btn-outline toggle-comment-form" data-toggle="tooltip" data-placement="bottom" title="Add comment">Add comment</button>
     &nbsp;
     {{#if application.candidateInfo.emails.length}}
-        <button class="btn btn-sm btn-warning btn-outline toggle-email-candidate-form"  data-toggle="tooltip" data-placement="bottom" title="Send email to candidate"><i class="fa fa-envelope-o"></i></button>
+        <button class="btn btn-sm btn-default btn-outline toggle-email-candidate-form"  data-toggle="tooltip" data-placement="bottom" title="Send email to candidate">Send message</button>
     &nbsp;
     {{/if}}
+
     {{#if application.disqualified}}
-        <button class="btn btn-sm btn-primary btn-outline revert-application" data-toggle="tooltip" data-placement="bottom" title="Revert qualify"><i class="fa fa-life-saver"></i></button>
+        <button class="btn btn-sm btn-primary btn-outline revert-application" data-toggle="tooltip" data-placement="bottom" title="Revert qualify">Revert qualify</button>
     {{else}}
-        <button class="btn btn-sm btn-danger btn-outline disqualify-application" data-toggle="tooltip" data-placement="bottom" title="Disqualify candidate"><i class="fa fa-thumbs-down"></i></button>
+        <button class="btn btn-sm btn-default btn-outline disqualify-application" data-toggle="tooltip" data-placement="bottom" title="Disqualify candidate">Disqualify</button>
     {{/if}}
 
     &nbsp;

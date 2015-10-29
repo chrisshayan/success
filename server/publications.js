@@ -341,11 +341,14 @@ Meteor.publish('recruiterSearch', function (filter, option) {
     return Meteor.users.find(filter, option);
 });
 
-Meteor.publish('skillSearch', function (filter, option) {
+Meteor.publish('skillSearch', function (q) {
+    check(q, String);
     if (!this.userId) return this.ready();
-    if (!option) option = {};
-    option['sort'] = {skillLength: 1};
-    if(!option.limit) option.limit = 5;
-    if(option.limit > 10) option.limit = 10;
-    return Collections.SkillTerms.find(filter, option);
+    q = q.trim();
+    if(q.length < 1) return this.ready();
+    var option = {
+        sort: {skillLength: 1},
+        limit: 10
+    };
+    return Collections.SkillTerms.find({ $text: { $search: q } }, option);
 });

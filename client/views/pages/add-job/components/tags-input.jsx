@@ -12,12 +12,14 @@ TagsInput = React.createClass({
 
     getMeteorData() {
         var fetch = [this.filter(), this.option()];
+        var isReady = false;
         if (this.state.q.length > 0) {
-            var sub = SkillsSubs.subscribe('skillSearch', ...fetch);
+            var sub = SkillsSubs.subscribe('skillSearch', this.state.q);
+            isReady = sub && sub.ready();
         }
 
         return {
-            isReady: sub && sub.ready() ? true : false,
+            isReady: isReady,
             isSearching: sub ? !sub.ready() : false,
             skills: Collections.SkillTerms.find(...fetch).fetch()
         };
@@ -52,7 +54,7 @@ TagsInput = React.createClass({
                 } else {
                     k -= 1;
                     if (k < 0) {
-                        k = this.data.skills.length - 1;
+                        k = -1
                     }
                 }
                 break;
@@ -62,7 +64,7 @@ TagsInput = React.createClass({
                 } else {
                     k += 1;
                     if (k >= this.data.skills.length) {
-                        k = 0;
+                        k = -1;
                     }
                 }
                 break;
