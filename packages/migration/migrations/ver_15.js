@@ -2,7 +2,7 @@ Migrations.add({
     version: 15,
     name: "add owner into hiringTeam default",
     up: function () {
-        Collections.Users.find().map(function (user) {
+        Meteor.users.find().map(function (user) {
             var data = {
                 userId: user.vnwId,
                 companyId: user.companyId
