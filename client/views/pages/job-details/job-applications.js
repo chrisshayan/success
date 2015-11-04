@@ -19,7 +19,7 @@ JobApplications = BlazeComponent.extendComponent({
         // store all trackers involve in component
         this.trackers = [];
 
-        if (Collections.Applications.find(self.filters()).count() <= 0) {
+        if (Meteor.applications.find(self.filters()).count() <= 0) {
             this.isLoading.set(true);
         }
 
@@ -53,7 +53,7 @@ JobApplications = BlazeComponent.extendComponent({
                     stage: self.stage.get().alias
                 }, {
                     query: {
-                        application: Collections.Applications.findOne(self.filters(), self.options()).entryId
+                        application: Meteor.applications.findOne(self.filters(), self.options()).entryId
                     }
                 });
             } else {
@@ -106,7 +106,7 @@ JobApplications = BlazeComponent.extendComponent({
     },
 
     fetch: function () {
-        return Collections.Applications.find(this.filters(), this.options());
+        return Meteor.applications.find(this.filters(), this.options());
     },
 
     events: function () {
@@ -156,7 +156,7 @@ JobApplication = BlazeComponent.extendComponent({
             self.props.set("application", self.data());
             self.props.set("matchingScore", self.data().matchingScore);
 
-            var candidate = Collections.Candidates.findOne({candidateId: self.props.get("candidateId")});
+            var candidate = Meteor.candidates.findOne({candidateId: self.props.get("candidateId")});
             self.props.set("candidate", candidate);
             self.props.set("currentApplication", Session.get("currentApplicationId"));
 
@@ -194,6 +194,6 @@ JobApplication = BlazeComponent.extendComponent({
     },
 
     candidate: function() {
-        return Collections.Candidates.findOne({candidateId: this.props.get("candidateId")});
+        return Meteor.candidates.findOne({candidateId: this.props.get("candidateId")});
     }
 }).register('JobApplication');

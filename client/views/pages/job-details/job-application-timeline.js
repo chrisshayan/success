@@ -110,7 +110,7 @@ JobApplicationTimeline = BlazeComponent.extendComponent({
             appIds: [],
             emails: []
         };
-        var app = Collections.Applications.findOne({_id: this.props.get('applicationId')});
+        var app = Meteor.applications.findOne({_id: this.props.get('applicationId')});
         if(!app) return to;
         to.appIds.push(app._id);
         to.emails.push(app.candidateInfo.emails[0]);
@@ -263,11 +263,11 @@ SendEmailCandidateForm = BlazeComponent.extendComponent({
                     applicationId = +applicationId;
 
                 self.applicationId.set(applicationId);
-                var application = Collections.Applications.findOne({entryId: self.applicationId.get()});
+                var application = Meteor.applications.findOne({entryId: self.applicationId.get()});
                 if (application) {
                     self.application.set(application);
 
-                    var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+                    var candidate = Meteor.candidates.findOne({candidateId: application.candidateId});
                     if (candidate) {
                         self.candidate.set(candidate);
                     } else {

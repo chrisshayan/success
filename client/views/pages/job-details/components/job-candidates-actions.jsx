@@ -244,7 +244,7 @@ MailComposerModal = React.createClass({
             emails: []
         };
         _.each(this.context.state.selectedItems, function(id) {
-            var app = Collections.Applications.findOne({_id: id});
+            var app = Meteor.applications.findOne({_id: id});
             if(app && app.candidateInfo && app.candidateInfo.emails.length > 0) {
                 mailTo.appIds.push(id);
                 mailTo.emails.push(app.candidateInfo.emails[0]);

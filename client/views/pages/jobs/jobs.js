@@ -32,7 +32,7 @@ Jobs = BlazeComponent.extendComponent({
 
     counterName: function () {
         var data = this.data();
-        return ['jobs_status', data.source, data.status].join('_');
+        return ['jobs_status', data.source.type, data.status].join('_');
     },
 
     filters: function () {
@@ -42,7 +42,7 @@ Jobs = BlazeComponent.extendComponent({
         };
 
         if (data.source) {
-            filters['source'] = data.source;
+            filters['source.type'] = data.source;
         }
 
         if (Meteor.currentRecruiter().showMyJob && Meteor.currentRecruiter().email) {

@@ -5,7 +5,7 @@ Router.route('/downloadresume/:companyId/:entryId/:token', {
         try {
             var dataToken = IZToken.decode(this.params.token);
             if (dataToken.companyId == this.params.companyId && dataToken.expireTime >= Date.now()) {
-                var application = Collections.Applications.findOne({
+                var application = Meteor.applications.findOne({
                     _id: this.params.entryId,
                     companyId: dataToken.companyId
                 });

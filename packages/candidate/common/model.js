@@ -12,21 +12,40 @@ model.prototype.isExist = function (condition) {
 };
 
 
-model.prototype.updateCandidate = function (data, cb) {
-    if (data == void 0 || typeof data === 'function') data = this;
-
-    return Meteor.call('updateCandidate', this, data, cb);
-};
-
 model.appendSchema({
     candidateId: {
-        type: Number
+        type: Number,
+        optional: true
     },
     username: {
-        type: String
+        type: String,
+        optional: true
     },
     password: {
-        type: String
+        type: String,
+        optional: true
+    },
+    email: {
+        type: String,
+        optional: true
+    },
+    email1: {
+        type: String,
+        optional: true
+    },
+    email2: {
+        type: String,
+        optional: true
+    },
+    source: {
+        type: Object,
+        blackbox: true,
+        optional: true
+    },
+    data: {
+        type: Object,
+        blackbox: true,
+        optional: true
     },
     firstname: {
         type: String,
@@ -34,6 +53,10 @@ model.appendSchema({
     },
     lastname: {
         type: String,
+        optional: true
+    },
+    genderId: {
+        type: Number,
         optional: true
     },
     jobTitle: {
@@ -44,14 +67,14 @@ model.appendSchema({
         type: String,
         optional: true
     },
-    vnwData: {
-        type: Object,
-        blackbox: true
-    },
-    'vnwData.$.username': {
-        type: String,
-        optional: true
-    },
+    /*data: {
+     type: Object,
+     blackbox: true
+     },
+     vnwData: {
+     type: Object,
+     blackbox: true
+     },*/
     createdAt: {
         type: Date
     },

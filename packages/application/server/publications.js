@@ -1,4 +1,4 @@
-Publications = {};
+var publications = {};
 
 /**
  * Publish job's applications
@@ -6,7 +6,11 @@ Publications = {};
  * @param options
  * @returns {{find: Function, children: Array}}
  */
-Publications.getApplications = function (filters, options) {
+
+var candidateCollection = Candidate.collection;
+var jobCollection = vnwJob.collection;
+
+publications.getApplications = function (filters, options) {
     if (!this.userId) return this.ready();
     return {
         find: function () {
@@ -19,12 +23,14 @@ Publications.getApplications = function (filters, options) {
             } else {
                 options['limit'] += 10;
             }
-            return Collections.Applications.find(filters, options);
+            //return Meteor.applications.find(filters, options);
+            return Collection.find(filters, options);
         },
         children: [
             {
                 find: function (app) {
-                    return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
+                    //return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
+                    candidateCollection.find({candidateId: app.candidateId}, {limit: 1});
                 }
             }
         ]
@@ -35,7 +41,7 @@ Publications.getApplications = function (filters, options) {
  * Publish 10 latest applications of open jobs
  * @returns {*}
  */
-Publications.lastApplications = function () {
+publications.lastApplications = function () {
     if (!this.userId) return null;
     var self = this;
     return {
@@ -45,8 +51,8 @@ Publications.lastApplications = function () {
                 if (!user) return [];
                 var jobPermissions = user.jobPermissions();
                 //var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
-                var jobIds = Meteor['jobs'].find({status: 1, $or: jobPermissions}).map(function (r) {
-                    return r.jobId
+                var jobIds = jobCollection.find({status: 1, $or: jobPermissions}).map(function (r) {
+                    return r.source.jobId
                 });
                 jobIds = _.filter(jobIds, (v) => v != void 0);
 
@@ -61,7 +67,9 @@ Publications.lastApplications = function () {
                 options['sort'] = {
                     createdAt: -1
                 };
-                return Collections.Applications.find(filters, options);
+                //return Meteor.applications.find(filters, options);
+                return Collection.find(filters, options);
+
             } catch (e) {
                 console.trace('Last applications:', e);
                 return null;
@@ -75,7 +83,7 @@ Publications.lastApplications = function () {
  * @param data
  * @returns {*}
  */
-Publications.applicationDetails = function (data) {
+publications.applicationDetails = function (data) {
     if (!this.userId) return this.ready();
     check(data.application, String);
     var self = this;
@@ -89,7 +97,8 @@ Publications.applicationDetails = function (data) {
                 };
             var options = {};
             options['limit'] = 1;
-            return Collections.Applications.find(filters, options);
+            //return Collections.Applications.find(filters, options);
+            return Collection.find(filters, options);
         },
         children: [
             {
@@ -99,7 +108,7 @@ Publications.applicationDetails = function (data) {
                     };
                     var options = {};
                     options.limit = 1;
-                    return Meteor.candidates.find(cond, options);
+                    return candidateCollection.find(cond, options);
                 }
             }
         ]
@@ -107,7 +116,40 @@ Publications.applicationDetails = function (data) {
 };
 
 
+publications.applicationCounter = function (counterName, filters) {
+    if (!this.userId) return this.ready();
+    var self = this;
+    check(counterName, String);
+    check(filters, Object);
+
+    var count = 0;
+    var initializing = true;
+    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
+    if (!user) return;
+    filters['companyId'] = user.companyId;
+    var handle = Collection.find(filters).observeChanges({
+        added: function (id) {
+            count++;
+            if (!initializing)
+                self.changed("vnw_counts", counterName, {count: count});
+        },
+        removed: function (id) {
+            count--;
+            self.changed("vnw_counts", counterName, {count: count});
+        }
+    });
+
+    initializing = false;
+    self.added("vnw_counts", counterName, {count: count});
+    self.ready();
+
+    self.onStop(function () {
+        handle.stop();
+    });
+};
+
+
 /**
  * Map to meteor
  */
-_.each(Publications, (func, name) =>  Meteor.publishComposite(name, func));
+_.each(publications, (func, name) =>  Meteor.publishComposite(name, func));

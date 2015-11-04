@@ -14,7 +14,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
             var params = Router.current().params;
             var applicationId = params.query.application;
             self.props.set('applicationId', applicationId);
-            var application = Collections.Applications.findOne({_id: applicationId});
+            var application = Meteor.applications.findOne({_id: applicationId});
             self.props.set('application', application);
         }));
     },
@@ -178,7 +178,7 @@ JobApplicationActions = BlazeComponent.extendComponent({
     },
 
     application: function () {
-        var app = Collections.Applications.findOne({
+        var app = Meteor.applications.findOne({
             _id: this.props.get("applicationId")
         });
         if (app) {
@@ -188,6 +188,6 @@ JobApplicationActions = BlazeComponent.extendComponent({
     },
 
     candidate: function () {
-        return Collections.Candidates.findOne({candidateId: this.props.get("candidateId")});
+        return Meteor.candidates.findOne({candidateId: this.props.get("candidateId")});
     }
 }).register('JobApplicationActions');

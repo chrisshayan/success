@@ -37,7 +37,7 @@ var methods = {
 
     addJob: function (data) {
 
-        var data = new vnwJob(data);
+        var job = new vnwJob(data);
 
         if (!this.userId) return false;
 
@@ -47,25 +47,27 @@ var methods = {
             var listCompanyByUser = Meteor.call('getCompanyListByUser');
 
             if (listCompanyByUser.length) {
-                data.companyId = listCompanyByUser[0].companyId
+                job.companyId = listCompanyByUser[0].companyId
             }
         }
 
         if (currentUser) {
-            data.companyId = data.companyId || currentUser.companyId || -1;
-            data.data = {};
-            data.source = "recruit";
-            data.status = 1;
-            data.createdAt = new Date();
-            data.updatedAt = new Date();
-            data.expiredAt = new Date();
-            data.createdBy = this.userId;
-            data.userId = this.userId;
+            job.companyId = job.companyId || currentUser.companyId || -1;
+            job.data = {};
+            job.source = {
+                type: 2
+            };
+            job.status = 1;
+            job.createdAt = new Date();
+            job.updatedAt = new Date();
+            job.expiredAt = new Date();
+            job.createdBy = this.userId;
+            job.userId = this.userId;
 
             //var jobId = Collections.Jobs.insert(data);
-            data.save();
+            job.save();
 
-            return data._id;
+            return job._id;
 
             /*if (jobId) {
              Collections.Jobs.update({_id: jobId}, {
@@ -100,7 +102,7 @@ var methods = {
         return Core.doUpdate(Collection, query, modifier);
     },
 
-    updateJobsTag: function (_id, tags) {
+    updateJobTags: function (_id, tags) {
         if (typeof tags !== 'object' || !tags.length || _id == void 0 || this.userId == void 0)
             return false;
 

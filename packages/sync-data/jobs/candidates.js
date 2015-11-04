@@ -51,7 +51,7 @@ var Candidates = {
                 var candidateRows = fetchVNWData(getCandidatesSQL);
 
                 candidateRows.forEach(function (row) {
-                    var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+                    var candidate = Meteor.candidates.findOne({candidateId: row.userid});
                     if (!candidate) {
                         //console.log('new candidate: ', row.userid);
                         //console.log('new', row.userid, row.firstname);
@@ -60,7 +60,7 @@ var Candidates = {
                         candidate.data = row;
                         candidate.createdAt = formatDatetimeFromVNW(row.createddate);
                         console.log('add new candidate: ', row.userid);
-                        Collections.Candidates.insert(candidate);
+                        Meteor.candidates.insert(candidate);
 
                     } else {
                         //TODO : in the future, the 3rd job will care this one

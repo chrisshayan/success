@@ -6,7 +6,7 @@ Migrations.add({
             return d.data.applicationId;
         });
 
-        Collections.Applications.find({entryId: {$nin: exceptIds}}).forEach(function(app) {
+        Meteor.applications.find({entryId: {$nin: exceptIds}}).forEach(function(app) {
             var activity = new Activity();
             activity.companyId = app.companyId;
             activity.data = {

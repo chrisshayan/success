@@ -64,7 +64,7 @@
                                                 {{#unless _id}}
                                                     {{> quickForm schema="Schemas.addJobForm" type="method" meteormethod="addJob" id="addJob" }}
                                                 {{else}}
-                                                    {{#unless vnwData}}
+                                                    {{#unless source.jobId}}
                                                         {{> quickForm schema="Schemas.addJobForm" type="method-update" meteormethod="updateJobAT" id="updateJob" doc=this }}
                                                     {{else}}
                                                         {{>jobDetailSettings this}}

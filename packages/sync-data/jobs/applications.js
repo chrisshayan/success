@@ -107,7 +107,7 @@ function processApplication(row, companyId, sourceId) {
     application.createdAt = formatDatetimeFromVNW(row.createddate);
 
 
-    var can = Collections.Candidates.findOne({candidateId: row.userid});
+    var can = Meteor.candidates.findOne({candidateId: row.userid});
 
     if (can) {
         var candidateInfo = {
@@ -145,7 +145,7 @@ var Applications = {
                 //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
                 var mongoJob = Meteor['jobs'].findOne({jobId: data.jobId});
 
-                var mongoApp = Collections.Applications.findOne({entryId: data.entryId});
+                var mongoApp = Meteor.applications.findOne({entryId: data.entryId});
 
                 if (mongoJob && !mongoApp) {
 
@@ -162,10 +162,10 @@ var Applications = {
                         var application = processApplication(row, mongoJob.companyId, data.source);
 
                         var query = {entryId: application.entryId};
-                        if (Collections.Applications.findOne(query))
+                        if (Meteor.applications.findOne(query))
                             sJobCollections.addJobtoQueue('addApplication', data);
                         else
-                            Collections.Applications.insert(application);
+                            Meteor.applications.insert(application);
 
                         /*
                          if (application.isExist()) {
@@ -175,7 +175,7 @@ var Applications = {
                          */
 
 
-//                        Collections.Applications.upsert(query, application);
+//                        Meteor.applications.upsert(query, application);
 
 
                         (data.source == 1) && Meteor.defer(function () {
@@ -224,7 +224,7 @@ var Applications = {
                 //var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
                 var mongoJob = Meteor['jobs'].findOne({jobId: data.jobId});
 
-                var mongoApp = Collections.Applications.findOne({entryId: data.entryId});
+                var mongoApp = Meteor.applications.findOne({entryId: data.entryId});
 
                 if (mongoJob) {
 

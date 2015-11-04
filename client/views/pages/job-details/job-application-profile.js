@@ -142,7 +142,7 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     application: function () {
         var self = this;
-        var app = Collections.Applications.findOne({_id: this.props.get("applicationId")});
+        var app = Meteor.applications.findOne({_id: this.props.get("applicationId")});
         if (app) {
             this.props.set("candidateId", app.candidateId);
 
@@ -171,6 +171,6 @@ JobApplicationProfile = BlazeComponent.extendComponent({
 
     candidate: function () {
         if (!this.props.get('candidateId')) return {};
-        return Collections.Candidates.findOne({candidateId: this.props.get('candidateId')});
+        return Meteor.candidates.findOne({candidateId: this.props.get('candidateId')});
     }
 }).register('JobApplicationProfile');

@@ -54,7 +54,7 @@ JobInfo = BlazeComponent.extendComponent({
     filter() {
         return {
             _id: {$ne: this.jobId},
-            source: this.job.source,
+            source: this.job.source.type,
             status: this.job.status
         }
     },

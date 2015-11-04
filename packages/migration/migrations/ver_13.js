@@ -4,7 +4,7 @@ Migrations.add({
     up: function () {
         Collections.Activities.find({}).forEach(function(_item) {
             if(_item.data.applicationId) {
-                var app = Collections.Applications.findOne({entryId: _item.data.applicationId});
+                var app = Meteor.applications.findOne({entryId: _item.data.applicationId});
                 if(app) {
                     Collections.Activities.update({_id: _item._id}, {
                         $set: {

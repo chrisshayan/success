@@ -46,7 +46,7 @@ function processCandidates(candidateList) {
     console.log('row', candidateRows);
 
     candidateRows.forEach(function (row) {
-        var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+        var candidate = Meteor.candidates.findOne({candidateId: row.userid});
         if (!candidate) {
             console.log('new candidate: ', row.userid);
             //console.log('new', row.userid, row.firstname);
@@ -54,7 +54,7 @@ function processCandidates(candidateList) {
             candidate.candidateId = row.userid;
             candidate.data = row;
             candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            Collections.Candidates.insert(candidate);
+            Meteor.candidates.insert(candidate);
 
 
         } else {
@@ -77,7 +77,7 @@ Migrations.add({
     version: 11,
     name: "Fix missing candidates",
     up: function () {
-        var emptyScoreApplication = Collections.Applications.find({
+        var emptyScoreApplication = Meteor.applications.find({
             source: {$ne: 3},
             candidateInfo: {'$exists': false}
         }, {
@@ -96,7 +96,7 @@ Migrations.add({
         processCandidates(canLists);
 
         emptyScoreApplication.forEach(function (app) {
-            var can = Collections.Candidates.findOne({candidateId: app.candidateId});
+            var can = Meteor.candidates.findOne({candidateId: app.candidateId});
 
             if (can) {
 
@@ -117,7 +117,7 @@ Migrations.add({
                     }
                 };
 
-                Collections.Applications.update({candidateId: app.candidateId}, modifier);
+                Meteor.applications.update({candidateId: app.candidateId}, modifier);
 
             }
 

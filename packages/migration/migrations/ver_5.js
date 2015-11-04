@@ -3,12 +3,12 @@ Migrations.add({
     name: "get missing cv",
     up: function () {
         // integration go here;
-        var directApplication = Collections.Applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
+        var directApplication = Meteor.applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
             fields: {source: 1}
         }).fetch();
         var directIds = _.pluck(directApplication, '_id');
 
-        Collections.Applications.update({_id: {$in: directIds}}, {
+        Meteor.applications.update({_id: {$in: directIds}}, {
             '$set': {
                 source: 2
             }
@@ -16,8 +16,8 @@ Migrations.add({
 
         var resumeIds = [];
 
-        Collections.Applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
-            Collections.Applications.update({_id: application._id},
+        Meteor.applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
+            Meteor.applications.update({_id: application._id},
                 {
                     '$set': {
                         'resumeId': application.data.resumeid

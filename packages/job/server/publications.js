@@ -192,7 +192,7 @@ publications.jobStagesCounter = function (counterName, jobId) {
                     stage: 1
                 }
             }
-            var handle = Collections.Applications.find(filters, options).observe({
+            var handle = Meteor.applications.find(filters, options).observe({
                 added: function (doc) {
                     count[doc.stage]++;
                     if (!initializing)

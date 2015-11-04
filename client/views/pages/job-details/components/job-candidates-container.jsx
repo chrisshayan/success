@@ -77,7 +77,7 @@ var AppHelpers = {
     getEmailsSelected() {
         var emails = [];
         _.each(this.state.selectedItems, function (appId) {
-            var app = Collections.Applications.findOne({_id: appId});
+            var app = Meteor.applications.findOne({_id: appId});
             if (app) {
                 emails.push(app.candidateInfo.emails[0]);
             }
@@ -106,7 +106,7 @@ JobCandidatesContainer = React.createClass({
 
         if (sub.ready()) {
             isLoading = false;
-            total = Collections.Applications.find(this.filter()).count();
+            total = Meteor.applications.find(this.filter()).count();
         }
 
         return {
@@ -154,7 +154,7 @@ JobCandidatesContainer = React.createClass({
     },
 
     fetch: function () {
-        return Collections.Applications.find(this.filter(), this.options()).fetch();
+        return Meteor.applications.find(this.filter(), this.options()).fetch();
     },
 
     childContextTypes: {

@@ -55,7 +55,7 @@ var LastCandidates = BlazeComponent.extendComponent({
     },
 
     fetch: function () {
-        return Collections.Applications.find(this.filters(), this.options());
+        return Meteor.applications.find(this.filters(), this.options());
     },
 
     items: function () {
@@ -121,7 +121,7 @@ var LastCandidateItem = BlazeComponent.extendComponent({
         var app = this.application;
         if (!app) return "";
         var queryParams = "";
-        if (app.source == 1) {
+        if (app.source.type === 1) {
             queryParams = "?jobid=%s&appid=%s";
         } else {
             queryParams = "?jobid=%s&sdid=%s";

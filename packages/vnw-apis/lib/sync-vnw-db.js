@@ -152,10 +152,10 @@ SYNC_VNW.pullApplicationScores = function (entryIds) {
         var rows = fetchVNWData(pullApplicationScoreSql);
 
         _.each(rows, function (row) {
-            var application = Collections.Applications.findOne({entryId: row.applicationId});
+            var application = Meteor.applications.findOne({entryId: row.applicationId});
             if (application) {
                 if (!_.isEqual(application.matchingScore, row.matchingScore)) {
-                    Collections.Applications.update(application._id, {
+                    Meteor.applications.update(application._id, {
                         $set: {
                             matchingScore: row.matchingScore
                         }
@@ -179,7 +179,7 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
         removed: []
     };
 
-    var oldIds = Collections.Jobs.find({companyId: companyId}, {fields: {jobId: 1}}).map(function (doc) {
+    var oldIds = Meteor.jobs.find({companyId: companyId}, {fields: {jobId: 1}}).map(function (doc) {
         return doc.jobId
     });
     var newIds = _.pluck(items, 'typeId');
@@ -215,7 +215,7 @@ SYNC_VNW.analyticJobs = function (companyId, items) {
 SYNC_VNW.syncApplication = function (companyId, applications) {
     check(companyId, Number);
     check(applications, Array);
-    var mongoApps = Collections.Applications.find({companyId: companyId}).fetch();
+    var mongoApps = Meteor.applications.find({companyId: companyId}).fetch();
 
     applications.forEach(function (app) {
         var query = {entryId: app.typeId};
@@ -392,7 +392,7 @@ SYNC_VNW.updateVNWJob = function (jobId, companyId) {
             var modifier = {
                 $set: updateData
             };
-            Collections.Jobs.update(criteria, modifier);
+            Meteor.jobs.update(criteria, modifier);
         });
     } catch (e) {
         debuger(e)
@@ -410,7 +410,7 @@ SYNC_VNW.deleteVNWJobs = function (jobIds) {
                 $in: jobIds
             }
         };
-        Collections.Jobs.remove(criteria);
+        Meteor.jobs.remove(criteria);
     } catch (e) {
         debuger(e);
     }

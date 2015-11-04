@@ -6,6 +6,8 @@ CRON_VNW = {};
 var _ = lodash;
 
 function formatDatetimeFromVNW(datetime) {
+    if (datetime == void 0) return false;
+
     var d = moment(datetime);
     var offsetBase = 420;
     var offsetServer = new Date().getTimezoneOffset();
@@ -24,7 +26,8 @@ function formatDatetimeToVNW(datetime) {
 }
 
 function parseTimeToString(date) {
-    return moment(date).format('YYYY-MM-DD HH:mm:ss');
+    if (date == void 0)
+        return moment(date).format('YYYY-MM-DD HH:mm:ss');
 }
 
 var VNW_QUERIES = Meteor.settings.cronQueries;
@@ -247,13 +250,9 @@ function processJob(items, companyId) {
          console.log("processJob")
          } else {*/
         var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.jobId);
-        //console.log(getJobQuery);
         var cJobs = fetchVNWData(getJobQuery);
-        cJobs.forEach(function (row) {
-            var query = {
-                jobId: +item.jobId
-            };
 
+        cJobs.forEach(function (row) {
 
             /*var job = {
              companyId: +companyId,
@@ -279,7 +278,7 @@ function processJob(items, companyId) {
              expiredAt: expiredAt
              };*/
 
-            var job = Meteor['jobs'].findOne({jobId: item.jobId});
+            var job = Meteor['jobs'].findOne({sourceId: item.jobId});
             if (!job)
                 job = new vnwJob();
 
@@ -287,9 +286,14 @@ function processJob(items, companyId) {
             var createdAt = formatDatetimeFromVNW(row.createddate);
             var updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
             job.companyId = +companyId;
-            job.jobId = +row.jobid;
+            //job.jobId = +row.jobid;
             job.userId = +row.userid;
-            job.source = 'vnw';
+            /*job.source = 1;
+             job.sourceId = +row.jobid;*/
+            job.source = {
+                type: 1, // 1 : vnw  , 2 : success
+                jobId: +row.jobid
+            };
             job.title = row.jobtitle;
             job.level = '';
             job.categories = [];
@@ -302,13 +306,11 @@ function processJob(items, companyId) {
             job.benefits = '';
             job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
             job.skills = [];
-            job.vnwData = EJSON.parse(EJSON.stringify(row));
+            //job.vnwData = EJSON.parse(EJSON.stringify(row));
             job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
             job.createdAt = createdAt;
             job.updatedAt = updatedAt;
             job.expiredAt = expiredAt;
-            //console.log('a', job.createdAt);
-            //console.log('b', job.updatedAt);
 
 
             if (!row.isactive)
@@ -322,13 +324,12 @@ function processJob(items, companyId) {
 
             //var mongoJob = Meteor['jobs'].findOne({jobId: item.jobId});
             var existJob = job.isExist();
-            if (existJob
-                && (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
-                || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
-                console.log('update Job :', job.jobId);
 
-                console.log('previous info create : %s, update :%s', existJob.createdAt, existJob.updatedAt);
-                console.log('new info create : %s, update :%s', job.createdAt, job.updatedAt);
+            if (!existJob
+                || (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
+                || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
+                console.log('update Job :', job.source.type);
+
                 job.skills = CRON_VNW.getJobTags(+row.jobid);
                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
                 job.locations = CRON_VNW.getLocations(+row.jobid);
@@ -336,7 +337,7 @@ function processJob(items, companyId) {
                 /*var modifier = {
                  '$set': job
                  };*/
-
+                console.log('job insert');
                 job.save();
                 //console.log(Meteor.jobs.findOne());
                 //Collections.Jobs.update(query, modifier);
@@ -368,9 +369,14 @@ function processAfterSyncJob(jobs, companyId) {
             var jobIds = _.pluck(chunk, 'jobId');
 
             //console.log('chunk: ', jobIds);
-
+            _.remove(jobIds, function (jId) {
+                return jId === '' || jId == void 0
+            });
             // - Check new applicatiocn of this job if available.
             // - Then insert / update / remove
+
+            if (typeof jobIds !== 'object' || jobIds.length == 0)
+                return;
 
             var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
             //console.log('appSql', appSql);
@@ -391,7 +397,7 @@ function processAfterSyncJob(jobs, companyId) {
 
 
 function processApp(appRows, companyId, sourceId) {
-    var mongoApps = companyId ? Collections.Applications.find({companyId: companyId}).fetch() : [];
+    var mongoApps = companyId ? Meteor.applications.find({companyId: companyId}).fetch() : [];
 
     var filter = {
         fields: {
@@ -415,32 +421,38 @@ function processApp(appRows, companyId, sourceId) {
                 'isDeleted': row['deleted_by_employer']
             };
 
-            Collections.Applications.update(query, {
+            Meteor.applications.update(query, {
                 '$set': modifier
             })
 
         } else if (!row['deleted_by_employer']) {
 
-            var application = new Schemas.Application();
+            var can = Meteor.candidates.findOne({candidateId: row.userid});
+
+            var application = new Application();
             application.entryId = +appId;
             application.companyId = +companyId;
-            application.jobId = +row.jobid;
-            application.candidateId = +row.userid;
-            application.source = +sourceId;
+            //application.jobId = +row.jobid;
+
+            application.candidateId = can._id;
+            application.source = {
+                id: +sourceId,
+                appId: +appId
+            };
+            application.sourceId = +appId;
+            application.coverLetter = row.coverletter || '';
             application.isDeleted = row['deleted_by_employer'];
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
-            application.matchingScore = row.matchingScore;
+            application.matchingScore = row.matchingScore || 0;
 
-
-            var can = Collections.Candidates.findOne({candidateId: row.userid});
 
             if (can) {
                 var candidateInfo = {
-                    "firstName": can.data.firstname || can.data.firstName || '',
-                    "lastName": can.data.lastname || can.data.lastName || '',
+                    "firstName": can.firstname || '',
+                    "lastName": can.lastname || '',
                     "emails": [
-                        can.data.username, can.data.email, can.data.email1, can.data.email2
+                        can.username, can.email, can.email1, can.email2
                     ]
                 };
 
@@ -454,7 +466,9 @@ function processApp(appRows, companyId, sourceId) {
             if (sourceId == '1')
                 application.resumeId = row.resumeid;
 
-            var aId = Collections.Applications.insert(application);
+            //var aId = Meteor.applications.insert(application);
+
+            application.save();
 
             /* Log activity */
             Meteor.defer(function () {
@@ -462,9 +476,9 @@ function processApp(appRows, companyId, sourceId) {
                 var activity = new Activity();
                 activity.companyId = companyId;
                 activity.data = {
-                    applicationId: aId,
+                    applicationId: application._id,
                     source: sourceId,
-                    userId: can._id || row.userid
+                    userId: (can) ? can._id : row.userid
                 };
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();
@@ -486,28 +500,61 @@ function processCandidates(candidateList) {
     var candidateRows = fetchVNWData(getCandidatesSQL);
 
     candidateRows.forEach(function (row) {
-        var candidate = Collections.Candidates.findOne({candidateId: row.userid});
+        var candidate = Meteor.candidates.findOne({candidateId: row.userid});
         if (!candidate) {
             //console.log('new candidate: ', row.userid);
             //console.log('new', row.userid, row.firstname);
-            candidate = new Schemas.Candidate();
-            candidate.candidateId = row.userid;
-            candidate.data = row;
-            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            Collections.Candidates.insert(candidate);
+            //candidate = new Schemas.Candidate();
+            //candidate.candidateId = row.userid;
+            //candidate.data = row;
+            //candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+            //Collections.Candidates.insert(candidate);
+            candidate = new Candidate();
 
-
-        } else {
-            //TODO : in the future, the 3rd job will care this one
-            if (!_.isEqual(candidate.data, row)) {
-                Collections.Candidates.update(candidate._id, {
-                    $set: {
-                        data: row,
-                        lastSyncedAt: new Date()
-                    }
-                });
-            }
         }
+
+        candidate.candidateId = row.userid;
+        candidate.username = row.username;
+        candidate.password = row.userpass;
+        candidate.source = {
+            sourceId: 1,
+            candidateId: row.userid
+        };
+        candidate.firstname = row.firstname;
+        candidate.lastname = row.lastname;
+        candidate.email = row.email;
+        candidate.email1 = row.email1;
+        candidate.email2 = row.email2;
+        candidate.genderId = row.genderid;
+        candidate.jobTitle = row.jobtitle;
+        candidate.workingCompany = row.workingCompanyName;
+
+        //candidate.data = job.vnwData = EJSON.parse(EJSON.stringify(row));;
+        //candidate.vnwData = job.vnwData = EJSON.parse(EJSON.stringify(row));;
+        //console.log(candidate);
+
+        //console.log('date', row);
+        var updatedDate = formatDatetimeFromVNW(row.lastdateupdated);
+
+        if (parseTimeToString(candidate.updatedAt) != parseTimeToString(updatedDate)) {
+            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+            candidate.updatedAt = updatedDate || candidate.createdAt;
+
+            //TODO : in the future, the 3rd job will care this one
+            //console.log(candidate);
+            candidate.save();
+        }
+
+
+        /*    if (!_.isEqual(candidate.data, row)) {
+         Collections.Candidates.update(candidate._id, {
+         $set: {
+         data: row,
+         lastSyncedAt: new Date()
+         }
+         });
+         }*/
+
     })
 }
 
@@ -690,12 +737,12 @@ CRON_VNW.cronResume = function (resumeIds) {
 
 CRON_VNW.integration = function () {
     // integration go here;
-    //var directApplication = Collections.Applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
+    //var directApplication = Meteor.applications.find({source: 1, 'data.resumeid': {'$exists': false}}, {
     //    fields: {source: 1}
     //}).fetch();
     //var directIds = _.pluck(directApplication, '_id');
     //
-    //Collections.Applications.update({_id: {$in: directIds}}, {
+    //Meteor.applications.update({_id: {$in: directIds}}, {
     //    '$set': {
     //        source: 2
     //    }
@@ -703,8 +750,8 @@ CRON_VNW.integration = function () {
     //
     //var resumeIds = [];
     //
-    //Collections.Applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
-    //    Collections.Applications.update({_id: application._id},
+    //Meteor.applications.find({'data.resumeid': {'$exists': true}}).map(function (application) {
+    //    Meteor.applications.update({_id: application._id},
     //        {
     //            '$set': {
     //                'resumeId': application.data.resumeid
@@ -752,7 +799,7 @@ function cronSkills(j, cb) {
 
 
 var cronApplications = function () {
-    var lastOnlineAppliation = Collections.Applications.findOne({source: 1}, {
+    var lastOnlineAppliation = Meteor.applications.findOne({source: 1}, {
         fields: {candidateId: 1},
         sort: {candidateId: -1}
     });
@@ -777,7 +824,7 @@ var cronApplications = function () {
     }
 
 
-    var lastDirectAppliation = Collections.Applications.findOne({source: 2}, {
+    var lastDirectAppliation = Meteor.applications.findOne({source: 2}, {
         fields: {candidateId: 1},
         sort: {candidateId: -1}
     });

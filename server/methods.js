@@ -172,7 +172,7 @@ Meteor.methods({
      * opt.stage {Number}
      * @returns { Number|null}
      */
-    getFirstJobApplication: function (opt) {
+ /*   getFirstJobApplication: function (opt) {
         try {
             if (!this.userId) return false;
 
@@ -196,14 +196,14 @@ Meteor.methods({
         return null;
     },
 
-    /**
+    /!**
      * check application exists in job stage
      * @param opt {Object}
      * @param opt.jobId {String}
      * @param opt.stage {Number}
      * @param opt.application {String}
      * @returns {boolean}
-     */
+     *!/
     checkApplicationInStage: function (opt) {
         if (!this.userId) return false;
         check(opt, {
@@ -223,10 +223,10 @@ Meteor.methods({
     },
 
 
-    /**
+    /!**
      * Update application qualify
      * @param applicationId {Number}
-     */
+     *!/
     disqualifyApplication: function (applicationId) {
         try {
             if (!this.userId) return false;
@@ -298,10 +298,10 @@ Meteor.methods({
             debuger(e);
         }
     },
-    /**
+    /!**
      * Update application qualify
      * @param applicationId {Number}
-     */
+     *!/
     revertApplication: function (applicationId) {
         try {
             if (!this.userId) return false;
@@ -331,7 +331,7 @@ Meteor.methods({
             debuger(e);
         }
         return result;
-    },
+    },*/
 
     /**
      * Update company mail signature
@@ -394,9 +394,9 @@ Meteor.methods({
             }
             console.log('email from : ', from);
 
-            var application = Collections.Applications.findOne({_id: data.application});
+            var application = Meteor.applications.findOne({_id: data.application});
             if (!application) return false;
-            var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+            var candidate = Meteor.candidates.findOne({candidateId: application.candidateId});
             if (!candidate) return false;
             var to = candidate.data.email1 || candidate.data.email2 || candidate.data.username || candidate.data.email || "";
             if (!to) return false;
@@ -447,7 +447,7 @@ Meteor.methods({
 
                 var from = user.defaultEmail();
 
-                var application = Collections.Applications.findOne({_id: appId});
+                var application = Meteor.applications.findOne({_id: appId});
                 if (!application) return false;
                 var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
                 if (!candidate) return false;
@@ -481,12 +481,12 @@ Meteor.methods({
         return true;
     },
 
-    /**
+/*    /!**
      * Add comment to application
      * @param data {Object}
      * @param data.application {Number}
      * @param data.content {String}
-     */
+     *!/
     addCommentApplication: function (data) {
         try {
             check(data, {
@@ -510,7 +510,7 @@ Meteor.methods({
             return false;
         }
         return true;
-    },
+    },*/
 
     /**
      * REFACTOR NEW METHODS
@@ -566,6 +566,7 @@ Meteor.methods({
         }
     },
 
+/*
 
     addCandidate: function (data, jobId) {
         try {
@@ -687,6 +688,7 @@ Meteor.methods({
         };
         return Collections.Applications.find(criteria, options).count() > 0;
     }
+*/
 
 });
 

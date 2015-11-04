@@ -5,7 +5,6 @@ function transformVNWId(id) {
 }
 
 
-
 Meteor.publish('companyInfo', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
@@ -28,7 +27,7 @@ Meteor.publish('mailTemplates', function () {
 });
 
 Meteor.publish('mailTemplateDetails', function (_id) {
-    if(!this.userId) return null;
+    if (!this.userId) return null;
     check(_id, String);
     var cond = {
         _id: _id,
@@ -123,7 +122,6 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 
-
 //Meteor.publishComposite('getApplications', function (filters, options) {
 //
 //    return {
@@ -185,7 +183,7 @@ Meteor.publish('applicationActivities', function (filters, options) {
     return Collections.Activities.find(filters, options);
 });
 
-Meteor.publish("applicationCounter", function (counterName, filters) {
+/*Meteor.publish("applicationCounter", function (counterName, filters) {
     if (!this.userId) return this.ready();
     var self = this;
     check(counterName, String);
@@ -215,7 +213,7 @@ Meteor.publish("applicationCounter", function (counterName, filters) {
     self.onStop(function () {
         handle.stop();
     });
-});
+});*/
 
 Meteor.publish("activityCounter", function (counterName, filters) {
     if (!this.userId) return this.ready();
@@ -285,19 +283,19 @@ Meteor.publish('staticModels', function () {
 });
 
 /*
-Meteor.publish('addJobPage', function () {
-    if (!this.userId) return this.ready();
-    var cursors = [];
-    var jobLevels = Meteor.job_levels.find();
-    var industries = Meteor.industries.find();
-    var cities = Meteor.cities.find();
+ Meteor.publish('addJobPage', function () {
+ if (!this.userId) return this.ready();
+ var cursors = [];
+ var jobLevels = Meteor.job_levels.find();
+ var industries = Meteor.industries.find();
+ var cities = Meteor.cities.find();
 
-    cursors.push(jobLevels);
-    cursors.push(industries);
-    cursors.push(cities);
-    return cursors;
-});
-*/
+ cursors.push(jobLevels);
+ cursors.push(industries);
+ cursors.push(cities);
+ return cursors;
+ });
+ */
 
 
 Meteor.publish('searchSkillAutocomplete', function (selector, options) {
@@ -345,10 +343,11 @@ Meteor.publish('skillSearch', function (q) {
     check(q, String);
     if (!this.userId) return this.ready();
     q = q.trim();
-    if(q.length < 1) return this.ready();
+    if (q.length < 1) return this.ready();
     var option = {
         sort: {skillLength: 1},
         limit: 10
     };
-    return Collections.SkillTerms.find({ $text: { $search: q } }, option);
+
+    return Collections.SkillTerms.find({$text: {$search: q}}, option);
 });

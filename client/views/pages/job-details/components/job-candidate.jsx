@@ -1,5 +1,10 @@
 let cx = React.addons.classSet;
 
+function formatCoverletter(coverLetter) {
+    if (typeof coverLetter !== 'string') return '';
+    return coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
+}
+
 JobCandidate = React.createClass({
 
     componentDidMount() {
@@ -11,15 +16,15 @@ JobCandidate = React.createClass({
         var can = app.candidateInfo;
         var fullname = can.fullname;
         var appliedDate = moment(app.createdAt).fromNow();
-        var coverLetter = app.shortCoverLetter();
+        var coverLetter = formatCoverletter(app.coverLetter);
         var matchingScore = app.matchingScore;
         var disqualified = app.disqualified;
         var city = can.city;
         var link = app.link();
 
         var matchingScoreLabel = null;
-        if(matchingScore > 0) {
-            matchingScoreClass = "label pull-right " +app.matchingScoreLabel();
+        if (matchingScore > 0) {
+            matchingScoreClass = "label pull-right " + app.matchingScoreLabel();
             matchingScoreLabel = (<span className={matchingScoreClass}>{ matchingScore }%</span>);
         }
 
@@ -45,7 +50,9 @@ JobCandidate = React.createClass({
 
                         <p className="m-b-none">
                             {matchingScoreLabel}
-                            {disqualified ? <span className="label pull-right label-danger" style={ {marginRight: "3px"} }><i className="fa fa-thumbs-down"></i></span> : null}
+                            {disqualified ? <span className="label pull-right label-danger"
+                                                  style={ {marginRight: "3px"} }><i
+                                className="fa fa-thumbs-down"></i></span> : null}
                             <i className="fa fa-map-marker"></i> { city }
                         </p>
                     </div>
@@ -67,7 +74,7 @@ CandidateCheckbox = React.createClass({
         $(el).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
-        if(this.props.checked) {
+        if (this.props.checked) {
             $(el).iCheck('check');
         }
 
@@ -77,9 +84,9 @@ CandidateCheckbox = React.createClass({
     },
 
     componentWillUpdate(nextProps, nextState) {
-        if(this.props.checked != nextProps.checked) {
+        if (this.props.checked != nextProps.checked) {
             var el = React.findDOMNode(this.refs.checkbox);
-            if(nextProps.checked) {
+            if (nextProps.checked) {
                 $(el).iCheck('check');
             } else {
                 $(el).iCheck('uncheck');
@@ -90,7 +97,7 @@ CandidateCheckbox = React.createClass({
     render() {
         return (
             <div style={styles.jobCandidate.selectBox}>
-                <input type="checkbox" ref="checkbox" className="candidate-select" />
+                <input type="checkbox" ref="checkbox" className="candidate-select"/>
             </div>
         );
     }

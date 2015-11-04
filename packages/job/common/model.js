@@ -16,7 +16,7 @@ model.prototype.updateJob = function (data, cb) {
 };
 
 model.prototype.isExist = function (condition) {
-    var query = condition || {jobId: this.jobId};
+    var query = condition || {'source.jobId': this.source.jobId};
     return Collection.findOne(query);
 };
 
@@ -25,13 +25,13 @@ model.appendSchema({
         type: Number,
         optional: true
     },
-    jobId: {
-        type: Number,
-        optional: true
-    },
+    /*    jobId: {
+     type: Number,
+     optional: true
+     },*/
     source: {
-        type: String,
-        defaultValue: "vietnamworks" // from recruit|vietnamworks|some sources
+        type: Object,
+        blackbox: true
     },
 
     title: {

@@ -2,7 +2,7 @@ Migrations.add({
     version: 4,
     name: "add field isDeleted to application that added from Success",
     up: function () {
-        Collections.Applications.update(
+        Meteor.applications.update(
             {source: 3, isDeleted: {$exists: false}},
             {$set: {isDeleted: 0}},
             {multi: true}

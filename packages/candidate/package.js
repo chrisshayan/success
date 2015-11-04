@@ -11,8 +11,9 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.versionsFrom('1.1.0.3');
-    api.use(["vnw:core"]);
+    api.versionsFrom('1.2.0.2');
+    api.use('ecmascript');
+    api.use(["vnw:core","vnw:user"]);
 
     /* namespace */
     api.addFiles(['candidate.js']);

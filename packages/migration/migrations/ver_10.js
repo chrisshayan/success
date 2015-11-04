@@ -18,7 +18,7 @@ Migrations.add({
     version: 10,
     name: "Fix missing matchingScore",
     up: function () {
-        var emptyScoreApplication = Collections.Applications.find({matchingScore: {'$in': [null, 0]}}, {
+        var emptyScoreApplication = Meteor.applications.find({matchingScore: {'$in': [null, 0]}}, {
             fields: {
                 source: 1,
                 entryId: 1
@@ -37,7 +37,7 @@ Migrations.add({
             var appOnlineRows = fetchVNWData(appOnlineSQL);
 
             appOnlineRows.forEach(function (item) {
-                Collections.Applications.update({entryId: item.entryid}, {'$set': {matchingScore: item.matchingScore}});
+                Meteor.applications.update({entryId: item.entryid}, {'$set': {matchingScore: item.matchingScore}});
             });
         }
 
@@ -47,7 +47,7 @@ Migrations.add({
             var appDirectRows = fetchVNWData(appDirectSQL);
 
             appDirectRows.forEach(function (item) {
-                Collections.Applications.update({entryId: item.sdid}, {'$set': {matchingScore: item.matchingScore}});
+                Meteor.applications.update({entryId: item.sdid}, {'$set': {matchingScore: item.matchingScore}});
             });
         }
 

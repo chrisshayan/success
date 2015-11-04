@@ -21,7 +21,8 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager",
         "reywood:publish-composite",
         "stevezhu:lodash",
-        "ecmascript"
+        "ecmascript",
+        "iron:router@1.0.12"
     ]);
 
     api.addFiles('utils/common.js', ['server', 'client']);
