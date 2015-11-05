@@ -1,4 +1,4 @@
-let cx = React.addons.classSet;
+let cx = React.addons.classSet || Classnames || false;
 
 function formatCoverletter(coverLetter) {
     if (typeof coverLetter !== 'string') return '';
@@ -27,12 +27,13 @@ JobCandidate = React.createClass({
             matchingScoreClass = "label pull-right " + app.matchingScoreLabel();
             matchingScoreLabel = (<span className={matchingScoreClass}>{ matchingScore }%</span>);
         }
-
-        var containerClass = cx({
-            "active": this.props.selected,
-            "list-group-item": true,
-            "clear": true
-        });
+        var containerClass = {};
+        if (cx)
+            containerClass = cx({
+                "active": this.props.selected,
+                "list-group-item": true,
+                "clear": true
+            });
 
         return (
             <li className={containerClass} style={ styles.jobCandidate.container }>
@@ -70,7 +71,7 @@ CandidateCheckbox = React.createClass({
     componentDidMount() {
         var self = this;
 
-        var el = React.findDOMNode(this.refs.checkbox);
+        var el = ReactDOM.findDOMNode(this.refs.checkbox);
         $(el).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
@@ -85,7 +86,7 @@ CandidateCheckbox = React.createClass({
 
     componentWillUpdate(nextProps, nextState) {
         if (this.props.checked != nextProps.checked) {
-            var el = React.findDOMNode(this.refs.checkbox);
+            var el = ReactDOM.findDOMNode(this.refs.checkbox);
             if (nextProps.checked) {
                 $(el).iCheck('check');
             } else {

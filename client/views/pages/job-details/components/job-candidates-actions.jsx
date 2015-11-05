@@ -60,7 +60,7 @@ JobCandidatesActions = React.createClass({
 var ActionSelectAll = React.createClass({
     componentDidMount() {
         var self = this;
-        var selectEl = React.findDOMNode(this.refs.checkbox);
+        var selectEl = ReactDOM.findDOMNode(this.refs.checkbox);
         $(selectEl).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
@@ -96,7 +96,7 @@ var ActionSearch = React.createClass({
     },
 
     componentDidMount(){
-        React.findDOMNode(this.refs.searchInput).focus();
+        ReactDOM.findDOMNode(this.refs.searchInput).focus();
     },
 
     render() {
@@ -216,7 +216,7 @@ const BulkActions = React.createClass({
 
     render() {
         return (
-            <DropdownButton disabled={this.props.disabled} title='bulk actions' bsStyle="link" className="pull-right">
+            <DropdownButton id="action-ddb" disabled={this.props.disabled} title='bulk actions' bsStyle="link" className="pull-right">
                 <MenuItem eventKey='1' onClick={this.onSendMassEmail}><i className="fa fa-envelope-o"></i>&nbsp;Send
                     mass emails</MenuItem>
                 <MenuItem onClick={this.massDisqualify} eventKey='2'><i className="fa fa-thumbs-o-down"></i>&nbsp;

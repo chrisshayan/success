@@ -88,7 +88,8 @@ model.appendSchema({
      optional: true
      },*/
     candidateId: {
-        type: String
+        type: String,
+        optional: true
     },
     companyId: {
         type: Number
@@ -133,7 +134,7 @@ model.appendSchema({
      },*/
     createdAt: {
         type: Date,
-        defaultValue : new Date()
+        defaultValue: new Date()
     },
     updatedAt: {
         type: Date,

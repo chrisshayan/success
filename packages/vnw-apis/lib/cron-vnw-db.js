@@ -434,7 +434,6 @@ function processApp(appRows, companyId, sourceId) {
             application.companyId = +companyId;
             //application.jobId = +row.jobid;
 
-            application.candidateId = can._id;
             application.source = {
                 id: +sourceId,
                 appId: +appId
@@ -460,6 +459,8 @@ function processApp(appRows, companyId, sourceId) {
                 candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
                 application.candidateInfo = candidateInfo;
+
+                application.candidateId = can._id;
             }
             //console.log('insert application:', application.entryId);
 
