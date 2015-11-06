@@ -18,6 +18,7 @@ var methods = {
     },
 
     getJobs: function (filters, options) {
+        console.log(filters, options);
 
         if (!filters || typeof filters != 'object' || !options || typeof options != 'object')
             return null;
@@ -193,21 +194,22 @@ var methods = {
     },
 
     jobListCounter(filter) {
-        if(!this.userId) return 0;
+        if (!this.userId) return 0;
+        console.log(filter);
         var user = Meteor.users.findOne({_id: this.userId});
         var permissions = user.jobPermissions();
 
         filter = _.pick(filter, 'status', 'source', 'recruiterEmails');
         filter['$or'] = permissions;
 
-        return Collections.Jobs.find(filter).count();
+        return Collection.find(filter).count();
     },
 
     updateJobTags: function (jobId, tags) {
         check(jobId, String);
         check(tags, [String]);
         if (!this.userId) return false;
-        var job = Collections.Jobs.findOne({_id: jobId});
+        var job = Collection.findOne({_id: jobId});
         if (!job) return false;
         var newTags = [];
         _.each(tags, function (t) {
@@ -224,28 +226,9 @@ var methods = {
                 }
             });
         });
-        return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
+        return Collection.update({_id: job._id}, {$set: {tags: newTags}});
     },
 
-    /**
-     * check job has application with specific stage
-     * @param jobId
-     * @param stage
-     * @returns {boolean}
-     */
-    hasApplication: function(jobId, stage) {
-        check(jobId, String);
-        check(stage, Number);
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if(job) {
-            return Collections.Applications.findOne({jobId: job.jobId, stage: stage}, {
-                sort: {
-                    createdAt: -1
-                }
-            });
-        }
-        return false;
-    }
 };
 
 

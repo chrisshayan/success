@@ -12,7 +12,7 @@ JobDetailsContainer = React.createClass({
             jobId = params._id,
             stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
 
-        let job = Collections.Jobs.findOne({_id: jobId});
+        let job = Meteor.jobs.findOne({_id: jobId});
 
         return {
             jobId: jobId,

@@ -148,8 +148,10 @@ model.appendSchema({
 
 Collection.after.insert(function (userId, doc) {
     var mod = {};
-    mod['stages.' + doc.stage] = 1;
-    jobCollection.update({'source.jobId': doc.jobId}, {
+    mod['stages.s' + doc.stage] = 1;
+    console.log('mod', mod, 'jobID ', doc.source.jobId);
+
+    jobCollection.update({'source.jobId': doc.source.jobId}, {
         $inc: mod
     });
 });
@@ -159,8 +161,8 @@ Collection.after.update(function (userId, doc, fieldNames, modifier, options) {
         console.log("Move from: ", this.previous.stage);
         console.log("to: ", doc.stage);
         var mod = {};
-        mod['stages.' + this.previous.stage] = -1;
-        mod['stages.' + doc.stage] = 1;
+        mod['stages.s' + this.previous.stage] = -1;
+        mod['stages.s' + doc.stage] = 1;
 
         jobCollection.update({'source.jobId': doc.jobId}, {
             $inc: mod

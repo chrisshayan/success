@@ -114,6 +114,7 @@ publications.jobDetails = function (opt) {
                 _id: opt.jobId,
                 $or: permissions
             };
+            console.log('jobcon', cond);
             return Collection.find(cond);
         },
         children: [
@@ -125,7 +126,8 @@ publications.jobDetails = function (opt) {
                         status: job.status,
                         $or: permissions
                     };
-                    return Collections.Jobs.find(cond, {limit: 5});
+                    console.log('child jobcon', cond);
+                    return Collection.find(cond, {limit: 5});
                 }
             },
         /**
@@ -238,7 +240,7 @@ publications.jobStagesCounter = function (counterName, jobId) {
                 fields: {
                     stage: 1
                 }
-            }
+            };
             var handle = Meteor.applications.find(filters, options).observe({
                 added: function (doc) {
                     count[doc.stage]++;

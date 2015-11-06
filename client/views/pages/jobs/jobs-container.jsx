@@ -40,30 +40,30 @@ JobsContainer = React.createClass({
                     <div style={styles.jobsContainer}>
                         <JobList
                             status={1}
-                            source={"recruit"}
+                            source={2}
                             title={"CUSTOM POSITIONS"}
                             icon="fa-cloud"
                             emptyMsg="There is no position here."
                             subCache={Sub1}
-                            />
+                        />
 
                         <JobList
                             status={1}
-                            source="vnw"
+                            source={1}
                             title="PUBLISHED POSITIONS"
                             icon="fa-cloud"
                             emptyMsg="There is no position here."
                             subCache={Sub2}
-                            />
+                        />
 
                         <JobList
                             status={0}
-                            source="vnw"
+                            source={1}
                             title="CLOSED POSITIONS"
                             icon="fa-archive"
                             emptyMsg="Positions that no longer accepting new applicants will appear here."
                             subCache={Sub3}
-                            />
+                        />
 
                     </div>
                 </div>
@@ -107,7 +107,7 @@ JobList = React.createClass({
         let isReady = this.props.subCache.subscribe('getJobs', ...subData).ready();
         return {
             isReady: isReady,
-            jobs: Collections.Jobs.find(...subData).fetch()
+            jobs: Meteor.jobs.find(...subData).fetch()
         };
     },
 
@@ -127,7 +127,7 @@ JobList = React.createClass({
         };
 
         if (this.props.source) {
-            filters['source'] = this.props.source;
+            filters['source.type'] = this.props.source;
         }
 
         var tags = Session.get('jobFilterTags') || [];
@@ -217,7 +217,7 @@ JobList = React.createClass({
             <div>
                 {this.data.jobs.map((data, key)=> {
                     return <Job job={data} key={key}/>
-                })}
+                    })}
             </div>
         );
     }
@@ -394,8 +394,9 @@ Job = React.createClass({
     },
 
     renderStage(stage, key) {
+
         var stages = this.props.job['stages'] || null;
-        var stageCount = stages && stages[key] ? stages[key] : '-';
+        var stageCount = stages && stages['s' + key] ? stages['s' + key] : '-';
         return (
             <div className="col-sm-2 stage stage-" key={key}>
                 <a href={this.link(stage.alias)} className="stage-number">{stageCount}</a>

@@ -18,7 +18,7 @@ HiringProcess = BlazeComponent.extendComponent({
     stages: function () {
         var self = this;
         var stages = [];
-        var job = Collections.Jobs.findOne({_id: self.jobId});
+        var job = Meteor.jobs.findOne({_id: self.jobId});
         var counter = job['stages'] || {};
         _.each(Success.APPLICATION_STAGES, function (stage) {
             stage.jobId = self.jobId;

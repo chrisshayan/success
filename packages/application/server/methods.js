@@ -319,4 +319,25 @@ methods.applicationStageCount = function (jobId, stage) {
 };
 
 
+/**
+ * check job has application with specific stage
+ * @param jobId
+ * @param stage
+ * @returns {boolean}
+ */
+methods.hasApplication = function (jobId, stage) {
+    check(jobId, String);
+    check(stage, Number);
+    var job = jobCollection.findOne({_id: jobId});
+    if (job) {
+        return Collection.findOne({'source.jobId': job.source.jobId, stage: stage}, {
+            sort: {
+                createdAt: -1
+            }
+        });
+    }
+    return false;
+};
+
+
 Meteor.methods(methods);

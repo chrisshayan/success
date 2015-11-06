@@ -42,7 +42,7 @@ Meteor.startup(function () {
     //    Migrations.migrateTo(process.env.MIGRATION);
     //}
     //
-    //CRON_VNW.sync();
+    CRON_VNW.sync();
     /*
      CRON_VNW.cronCity();
      CRON_VNW.cronDegree();*/

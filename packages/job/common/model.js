@@ -70,6 +70,7 @@ model.appendSchema({
 
     categories: {
         type: [String],
+        optional: true,
         autoform: {
             type: "select2",
             multiple: true,
@@ -227,7 +228,7 @@ model.appendSchema({
 
     status: {
         type: Number,
-        defaultValue: 1, // 1: open (or publish or active), 0: close
+        defaultValue: 1, // 1: open (or publish or active), 0: close, 2 : inactive
         optional: true
     },
     recruiters: {
@@ -236,27 +237,40 @@ model.appendSchema({
         defaultValue: []
     },
     stages: {
-        type: [Object],
-        optional: true
+        type: Object,
+        blackbox: true,
+        defaultValue: {
+            's0': 0,
+            's1': 0,
+            's2': 0,
+            's3': 0,
+            's4': 0,
+            's5': 0
+        }
+
     },
 
     createdAt: {
         type: Date,
         defaultValue: Date.now()
-    },
+    }
+    ,
     updatedAt: {
         type: Date,
         defaultValue: Date.now()
-    },
+    }
+    ,
     expiredAt: {
         type: Date,
         defaultValue: Date.now()
-    },
+    }
+    ,
     createdBy: {
         type: String,
         optional: true
     }
-});
+})
+;
 
 vnwJob = model;
 
@@ -290,20 +304,22 @@ Collection.allow({
  });*/
 
 
-if (Meteor.isServer) {
-    Collection.after.insert(function (userId, doc) {
-        Collection.update({_id: doc._id}, {
-            $set: {
-                stages: {
-                    0: 0,
-                    1: 0,
-                    2: 0,
-                    3: 0,
-                    4: 0,
-                    5: 0
-                }
-            }
-        })
-    });
+/*
+ if (Meteor.isServer) {
+ Collection.after.insert(function (userId, doc) {
+ Collection.update({_id: doc._id}, {
+ $set: {
+ stages: {
+ 0: 0,
+ 1: 0,
+ 2: 0,
+ 3: 0,
+ 4: 0,
+ 5: 0
+ }
+ }
+ })
+ });
 
-}
+ }
+ */

@@ -24,7 +24,7 @@ JobHeader = React.createClass({
             }
         };
         return {
-            relatedJobs: Collections.Jobs.find(filter, opt).fetch()
+            relatedJobs: Meteor.jobs.find(filter, opt).fetch()
         };
     },
 

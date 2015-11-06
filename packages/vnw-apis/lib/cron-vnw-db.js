@@ -226,15 +226,16 @@ function cronClosedJob(jb, cb) {
     else {
         try {
             //console.log('company : %s closeJob: ', info.companyId, info.closedJobIds.length);
-
+            //console.log(info.closedJobIds);
             processJob(info.closedJobIds, info.companyId);
+            console.log('done');
             jb.done();
             console.log('closedJob of company %s is done', info.companyId);
 
         } catch (e) {
-            console.log('error');
+            console.log('closedJob error');
+            console.trace(e);
             jb.fail();
-            throw e;
         }
     }
     cb();
@@ -243,117 +244,130 @@ function cronClosedJob(jb, cb) {
 
 function processJob(items, companyId) {
     items.forEach(function (item) {
+        try {
+            //remove
+            /*if (mongoJob && item.isdeleted) {
+             Collections.Jobs.remove({jobId: item.jobId});
+             console.log("processJob")
+             } else {*/
+            var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.jobId);
+            var cJobs = fetchVNWData(getJobQuery);
+            //console.log('jobs', cJobs.length);
+            cJobs.forEach(function (row) {
 
-        //remove
-        /*if (mongoJob && item.isdeleted) {
-         Collections.Jobs.remove({jobId: item.jobId});
-         console.log("processJob")
-         } else {*/
-        var getJobQuery = sprintf(VNW_QUERIES.pullJob, item.jobId);
-        var cJobs = fetchVNWData(getJobQuery);
-
-        cJobs.forEach(function (row) {
-
-            /*var job = {
-             companyId: +companyId,
-             jobId: +row.jobid,
-             userId: +row.userid,
-             source: 'vnw',
-             title: row.jobtitle,
-             level: '',
-             categories: [],
-             locations: [],
-             salaryMin: +row.salarymin,
-             salaryMax: +row.salarymax,
-             showSalary: true,
-             description: row.jobdescription,
-             requirements: row.skillexperience,
-             benefits: '',
-             recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
-             skills: [],
-             vnwData: row,
-             status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
-             createdAt: formatDatetimeFromVNW(row.createddate),
-             updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
-             expiredAt: expiredAt
-             };*/
-
-            var job = Meteor['jobs'].findOne({sourceId: item.jobId});
-            if (!job)
-                job = new vnwJob();
-
-            var expiredAt = formatDatetimeFromVNW(row.expireddate);
-            var createdAt = formatDatetimeFromVNW(row.createddate);
-            var updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
-            job.companyId = +companyId;
-            //job.jobId = +row.jobid;
-            job.userId = +row.userid;
-            /*job.source = 1;
-             job.sourceId = +row.jobid;*/
-            job.source = {
-                type: 1, // 1 : vnw  , 2 : success
-                jobId: +row.jobid
-            };
-            job.title = row.jobtitle;
-            job.level = '';
-            job.categories = [];
-            job.locations = [];
-            job.salaryMin = +row.salarymin;
-            job.salaryMax = +row.salarymax;
-            job.showSalary = true;
-            job.description = row.jobdescription;
-            job.requirements = row.skillexperience;
-            job.benefits = '';
-            job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
-            job.skills = [];
-            //job.vnwData = EJSON.parse(EJSON.stringify(row));
-            job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
-            job.createdAt = createdAt;
-            job.updatedAt = updatedAt;
-            job.expiredAt = expiredAt;
-
-
-            if (!row.isactive)
-                job.status = 2;
-            else if (moment(expiredAt).valueOf() < Date.now())
-                job.status = 0;
-            else
-                job.status = 1;
-
-            // update
-
-            //var mongoJob = Meteor['jobs'].findOne({jobId: item.jobId});
-            var existJob = job.isExist();
-
-            if (!existJob
-                || (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
-                || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt))) {
-                console.log('update Job :', job.source.type);
-
-                job.skills = CRON_VNW.getJobTags(+row.jobid);
-                job.benefits = CRON_VNW.getBenefits(+row.jobid);
-                job.locations = CRON_VNW.getLocations(+row.jobid);
-
-                /*var modifier = {
-                 '$set': job
+                /*var job = {
+                 companyId: +companyId,
+                 jobId: +row.jobid,
+                 userId: +row.userid,
+                 source: 'vnw',
+                 title: row.jobtitle,
+                 level: '',
+                 categories: [],
+                 locations: [],
+                 salaryMin: +row.salarymin,
+                 salaryMax: +row.salarymax,
+                 showSalary: true,
+                 description: row.jobdescription,
+                 requirements: row.skillexperience,
+                 benefits: '',
+                 recruiterEmails: _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g)),
+                 skills: [],
+                 vnwData: row,
+                 status: (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1,
+                 createdAt: formatDatetimeFromVNW(row.createddate),
+                 updatedAt: formatDatetimeFromVNW(row.lastupdateddate),
+                 expiredAt: expiredAt
                  };*/
-                console.log('job insert');
-                job.save();
-                //console.log(Meteor.jobs.findOne());
-                //Collections.Jobs.update(query, modifier);
 
-                // add new
-            } else if (!existJob) {
+                /*var job = Meteor['jobs'].findOne({'source.jobId': item.jobId});
+                 if (!job)*/
+                var job = new vnwJob();
 
-                //console.log('func ', job.save.toString());
-                job.skills = CRON_VNW.getJobTags(+row.jobid);
-                job.benefits = CRON_VNW.getBenefits(+row.jobid);
-                job.locations = CRON_VNW.getLocations(+row.jobid);
-                job.save();
-                //Collections.Jobs.insert(job);
+                var expiredAt = formatDatetimeFromVNW(row.expireddate);
+                var createdAt = formatDatetimeFromVNW(row.createddate);
+                var updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
+                job.companyId = +companyId;
+                //job.jobId = +row.jobid;
+                job.userId = +row.userid;
+                /*job.source = 1;
+                 job.sourceId = +row.jobid;*/
+                job.source = {
+                    type: 1, // 1 : vnw  , 2 : success
+                    jobId: +row.jobid
+                };
+                job.title = row.jobtitle;
+                job.level = '';
+                //job.categories = [];
+                job.salaryMin = +row.salarymin;
+                job.salaryMax = +row.salarymax;
+                job.showSalary = true;
+                job.description = row.jobdescription;
+                job.requirements = row.skillexperience;
+                job.benefits = '';
+                job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
+                job.skills = [];
+                //job.vnwData = EJSON.parse(EJSON.stringify(row));
+                job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
+                job.createdAt = createdAt;
+                job.updatedAt = updatedAt;
+                job.expiredAt = expiredAt;
 
-            }
-        });
+
+                if (!row.isactive)
+                    job.status = 2;
+                else if (moment(expiredAt).valueOf() < Date.now())
+                    job.status = 0;
+                else
+                    job.status = 1;
+
+                // update
+
+                //var mongoJob = Meteor['jobs'].findOne({jobId: item.jobId});
+                var existJob = job.isExist();
+                /*console.log('existJob: ', !!existJob);
+                 console.log('isupdate: ', (!existJob));*/
+                if (!existJob) {
+
+                    job.skills = CRON_VNW.getJobTags(+row.jobid);
+                    job.benefits = CRON_VNW.getBenefits(+row.jobid);
+                    job.locations = CRON_VNW.getLocations(+row.jobid);
+
+                    /*var modifier = {
+                     '$set': job
+                     };*/
+                    //console.log('job insert ', row.jobid);
+                    job.save();
+                    //console.log(Meteor.jobs.findOne());
+                    //Collections.Jobs.update(query, modifier);
+                    //console.log('job insert complete', row.jobid);
+                    // add new
+                } else if (parseTimeToString(existJob.createdAt) !== parseTimeToString(job.createdAt)
+                    || parseTimeToString(existJob.updatedAt) !== parseTimeToString(job.updatedAt)) {
+                    //console.log('update');
+                    existJob.skills = CRON_VNW.getJobTags(+row.jobid);
+                    existJob.benefits = CRON_VNW.getBenefits(+row.jobid);
+                    existJob.locations = CRON_VNW.getLocations(+row.jobid);
+                    existJob.createdAt = job.createdAt;
+                    existJob.updatedAt = job.updatedAt;
+
+                    existJob.save();
+                }
+                //console.log('cjob', cJobs);
+                /*else {
+
+                 //console.log('func ', job.save.toString());
+                 job.skills = CRON_VNW.getJobTags(+row.jobid);
+                 job.benefits = CRON_VNW.getBenefits(+row.jobid);
+                 job.locations = CRON_VNW.getLocations(+row.jobid);
+                 job.save();
+                 //Collections.Jobs.insert(job);
+
+                 }*/
+            });
+        } catch (e) {
+            console.log('err');
+            console.trace(e);
+        }
     });
 
     processAfterSyncJob(items, companyId);
@@ -362,83 +376,83 @@ function processJob(items, companyId) {
 
 
 function processAfterSyncJob(jobs, companyId) {
-    if (jobs.length) {
-        while (jobs.length > 0) {
-            var chunk = jobs.splice(0, 5);
+    try {
+        if (jobs.length) {
+            console.log('jl', jobs.length);
+            while (jobs.length > 0) {
+                var chunk = jobs.splice(0, 5);
 
-            var jobIds = _.pluck(chunk, 'jobId');
+                var jobIds = _.pluck(chunk, 'jobId');
 
-            //console.log('chunk: ', jobIds);
-            _.remove(jobIds, function (jId) {
-                return jId === '' || jId == void 0
-            });
-            // - Check new applicatiocn of this job if available.
-            // - Then insert / update / remove
+                //console.log('chunk: ', jobIds);
+                _.remove(jobIds, function (jId) {
+                    return jId === '' || jId == void 0
+                });
+                // - Check new applicatiocn of this job if available.
+                // - Then insert / update / remove
 
-            if (typeof jobIds !== 'object' || jobIds.length == 0)
-                return;
+                if (typeof jobIds !== 'object' || jobIds.length == 0)
+                    return;
 
-            var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
-            //console.log('appSql', appSql);
+                var appSql = sprintf(VNW_QUERIES.cronApplicationsUpdate, jobIds, jobIds);
+                //console.log('appSql', appSql);
 
-            var appRows = fetchVNWData(appSql);
-            //   console.log(appRows.length);
+                var appRows = fetchVNWData(appSql);
+                console.log(appRows.length);
 
-            if (appRows.length) {
-                var candidates = _.pluck(appRows, 'candidateId');
-                processCandidates(candidates);
+                if (appRows.length) {
+                    var candidates = _.pluck(appRows, 'candidateId');
+                    processCandidates(candidates);
 
-                cronApps(appRows, companyId);
+                    cronApps(appRows, companyId);
+                }
+
             }
-
         }
+    } catch (e) {
+        console.log('sync application error');
+        console.trace(e);
     }
 }
 
 
 function processApp(appRows, companyId, sourceId) {
-    var mongoApps = companyId ? Meteor.applications.find({companyId: companyId}).fetch() : [];
+    try {
+        var mongoApps = companyId ? Meteor.applications.find({companyId: companyId}).fetch() : [];
 
-    var filter = {
-        fields: {
-            candidateId: 1,
-            'data.firstname': 1,
-            'data.lastname': 1
-        }
-    };
+        /*var filter = {
+         fields: {
+         candidateId: 1,
+         'data.firstname': 1,
+         'data.lastname': 1
+         }
+         };*/
 
-    appRows.forEach(function (row) {
-        var appId = row.entryid || row.sdid;
+        appRows.forEach(function (row) {
+            var appId = row.entryid || row.sdid;
 
-        var query = {entryId: appId};
-        var indexApp = _.findKey(mongoApps, query);
+            var query = {'source.appId': appId};
 
-        if (indexApp >= 0) {
-            if (mongoApps[indexApp].isDeleted === row['deleted_by_employer'])
+            var application = Meteor.applications.findOne(query);
+            if (application == void 0) {
+                application = new Application();
+
+                if (row['deleted_by_employer'])
+                    return;
+            }
+
+            if (application.isDeleted === row['deleted_by_employer'])
                 return;
-            //    console.log('update application: ', appId);
-            var modifier = {
-                'isDeleted': row['deleted_by_employer']
-            };
 
-            Meteor.applications.update(query, {
-                '$set': modifier
-            })
-
-        } else if (!row['deleted_by_employer']) {
-
-            var can = Meteor.candidates.findOne({candidateId: row.userid});
-
-            var application = new Application();
             application.entryId = +appId;
             application.companyId = +companyId;
             //application.jobId = +row.jobid;
 
             application.source = {
-                id: +sourceId,
+                type: +sourceId,
                 appId: +appId,
-                jobId : +row.jobid,
-                candidateId : +row.userid
+                jobId: +row.jobid,
+                candidateId: +row.userid
             };
 
             application.coverLetter = row.coverletter || '';
@@ -446,6 +460,9 @@ function processApp(appRows, companyId, sourceId) {
             application.data = row;
             application.createdAt = formatDatetimeFromVNW(row.createddate);
             application.matchingScore = row.matchingScore || 0;
+
+
+            var can = Meteor.candidates.findOne({candidateId: row.userid});
 
 
             if (can) {
@@ -471,10 +488,14 @@ function processApp(appRows, companyId, sourceId) {
 
             //var aId = Meteor.applications.insert(application);
 
+            console.log('app');
+
             application.save();
 
+            console.log('save done');
+
             /* Log activity */
-            Meteor.defer(function () {
+            /*Meteor.defer(function () {
                 // Log applied activity
                 var activity = new Activity();
                 activity.companyId = companyId;
@@ -486,79 +507,87 @@ function processApp(appRows, companyId, sourceId) {
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();
 
-            });
+            });*/
 
-        }
-    });
+        });
 
-    /*    var candidateLists = _.pluck(appRows, 'userid');
+        /*    var candidateLists = _.pluck(appRows, 'userid');
 
-     Meteor.defer(function () {
-     candidateLists.length && processCandidates(candidateLists);
-     });*/
+         Meteor.defer(function () {
+         candidateLists.length && processCandidates(candidateLists);
+         });*/
+    } catch (e) {
+        console.log('process application error');
+        console.trace(e);
+    }
 }
 
 function processCandidates(candidateList) {
-    var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
-    var candidateRows = fetchVNWData(getCandidatesSQL);
+    try {
+        var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateList);
+        var candidateRows = fetchVNWData(getCandidatesSQL);
 
-    candidateRows.forEach(function (row) {
-        var candidate = Meteor.candidates.findOne({candidateId: row.userid});
-        if (!candidate) {
-            //console.log('new candidate: ', row.userid);
-            //console.log('new', row.userid, row.firstname);
-            //candidate = new Schemas.Candidate();
-            //candidate.candidateId = row.userid;
-            //candidate.data = row;
-            //candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            //Collections.Candidates.insert(candidate);
-            candidate = new Candidate();
+        candidateRows.forEach(function (row) {
+            var candidate = Meteor.candidates.findOne({candidateId: row.userid});
+            if (!candidate) {
+                //console.log('new candidate: ', row.userid);
+                //console.log('new', row.userid, row.firstname);
+                //candidate = new Schemas.Candidate();
+                //candidate.candidateId = row.userid;
+                //candidate.data = row;
+                //candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+                //Collections.Candidates.insert(candidate);
+                candidate = new Candidate();
 
-        }
+            }
 
-        candidate.candidateId = row.userid;
-        candidate.username = row.username;
-        candidate.password = row.userpass;
-        candidate.source = {
-            sourceId: 1,
-            candidateId: row.userid
-        };
-        candidate.firstname = row.firstname;
-        candidate.lastname = row.lastname;
-        candidate.email = row.email;
-        candidate.email1 = row.email1;
-        candidate.email2 = row.email2;
-        candidate.genderId = row.genderid;
-        candidate.jobTitle = row.jobtitle;
-        candidate.workingCompany = row.workingCompanyName;
+            candidate.candidateId = row.userid;
+            candidate.username = row.username;
+            candidate.password = row.userpass;
+            candidate.source = {
+                type: 1,
+                candidateId: row.userid
+            };
+            candidate.firstname = row.firstname;
+            candidate.lastname = row.lastname;
+            candidate.email = row.email;
+            candidate.email1 = row.email1;
+            candidate.email2 = row.email2;
+            candidate.genderId = row.genderid;
+            candidate.jobTitle = row.jobtitle;
+            candidate.workingCompany = row.workingCompanyName;
 
-        //candidate.data = job.vnwData = EJSON.parse(EJSON.stringify(row));;
-        //candidate.vnwData = job.vnwData = EJSON.parse(EJSON.stringify(row));;
-        //console.log(candidate);
-
-        //console.log('date', row);
-        var updatedDate = formatDatetimeFromVNW(row.lastdateupdated);
-
-        if (parseTimeToString(candidate.updatedAt) != parseTimeToString(updatedDate)) {
-            candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-            candidate.updatedAt = updatedDate || candidate.createdAt;
-
-            //TODO : in the future, the 3rd job will care this one
+            //candidate.data = job.vnwData = EJSON.parse(EJSON.stringify(row));;
+            //candidate.vnwData = job.vnwData = EJSON.parse(EJSON.stringify(row));;
             //console.log(candidate);
-            candidate.save();
-        }
+
+            //console.log('date', row);
+            var updatedDate = formatDatetimeFromVNW(row.lastdateupdated);
+
+            if (parseTimeToString(candidate.updatedAt) != parseTimeToString(updatedDate)) {
+                candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+                candidate.updatedAt = updatedDate || candidate.createdAt;
+                console.log('save candidate');
+                //TODO : in the future, the 3rd job will care this one
+                //console.log(candidate);
+                candidate.save();
+            }
 
 
-        /*    if (!_.isEqual(candidate.data, row)) {
-         Collections.Candidates.update(candidate._id, {
-         $set: {
-         data: row,
-         lastSyncedAt: new Date()
-         }
-         });
-         }*/
+            /*    if (!_.isEqual(candidate.data, row)) {
+             Collections.Candidates.update(candidate._id, {
+             $set: {
+             data: row,
+             lastSyncedAt: new Date()
+             }
+             });
+             }*/
 
-    })
+        })
+    } catch (e) {
+        console.log('candidate error');
+        console.trace(e);
+    }
 }
 
 
