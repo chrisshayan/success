@@ -70,7 +70,7 @@ JobInfo = BlazeComponent.extendComponent({
             jobId: {
                 $nin: [this.job.jobId]
             },
-            source: this.job.source,
+            source: this.job.source.type,
             status: this.job.status
         };
 

@@ -436,9 +436,11 @@ function processApp(appRows, companyId, sourceId) {
 
             application.source = {
                 id: +sourceId,
-                appId: +appId
+                appId: +appId,
+                jobId : +row.jobid,
+                candidateId : +row.userid
             };
-            application.sourceId = +appId;
+
             application.coverLetter = row.coverletter || '';
             application.isDeleted = row['deleted_by_employer'];
             application.data = row;

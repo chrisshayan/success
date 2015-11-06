@@ -15,6 +15,7 @@ var BS_VERSION = '0.27.3',
     REACT_VERSION = '0.14.2',
     REACT_DOM_VERSION = '0.14.2',
     CLASSNAMES_VERSION = '2.2.0';
+
 Npm.depends({
     'externalify': EXTERNALIFY_VERSION,
     'react': REACT_VERSION,
@@ -28,7 +29,6 @@ Package.onUse(function (api) {
     api.use(['react@0.14.1_1', 'cosmos:browserify@0.8.2']);
     api.addFiles([
         'bs.browserify.js'
-//        'bs.browserify.options.json'
     ], 'client');
 
     api.imply('react');

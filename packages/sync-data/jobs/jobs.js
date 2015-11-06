@@ -47,7 +47,10 @@ function processJob(row, companyId) {
     job.companyId = +companyId;
     job.jobId = +row.jobid;
     job.userId = +row.userid;
-    job.source = 'vnw';
+    job.source = {
+        type: 1,
+        jobId: +row.jobid
+    };
     job.title = row.jobtitle;
     job.level = '';
     job.categories = [];
@@ -60,14 +63,14 @@ function processJob(row, companyId) {
 
     job.recruiterEmails = _.unique(row.emailaddress.toLowerCase().match(/[A-Za-z\.0-9_]+@[a-zA-Z\.0-9_]+/g));
 
-    job.vnwData = row;
+    //job.vnwData = row;
     job.status = (moment(expiredAt).valueOf() < Date.now()) ? 0 : 1;
     job.createdAt = formatDatetimeFromVNW(row.createddate);
     job.updatedAt = formatDatetimeFromVNW(row.lastupdateddate);
     job.expiredAt = expiredAt;
     job.benefits = CRON_VNW.getBenefits(job.jobId);
     job.skills = CRON_VNW.getJobTags(job.jobId);
-
+    job.locations = CRON_VNW.getLocations(+row.jobid);
 
     if (!row.isactive)
         job.status = 2;
@@ -91,7 +94,7 @@ function getApplications(jobId) {
         var data = {
             jobId: jobId,
             entryId: row.typeId,
-            source: row.source
+            source: row.source.type
         };
 
         sJobCollections.addJobtoQueue('addApplication', data);
@@ -121,7 +124,7 @@ var Jobs = {
                     } else {
                         //Collections.Jobs.insert(job);
                         job.save();
-                        Meteor.jobs.insert(job);
+                        //Meteor.jobs.insert(job);
                         getApplications(job.jobId);
                     }
 

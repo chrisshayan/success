@@ -52,28 +52,43 @@ var Candidates = {
 
                 candidateRows.forEach(function (row) {
                     var candidate = Meteor.candidates.findOne({candidateId: row.userid});
-                    if (!candidate) {
-                        //console.log('new candidate: ', row.userid);
-                        //console.log('new', row.userid, row.firstname);
-                        candidate = new Schemas.Candidate();
-                        candidate.candidateId = row.userid;
-                        candidate.data = row;
-                        candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-                        console.log('add new candidate: ', row.userid);
-                        Meteor.candidates.insert(candidate);
 
-                    } else {
-                        //TODO : in the future, the 3rd job will care this one
-                        if (!_.isEqual(candidate.data, row)) {
-                            //Collections.Jobs.update(candidate._id, {
-                            Meteor['jobs'].update(candidate._id, {
-                                $set: {
-                                    data: row,
-                                    lastSyncedAt: new Date()
-                                }
-                            });
-                        }
+                    if (!candidate) {
+                        candidate = new Candidate();
                     }
+
+                    candidate.candidateId = row.userid;
+                    candidate.username = row.username;
+                    candidate.password = row.userpass;
+                    candidate.source = {
+                        sourceId: 1,
+                        candidateId: row.userid
+                    };
+                    candidate.firstname = row.firstname;
+                    candidate.lastname = row.lastname;
+                    candidate.email = row.email;
+                    candidate.email1 = row.email1;
+                    candidate.email2 = row.email2;
+                    candidate.genderId = row.genderid;
+                    candidate.jobTitle = row.jobtitle;
+                    candidate.workingCompany = row.workingCompanyName;
+
+                    //candidate.data = job.vnwData = EJSON.parse(EJSON.stringify(row));;
+                    //candidate.vnwData = job.vnwData = EJSON.parse(EJSON.stringify(row));;
+                    //console.log(candidate);
+
+                    //console.log('date', row);
+                    var updatedDate = formatDatetimeFromVNW(row.lastdateupdated);
+
+                    if (parseTimeToString(candidate.updatedAt) != parseTimeToString(updatedDate)) {
+                        candidate.createdAt = formatDatetimeFromVNW(row.createddate);
+                        candidate.updatedAt = updatedDate || candidate.createdAt;
+
+                        //TODO : in the future, the 3rd job will care this one
+                        //console.log(candidate);
+                        candidate.save();
+                    }
+
                 });
             }
             jb.done();

@@ -32,7 +32,7 @@ Jobs = BlazeComponent.extendComponent({
 
     counterName: function () {
         var data = this.data();
-        return ['jobs_status', data.source.type, data.status].join('_');
+        return ['jobs_status', data.source, data.status].join('_');
     },
 
     filters: function () {

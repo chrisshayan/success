@@ -97,9 +97,15 @@ function processApplication(row, companyId, sourceId) {
     application.entryId = +appId;
     application.jobId = +row.jobid;
     application.companyId = +companyId;
-    application.candidateId = +row.userid;
-    application.source = +sourceId;
-    application.coverLetter = row.coverletter;
+
+    application.source = {
+        id: +sourceId,
+        appId: +appId,
+        jobId : +row.jobid,
+        candidateId : +row.userid
+    };
+
+    application.coverLetter = row.coverletter || '';
     application.matchingScore = row.matchingScore;
     application.isDeleted = row['deleted_by_employer'];
     application.data = row;
@@ -122,6 +128,8 @@ function processApplication(row, companyId, sourceId) {
         candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
         application.candidateInfo = candidateInfo;
+
+        application.candidateId = can._id;
     }
     //console.log('insert application:', application.entryId);
 
