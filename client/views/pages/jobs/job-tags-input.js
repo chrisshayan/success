@@ -1,4 +1,15 @@
 Template.jobTagsInput.helpers({
+
+    TagsInput: function() {
+        return TagsInput;
+    },
+
+    onSelect: function() {
+        return function(skill) {
+            console.log(skill)
+        };
+    },
+
     tags: function () {
         //var job = Collections.Jobs.findOne({_id: this.jobId});
         var job = Meteor['jobs'].findOne({_id: this.jobId});

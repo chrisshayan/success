@@ -6,6 +6,8 @@ var model = BaseModel.extendAndSetupCollection("applications");
 
 Collection = model.collection;
 
+jobCollection = vnwJob.collection;
+
 model.prototype.candidate = function (options) {
     if (this.candidateId == void 0) return [];
     return Meteor.candidates.findOne({candidateId: this.candidateId}, options || {});
@@ -17,7 +19,7 @@ model.prototype.isExist = function (condition) {
 };
 
 model.prototype.link = function () {
-    var job = Meteor['jobs'].findOne({jobId: this.jobId});
+    var job = Meteor['jobs'].findOne({jobId: this.source.jobId});
 
     var params = {
         _id: job._id,
@@ -61,7 +63,7 @@ model.prototype.vnwProfileLink = function () {
     }
 
     var url = Meteor.settings.public.applicationUrl;
-    return url + sprintf(queryParams, this.jobId, this.entryId);
+    return url + sprintf(queryParams, this.source.jobId, this.entryId);
 };
 
 model.prototype.isSentDirectly = function () {
@@ -142,5 +144,29 @@ model.appendSchema({
     }
 
 });
+
+
+Collection.after.insert(function (userId, doc) {
+    var mod = {};
+    mod['stages.' + doc.stage] = 1;
+    jobCollection.update({'source.jobId': doc.jobId}, {
+        $inc: mod
+    });
+});
+
+Collection.after.update(function (userId, doc, fieldNames, modifier, options) {
+    if (fieldNames.indexOf('stage') >= 0) {
+        console.log("Move from: ", this.previous.stage);
+        console.log("to: ", doc.stage);
+        var mod = {};
+        mod['stages.' + this.previous.stage] = -1;
+        mod['stages.' + doc.stage] = 1;
+
+        jobCollection.update({'source.jobId': doc.jobId}, {
+            $inc: mod
+        });
+    }
+}, {fetchPrevious: true});
+
 
 Application = model;

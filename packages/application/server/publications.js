@@ -14,8 +14,8 @@ publications.getApplications = function (filters, options) {
     if (!this.userId) return this.ready();
     return {
         find: function () {
-            check(filters, Object);
-            check(options, Object);
+            //check(filters, Object);
+            //check(options, Object);
 
             filters['isDeleted'] = 0;
             if (!options.hasOwnProperty("limit")) {
@@ -27,12 +27,13 @@ publications.getApplications = function (filters, options) {
             return Collection.find(filters, options);
         },
         children: [
-            {
-                find: function (app) {
-                    //return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
-                    candidateCollection.find({candidateId: app.candidateId}, {limit: 1});
-                }
-            }
+            /*  {
+             find: function (app) {
+             //return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
+             candidateCollection.find({candidateId: app.candidateId}, {limit: 1});
+             }
+             }*/
+
         ]
     }
 };
@@ -114,6 +115,34 @@ publications.applicationDetails = function (data) {
         ]
     }
 };
+
+publications.application = function (appId) {
+    if (!this.userId || !appId) return this.ready();
+    check(appId, String);
+    var user = Meteor.users.findOne({_id: this.userId});
+    return {
+        find: function () {
+            if (!user.canViewApplication(appId)) return null;
+            var filters = {_id: appId};
+            var options = {limit: 1};
+            return Collection.find(filters, options);
+        },
+        children: [
+            {
+                find: function (application) {
+                    var filters = {
+                        candidateId: application.candidateId
+                    };
+                    var options = {
+                        limit: 1
+                    };
+
+                    return candidateCollection.find(filters, options);
+                }
+            }
+        ]
+    }
+}
 
 
 publications.applicationCounter = function (counterName, filters) {

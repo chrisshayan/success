@@ -1,0 +1,82 @@
+.job-hiring-process {
+	background: #fff;
+
+	.stage {
+		line-height: 40px;
+		text-align: center;
+		border-right: 1px solid #ddd;
+
+		&:hover, &.active {
+			background-color: #fff;
+			color: #666;
+			box-shadow: inset 0px 0px 24px rgba(163, 161, 161, 0.4);
+		}
+
+		.link {
+			display: inline-block;
+			width: 100%;
+			text-align: center;
+		}
+
+		.title {
+			color: #777;
+			font-weight: 400;
+			font-size: 15px;
+		}
+
+		.count {
+			padding: 0 2px;
+			color: #777;
+			font-weight: 600;
+			font-size: 16px;
+		}
+	}
+}
+
+
+.job-candidate-profile {
+	width: 73%;
+	height: auto;
+	min-height: 600px;
+	float: right;
+	position: relative;
+
+	.no-application {
+		border: 2px dashed #ccc;
+		text-align: center;
+		height: 400px;
+		width: 90%;
+		margin: 20px 0;
+		padding: 50px 20px;
+
+		.fa {
+			font-size: 60px;
+			color: #9b9b9b;
+		}
+	}
+
+	.content {
+		background: #fff;
+	}
+}
+
+.job-candidate-actions {
+	top: 0;
+	z-index: 9999;
+}
+
+
+.job-candidate-actions {
+	&.affix  {
+		.profile-action-title {
+			display: block;
+			margin: 5px 0;
+		}
+	}
+
+	&.affix-top {
+		.profile-action-title {
+			display: none;
+		}
+	}
+}

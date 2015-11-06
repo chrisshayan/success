@@ -6,7 +6,6 @@ HiringProcess = BlazeComponent.extendComponent({
             var params = Router.current().params;
             self.jobId = params._id;
             self.stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
-            self.subscribe("jobStagesCounter", "job_stages_" + self.jobId, self.jobId);
         }));
     },
 
@@ -19,13 +18,11 @@ HiringProcess = BlazeComponent.extendComponent({
     stages: function () {
         var self = this;
         var stages = [];
-        var counter = Collections.Counts.findOne("job_stages_" + self.jobId);
+        var job = Collections.Jobs.findOne({_id: self.jobId});
+        var counter = job['stages'] || {};
         _.each(Success.APPLICATION_STAGES, function (stage) {
             stage.jobId = self.jobId;
-            stage.total = "";
-            if(counter)
-                stage.total = counter.count[stage.id];
-
+            stage.total = counter[stage.id] || "";
             stages.push(stage);
         });
         return stages;

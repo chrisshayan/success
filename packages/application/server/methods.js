@@ -293,6 +293,30 @@ methods.checkApplicationInStage = function (opt) {
         stage: opt.stage
     };
     return !!Collection.find(criteria).count();
-}
+};
+
+methods.applicationStageCount = function (jobId, stage) {
+    var result = {
+        qualify: 0,
+        disqualified: 0
+    };
+    if (this.userId && jobId && stage !== null) {
+        var job = jobCollection.findOne({_id: jobId});
+        if (job) {
+            result['qualify'] = Collection.find({
+                'source.jobId': job.source.jobId,
+                stage: stage,
+                disqualified: false
+            }).count();
+            result['disqualified'] = Collection.find({
+                'source.jobId': job.source.jobId,
+                stage: stage,
+                disqualified: true
+            }).count();
+        }
+    }
+    return result;
+};
+
 
 Meteor.methods(methods);

@@ -235,6 +235,10 @@ model.appendSchema({
         blackbox: true,
         defaultValue: []
     },
+    stages: {
+        type: [Object],
+        optional: true
+    },
 
     createdAt: {
         type: Date,
@@ -284,3 +288,22 @@ Collection.allow({
  doc.updatedAt = new Date();
  doc.updatedBy = userId;
  });*/
+
+
+if (Meteor.isServer) {
+    Collection.after.insert(function (userId, doc) {
+        Collection.update({_id: doc._id}, {
+            $set: {
+                stages: {
+                    0: 0,
+                    1: 0,
+                    2: 0,
+                    3: 0,
+                    4: 0,
+                    5: 0
+                }
+            }
+        })
+    });
+
+}

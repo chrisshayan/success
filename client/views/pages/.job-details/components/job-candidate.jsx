@@ -5,6 +5,7 @@ function formatCoverletter(coverLetter) {
     return coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
 }
 
+
 JobCandidate = React.createClass({
 
     componentDidMount() {

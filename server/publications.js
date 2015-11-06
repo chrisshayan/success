@@ -184,36 +184,36 @@ Meteor.publish('applicationActivities', function (filters, options) {
 });
 
 /*Meteor.publish("applicationCounter", function (counterName, filters) {
-    if (!this.userId) return this.ready();
-    var self = this;
-    check(counterName, String);
-    check(filters, Object);
+ if (!this.userId) return this.ready();
+ var self = this;
+ check(counterName, String);
+ check(filters, Object);
 
-    var count = 0;
-    var initializing = true;
-    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return;
-    filters['companyId'] = user.companyId;
-    var handle = Collections.Applications.find(filters).observeChanges({
-        added: function (id) {
-            count++;
-            if (!initializing)
-                self.changed("vnw_counts", counterName, {count: count});
-        },
-        removed: function (id) {
-            count--;
-            self.changed("vnw_counts", counterName, {count: count});
-        }
-    });
+ var count = 0;
+ var initializing = true;
+ var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
+ if (!user) return;
+ filters['companyId'] = user.companyId;
+ var handle = Collections.Applications.find(filters).observeChanges({
+ added: function (id) {
+ count++;
+ if (!initializing)
+ self.changed("vnw_counts", counterName, {count: count});
+ },
+ removed: function (id) {
+ count--;
+ self.changed("vnw_counts", counterName, {count: count});
+ }
+ });
 
-    initializing = false;
-    self.added("vnw_counts", counterName, {count: count});
-    self.ready();
+ initializing = false;
+ self.added("vnw_counts", counterName, {count: count});
+ self.ready();
 
-    self.onStop(function () {
-        handle.stop();
-    });
-});*/
+ self.onStop(function () {
+ handle.stop();
+ });
+ });*/
 
 Meteor.publish("activityCounter", function (counterName, filters) {
     if (!this.userId) return this.ready();
@@ -344,10 +344,11 @@ Meteor.publish('skillSearch', function (q) {
     if (!this.userId) return this.ready();
     q = q.trim();
     if (q.length < 1) return this.ready();
+
     var option = {
         sort: {skillLength: 1},
         limit: 10
     };
-
     return Collections.SkillTerms.find({$text: {$search: q}}, option);
+
 });

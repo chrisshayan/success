@@ -16,21 +16,21 @@ var syncData = function () {
             CRON_VNW.sync();
         }
     });
-    //SyncedCron.add({
-    //    name: 'Pull and sync skill term from VNW',
-    //    schedule: function (parser) {
-    //        return parser.recur().on(0, 12).hour();
-    //    },
-    //    job: function () {
-    //        CRON_VNW.cronSkills();
-    //    }
-    //});
+    SyncedCron.add({
+        name: 'Pull and sync skill term from VNW',
+        schedule: function (parser) {
+            return parser.recur().on(0, 12).hour();
+        },
+        job: function () {
+            CRON_VNW.cronSkills();
+        }
+    });
 };
 
 
 Meteor.startup(function () {
     if(process.env.CRON_SCHEDULE) {
-        syncData();
-        SyncedCron.start();
+        //syncData();
+        //SyncedCron.start();
     }
 });

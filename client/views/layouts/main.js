@@ -30,20 +30,20 @@ Template.mainLayout.rendered = function () {
     $(window).bind("load resize scroll", function () {
         if (!$("body").hasClass('body-small')) {
 
-            var navbarHeigh = $('nav.navbar-default').height();
-            var wrapperHeigh = $('#page-wrapper').height();
+            //var navbarHeigh = $('nav.navbar-default').height();
+            //var wrapperHeigh = $('#page-wrapper').height();
 
-            if (navbarHeigh > wrapperHeigh) {
-                $('#page-wrapper').css("min-height", navbarHeigh + "px");
-            }
-
-            if (navbarHeigh < wrapperHeigh) {
-                $('#page-wrapper').css("min-height", $(window).height() + "px");
-            }
-
-            if ($('body').hasClass('fixed-nav')) {
-                $('#page-wrapper').css("min-height", $(window).height() - 60 + "px");
-            }
+            //if (navbarHeigh > wrapperHeigh) {
+            //    $('#page-wrapper').css("min-height", navbarHeigh + "px");
+            //}
+            //
+            //if (navbarHeigh < wrapperHeigh) {
+            //    $('#page-wrapper').css("min-height", $(window).height() + "px");
+            //}
+            //
+            //if ($('body').hasClass('fixed-nav')) {
+            //    $('#page-wrapper').css("min-height", $(window).height() - 60 + "px");
+            //}
         }
     });
 

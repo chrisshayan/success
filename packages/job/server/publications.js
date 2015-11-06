@@ -21,13 +21,19 @@ DEFAULT_JOB_OPTIONS = {
         status: 1,
         createdAt: 1,
         createdBy: 1,
+        expiredAt: 1,
         recruiterEmails: 1,
         recruiters: 1,
-        tags: 1
+        tags: 1,
+        stages: 1
     }
 };
 
 var publications = {};
+
+var appCollection = Meteor.applications
+    , candidateCollection = Meteor.candidates;
+
 /**
  * Publish own jobs and job assigned
  * @param filters
@@ -43,7 +49,6 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
             try {
                 check(filters, Object);
                 check(options, Match.Optional(Object));
-
                 var user = Meteor.users.findOne({_id: self.userId});
                 var permissions = user.jobPermissions();
 
@@ -54,7 +59,9 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
                 options['fields'] = DEFAULT_JOB_OPTIONS['fields'];
 
                 if (!options.hasOwnProperty("limit")) {
-                    options['limit'] = 5;
+                    options['limit'] = 10;
+                } else {
+                    options['limit'] += 5;
                 }
                 //return Collections.Jobs.find(filters, options);
                 return Meteor['jobs'].find(filters, options);
@@ -73,6 +80,7 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
  * @param options.jobId {String}
  * @returns {Cursor}
  */
+
 publications.jobDetails = function (opt) {
     if (!this.userId) return this.ready();
     check(opt, {
@@ -80,30 +88,69 @@ publications.jobDetails = function (opt) {
     });
 
     var self = this;
+    var user = Meteor.users.findOne({_id: self.userId});
+    var permissions = user.jobPermissions();
     return {
+
+        /*
+         find: function () {
+         var user = Meteor.users.findOne({_id: self.userId});
+         var permissions = user.jobPermissions();
+         var curJobCond = {
+         _id: opt.jobId,
+         $or: permissions
+         };
+         //var job = Collections.Jobs.findOne(curJobCond);
+         var job = Meteor['jobs'].findOne(curJobCond);
+         if (!job) return null;
+         var cond = {
+         $or: [
+         {_id: job._id},
+         {
+         */
+
         find: function () {
-            var user = Meteor.users.findOne({_id: self.userId});
-            var permissions = user.jobPermissions();
-            var curJobCond = {
+            var cond = {
                 _id: opt.jobId,
                 $or: permissions
             };
-            //var job = Collections.Jobs.findOne(curJobCond);
-            var job = Meteor['jobs'].findOne(curJobCond);
-            if (!job) return null;
-            var cond = {
-                $or: [
-                    {_id: job._id},
-                    {
+            return Collection.find(cond);
+        },
+        children: [
+            // Related jobs
+            {
+                find: function (job) {
+                    var cond = {
+                        _id: {$ne: job._id},
                         status: job.status,
                         $or: permissions
+                    };
+                    return Collections.Jobs.find(cond, {limit: 5});
+                }
+            },
+        /**
+         * Publish application and candidate selected
+         */
+            {
+                find: function (job) {
+                    if (job && opt.application) {
+                        return appCollection.find({_id: opt.application}, {limit: 1});
+                    }
+                    return null;
+                },
+
+                children: [
+                    {
+                        find: function (app) {
+                            if (app) {
+                                return candidateCollection.find({candidateId: app.candidateId}, {limit: 1});
+                            }
+                            return null;
+                        }
                     }
                 ]
-            };
-            //return Collections.Jobs.find(cond, {limit: 6});
-            return Meteor['jobs'].find(cond, {limit: 6});
-        },
-        children: []
+            }
+        ]
     }
 };
 
@@ -254,18 +301,18 @@ publications.lastOpenJobs = function () {
 
 
 /*publications.addJobPage = function () {
-    console.log('this userid', this.userI);
-    if (!this.userId) return this.ready();
-    var cursors = [];
-    var jobLevels = Meteor.job_levels.find();
-    var industries = Meteor.industries.find();
-    var cities = Meteor.cities.find();
-    console.log('cur : ', jobLevels, industries);
-    cursors.push(jobLevels);
-    cursors.push(industries);
-    cursors.push(cities);
-    return cursors;
-}*/
+ console.log('this userid', this.userI);
+ if (!this.userId) return this.ready();
+ var cursors = [];
+ var jobLevels = Meteor.job_levels.find();
+ var industries = Meteor.industries.find();
+ var cities = Meteor.cities.find();
+ console.log('cur : ', jobLevels, industries);
+ cursors.push(jobLevels);
+ cursors.push(industries);
+ cursors.push(cities);
+ return cursors;
+ }*/
 
 
 Meteor.publish('addJobPage', function () {

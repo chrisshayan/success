@@ -1,5 +1,3 @@
-var cx = React.addons.classSet;
-
 JourneySetup = React.createClass({
     mixins: [ReactMeteorData],
 
@@ -44,7 +42,7 @@ JourneySetup = React.createClass({
     },
 
     render() {
-        var classNames = cx({
+        var cx = classNames({
             "modal": true,
             "inmodal": true,
             "in": true,
@@ -55,7 +53,7 @@ JourneySetup = React.createClass({
         if(this.data.current >= 0) {
             content = (
                 <div>
-                    <div className={classNames} id="productTour" tabIndex="-1" role="dialog" ariaHidden="false">
+                    <div className={cx} id="productTour" tabIndex="-1" role="dialog" ariaHidden="false">
                         <div className="modal-dialog modal-lg">
                             <div className="modal-content product-tour animated bounceInRight">
                                 <div className="modal-body">
@@ -109,12 +107,12 @@ JourneySetup = React.createClass({
 
 var JourneyWellcome = React.createClass({
     render() {
-        var classNames = cx({
+        var cx = classNames({
             'item': true,
             'active': this.props.active
         });
         return (
-            <div className={ classNames }>
+            <div className={ cx }>
                 <div className="carousel-caption animated bounceInRight">
                     <h2>Welcome to SUCCESS Site</h2>
 
@@ -130,12 +128,12 @@ var JourneyWellcome = React.createClass({
 
 var JourneyUpdateProfile = React.createClass({
     render() {
-        var classNames = cx({
+        var cx = classNames({
             'item': true,
             'active': this.props.active
         });
         return (
-            <div className={ classNames }>
+            <div className={ cx }>
                 <div className="carousel-caption animated bounceInRight">
                     <h2><i className="fa fa-flask"></i> Update your profile</h2>
 
@@ -153,12 +151,12 @@ var JourneyUpdateProfile = React.createClass({
 
 var JourneyUpdateMailSignature = React.createClass({
     render() {
-        var classNames = cx({
+        var cx = classNames({
             'item': true,
             'active': this.props.active
         });
         return (
-            <div className={ classNames }>
+            <div className={ cx }>
                 <div className="carousel-caption animated bounceInRight">
                     <h2><i className="fa fa-flask"></i> Mail signature</h2>
 

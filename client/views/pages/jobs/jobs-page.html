@@ -1,0 +1,484 @@
+<template name="JobsPage">
+    <div>
+        {{> React component=JobsContainer }}
+    </div>
+
+    <div class="wrapper wrapper-content animated fadeInRight" id="resumeDetail">
+        <div class="row hidden-print">
+            <div class="col-sm-6 col-md-6 col-lg-4">
+                <div class="form-group">
+                    <div class="input-group">
+                        <div class="input-group-addon"><i class="fa fa-fw fa-folder-open"></i></div>
+                        <select name="" id="selectFolder" class="form-control select2-sing pull-left">
+                            <option value="0">Move To Folder</option>
+                            <option value="1" class="current">2015 - Php Jobs</option>
+                            <option value="2">2015 - UX Jobs</option>
+                            <option value="3">2015 - Internal Project</option>
+                            <optgroup label="New folder">
+                                <option value="4" data-toggle="dropdown" dropdown-toggle="">Add New Folder</option>
+                            </optgroup>
+                        </select>
+                        <ul class="dropdown-menu pull-right" aria-labelledby="stage-menu" id="myDropdown">
+                            <li>
+                                <div class="m-l m-r m-t">
+                                    <form role="form">
+                                        <fieldset class="control-group">
+                                            <h5>Add To This Folder</h5>
+
+                                            <div class="form-group">
+                                                <label class="sr-only">Add New Folder</label>
+                                                <input type="text" placeholder="Folder name" class="form-control input-sm">
+
+                                                <div class="text-right">
+                                                    <button type="button" class="btn btn-sm btn-default m-t" id="">Cancel</button>
+                                                    <button type="button" class="btn btn-sm btn-primary m-t" id="btnAddFolder">Create</button>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-6 col-lg-8 pull-right">
+                <div class="row">
+                    <div class="btn-group pull-right">
+                        <button class="btn btn-default btn-outline toggle-comment-form" data-toggle="tooltip" data-placement="bottom" title="Forward resume">
+                            <i class="fa fa-fw fa-mail-forward"></i> Forward</button>
+                        <button class="btn btn-default btn-outline " data-toggle="tooltip" data-placement="bottom" title="Print resume">
+                            <i class="fa fa-fw fa-print"></i> Print</button>
+                        <button class="btn btn-danger btn-outline btn-delete-candidate">
+                            <i class="fa fa-fw fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 col-md-5 col-md-push-7">
+
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <div class="tab-content">
+                            <div class="text-center">
+
+                                <div class="m-b-sm m-t">
+                                    <img alt="image" class="" src="http://images.vietnamworks.com/pictureofresume/9d/10210743.png">
+                                </div>
+                                <h2>Jasper Carson</h2>
+                                <strong>Php Developer </strong>
+
+                                <p>
+                                    Local Vietnamese, Female - Single 11<br> February 1992
+                                </p>
+
+
+
+                                <!--Viewed Contact Information-->
+                                <div class="contact-detail gray-light">
+                                    <p class="m-b">130 Suong Nguyet Anh St.<br> District 7, Ho Chi Minh City, Vietnam<br> Phone: 01223455034<br> Email:
+                                        <a href="mailto:kimchi8192@gmail.com">kimchi8192@gmail.com</a>
+                                    </p>
+                                </div>
+                                <!--Viewed Contact Information-->
+                                <!--<p class="m-t small gray-light">-->
+                                <!--<span><i class="fa fa-fw fa-eye"></i> Views: 10 </span>-->
+                                <!--<span class="m-l"><i class="fa fa-fw fa-download"></i> Download: 322</span>-->
+                                <!--<span class="m-l"><i class="fa fa-fw fa-bar-chart"></i> Progress: 80%</span>-->
+                                <!--<span class="m-l"><i class="fa fa-fw fa-calendar"></i> Updated: Today</span>-->
+                                <!--</p>-->
+
+                                <!--Not View Contact Detail -->
+                                <div class="contact-default ibox-content hidden-print">
+                                    <p class="m-t">
+                                        <button class="btn btn-primary btn-outline">
+                                            <i class="fa fa-fw fa-eye"></i> View Contact Information<br> (-2 Credits)
+                                        </button>
+                                    </p>
+                                    <p class="m-t-sm"><strong>(60 of 100 credits remaining)</strong><br>
+                                        <small>To view this featured candidate contact information, it will decrease 2 resume credits from your package.</small>
+                                    </p>
+                                </div>
+
+
+                                <!--Viewed Contact Information-->
+                                <!--<div class="center-block text-center m-t-xs hidden-print ibox-content">-->
+                                <!--<button class="btn btn-primary btn-outline">-->
+                                <!--<i class="fa fa-fw fa-envelope"></i> Send Email to Candidate-->
+                                <!--</button>-->
+                                <!--</div>-->
+
+                                <div class="contact-default ibox-content">
+                                    <div class="">
+                                        <h4>Apply for: <a href="http://www.vietnamworks.com/digital-designer-1-583274-jd" target="_blank"><strong>Digital Marketing Executive </strong></a></h4>
+                                        <p class="small gray-light">Job posted: 21 Aug 2015 | Applied date: 14 Sep 2015 </p>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+            <div class="col-sm-12 col-md-7 col-md-pull-5">
+                <div class="page-break"></div>
+                <div class="ibox hidden-print">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-download"></i> Download Resume &amp; Cover Letter</h2>
+                        <div class="text-center">
+                            <button type="button" class="btn btn-primary btn-outline m-t-sm">
+                                <i class="fa fa-fw fa-download"></i> Download Resume &amp; Cover letter
+                            </button>
+                            <button type="button" class="btn btn-primary btn-outline m-t-sm">
+                                <i class="fa fa-fw fa-download"></i> Download Resume only
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- General-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-list"></i> General Information</h2>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table m-b-xs m-t">
+                                    <tbody>
+                                    <tr>
+                                        <td>
+                                            <strong>Highest Education</strong>
+                                        </td>
+                                        <td>
+                                            Bachelors
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Total Years of Experience</strong>
+                                        </td>
+                                        <td>
+                                            3 year(s)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Language Proficiency</strong>
+                                        </td>
+                                        <td>
+                                            Vietnamese( Native)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Most Recent Job</strong>
+                                        </td>
+                                        <td>
+                                            Senior Graphic Design
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Most Recent Company</strong>
+                                        </td>
+                                        <td>
+                                            Hoàng Phúc International
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Current Job Level</strong>
+                                        </td>
+                                        <td>
+                                            Experienced (Non-Manager)
+                                        </td>
+                                    </tr>
+
+
+                                    <tr>
+                                        <td>
+                                            <strong>Expected Position</strong>
+                                        </td>
+                                        <td>
+                                            Senior Graphic Design
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Expected Job Level</strong>
+                                        </td>
+                                        <td>
+                                            Team Leader/Supervisor
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Expected Work Place</strong>
+                                        </td>
+                                        <td>
+                                            Ho Chi Minh
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Expected Job Category</strong>
+                                        </td>
+                                        <td>
+                                            Arts/Design
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Expected Salary</strong>
+                                        </td>
+                                        <td>
+                                            Negotiable
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End General-->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <!-- Cover Letter -->
+                <div class="page-break"></div>
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
+                        <blockquote>
+                            <p class="small">
+                                Dear Mr/Mrs, I have recently completed my study which majors in Business English at Foreign Trade University. Now I would like to welcome the opportunity to contribute my knowledge, skills and some experience to growing business. During my university study period, I only work as a tutor and a freelance translator. Besides, I had a chance to be a graduate trainee at APT company in 2 months. After graduation, I worked as a sales representative at Paradise Bay company. Moreover, I am a responsible person and willing to learn anything which is essential for my work. I know pressure at work is unavoidable, especially in private businesses but this is one of my strengths. Despite of not having a lot experience, if I win a place in business, I will try my best to learn and work due to its development. Now I am ready for work. I am looking forward to hearing from you and to a possibility of an interview. Thank you for your time and consideration. Best regards, Doan Ngoc Quynh Trang </p>
+                        </blockquote>
+
+                    </div>
+                </div>
+                <!-- End Cover Letter -->
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <!--Attached CV-->
+                <div class="ibox hidden-print">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-paperclip"></i> Attached CV</h2>
+                        <div class="center-block text-center">
+
+                            <span class="fa fa-file-pdf-o big-icon"></span><br>
+                            <button type="button" class="btn btn-primary btn-outline m-t-sm">
+                                <i class="fa fa-fw fa-eye"></i> Preview by Google Viewer
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile / Objective-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-user"></i> Profile / Objective</h2>
+                        <p class="m-t">My career goal is to become a Marketing Expert. I always want to explore large Marketing project to be collisions and willing to learn. I want to work in a professional environment where I could my best abilities and have more opportunities to develop myself in a future. With accumulated skills after working indepently and in team. I hope to have good performance at your company in future. </p>
+                    </div>
+                </div>
+                <!-- End Profile / Objective -->
+
+                <!-- Keyskills-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-flash"></i> Key Skills</h2>
+
+                        <div class="skills clearfix">
+                            <ul class="tag-list">
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">JAVASCRIPT</a></li>
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">JAVASCRIPT</a></li>
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">JAVASCRIPT</a></li>
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">JAVASCRIPT</a></li>
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">UX DESIGN</a></li>
+                                <li><a href="">PHP</a></li>
+                                <li><a href="">JAVASCRIPT</a></li>
+                            </ul>
+                        </div>
+
+
+                    </div>
+                </div>
+                <!-- End Keyskills-->
+
+
+                <!-- Education-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-graduation-cap"></i> Education &amp; Qualifications</h2>
+                        <div id="vertical-timeline" class="vertical-container dark-timeline vertical-timeline-content no-margins">
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon navy-bg">
+                                    <i class="fa fa-building"></i>
+                                </div>
+
+                                <div class="vertical-timeline-content">
+                                    <h2>Hutech
+                                        <small>- Bachelors - Marketing</small>
+                                    </h2>
+										<span class="vertical-date m-t-n-xs">
+											<small>Jun 2015 - August 2015</small>
+										</span><br>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et lacus rutrum, ullamcorper dui at, viverra dolor. Proin sollicitudin purus mi, pulvinar tincidunt lectus tempor ac. Cras id sem tincidunt, porta dui vel, tincidunt quam. Sed lorem mauris, tristique eu nisi at, varius lacinia quam. Pellentesque in suscipit nisi. Donec viverra augue ante, ac eleifend lectus auctor in. Nulla facilisi. Nam maximus purus et dolor gravida, et vehicula sem sodales. Vestibulum sed ipsum ac ipsum commodo auctor eu eu ante. Vestibulum id gravida felis. Fusce vehicula felis id dui efficitur auctor. </p>
+
+                                </div>
+                            </div>
+
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon blue-bg">
+                                    <i class="fa fa-building"></i>
+                                </div>
+
+                                <div class="vertical-timeline-content">
+                                    <h2>Marketing College
+                                        <small>- Bachelors - Marketing</small>
+                                    </h2>
+										<span class="vertical-date m-t-n-xs">
+											<small>Jun 2015 - August 2015</small>
+										</span><br>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et lacus rutrum, ullamcorper dui at, viverra dolor. Proin sollicitudin purus mi, pulvinar tincidunt lectus tempor ac. Cras id sem tincidunt, porta dui vel, tincidunt quam. Sed lorem mauris, tristique eu nisi at, varius lacinia quam. Pellentesque in suscipit nisi. Donec viverra augue ante, ac eleifend lectus auctor in. Nulla facilisi. Nam maximus purus et dolor gravida, et vehicula sem sodales. Vestibulum sed ipsum ac ipsum commodo auctor eu eu ante. Vestibulum id gravida felis. Fusce vehicula felis id dui efficitur auctor. </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Education-->
+                <!-- Work Experience-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-bank"></i> Work Experience</h2>
+                        <div id="vertical-timeline" class="vertical-container dark-timeline vertical-timeline-content no-margins">
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon navy-bg">
+                                    <i class="fa fa-black-tie"></i>
+                                </div>
+
+                                <div class="vertical-timeline-content">
+                                    <h2>Freelancer
+                                        <small>- Grab Taxi</small>
+                                    </h2>
+										<span class="vertical-date m-t-n-xs">
+											<small>Jun 2015 - Current</small>
+										</span>
+                                    <br>
+
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et lacus rutrum, ullamcorper dui at, viverra dolor. Proin sollicitudin purus mi, pulvinar tincidunt lectus tempor ac. Cras id sem tincidunt, porta dui vel, tincidunt quam. Sed lorem mauris, tristique eu nisi at, varius lacinia quam. Pellentesque in suscipit nisi. Donec viverra augue ante, ac eleifend lectus auctor in. Nulla facilisi. Nam maximus purus et dolor gravida, et vehicula sem sodales. Vestibulum sed ipsum ac ipsum commodo auctor eu eu ante. Vestibulum id gravida felis. Fusce vehicula felis id dui efficitur auctor. </p>
+
+                                </div>
+                            </div>
+
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon blue-bg">
+                                    <i class="fa fa-black-tie"></i>
+                                </div>
+
+                                <div class="vertical-timeline-content">
+                                    <h2>UX Leader
+                                        <small>- Navigos Group</small>
+                                    </h2>
+										<span class="vertical-date m-t-n-xs">
+											<small>Jun 2015 - Current</small>
+										</span><br>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et lacus rutrum, ullamcorper dui at, viverra dolor. Proin sollicitudin purus mi, pulvinar tincidunt lectus tempor ac. Cras id sem tincidunt, porta dui vel, tincidunt quam. Sed lorem mauris, tristique eu nisi at, varius lacinia quam. Pellentesque in suscipit nisi. Donec viverra augue ante, ac eleifend lectus auctor in. Nulla facilisi. Nam maximus purus et dolor gravida, et vehicula sem sodales. Vestibulum sed ipsum ac ipsum commodo auctor eu eu ante. Vestibulum id gravida felis. Fusce vehicula felis id dui efficitur auctor. </p>
+
+                                </div>
+                            </div>
+
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon lazur-bg">
+                                    <i class="fa fa-black-tie"></i>
+                                </div>
+
+                                <div class="vertical-timeline-content">
+                                    <h2>Marketing Staff
+                                        <small>- Navigos Group</small>
+                                    </h2>
+										<span class="vertical-date m-t-n-xs">
+											<small>Jun 2015 - Current</small>
+										</span><br>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et lacus rutrum, ullamcorper dui at, viverra dolor. Proin sollicitudin purus mi, pulvinar tincidunt lectus tempor ac. Cras id sem tincidunt, porta dui vel, tincidunt quam. Sed lorem mauris, tristique eu nisi at, varius lacinia quam. Pellentesque in suscipit nisi. Donec viverra augue ante, ac eleifend lectus auctor in. Nulla facilisi. Nam maximus purus et dolor gravida, et vehicula sem sodales. Vestibulum sed ipsum ac ipsum commodo auctor eu eu ante. Vestibulum id gravida felis. Fusce vehicula felis id dui efficitur auctor. </p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Work Experience-->
+
+                <!-- References-->
+                <div class="ibox">
+                    <div class="ibox-content">
+                        <h2><i class="fa fa-fw fa-book"></i> References</h2>
+                        <div id="vertical-timeline" class="vertical-container dark-timeline vertical-timeline-content no-margins">
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon navy-bg">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="vertical-timeline-content">
+                                    <h2 class="m-b-xs">Eduardo Mora Barbaro
+                                        <small>- Head of Product at <strong>En-Japan</strong></small>
+                                    </h2>
+                                    <span>Email: eduardo@navigosgroup.com<br>Phone number: 0903252255</span>
+                                </div>
+                            </div>
+
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon navy-bg">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="vertical-timeline-content">
+                                    <h2 class="m-b-xs">Akira Dalton
+                                        <small>- Product Owner at <strong>VietnamWorks</strong></small>
+                                    </h2>
+                                    <span>Email: akiramalaysia@navigosgroup.com<br>Phone number: 0903252255</span>
+                                </div>
+                            </div>
+
+                            <div class="vertical-timeline-block">
+                                <div class="vertical-timeline-icon navy-bg">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="vertical-timeline-content">
+                                    <h2 class="m-b-xs">Bui Ba Cong
+                                        <small>- Product Manager at <strong>VietnamWorks</strong></small>
+                                    </h2>
+                                    <span>Email: cong.bui@navigosgroup.com<br>Phone number: 0903252255</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End References-->
+            </div>
+        </div>
+
+    </div>
+</template>

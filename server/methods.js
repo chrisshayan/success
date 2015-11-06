@@ -172,31 +172,31 @@ Meteor.methods({
      * opt.stage {Number}
      * @returns { Number|null}
      */
- /*   getFirstJobApplication: function (opt) {
-        try {
-            if (!this.userId) return false;
+    /*   getFirstJobApplication: function (opt) {
+     try {
+     if (!this.userId) return false;
 
-            check(opt, {
-                jobId: String,
-                stage: Number
-            });
-            //var job = Collections.Jobs.findOne({_id: opt.jobId});
-            var job = Meteor['jobs'].findOne({_id: opt.jobId});
-            if (!job) return false;
+     check(opt, {
+     jobId: String,
+     stage: Number
+     });
+     //var job = Collections.Jobs.findOne({_id: opt.jobId});
+     var job = Meteor['jobs'].findOne({_id: opt.jobId});
+     if (!job) return false;
 
-            var application = Collections.Applications.findOne({
-                jobId: job.jobId,
-                stage: opt.stage
-            }, {sort: {createdAt: -1}});
+     var application = Collections.Applications.findOne({
+     jobId: job.jobId,
+     stage: opt.stage
+     }, {sort: {createdAt: -1}});
 
-            return application ? application._id : false;
-        } catch (e) {
-            debuger(e);
-        }
-        return null;
-    },
+     return application ? application._id : false;
+     } catch (e) {
+     debuger(e);
+     }
+     return null;
+     },
 
-    /!**
+     /!**
      * check application exists in job stage
      * @param opt {Object}
      * @param opt.jobId {String}
@@ -204,134 +204,134 @@ Meteor.methods({
      * @param opt.application {String}
      * @returns {boolean}
      *!/
-    checkApplicationInStage: function (opt) {
-        if (!this.userId) return false;
-        check(opt, {
-            jobId: String,
-            stage: Number,
-            application: String
-        });
-        //var job = Collections.Jobs.findOne({_id: opt.jobId});
-        var job = Meteor['jobs'].findOne({_id: opt.jobId});
-        if (!job) return false;
-        var criteria = {
-            _id: opt.application,
-            jobId: job.jobId,
-            stage: opt.stage
-        };
-        return !!Collections.Applications.find(criteria).count();
-    },
+     checkApplicationInStage: function (opt) {
+     if (!this.userId) return false;
+     check(opt, {
+     jobId: String,
+     stage: Number,
+     application: String
+     });
+     //var job = Collections.Jobs.findOne({_id: opt.jobId});
+     var job = Meteor['jobs'].findOne({_id: opt.jobId});
+     if (!job) return false;
+     var criteria = {
+     _id: opt.application,
+     jobId: job.jobId,
+     stage: opt.stage
+     };
+     return !!Collections.Applications.find(criteria).count();
+     },
 
 
-    /!**
+     /!**
      * Update application qualify
      * @param applicationId {Number}
      *!/
-    disqualifyApplication: function (applicationId) {
-        try {
-            if (!this.userId) return false;
-            this.unblock();
+     disqualifyApplication: function (applicationId) {
+     try {
+     if (!this.userId) return false;
+     this.unblock();
 
-            check(applicationId, String);
-            var conditions = {
-                _id: applicationId
-            };
-            var application = Collections.Applications.findOne(conditions);
+     check(applicationId, String);
+     var conditions = {
+     _id: applicationId
+     };
+     var application = Collections.Applications.findOne(conditions);
 
-            if (!application || application.disqualified == true) return;
+     if (!application || application.disqualified == true) return;
 
-            var modifier = {
-                $set: {
-                    disqualified: true
-                }
-            }
-            var result = Collections.Applications.update(conditions, modifier);
-            if (result) {
-                // Log activity
-                var activity = new Activity();
-                activity.companyId = application.companyId;
-                activity.createdBy = this.userId;
-                activity.data = {
-                    applicationId: applicationId
-                };
-                activity.disqualifiedApplication();
-            }
-        } catch (e) {
-            debuger(e);
-        }
-    },
+     var modifier = {
+     $set: {
+     disqualified: true
+     }
+     }
+     var result = Collections.Applications.update(conditions, modifier);
+     if (result) {
+     // Log activity
+     var activity = new Activity();
+     activity.companyId = application.companyId;
+     activity.createdBy = this.userId;
+     activity.data = {
+     applicationId: applicationId
+     };
+     activity.disqualifiedApplication();
+     }
+     } catch (e) {
+     debuger(e);
+     }
+     },
 
 
-    disqualifyApplications: function (ids) {
-        try {
-            if (!this.userId) return false;
-            var self = this;
-            this.unblock();
+     disqualifyApplications: function (ids) {
+     try {
+     if (!this.userId) return false;
+     var self = this;
+     this.unblock();
 
-            check(ids, [String]);
+     check(ids, [String]);
 
-            _.each(ids, function (_id) {
-                Meteor.defer(function () {
-                    var application = Collections.Applications.findOne({_id: _id});
-                    if (!application || application.disqualified == true) return;
+     _.each(ids, function (_id) {
+     Meteor.defer(function () {
+     var application = Collections.Applications.findOne({_id: _id});
+     if (!application || application.disqualified == true) return;
 
-                    var modifier = {
-                        $set: {
-                            disqualified: true
-                        }
-                    }
-                    var result = Collections.Applications.update({_id: application._id}, modifier);
-                    if (result) {
-                        // Log activity
-                        var activity = new Activity();
-                        activity.companyId = application.companyId;
-                        activity.createdBy = self.userId;
-                        activity.data = {
-                            applicationId: application._id
-                        };
-                        activity.disqualifiedApplication();
-                    }
-                });
-            });
+     var modifier = {
+     $set: {
+     disqualified: true
+     }
+     }
+     var result = Collections.Applications.update({_id: application._id}, modifier);
+     if (result) {
+     // Log activity
+     var activity = new Activity();
+     activity.companyId = application.companyId;
+     activity.createdBy = self.userId;
+     activity.data = {
+     applicationId: application._id
+     };
+     activity.disqualifiedApplication();
+     }
+     });
+     });
 
-        } catch (e) {
-            debuger(e);
-        }
-    },
-    /!**
+     } catch (e) {
+     debuger(e);
+     }
+     },
+     /!**
      * Update application qualify
      * @param applicationId {Number}
      *!/
-    revertApplication: function (applicationId) {
-        try {
-            if (!this.userId) return false;
-            check(applicationId, String);
-            var application = Collections.Applications.findOne({_id: applicationId});
-            if (!application) return;
-            var conditions = {
-                _id: applicationId
-            };
-            var modifier = {
-                $set: {
-                    disqualified: false
-                }
-            }
-            var result = Collections.Applications.update(conditions, modifier);
-            if (result) {
-                // Log activity
-                var activity = new Activity();
-                activity.companyId = application.companyId;
-                activity.createdBy = this.userId;
-                activity.data = {
-                    applicationId: applicationId
-                };
-                activity.revertApplication();
-            }
-        } catch (e) {
-            debuger(e);
-        }
-        return result;
-    },*/
+     revertApplication: function (applicationId) {
+     try {
+     if (!this.userId) return false;
+     check(applicationId, String);
+     var application = Collections.Applications.findOne({_id: applicationId});
+     if (!application) return;
+     var conditions = {
+     _id: applicationId
+     };
+     var modifier = {
+     $set: {
+     disqualified: false
+     }
+     }
+     var result = Collections.Applications.update(conditions, modifier);
+     if (result) {
+     // Log activity
+     var activity = new Activity();
+     activity.companyId = application.companyId;
+     activity.createdBy = this.userId;
+     activity.data = {
+     applicationId: applicationId
+     };
+     activity.revertApplication();
+     }
+     } catch (e) {
+     debuger(e);
+     }
+     return result;
+     },*/
 
     /**
      * Update company mail signature
@@ -481,36 +481,36 @@ Meteor.methods({
         return true;
     },
 
-/*    /!**
+    /*    /!**
      * Add comment to application
      * @param data {Object}
      * @param data.application {Number}
      * @param data.content {String}
      *!/
-    addCommentApplication: function (data) {
-        try {
-            check(data, {
-                application: String,
-                content: String
-            });
+     addCommentApplication: function (data) {
+     try {
+     check(data, {
+     application: String,
+     content: String
+     });
 
-            this.unblock();
-            var application = Collections.Applications.findOne({_id: data.application});
-            if (!application) return false;
-            var activity = new Activity();
-            activity.companyId = application.companyId;
-            activity.createdBy = this.userId;
-            activity.data = {
-                applicationId: data.application,
-                content: data.content
-            };
-            activity.addCommentApplication();
-        } catch (e) {
-            debuger(e);
-            return false;
-        }
-        return true;
-    },*/
+     this.unblock();
+     var application = Collections.Applications.findOne({_id: data.application});
+     if (!application) return false;
+     var activity = new Activity();
+     activity.companyId = application.companyId;
+     activity.createdBy = this.userId;
+     activity.data = {
+     applicationId: data.application,
+     content: data.content
+     };
+     activity.addCommentApplication();
+     } catch (e) {
+     debuger(e);
+     return false;
+     }
+     return true;
+     },*/
 
     /**
      * REFACTOR NEW METHODS
@@ -548,8 +548,8 @@ Meteor.methods({
     setNumberOfMonth: function (newValue, companyId) {
         var query = {companyId: companyId}
             , options = {
-                fields: {numberOfMonthSync: 1}
-            };
+            fields: {numberOfMonthSync: 1}
+        };
 
         var oldValue = Collections.CompanySettings.findOne(query, options);
         try {
@@ -566,129 +566,129 @@ Meteor.methods({
         }
     },
 
-/*
+    /*
 
-    addCandidate: function (data, jobId) {
-        try {
-            if (!this.userId) return false;
-            check(data, Object);
-            check(jobId, Match.Any);
+     addCandidate: function (data, jobId) {
+     try {
+     if (!this.userId) return false;
+     check(data, Object);
+     check(jobId, Match.Any);
 
-            var isCandidateExists = false;
-            var user = Meteor.users.findOne({_id: this.userId});
-            var company = user.defaultCompany();
-            //var job = Collections.Jobs.findOne({_id: jobId});
-            var job = Meteor['jobs'].findOne({_id: jobId});
-            if (!job) return false;
+     var isCandidateExists = false;
+     var user = Meteor.users.findOne({_id: this.userId});
+     var company = user.defaultCompany();
+     //var job = Collections.Jobs.findOne({_id: jobId});
+     var job = Meteor['jobs'].findOne({_id: jobId});
+     if (!job) return false;
 
-            email = data.email.trim();
+     email = data.email.trim();
 
-            var criteria = {
-                jobId: job.jobId,
-                "candidateInfo.emails": data.email
-            };
-            var options = {
-                limit: 1
-            };
-            var isAppExists = Collections.Applications.find(criteria, options).count() > 0;
-            if (isAppExists) return false;
+     var criteria = {
+     jobId: job.jobId,
+     "candidateInfo.emails": data.email
+     };
+     var options = {
+     limit: 1
+     };
+     var isAppExists = Collections.Applications.find(criteria, options).count() > 0;
+     if (isAppExists) return false;
 
-            if (!isCandidateExists) {
-                can = new Schemas.Candidate();
-                can.candidateId = null;
-                can.data = data;
-                can.createdAt = new Date();
-                var candidateId = Collections.Candidates.insert(can);
-                Collections.Candidates.update({_id: candidateId}, {$set: {candidateId: candidateId}});
-            }
+     if (!isCandidateExists) {
+     can = new Schemas.Candidate();
+     can.candidateId = null;
+     can.data = data;
+     can.createdAt = new Date();
+     var candidateId = Collections.Candidates.insert(can);
+     Collections.Candidates.update({_id: candidateId}, {$set: {candidateId: candidateId}});
+     }
 
-            var application = new Schemas.Application();
-            application.source = 3;
-            application.stage = 0;
-            application.companyId = job.companyId;
-            application.jobId = job.jobId;
-            application.candidateId = candidateId;
-            application.data = {};
-            var candidateInfo = {
-                firstName: can.data.firstname || can.data.firstName || '',
-                lastName: can.data.lastname || can.data.lastName || '',
-                emails: [can.data.username, can.data.email, can.data.email1, can.data.email2],
-                city: can.data.city || ''
-            };
-            candidateInfo['fullname'] = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
-            candidateInfo.emails = _.filter(candidateInfo.emails, (email) => email != void 0);
-            application.candidateInfo = candidateInfo;
+     var application = new Schemas.Application();
+     application.source = 3;
+     application.stage = 0;
+     application.companyId = job.companyId;
+     application.jobId = job.jobId;
+     application.candidateId = candidateId;
+     application.data = {};
+     var candidateInfo = {
+     firstName: can.data.firstname || can.data.firstName || '',
+     lastName: can.data.lastname || can.data.lastName || '',
+     emails: [can.data.username, can.data.email, can.data.email1, can.data.email2],
+     city: can.data.city || ''
+     };
+     candidateInfo['fullname'] = [candidateInfo.lastName, candidateInfo.firstName].join(' ');
+     candidateInfo.emails = _.filter(candidateInfo.emails, (email) => email != void 0);
+     application.candidateInfo = candidateInfo;
 
-            var appId = Collections.Applications.insert(application);
-            Collections.Applications.update({_id: appId}, {$set: {entryId: appId}});
-            // Log applied activity
-            var activity = new Activity();
-            activity.companyId = job.companyId;
-            activity.data = {
-                applicationId: appId,
-                source: 3,
-                userId: candidateId
-            };
-            activity.createdAt = application.createdAt;
-            activity.createdBy = this.userId;
-            activity.addCandidateToSourced();
+     var appId = Collections.Applications.insert(application);
+     Collections.Applications.update({_id: appId}, {$set: {entryId: appId}});
+     // Log applied activity
+     var activity = new Activity();
+     activity.companyId = job.companyId;
+     activity.data = {
+     applicationId: appId,
+     source: 3,
+     userId: candidateId
+     };
+     activity.createdAt = application.createdAt;
+     activity.createdBy = this.userId;
+     activity.addCandidateToSourced();
 
-            if (data.email) {
-                Meteor.defer(function () {
-                    try {
-                        var apiUrl = process.env.VNW_API_URI + Meteor.settings.VNW_API.registerAccount;
-                        var apiKey = process.env.VNW_API_KEY;
-                        var result = Meteor.http.call(
-                            "POST",
-                            apiUrl, {
-                                headers: {
-                                    "content-type": "application/json",
-                                    "Accept": "application/json",
-                                    "content-md5": apiKey
-                                },
-                                data: {
-                                    "email": data.email,
-                                    "firstname": data.firstName,
-                                    "lastname": data.lastName
-                                }
-                            }
-                        );
+     if (data.email) {
+     Meteor.defer(function () {
+     try {
+     var apiUrl = process.env.VNW_API_URI + Meteor.settings.VNW_API.registerAccount;
+     var apiKey = process.env.VNW_API_KEY;
+     var result = Meteor.http.call(
+     "POST",
+     apiUrl, {
+     headers: {
+     "content-type": "application/json",
+     "Accept": "application/json",
+     "content-md5": apiKey
+     },
+     data: {
+     "email": data.email,
+     "firstname": data.firstName,
+     "lastname": data.lastName
+     }
+     }
+     );
 
-                        var content = JSON.parse(result.content);
-                        console.log("Add account vnw: ", content);
-                    } catch (e) {
-                        console.log("rest-api-failed", "Failed to call the REST api on VietnamWorks", e);
-                    }
-                })
-            }
+     var content = JSON.parse(result.content);
+     console.log("Add account vnw: ", content);
+     } catch (e) {
+     console.log("rest-api-failed", "Failed to call the REST api on VietnamWorks", e);
+     }
+     })
+     }
 
-        } catch (e) {
-            debuger(e);
-            return false;
-        }
-        return {candidateId: candidateId};
-    },
+     } catch (e) {
+     debuger(e);
+     return false;
+     }
+     return {candidateId: candidateId};
+     },
 
-    checkCandidateExists: function (data) {
-        check(data, {
-            jobId: Match.Any,
-            email: String
-        });
-        //var job = Collections.Jobs.findOne({_id: data.jobId});
-        var job = Meteor['jobs'].findOne({_id: data.jobId});
-        if (!job) return false;
-        email = data.email.trim();
+     checkCandidateExists: function (data) {
+     check(data, {
+     jobId: Match.Any,
+     email: String
+     });
+     //var job = Collections.Jobs.findOne({_id: data.jobId});
+     var job = Meteor['jobs'].findOne({_id: data.jobId});
+     if (!job) return false;
+     email = data.email.trim();
 
-        var criteria = {
-            jobId: job.jobId,
-            "candidateInfo.emails": data.email
-        };
-        var options = {
-            limit: 1
-        };
-        return Collections.Applications.find(criteria, options).count() > 0;
-    }
-*/
+     var criteria = {
+     jobId: job.jobId,
+     "candidateInfo.emails": data.email
+     };
+     var options = {
+     limit: 1
+     };
+     return Collections.Applications.find(criteria, options).count() > 0;
+     }
+     */
 
 });
 
@@ -801,6 +801,7 @@ Meteor.methods({
         }
         return result;
     },
+
 
     /*    updateJobTags: function (jobId, tags) {
      check(jobId, String);
