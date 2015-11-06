@@ -15,20 +15,6 @@
     clear: both;
 }
 
-#job-candidates-container {
-    background: #fff;
-    float: left;
-    width: 26%;
-
-}
-
-#job-candidates-container .nav.nav-tabs li a {
-    border-radius: 0 !important;
-    margin: 0;
-    text-align: center;
-    outline: none;
-}
-
 
 #job-candidate-profile {
     width: 73%;

@@ -1,3 +1,17 @@
+#job-candidates-container {
+	background: #fff;
+	float: left;
+	width: 26%;
+	margin-left: 10px;
+
+	.nav.nav-tabs li a {
+		border-radius: 0 !important;
+		margin: 0;
+		text-align: center;
+		outline: none;
+	}
+}
+
 .job-hiring-process {
 	background: #fff;
 
@@ -35,10 +49,11 @@
 
 
 .job-candidate-profile {
-	width: 73%;
+	width: 71%;
 	height: auto;
 	min-height: 600px;
 	float: right;
+	margin-right: 10px;
 	position: relative;
 
 	.no-application {
@@ -96,5 +111,40 @@
 	font-size: 16px;
 	font-weight: lighter;
 	text-align: center;
-	padding: 30px;
+	padding: 128px 0;
+}
+
+
+.score-icon {
+	margin: 0 5px;
+
+	i {
+		font-size: 25px;
+	}
+
+	&.score-strong-yes{
+		color: #00B2AA;
+	}
+
+	&.score-yes{
+		color: #77D5D1;
+	}
+
+	&.score-neutral{
+		color: #F6E076;
+	}
+
+	&.score-no{
+		color: #EE8F9E;
+	}
+
+	&.score-definitely-not{
+		color: #DC3F59;
+	}
+}
+
+.list-item-text {
+	p {
+		text-align: justify;
+	}
 }

@@ -22,7 +22,12 @@ JobCandidateProfileContent = React.createClass({
                         <JobCandidateTimeline />
                     </Tab>
                     <Tab eventKey={2} title="Profile">
-                        <JobCandidateResume />
+                        <JobCandidateResume
+                            job={this.props.job}
+                            stage={this.props.stage}
+                            application={this.props.application}
+                            candidate={this.props.candidate}
+                            resume={this.props.resume} />
                     </Tab>
                     <Tab eventKey={3} title="Scorecard summary">
                         <JobCandidateScorecardSummary />

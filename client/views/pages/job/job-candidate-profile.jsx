@@ -16,10 +16,12 @@ JobCandidateProfile = React.createClass({
         let sub = Meteor.subscribe('application', this.props.applicationId);
         let app = Collections.Applications.findOne({_id: this.props.applicationId});
         let can = app ? Collections.Candidates.findOne({candidateId: app.candidateId}) : null;
+        let resume = can ? Collections.Resumes.findOne({resumeId: app.data.resumeid}) : null;
         return {
             isReady: sub.ready(),
             application: app,
-            candidate: can
+            candidate: can,
+            resume: resume
         };
     },
 
@@ -55,7 +57,8 @@ JobCandidateProfile = React.createClass({
                             job={this.props.job}
                             stage={this.props.stage}
                             application={this.data.application}
-                            candidate={this.data.candidate}/>
+                            candidate={this.data.candidate}
+                            resume={this.data.resume} />
                     </div>
                 );
             } else {

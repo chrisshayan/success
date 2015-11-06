@@ -1,7 +1,149 @@
 JobCandidateResume = React.createClass({
+    propTypes: {
+        application: React.PropTypes.object.isRequired,
+        candidate: React.PropTypes.object.isRequired,
+        resume: React.PropTypes.object
+    },
+
+    getInitialState() {
+        return {
+            source: null,
+            isReady: false
+        };
+    },
+
+    componentDidMount() {
+        if (this.props.application) {
+            this.setState({
+                isReady: true,
+                source: this.props.application.source
+            });
+        }
+    },
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!_.isEqual(this.props.application, prevProps.application)) {
+            this.setState({
+                isReady: true,
+                source: this.props.application.source
+            });
+        }
+    },
+
     render() {
+        let content = null;
+        if (!this.state.isReady) {
+            content = <WaveLoading />;
+        } else {
+            if (this.state.source == 1) {
+                content = <JobCandidateResumeOnline
+                    application={this.props.application}
+                    candidate={this.props.candidate}
+                    resume={this.props.resume}/>;
+
+            } else if (this.state.source == 2) {
+
+                content = <JobCandidateResumeOffline
+                            application={this.props.application}
+                            candidate={this.props.candidate} />;
+
+            } else if (this.state.source == 3) {
+                content = <JobCandidateResumeFromSuccess />;
+            }
+        }
         return (
             <div id="job-candidate-resume">
+                {content}
+            </div>
+        );
+    }
+});
+
+JobCandidateResumeFromSuccess = React.createClass({
+    render() {
+        return (
+            <h2>Success</h2>
+        );
+    }
+});
+
+JobCandidateResumeOffline = React.createClass({
+    propTypes: {
+        application: React.PropTypes.object.isRequired,
+        candidate: React.PropTypes.object.isRequired,
+    },
+
+    render() {
+        return (
+            <div>
+                <div className="row">
+                    <div className="col-md-12">
+                        <div className="ibox">
+                            <div className="">
+                                <h2><i className="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
+
+                                <blockquote>
+                                    <p className="small"
+                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <div className="row">
+                    <div className="col-md-8 col-md-offset-1">
+                        <button className="btn btn-primary btn-outline">
+                            <i className="fa fa-fw fa-download" ></i>
+                            <span> Download CV</span>
+                        </button>
+
+                        &nbsp;
+                        <button className="btn btn-primary btn-outline">
+                            <i className="fa fa-fw fa-download" ></i>
+                            <span> Download CV</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+});
+
+
+JobCandidateResumeOnline = React.createClass({
+    propTypes: {
+        application: React.PropTypes.object.isRequired,
+        candidate: React.PropTypes.object.isRequired,
+        resume: React.PropTypes.object
+    },
+
+    componentDidMount() {
+
+    },
+
+    totalExperiences() {
+        let resume = this.props.resume;
+        let total = resume && resume.yearOfExperience ? resume.yearOfExperience : 0;
+        if (total <= 0) return '';
+        if (total == 1) return '1 year';
+        return `${total} years`;
+    },
+
+    currentJobLevel() {
+        let resume = this.props.resume;
+        if (resume['data'] && resume['data']['joblevelid']) {
+            let level = Meteor.job_levels.findOne({vnwId: resume['data']['joblevelid']});
+            if (level) return level.name;
+        }
+        return '';
+    },
+
+    render() {
+        return (
+            <div>
                 <div className="row">
                     <div className="col-md-6">
                         <div className="ibox">
@@ -14,35 +156,18 @@ JobCandidateResume = React.createClass({
                                             <tbody>
                                             <tr>
                                                 <td>
-                                                    <strong>Highest Education</strong>
-                                                </td>
-                                                <td>
-                                                    Bachelors
-                                                </td>
-
-                                            </tr>
-                                            <tr>
-                                                <td>
                                                     <strong>Total Years of Experience</strong>
                                                 </td>
-                                                <td>
-                                                    3 year(s)
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Language Proficiency</strong>
-                                                </td>
-                                                <td>
-                                                    Vietnamese( Native)
-                                                </td>
+                                                <td>{ this.totalExperiences() }</td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <strong>Most Recent Job</strong>
                                                 </td>
                                                 <td>
-                                                    Senior Graphic Design
+                                                    {this.props.resume && this.props.resume.mostRecentPosition
+                                                        ? this.props.resume.mostRecentPosition
+                                                        : ''}
                                                 </td>
 
                                             </tr>
@@ -51,7 +176,9 @@ JobCandidateResume = React.createClass({
                                                     <strong>Most Recent Company</strong>
                                                 </td>
                                                 <td>
-                                                    Hoàng Phúc International
+                                                    {this.props.resume && this.props.resume.mostRecentEmployer
+                                                        ? this.props.resume.mostRecentEmployer
+                                                        : ''}
                                                 </td>
                                             </tr>
                                             <tr>
@@ -59,50 +186,7 @@ JobCandidateResume = React.createClass({
                                                     <strong>Current Job Level</strong>
                                                 </td>
                                                 <td>
-                                                    Experienced (Non-Manager)
-                                                </td>
-                                            </tr>
-
-
-                                            <tr>
-                                                <td>
-                                                    <strong>Expected Position</strong>
-                                                </td>
-                                                <td>
-                                                    Senior Graphic Design
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Expected Job Level</strong>
-                                                </td>
-                                                <td>
-                                                    Team Leader/Supervisor
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Expected Work Place</strong>
-                                                </td>
-                                                <td>
-                                                    Ho Chi Minh
-                                                </td>
-
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Expected Job Category</strong>
-                                                </td>
-                                                <td>
-                                                    Arts/Design
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Expected Salary</strong>
-                                                </td>
-                                                <td>
-                                                    Negotiable
+                                                    {this.currentJobLevel()}
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -118,26 +202,30 @@ JobCandidateResume = React.createClass({
                                 <h2><i className="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
 
                                 <blockquote>
-                                    <p className="small">
-                                        Dear Mr/Mrs, I have recently completed my study which majors in Business English
-                                        at Foreign Trade University. Now I would like to welcome the opportunity to
-                                        contribute my knowledge, skills and some experience to growing business. During
-                                        my university study period, I only work as a tutor and a freelance translator.
-                                        Besides, I had a chance to be a graduate trainee at APT company in 2 months.
-                                        After graduation, I worked as a sales representative at Paradise Bay company.
-                                        Moreover, I am a responsible person and willing to learn anything which is
-                                        essential for my work. I know pressure at work is unavoidable, especially in
-                                        private businesses but this is one of my strengths. Despite of not having a lot
-                                        experience, if I win a place in business, I will try my best to learn and work
-                                        due to its development. Now I am ready for work. I am looking forward to hearing
-                                        from you and to a possibility of an interview. Thank you for your time and
-                                        consideration. Best regards, Doan Ngoc Quynh Trang
-                                    </p>
+                                    <p className="small"
+                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
                                 </blockquote>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <hr/>
+                {this.props.resume && this.props.resume['careerObjective'] ? (
+                <div className="row">
+                    <div className="col-md-12">
+                        <div className="ibox">
+                            <div className="ibox-content">
+                                <h2><i className="fa fa-dot-circle-o"></i> Career Objective </h2>
+                                <blockquote>
+                                    <p dangerouslySetInnerHTML={{__html: this.props.resume.careerObjective}}/>
+                                </blockquote>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    ) : null }
+
                 <hr/>
                 <div className="row">
                     <div className="col-md-7">
@@ -145,76 +233,7 @@ JobCandidateResume = React.createClass({
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-file-text-o"/>&nbsp;EXPERIENCE</h2>
                                 <ul className="content-list">
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <strong>Meteor Developer</strong> at <strong>Navigos Group</strong>
-                                            <span className="list-item-info">
-                                                <span className="list-item-date">07/2015 ~ now</span>
-                                                <p>
-                                                    - Training and managing employees to ensure effective work.<br/>
-                                                    - Responsible for the sales of stores.<br/>
-                                                    - Building positive relationships with the old customers. Searching
-                                                    new customer.
-                                                </p>
-                                            </span>
-                                        </span>
-                                    </li>
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <strong>PHP Developer</strong> at <strong>Evolable Asia</strong>
-                                           <span className="list-item-info">
-                                                <span className="list-item-date">07/2015 ~ now</span>
-                                                <p>
-                                                    - Training and managing employees to ensure effective work.<br/>
-                                                    - Responsible for the sales of stores.<br/>
-                                                    - Building positive relationships with the old customers. Searching
-                                                    new customer.
-                                                </p>
-                                            </span>
-                                        </span>
-                                    </li>
-
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <strong>PHP Developer</strong> at <strong>Evolable Asia</strong>
-                                            <span className="list-item-info">
-                                                <span className="list-item-date">07/2015 ~ now</span>
-                                                <p>
-                                                    - Training and managing employees to ensure effective work.<br/>
-                                                    - Responsible for the sales of stores.<br/>
-                                                    - Building positive relationships with the old customers. Searching
-                                                    new customer.
-                                                </p>
-                                            </span>
-                                        </span>
-                                    </li>
-
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <strong>PHP Developer</strong> at <strong>Evolable Asia</strong>
-                                            <span className="list-item-info">
-                                                <span className="list-item-date">07/2015 ~ now</span>
-                                                <p>
-                                                    - Training and managing employees to ensure effective work.<br/>
-                                                    - Responsible for the sales of stores.<br/>
-                                                    - Building positive relationships with the old customers. Searching
-                                                    new customer.
-                                                </p>
-                                            </span>
-                                        </span>
-                                    </li>
+                                    {this.props.resume.experience && this.props.resume.experience.map(this.renderExperience)}
                                 </ul>
                             </div>
                         </div>
@@ -225,43 +244,7 @@ JobCandidateResume = React.createClass({
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-trophy"/>&nbsp;EDUCATION</h2>
                                 <ul className="content-list">
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <span>Bachelor's degree, E-Commerce/Electronic Commerce</span> at <strong>HUI</strong>
-                                            <span className="list-item-info">09/2009 - 09/2011</span>
-                                        </span>
-                                    </li>
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <span>Student</span> at <strong>Nhat Nghe Education</strong>
-                                            <span className="list-item-info">11/2013-07/2015</span>
-                                        </span>
-                                    </li>
-
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <span>Student</span> at <strong>Nhat Nghe Education</strong>
-                                            <span className="list-item-info">11/2013-07/2015</span>
-                                        </span>
-                                    </li>
-                                    <li className="list-item">
-                                        <span className="list-item-icon">
-                                            <i className="fa fa-circle-o"/>
-                                        </span>
-                                        <span className="list-item-text">
-                                            <span>Student</span> at <strong>Nhat Nghe Education</strong>
-                                            <span className="list-item-info">11/2013-07/2015</span>
-                                        </span>
-                                    </li>
+                                    {this.props.resume.education && this.props.resume.education.map(this.renderEducation)}
                                 </ul>
                             </div>
                         </div>
@@ -277,41 +260,8 @@ JobCandidateResume = React.createClass({
                                 <h2><i className="fa fa-book"></i> References</h2>
                                 <div id="vertical-timeline"
                                      className="vertical-container dark-timeline vertical-timeline-content no-margins">
-                                    <div className="vertical-timeline-block">
-                                        <div className="vertical-timeline-icon navy-bg">
-                                            <i className="fa fa-user"></i>
-                                        </div>
-                                        <div className="vertical-timeline-content">
-                                            <h2 className="m-b-xs">Eduardo Mora Barbaro
-                                                <small>- Head of Product at <strong>En-Japan</strong></small>
-                                            </h2>
-                                            <span>Email: eduardo@navigosgroup.com<br/>Phone number: 0903252255</span>
-                                        </div>
-                                    </div>
 
-                                    <div className="vertical-timeline-block">
-                                        <div className="vertical-timeline-icon navy-bg">
-                                            <i className="fa fa-user"></i>
-                                        </div>
-                                        <div className="vertical-timeline-content">
-                                            <h2 className="m-b-xs">Akira Dalton
-                                                <small>- Product Owner at <strong>VietnamWorks</strong></small>
-                                            </h2>
-                                            <span>Email: akiramalaysia@navigosgroup.com<br/>Phone number: 0903252255</span>
-                                        </div>
-                                    </div>
-
-                                    <div className="vertical-timeline-block">
-                                        <div className="vertical-timeline-icon navy-bg">
-                                            <i className="fa fa-user"></i>
-                                        </div>
-                                        <div className="vertical-timeline-content">
-                                            <h2 className="m-b-xs">Bui Ba Cong
-                                                <small>- Product Manager at <strong>VietnamWorks</strong></small>
-                                            </h2>
-                                            <span>Email: cong.bui@navigosgroup.com<br/>Phone number: 0903252255</span>
-                                        </div>
-                                    </div>
+                                    {this.props.resume.reference && this.props.resume.reference.map(this.renderReference)}
                                 </div>
                             </div>
                         </div>
@@ -319,564 +269,71 @@ JobCandidateResume = React.createClass({
                 </div>
             </div>
         );
-    }
-});
-
-ScorecardOverallChart = React.createClass({
-    componentDidMount() {
-        var chart = new CanvasJS.Chart("chartContainer",
-            {
-                title: {
-                    text: ""
-                },
-                legend: {
-                    maxWidth: 350,
-                    itemWidth: 120
-                },
-                data: [
-                    {
-                        type: "pie",
-                        showInLegend: true,
-                        legendText: "{indexLabel}",
-                        dataPoints: [
-                            {y: 0, indexLabel: "Definitely Not"},
-                            {y: 2, indexLabel: "No"},
-                            {y: 2, indexLabel: "Yes"},
-                            {y: 1, indexLabel: "Strong Yes"}
-                        ]
-                    }
-                ]
-            });
-        chart.render();
     },
-    render() {
+
+    renderExperience(exp, key) {
+        let dateRange = '';
+        if (exp.isCurrent) {
+            dateRange = `${moment(exp.startDate).calendar()} ~ now`;
+        } else {
+            dateRange = `${moment(exp.startDate).calendar()} - ${moment(exp.endDate).calendar()}`;
+        }
         return (
-            <div id="chartContainer" style={{height: '400px', width: '80%'}}></div>
+            <li className="list-item" key={key}>
+                <span className="list-item-icon">
+                    <i className="fa fa-circle-o"/>
+                </span>
+                <span className="list-item-text">
+                    <strong>{exp.jobTitle ? exp.jobTitle : ''}</strong> at <strong>{exp.companyName ? exp.companyName : ''}</strong>
+                    <span className="list-item-info">
+                        <span className="list-item-date">{dateRange}</span>
+                        <p className="small"
+                           dangerouslySetInnerHTML={{__html: exp.description}}/>
+                    </span>
+                </span>
+            </li>
         );
-    }
-})
+    },
 
-
-JobCandidateScorecardSummary = React.createClass({
-
-    render() {
+    renderEducation(edu, key) {
+        let dateRange = `${moment(edu.startDate).calendar()} - ${moment(edu.endDate).calendar()}`;
         return (
-            <div>
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa  fa-pie-chart"/>&nbsp;OVERALL RECOMMENDATION</h2>
-                                <ScorecardOverallChart />
-                            </div>
-                        </div>
-                    </div>
+
+            <li className="list-item" key={key}>
+                <span className="list-item-icon">
+                    <i className="fa fa-circle-o"/>
+                </span>
+                <span className="list-item-text">
+                    <strong>{edu.major ? edu.major : ''}</strong> at <strong>{edu.schoolName ? edu.schoolName : ''}</strong>
+                    <span className="list-item-info">
+                        <span className="list-item-date">{dateRange}</span>
+                        <p className="small"
+                           dangerouslySetInnerHTML={{__html: edu.description}}/>
+                    </span>
+                </span>
+            </li>
+        );
+    },
+
+    renderReference(ref, key) {
+        return (
+            <div key={key} className="vertical-timeline-block">
+                <div className="vertical-timeline-icon navy-bg">
+                    <i className="fa fa-user"/>
                 </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa fa-graduation-cap"/>&nbsp;CORE SKILLS</h2>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa fa-check-square-o"/>&nbsp;QUALIFICATIONS</h2>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa  fa-puzzle-piece"/>&nbsp;PERSONAL TRAITS</h2>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa fa-list-alt"/>&nbsp;DETAILS</h2>
-                                <table className="table table-bordered">
-                                    <tbody>
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td width="40%">Android</td>
-                                        <td>
-                                            <span className='score-icon score-yes'><i
-                                                className="fa fa-thumbs-o-up"/></span>
-                                            <span className='score-icon score-definitely-not'><i
-                                                className="fa fa-times-circle-o"/></span>
-                                            <span className='score-icon score-no'><i
-                                                className="fa fa-thumbs-o-down"/></span>
-                                            <span className='score-icon score-strong-yes'><i className="fa fa-star-o"/></span>
-                                            <span className='score-icon score-neutral'><i
-                                                className="fa fa-minus-circle"/></span>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa  fa-key"/>&nbsp;KEY TAKE-AWAYS</h2>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="row">
-                    <div className="col-md-12">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa fa-building-o"/>&nbsp;COMPANY CULTURE FIT COMMENTS</h2>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-                                <div>
-                                    <blockquote>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat
-                                            a ante.</p>
-                                        <small>Written by <strong>Eduardo Mora</strong> on <cite title=""
-                                                                                                 data-original-title="">15:00
-                                            20/09/2015</cite></small>
-                                    </blockquote>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+                <div className="vertical-timeline-content">
+                    <h2 className="m-b-xs">
+                        {ref.name ? ref.name : ''} <br/>
+                        <small>
+                            {ref.title ? ref.title : ''} at &nbsp;
+                            <strong>{ref.companyName ? ref.companyName : ''}</strong>
+                        </small>
+                    </h2>
+                    <span>
+                        Email: {ref.email ? ref.email : ''}
+                        <br/>
+                        Phone number: {ref.phone ? ref.phone : ''}
+                    </span>
                 </div>
             </div>
         );

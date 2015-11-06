@@ -133,7 +133,7 @@ JobCandidateProfileActions = React.createClass({
 
                                     <button type="button" className="btn btn-primary btn-outline btn-sm dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span className="caret"></span>
+                                        <span className="caret" />
                                     </button>
                                     {this.renderMoveAbilities()}
 
@@ -150,13 +150,13 @@ JobCandidateProfileActions = React.createClass({
         let stages = _.sortByOrder(_.toArray(Success.APPLICATION_STAGES), 'id', 'desc');
         let current = this.props.stage;
         let menu = [];
-
+        let key = 0;
         stages.map((stage) => {
             if ([0, 1].indexOf(current.id) >= 0 && [0, 1].indexOf(stage.id) >= 0) return;
 
             if (stage.id > current.id) {
                 menu.push(
-                    <li>
+                    <li key={key}>
                         <a onClick={(e) => this.handleMoveToStage(stage.id, e)}>
                             <i className="fa fa-long-arrow-right"/>&nbsp;
                             {stage.label}
@@ -165,7 +165,7 @@ JobCandidateProfileActions = React.createClass({
                 );
             } else if (stage.id < current.id) {
                 menu.push(
-                    <li>
+                    <li key={key}>
                         <a onClick={(e) => this.handleMoveToStage(stage.id, e)}>
                             <i className="fa fa-long-arrow-left"/>&nbsp;
                             {stage.label}
@@ -173,8 +173,9 @@ JobCandidateProfileActions = React.createClass({
                     </li>
                 )
             } else if (stage.id == current.id) {
-                menu.push(<li role="separator" className="divider"/>);
+                menu.push(<li key={key} role="separator" className="divider"/>);
             }
+            key++;
         });
 
         return (
