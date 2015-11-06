@@ -794,31 +794,6 @@ Meteor.methods({
         return result;
     },
 
-    updateJobTags: function (jobId, tags) {
-        check(jobId, String);
-        check(tags, [String]);
-        if (!this.userId) return false;
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if (!job) return false;
-        var newTags = [];
-        _.each(tags, function (t) {
-            newTags.push(t.toLowerCase());
-        });
-
-        var diff = _.difference(newTags, job.tags || []);
-        _.each(diff, function (newSkill) {
-            Collections.SkillTerms.upsert({skillName: newSkill}, {
-                $set: {
-                    skillId: null,
-                    skillName: newSkill,
-                    skillLength: newSkill.length
-                }
-            });
-        });
-        return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
-    },
-
-
     assignJobRecruiter: function (jobId, role, userId) {
         if (this.userId) {
             var job = Collections.Jobs.findOne({_id: jobId});

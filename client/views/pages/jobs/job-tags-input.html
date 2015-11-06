@@ -5,6 +5,9 @@
                 {{> jobTagItem value=this jobId=jobId}}
             {{/each}}
         </div>
+        <div>
+            {{> React component=TagsInput onSelect=onSelect}}
+        </div>
         {{> inputAutocomplete settings=settings jobId=jobId class="tag-input" id="job-tag-input-{{jobId}}" placeholder=hint}}
     </div>
 </template>

@@ -59,6 +59,22 @@ methods.updateApplicationStage = function (option) {
         debuger(e);
     }
     return result;
-},
+};
+
+
+methods.applicationStageCount = function(jobId, stage) {
+    var result = {
+        qualify: 0,
+        disqualified: 0
+    };
+    if(this.userId && jobId && stage !== null) {
+        var job = Collections.Jobs.findOne({_id: jobId});
+        if(job) {
+            result['qualify'] = Collections.Applications.find({jobId: job.jobId, stage: stage, disqualified: false}).count();
+            result['disqualified'] = Collections.Applications.find({jobId: job.jobId, stage: stage, disqualified: true}).count();
+        }
+    }
+    return result;
+};
 
 Meteor.methods(methods);

@@ -1,5 +1,3 @@
-var cx = React.addons.classSet;
-
 TagsInput = React.createClass({
     mixins: [ReactMeteorData],
 
@@ -48,6 +46,7 @@ TagsInput = React.createClass({
     handleKeyUp(e) {
         var k = this.state.itemActive;
         switch (e.which) {
+
             case 38: // move up
                 if (k === null) {
                     k = this.data.skills.length - 1;
@@ -85,24 +84,36 @@ TagsInput = React.createClass({
         }
     },
 
+    handleKeyDown(e) {
+        switch (e.which) {
+            case 8:
+                if(this.state.q.length <= 0) {
+                    this.props.onRemoveLastTag && this.props.onRemoveLastTag();
+                }
+                break;
+        }
+    },
+
     handleSelect(skill) {
         if (this.state.q.length <= 0) return;
         this.setState({
             q: '',
             itemActive: null
         });
-        if (skill)
-            this.props.onSelect(skill, this.props.id || null);
+        if (skill) {
+            this.props.onSelect && this.props.onSelect(skill, this.props.id || null);
+        }
     },
 
     render() {
         var styles = {
             container: {
-                position: 'relative'
+                position: 'relative',
+                display: 'inline-block'
             },
             result: {
                 position: 'absolute',
-                top: '95%',
+                top: '100%',
                 left: '2.5%',
                 zIndex: 9999,
                 width: '95%',
@@ -111,7 +122,7 @@ TagsInput = React.createClass({
                 border: '1px solid #eee'
             }
         };
-        var className = cx({
+        var className = classNames({
             'recruiter-search': true,
             'form-control': true,
             'loading': this.data.isSearching
@@ -123,9 +134,10 @@ TagsInput = React.createClass({
                     className={className}
                     onChange={(e) => this.setState({q: e.target.value})}
                     onKeyUp={this.handleKeyUp}
+                    onKeyDown={this.handleKeyDown}
                     value={this.state.q}
                     placeholder={this.props.placeholder || 'Search skill...'}
-                    style={{width: '100%'}}/>
+                    style={this.props.style || {width: '100%'}}/>
 
                 <div style={ styles.result }>
                     {!this.data.skills.length ? <p style={{padding: '4px 10px 0 10px'}}>(no matches)</p> : null}

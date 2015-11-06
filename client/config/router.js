@@ -26,7 +26,7 @@ SkillsSubs = new SubsManager({
 StaticSubs.subscribe('staticModels');
 StaticSubs.subscribe('mailTemplates');
 
-Tracker.autorun(function() {
+Tracker.autorun(function () {
     Meteor.subscribe('userData');
 });
 
@@ -108,11 +108,19 @@ Router.route('/logout', {
 /**
  * Dashboard -> render jobs listing
  */
+//Router.route('/dashboard', {
+//    name: "dashboard",
+//    fastRender: true,
+//    action: function () {
+//        this.render('Dashboard');
+//    }
+//});
+
 Router.route('/dashboard', {
     name: "dashboard",
     fastRender: true,
     action: function () {
-        this.render('Dashboard');
+        this.render('JobsPage');
     }
 });
 
@@ -179,80 +187,80 @@ Router.route('/job/:jobId/stage/:stage', {
     }
 });
 
-
-Router.route('/job-details/:_id/stage/:stage', {
-    name: "Job",
-    //fastRender: true,
-    waitOn: function () {
-        if (!this.params.hasOwnProperty('_id') && !this.params.hasOwnProperty('stage'))
-            throw Meteor.Error(404);
-        return [Meteor.subscribe('jobDetails', {jobId: this.params._id}), Meteor.subscribe('mailTemplates')];
-    },
-    action: function () {
-        if(this.ready()) {
-            /**
-             * if url contains application, check app exists
-             * if url not contains app, find first application of job's stage
-             */
-            var params = this.params;
-            var queryParams = this.params.query;
-
-            var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
-            var application = queryParams.application || null;
-            var job = Collections.Jobs.find({_id: this.params._id}).count();
-            if (!job) {
-                this.render('notFound');
-                return;
-                //Router.go('notFound');
-            }
-            if (application) {
-                var options = {
-                    jobId: params._id,
-                    stage: stage.id,
-                    application: application
-                };
-                Meteor.call('checkApplicationInStage', options, function (err, isExists) {
-                    if (err) throw err;
-                    if (!isExists) {
-                        Router.go('Job', {
-                            _id: params._id,
-                            stage: stage.alias
-                        });
-                    }
-                });
-            } else {
-                var options = {
-                    jobId: this.params._id,
-                    stage: stage.id
-                };
-                Meteor.call('getFirstJobApplication', options, function (err, applicationId) {
-                    if (err) throw err;
-                    if (applicationId) {
-                        Router.go('Job', {
-                            _id: params._id,
-                            stage: params.stage
-                        }, {
-                            query: {
-                                application: applicationId
-                            }
-                        });
-                    }
-
-                });
-            }
-            this.render('jobDetails');
-        } else {
-            this.render('waveLoading');
-        }
-    },
-    data: function () {
-
-        return {
-            job: Collections.Jobs.findOne({_id: this.params._id}),
-            isEmpty: !this.params.query.hasOwnProperty('application')
-        }
-    }
-});
+//
+//Router.route('/job-details/:_id/stage/:stage', {
+//    name: "Job",
+//    //fastRender: true,
+//    waitOn: function () {
+//        if (!this.params.hasOwnProperty('_id') && !this.params.hasOwnProperty('stage'))
+//            throw Meteor.Error(404);
+//        return [Meteor.subscribe('jobDetails', {jobId: this.params._id}), Meteor.subscribe('mailTemplates')];
+//    },
+//    action: function () {
+//        if (this.ready()) {
+//            /**
+//             * if url contains application, check app exists
+//             * if url not contains app, find first application of job's stage
+//             */
+//            var params = this.params;
+//            var queryParams = this.params.query;
+//
+//            var stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage});
+//            var application = queryParams.application || null;
+//            var job = Collections.Jobs.find({_id: this.params._id}).count();
+//            if (!job) {
+//                this.render('notFound');
+//                return;
+//                //Router.go('notFound');
+//            }
+//            if (application) {
+//                var options = {
+//                    jobId: params._id,
+//                    stage: stage.id,
+//                    application: application
+//                };
+//                Meteor.call('checkApplicationInStage', options, function (err, isExists) {
+//                    if (err) throw err;
+//                    if (!isExists) {
+//                        Router.go('Job', {
+//                            _id: params._id,
+//                            stage: stage.alias
+//                        });
+//                    }
+//                });
+//            } else {
+//                var options = {
+//                    jobId: this.params._id,
+//                    stage: stage.id
+//                };
+//                Meteor.call('getFirstJobApplication', options, function (err, applicationId) {
+//                    if (err) throw err;
+//                    if (applicationId) {
+//                        Router.go('Job', {
+//                            _id: params._id,
+//                            stage: params.stage
+//                        }, {
+//                            query: {
+//                                application: applicationId
+//                            }
+//                        });
+//                    }
+//
+//                });
+//            }
+//            this.render('jobDetails');
+//        } else {
+//            this.render('waveLoading');
+//        }
+//    },
+//    data: function () {
+//
+//        return {
+//            job: Collections.Jobs.findOne({_id: this.params._id}),
+//            isEmpty: !this.params.query.hasOwnProperty('application')
+//        }
+//    }
+//});
 
 
 /**
@@ -412,5 +420,18 @@ Router.route('/profile', {
     },
     action: function () {
         this.render('updateProfile');
+    }
+});
+
+
+Router.route('/job-new/:_id/:stage', {
+    name: 'Job',
+    waitOn: function() {
+        return [
+            Meteor.subscribe('jobDetails', {jobId: this.params._id})
+        ];
+    },
+    action() {
+        this.render('Job');
     }
 });

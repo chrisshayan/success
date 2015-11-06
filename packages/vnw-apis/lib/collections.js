@@ -65,8 +65,8 @@ ApplicationTransform.prototype = {
 
     coverLetter: function () {
         var cover = '';
-        if(this.data.coverletter) {
-            cover = this.data.coverletter.replace(/(\r\n|\n)/gi,'<br/>');
+        if (this.data.coverletter) {
+            cover = this.data.coverletter.replace(/(\r\n|\n)/gi, '<br/>');
             cover = cover.replace(/\<br\/\>\s?\<br\/\>/g, '<br/>');
         }
         return cover;
@@ -113,14 +113,14 @@ ApplicationTransform.prototype = {
     },
 
     resumeFileUrl: function () {
-        if(Meteor.isClient)
+        if (Meteor.isClient)
             link = "downloadresume/" + this.companyId + "/" + this._id + '/' + Session.get('cvToken');
         else link = '/';
 
         return Meteor.absoluteUrl(link);
     },
 
-    link: function() {
+    link: function () {
         var job = Collections.Jobs.findOne({jobId: this.jobId});
 
         var params = {
@@ -202,6 +202,44 @@ Collections.Applications.allow({
     }
 });
 
+if (Meteor.isServer) {
+    Collections.Jobs.after.insert(function(userId, doc) {
+        Collections.Jobs.update({_id: doc._id}, {
+            $set: {
+                stages: {
+                    0: 0,
+                    1: 0,
+                    2: 0,
+                    3: 0,
+                    4: 0,
+                    5: 0
+                }
+            }
+        })
+    });
+
+    Collections.Applications.after.insert(function (userId, doc) {
+        var mod = {};
+        mod['stages.' + doc.stage] = 1;
+        Collections.Jobs.update({jobId: doc.jobId}, {
+            $inc: mod
+        });
+    });
+
+    Collections.Applications.after.update(function (userId, doc, fieldNames, modifier, options) {
+        if(fieldNames.indexOf('stage') >= 0) {
+            console.log("Move from: ", this.previous.stage)
+            console.log("to: ", doc.stage);
+            var mod = {};
+            mod['stages.' + this.previous.stage] = -1;
+            mod['stages.' + doc.stage] = 1;
+
+            Collections.Jobs.update({jobId: doc.jobId}, {
+                $inc: mod
+            });
+        }
+    }, {fetchPrevious: true});
+}
 
 
 Collections.Activities = new Mongo.Collection("vnw_activities");

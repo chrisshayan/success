@@ -1,5 +1,3 @@
-var cx = React.addons.classSet;
-
 RecruiterSearch = React.createClass({
     mixins: [ReactMeteorData],
 
@@ -122,7 +120,7 @@ RecruiterSearch = React.createClass({
                 border: '1px solid #eee'
             }
         };
-        var className = cx({
+        var className = classNames({
             'recruiter-search': true,
             'form-control': true,
             'loading': this.data.isSearching

@@ -26,6 +26,7 @@ ecmascript
 ecmascript-collections
 es5-shim
 iron:router@1.0.12
+okgrow:router-autoscroll
 react
 react-template-helper
 twbs:bootstrap
@@ -49,8 +50,6 @@ meteorhacks:subs-manager
 #meteorhacks:kadira-profiler
 #kadira:debug
 
-
-cfs:power-queue
 reywood:publish-composite
 lab:vnw-apis
 #lab:accounts-vnw
@@ -60,10 +59,8 @@ lab:mysql-connection-manager
 http
 froatsnook:request
 izzilab:token
-ahmetcetin:autoform-tags
-izzilab:react-bootstrap@0.0.1
+izzilab:react-bootstrap@0.0.2
 stevezhu:lodash
-thereactivestack:blazetoreact
 okgrow:analytics
 
 #vnw:core
@@ -78,14 +75,10 @@ vnw:job-criteria
 vnw:sync-data
 
 vnw:user
-#vnw:company
-#vnw:job
-#vnw:candidate
-#vnw:application
-
 mizzao:autocomplete
 vnw:hiring-team
-digilord:faker
 aldeed:tabular
 meteorhacks:ssr
 lepozepo:cloudinary
+ccorcos:react-radium
+maxharris9:classnames

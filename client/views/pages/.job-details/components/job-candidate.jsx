@@ -1,5 +1,3 @@
-let cx = React.addons.classSet;
-
 JobCandidate = React.createClass({
 
     componentDidMount() {

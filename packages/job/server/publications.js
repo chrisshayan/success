@@ -21,9 +21,11 @@ DEFAULT_JOB_OPTIONS = {
         status: 1,
         createdAt: 1,
         createdBy: 1,
+        expiredAt: 1,
         recruiterEmails: 1,
         recruiters: 1,
-        tags: 1
+        tags: 1,
+        stages: 1
     }
 };
 
@@ -43,7 +45,6 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
             try {
                 check(filters, Object);
                 check(options, Match.Optional(Object));
-
                 var user = Meteor.users.findOne({_id: self.userId});
                 var permissions = user.jobPermissions();
 
@@ -54,7 +55,9 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
                 options['fields'] = DEFAULT_JOB_OPTIONS['fields'];
 
                 if (!options.hasOwnProperty("limit")) {
-                    options['limit'] = 5;
+                    options['limit'] = 10;
+                } else {
+                    options['limit'] += 5;
                 }
                 return Collections.Jobs.find(filters, options);
             } catch (e) {
@@ -74,33 +77,52 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
  */
 publications.jobDetails =  function (opt) {
     if(!this.userId) return this.ready();
-    check(opt, {
-        jobId: Match.Any
-    });
-
     var self = this;
+    var user = Meteor.users.findOne({_id: self.userId});
+    var permissions = user.jobPermissions();
     return {
         find: function() {
-            var user = Meteor.users.findOne({_id: self.userId});
-            var permissions = user.jobPermissions();
-            var curJobCond = {
+            var cond = {
                 _id: opt.jobId,
                 $or: permissions
             };
-            var job = Collections.Jobs.findOne(curJobCond);
-            if(!job) return null;
-            var cond = {
-                $or: [
-                    {_id: job._id},
-                    {
+            return Collections.Jobs.find(cond);
+        },
+        children: [
+            // Related jobs
+            {
+                find: function(job) {
+                    var cond = {
+                        _id: {$ne: job._id},
                         status: job.status,
                         $or: permissions
+                    };
+                    return Collections.Jobs.find(cond, {limit: 5});
+                }
+            },
+            /**
+             * Publish application and candidate selected
+             */
+            {
+                find: function(job) {
+                    if(job && opt.application) {
+                        return Collections.Applications.find({_id: opt.application}, {limit: 1});
+                    }
+                    return null;
+                },
+
+                children: [
+                    {
+                        find: function(app) {
+                            if(app) {
+                                return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
+                            }
+                            return null;
+                        }
                     }
                 ]
-            };
-            return Collections.Jobs.find(cond, {limit: 6});
-        },
-        children: []
+            }
+        ]
     }
 };
 
