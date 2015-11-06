@@ -21,9 +21,6 @@
     width: 26%;
 
 }
-#job-candidates-container .nav.nav-tabs li {
-    width: 50% !important;
-}
 
 #job-candidates-container .nav.nav-tabs li a {
     border-radius: 0 !important;

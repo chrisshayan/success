@@ -50,7 +50,7 @@ JobCandidatesContainer = React.createClass({
         }
         content = (
             <Tabs id="job-candidates-container" activeKey={this.state.key} onSelect={this.handleSelect}>
-                <Tab eventKey={1} title="QUALIFIED">
+                <Tab eventKey={1} title="QUALIFIED" className="qualify">
                     {this.state.key === 1
                         ? <JobCandidates
                             subCache={Sub1}
@@ -63,7 +63,7 @@ JobCandidatesContainer = React.createClass({
                         : null}
                 </Tab>
 
-                <Tab eventKey={2} title={tab2Title}>
+                <Tab eventKey={2} title={tab2Title}  className="disqualified">
                     {this.state.key === 2
                         ? <JobCandidates
                             subCache={Sub2}
