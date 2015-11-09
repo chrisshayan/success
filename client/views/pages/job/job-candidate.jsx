@@ -25,15 +25,6 @@ JobCandidate = React.createClass({
                 padding: '10px'
             }
         };
-        //
-        //let link = Router.url('Job', {
-        //    _id: this.props.job._id,
-        //    stage: this.props.stage.alias
-        //}, {
-        //    query: {
-        //        application: app._id
-        //    }
-        //});
 
         let appliedTimeago = moment(app.createdAt.toISOString()).fromNow();
         let isCurrentApp = this.props.currentAppId === app._id;

@@ -81,11 +81,26 @@ JobCandidates = React.createClass({
     },
 
     render() {
-        let Loading = null;
-        let LoadMore = null;
+        let Loading = null,
+            LoadMore = null,
+            noContent = null;
+
         if (!this.data.isReady) {
             Loading = <WaveLoading />;
+        } else {
+            if(this.state.q.length > 0 && this.data.applications.length <= 0) {
+                noContent = (
+                    <h3 className="no-content">Your search returned no matches</h3>
+                );
+            }
+
+            if(this.state.q <= 0 && this.data.applications.length <= 0) {
+                noContent = (
+                    <h3 className="no-content">No application</h3>
+                );
+            }
         }
+
         if (this.data.total > this.state.limit) {
             LoadMore = (
                 <div className="row">
@@ -99,6 +114,8 @@ JobCandidates = React.createClass({
                 </div>
             );
         }
+
+
         let searchBoxStyle = {
             width: '90%',
             height: '30px',
@@ -113,9 +130,10 @@ JobCandidates = React.createClass({
                     onSearch={this.handleSearch}
                     onSort={this.handleSort}
                     onSelectAll={ () => { this.setState({isSelectAll: true}) } }
-                    onDeselectAll={ () => { this.setState({isSelectAll: false, selectedItems: [this.props.currentApp._id]}) } }/>
+                    onDeselectAll={ () => { this.setState({isSelectAll: false, selectedItems: [this.props.currentAppId]}) } }/>
 
-                {this.data.applications.map((app, key) => <JobCandidate key={key} app={app}/>)}
+                {this.data.applications.map((app, key) => <JobCandidate key={key} app={app} currentAppId={this.props.currentAppId}/>)}
+                {noContent}
                 {Loading}
                 {LoadMore}
             </div>

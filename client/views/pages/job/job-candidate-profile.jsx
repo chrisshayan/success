@@ -13,7 +13,6 @@ JobCandidateProfile = React.createClass({
     },
 
     getMeteorData() {
-        console.log(this.props.applicationId)
         let sub = Meteor.subscribe('application', this.props.applicationId);
         let app = Collections.Applications.findOne({_id: this.props.applicationId});
         let can = app ? Collections.Candidates.findOne({candidateId: app.candidateId}) : null;
@@ -63,7 +62,7 @@ JobCandidateProfile = React.createClass({
                 content = (
                     <div className="no-application">
                         <i className="fa fa-sticky-note-o"/>
-                        <h1>No application</h1>
+                        <h1>No application selected</h1>
                     </div>
                 );
             }
