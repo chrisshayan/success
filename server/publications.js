@@ -8,7 +8,8 @@ function transformVNWId(id) {
 Meteor.publish('companyInfo', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
-    if (!user) return;
+    
+    if (!user) return this.ready();
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 
@@ -16,6 +17,8 @@ Meteor.publish('mailTemplates', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
     var company = user.defaultCompany();
+
+    if (!company) return this.ready();
 
     return Collections.MailTemplates.find({
         companyId: company.companyId
@@ -330,6 +333,9 @@ Meteor.publish('recruiterSearch', function (filter, option) {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
     var company = user.defaultCompany();
+
+    if (!company)return this.ready();
+
     var userIds = Meteor['hiringTeam'].find({companyId: company.companyId}).map(function (r) {
         return r.userId;
     });

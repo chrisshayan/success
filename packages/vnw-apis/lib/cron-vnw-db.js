@@ -378,7 +378,6 @@ function processJob(items, companyId) {
 function processAfterSyncJob(jobs, companyId) {
     try {
         if (jobs.length) {
-            console.log('jl', jobs.length);
             while (jobs.length > 0) {
                 var chunk = jobs.splice(0, 5);
 
@@ -398,7 +397,7 @@ function processAfterSyncJob(jobs, companyId) {
                 //console.log('appSql', appSql);
 
                 var appRows = fetchVNWData(appSql);
-                console.log(appRows.length);
+                //console.log(appRows.length);
 
                 if (appRows.length) {
                     var candidates = _.pluck(appRows, 'candidateId');

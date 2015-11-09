@@ -19,7 +19,7 @@ Candidate.prototype.application = function (options) {
 };
 
 User.prototype.canViewApplication = function (appId) {
-    var app = Meteor.applications.findOne({_id: appId});
+    var app = Collection.findOne({_id: appId});
     if (app) {
         //return !!Collections.Jobs.find({jobId: app.jobId}).count();
         return Meteor['jobs'].find({jobId: app.jobId}).count();

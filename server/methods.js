@@ -23,6 +23,7 @@ function replacePlaceholder(userId, application, candidate, mail) {
                     var user = Meteor.users.findOne({_id: userId});
                     console.log(user.emailSignature)
                     var company = user.defaultCompany();
+                    if (!company) return false;
                     if (p1 == "company") {
                         replaces[p1] = company.companyName;
                     } else {
@@ -468,7 +469,8 @@ Meteor.methods({
                     var activity = new Activity();
 
                     mail.applicationId = application._id;
-                    activity.companyId = company.companyId;
+                    if (company)
+                        activity.companyId = company.companyId;
                     activity.createdBy = user._id;
                     activity.data = mail;
                     activity.sendMailToCandidate();
@@ -923,6 +925,8 @@ Meteor.methods({
         if (!this.userId) return false;
         var user = Meteor.users.findOne({_id: this.userId});
         var company = user.defaultCompany();
+        if (!user || !company) return false;
+
         var tokenData = {
             userId: user._id,
             companyId: company.companyId,
