@@ -18,8 +18,6 @@ var BS_VERSION = '0.27.3',
 
 Npm.depends({
     'externalify': EXTERNALIFY_VERSION,
-    'react': REACT_VERSION,
-    'react-dom': REACT_DOM_VERSION,
     'react-bootstrap': BS_VERSION,
     'classnames': CLASSNAMES_VERSION
 });
@@ -31,7 +29,7 @@ Package.onUse(function (api) {
         'bs.browserify.js'
     ], 'client');
 
-    api.imply('react');
+    //api.imply('react');
 
 
     api.export(["ReactBootstrap", 'Classnames'], 'client');

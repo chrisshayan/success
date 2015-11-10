@@ -15,10 +15,13 @@ JobCandidateProfile = React.createClass({
     },
 
     getMeteorData() {
+        console.log('this.props.applicationId', this.props.applicationId);
+        //this.props.applicationId = this.props.applicationId || '';
+
         let sub = Meteor.subscribe('application', this.props.applicationId);
-        let app = Collections.Applications.findOne({_id: this.props.applicationId});
-        let can = app ? Collections.Candidates.findOne({candidateId: app.candidateId}) : null;
-        let resume = can ? Collections.Resumes.findOne({resumeId: app.data.resumeid}) : null;
+        let app = Meteor.applications.findOne({_id: this.props.applicationId});
+        let can = app ? Meteor.candidates.findOne({_id: app.candidateId}) : null;
+        let resume = can && can.resumeId ? Collections.Resumes.findOne({resumeId: app.resumeId}) : null;
         return {
             isReady: sub.ready(),
             application: app,
@@ -33,7 +36,7 @@ JobCandidateProfile = React.createClass({
         window.addEventListener('resize', this.handleResize);
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         let el = this.refs.container.getDOMNode();
         $(el).unbind('resize', this.handleResize);
         window.removeEventListener('resize', this.handleResize);
@@ -41,7 +44,7 @@ JobCandidateProfile = React.createClass({
 
     handleResize() {
         let el = this.refs.container.getDOMNode();
-        if($(el).width() != this.state.width) {
+        if ($(el).width() != this.state.width) {
             this.setState({
                 width: $(el).width()
             });
@@ -50,12 +53,12 @@ JobCandidateProfile = React.createClass({
 
     handleToggleAddComment(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isAddingComment;
         }
         state['isAddingComment'] = status;
 
-        if(status && this.state.isSendingMessage) {
+        if (status && this.state.isSendingMessage) {
             state['isSendingMessage'] = false;
         }
         this.setState(state);
@@ -63,19 +66,19 @@ JobCandidateProfile = React.createClass({
 
     handleToggleSendMessage(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isSendingMessage;
         }
         state['isSendingMessage'] = status;
 
-        if(status && this.state.isAddingComment) {
+        if (status && this.state.isAddingComment) {
             state['isAddingComment'] = false;
         }
         this.setState(state);
     },
 
     handleSaveComment(text) {
-        console.log(text)
+        console.log('text', text);
         Meteor.call('addCommentApplication', {
             application: this.props.applicationId,
             content: text

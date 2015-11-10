@@ -1,11 +1,9 @@
-
-
 JobDetailsContainer = React.createClass({
-    mixins: [ReactMeteorData],
+    mixins: [ReactMeteorData, React.addons.LinkedStateMixin],
     getInitialState() {
         return {
             currentTab: 1,
-            currentAppId: null
+            currentAppId: ''
         }
     },
 
@@ -24,8 +22,8 @@ JobDetailsContainer = React.createClass({
     },
 
     componentDidMount() {
-        Meteor.call('getCVToken', function(err, token) {
-            if(!err && token) {
+        Meteor.call('getCVToken', function (err, token) {
+            if (!err && token) {
                 Session.set('cvToken', token);
             }
         });
@@ -34,7 +32,7 @@ JobDetailsContainer = React.createClass({
 
     childContextTypes: {
         nextApplication: React.PropTypes.func,
-        selectApplication: React.PropTypes.func,
+        selectApplication: React.PropTypes.func
     },
 
     getChildContext: function () {
@@ -46,6 +44,7 @@ JobDetailsContainer = React.createClass({
 
     selectApplication(appId) {
         this.setState({currentAppId: appId});
+
     },
 
     nextApplication(app) {
@@ -79,7 +78,7 @@ JobDetailsContainer = React.createClass({
                 '$ne': currentApp._id
             };
         }
-        let nextApp = Collections.Applications.findOne(filter, option);
+        let nextApp = Meteor.applications.findOne(filter, option);
         if (nextApp) {
             routeQuery['query'] = {application: nextApp._id};
         }
@@ -91,47 +90,14 @@ JobDetailsContainer = React.createClass({
 
 
     render(){
-        let jobContent = null;
-        if (this.state.hasApplication === null) {
-            jobContent = (
-                <div id="job-content">
-                    <WaveLoading />
-                </div>
-            );
-        } else if (this.state.hasApplication === false) {
-            jobContent = (
-                <div id="job-content">
-                    <JobContentEmpty />
-                </div>
-            );
-        } else {
-            jobContent = (
-                <div id="job-content">
-                    <JobCandidatesContainer
-                        job={this.data.job}
-                        stage={this.data.stage}
-                        currentApp={this.data.application}
-                        onChangeTab={(key) => { this.setState({currentTab: key}) }}
-                    />
-
-                    <JobCandidateProfile
-                        job={this.data.job}
-                        stage={this.data.stage}
-                        application={this.data.application}
-                        candidate={this.data.candidate}/>
-
-                </div>
-            );
-        }
         return (
             <div className="row" style={{paddingBottom: '60px'}}>
                 <div className="col-md-12">
                     <JobHeader job={this.data.job} stage={this.data.stage}/>
-                    <JobHiringProcess job={this.data.job} currentStage={this.data.stage}/>
+                    <JobHiringProcess jovar currentAppId b={this.data.job} currentStage={this.data.stage}/>
                 </div>
                 <div className="col-md-12">
                     <div id="job-content">
-
                         <JobCandidatesContainer
                             job={this.data.job}
                             stage={this.data.stage}

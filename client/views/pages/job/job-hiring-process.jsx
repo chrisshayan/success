@@ -1,4 +1,4 @@
-JobHiringProcess = Radium(React.createClass({
+JobHiringProcess = React.createClass({
     contextTypes: {
         selectApplication: React.PropTypes.func
     },
@@ -37,7 +37,6 @@ JobHiringProcess = Radium(React.createClass({
     },
 
     renderStage(stage, key) {
-
         let cx = classNames(
             'col-md-2',
             'stage',
@@ -53,4 +52,4 @@ JobHiringProcess = Radium(React.createClass({
             </div>
         );
     }
-}));
+});

@@ -18,6 +18,11 @@ model.prototype.isExist = function (condition) {
     return !!Collection.findOne(query);
 };
 
+model.prototype.shortCoverLetter = function () {
+    if (!this.coverLetter) return "";
+    return this.coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
+};
+
 model.prototype.link = function () {
     var job = Meteor['jobs'].findOne({jobId: this.source.jobId});
 

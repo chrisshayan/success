@@ -58,10 +58,10 @@ ApplicationTransform.prototype = {
      * Get 2 lines of cover letter
      * @returns {String}
      */
-    shortCoverLetter: function () {
+    /*shortCoverLetter: function () {
         if (!this.data.coverletter) return "";
         return this.data.coverletter.split(/\s+/).splice(0, 14).join(" ") + "...";
-    },
+    },*/
 
     coverLetter: function () {
         var cover = '';

@@ -10,6 +10,7 @@ JobCandidate = React.createClass({
 
     render() {
         let app = this.props.app;
+
         let styles = {
             container: {},
 

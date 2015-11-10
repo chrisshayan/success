@@ -117,7 +117,8 @@ publications.applicationDetails = function (data) {
 };
 
 publications.application = function (appId) {
-    if (!this.userId || !appId) return this.ready();
+    //console.log('appID', appId);
+    if (!this.userId || typeof appId !== 'string' || appId.length === 0) return this.ready();
     check(appId, String);
     var user = Meteor.users.findOne({_id: this.userId});
     return {
@@ -131,8 +132,9 @@ publications.application = function (appId) {
         children: [
             {
                 find: function (application) {
+                    console.log('can', application.candidateId);
                     var filters = {
-                        candidateId: application.candidateId
+                        _id: application.candidateId
                     };
                     var options = {
                         limit: 1
@@ -144,7 +146,7 @@ publications.application = function (appId) {
 
             {
                 find: function (app) {
-                    var resumeId = app['data'] && app['data']['resumeid'] ? app['data']['resumeid'] : null;
+                    var resumeId = app.resumeId;
                     if (resumeId) {
                         return Collections.Resumes.find({resumeId: resumeId}, {limit: 1});
                     }
@@ -164,7 +166,7 @@ publications.application = function (appId) {
             }
         ]
     }
-}
+};
 
 
 publications.applicationCounter = function (counterName, filters) {

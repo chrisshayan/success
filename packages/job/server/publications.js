@@ -114,7 +114,7 @@ publications.jobDetails = function (opt) {
                 _id: opt.jobId,
                 $or: permissions
             };
-            console.log('jobcon', cond);
+
             return Collection.find(cond);
         },
         children: [
@@ -126,7 +126,7 @@ publications.jobDetails = function (opt) {
                         status: job.status,
                         $or: permissions
                     };
-                    console.log('child jobcon', cond);
+
                     return Collection.find(cond, {limit: 5});
                 }
             },

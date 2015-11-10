@@ -25,8 +25,8 @@ JobCandidates = React.createClass({
         let isReady = this.props.subCache.subscribe('getApplications', ...subData).ready();
         return {
             isReady: isReady,
-            applications: Collections.Applications.find(...subData).fetch(),
-            total: Collections.Applications.find(this.filter()).count()
+            applications: Meteor.applications.find(...subData).fetch(),
+            total: Meteor.applications.find(this.filter()).count()
         };
     },
 

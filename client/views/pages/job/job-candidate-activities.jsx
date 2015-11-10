@@ -65,6 +65,7 @@ JobCandidateTimeline = React.createClass({
 
         if(this.props.isAddingComment) {
             action = <CommentBox onSave={this.props.onSaveComment} onDiscard={this.props.onDiscardComment} />
+
         } else if(this.props.isSendingMessage) {
             let candidateInfo = this.props.application['candidateInfo'] || null;
             if(candidateInfo) {
@@ -79,10 +80,7 @@ JobCandidateTimeline = React.createClass({
             <div className="feed-activity-list">
                 {action}
                 {this.data.activities.map((activity, key) => {
-                    return <CandidateActivityItem
-                        activity={activity}
-                        application={this.props.application}
-                        candidate={this.props.candidate} key={key}/>
+                    return <div></div>
                     } )}
 
                 {loadmore}
@@ -97,7 +95,7 @@ CandidateActivityItem = React.createClass({
     mixins: [ReactMeteorData],
     propTypes: {
         activity: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
+        candidate: React.PropTypes.object.isRequired
     },
 
     getInitialState() {
@@ -117,12 +115,14 @@ CandidateActivityItem = React.createClass({
     },
 
     componentWillMount() {
+        console.log('here componentWillMount');
         this.setState({
             type: this.props.activity.actionType
         });
     },
 
     componentWillReceiveProps(nextProps) {
+        console.log('here');
         this.setState({
             type: nextProps.activity.actionType
         });
@@ -136,38 +136,38 @@ CandidateActivityItem = React.createClass({
                     activity={this.props.activity}
                     application={this.props.application}
                     candidate={this.props.candidate}
-                    creator={this.data.creator}/>
+                    creator={this.data.creator}/>;
                 break;
             case 2: // applied job
                 content = <ActivityType2
                     activity={this.props.activity}
                     application={this.props.application}
-                    candidate={this.props.candidate}/>
+                    candidate={this.props.candidate}/>;
                 break;
 
             case 3: // disqualified app
                 content = <ActivityType3
                     activity={this.props.activity}
-                    creator={this.data.creator}/>
+                    creator={this.data.creator}/>;
 
                 break;
 
             case 4: // revert qualify app
                 content = <ActivityType4
                     activity={this.props.activity}
-                    creator={this.data.creator}/>
+                    creator={this.data.creator}/>;
 
                 break;
 
             case 5:  // sent mail
                 content = <ActivityType5
                     activity={this.props.activity}
-                    creator={this.data.creator}/>
+                    creator={this.data.creator}/>;
                 break;
             case 6:  // added comment
                 content = <ActivityType6
                     activity={this.props.activity}
-                    creator={this.data.creator}/>
+                    creator={this.data.creator}/>;
 
                 break;
             case 7:  // added candidate to source
@@ -311,7 +311,7 @@ var ActivityType2 = React.createClass({
     propTypes: {
         activity: React.PropTypes.object.isRequired,
         candidate: React.PropTypes.object.isRequired,
-        application: React.PropTypes.object.isRequired,
+        application: React.PropTypes.object.isRequired
     },
 
     firstName() {
