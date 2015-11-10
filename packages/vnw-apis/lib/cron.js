@@ -29,8 +29,8 @@ var syncData = function () {
 
 
 Meteor.startup(function () {
-    if(process.env.CRON_SCHEDULE) {
-        //syncData();
+    if (process.env.CRON_SCHEDULE) {
+        syncData();
         //SyncedCron.start();
     }
 });

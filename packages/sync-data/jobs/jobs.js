@@ -161,9 +161,8 @@ var Jobs = {
 
                     });
                 }
-            } else {
-                sJobCollections.addJobtoQueue('addJob', data);
             }
+
             jc.done();
             cb();
         } catch (e) {
