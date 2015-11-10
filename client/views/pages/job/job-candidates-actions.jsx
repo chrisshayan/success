@@ -47,7 +47,18 @@ JobCandidateListActions = React.createClass({
             sortKey: key
         });
         this.props.onSort(sort.field, sort.type);
+    },
 
+    handleDisqualify() {
+        this.props.onBulkDisqualify && this.props.onBulkDisqualify();
+    },
+
+    handleRevertQualify() {
+        this.props.onBulkRevertQualify && this.props.onBulkRevertQualify();
+    },
+
+    handleSendMessage() {
+        this.props.onBulkSendMessage && this.props.onBulkSendMessage();
     },
 
     render() {
@@ -109,8 +120,11 @@ JobCandidateListActions = React.createClass({
                             })}
                     </DropdownButton>
                     <DropdownButton bsStyle={'link'} title='Actions' id={"menu-" + Date.now()} className="pull-right">
-                        <MenuItem key={0} eventKey={0}>Disqualify</MenuItem>
-                        <MenuItem key={1} eventKey={1}>Send message</MenuItem>
+                        {!this.props.disqualified
+                            ? <MenuItem key={0} eventKey={0} onSelect={this.handleDisqualify}>Disqualify</MenuItem>
+                            : <MenuItem key={0} eventKey={0} onSelect={this.handleRevertQualify}>Revert qualify</MenuItem>}
+
+                        <MenuItem key={1} eventKey={1}  onSelect={this.handleSendMessage}>Send message</MenuItem>
                     </DropdownButton>
                 </div>
             </div>

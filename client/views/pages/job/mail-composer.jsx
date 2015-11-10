@@ -185,10 +185,10 @@ MailComposer = React.createClass({
                     <div className="clearfix"></div>
                 </div>
                 <div className="mail-body text-right tooltip-demo">
-                    <button className="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top"
+                    <button className="btn btn-sm btn-primary btn-outline" data-toggle="tooltip" data-placement="top"
                             title="Send" onClick={this.sendEmails}><i className="fa fa-reply"></i> Send</button>
                     &nbsp;
-                    <button onClick={this.props.onDiscard} className="btn btn-white btn-sm" data-toggle="tooltip" data-placement="top"
+                    <button onClick={this.props.onDiscard} className="btn btn-white btn-sm btn-outline" data-toggle="tooltip" data-placement="top"
                             title="Discard email"><i className="fa fa-times"></i> Discard</button>
                 </div>
                 <div className="clearfix"></div>

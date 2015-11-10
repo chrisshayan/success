@@ -45,7 +45,12 @@ JobDetailsContainer = React.createClass({
     },
 
     selectApplication(appId) {
-        this.setState({currentAppId: appId});
+        $('body').animate({
+            scrollTop: 0
+        }, 'slow');
+        this.setState({
+            currentAppId: appId
+        });
     },
 
     nextApplication(app) {
@@ -91,38 +96,6 @@ JobDetailsContainer = React.createClass({
 
 
     render(){
-        let jobContent = null;
-        if (this.state.hasApplication === null) {
-            jobContent = (
-                <div id="job-content">
-                    <WaveLoading />
-                </div>
-            );
-        } else if (this.state.hasApplication === false) {
-            jobContent = (
-                <div id="job-content">
-                    <JobContentEmpty />
-                </div>
-            );
-        } else {
-            jobContent = (
-                <div id="job-content">
-                    <JobCandidatesContainer
-                        job={this.data.job}
-                        stage={this.data.stage}
-                        currentApp={this.data.application}
-                        onChangeTab={(key) => { this.setState({currentTab: key}) }}
-                    />
-
-                    <JobCandidateProfile
-                        job={this.data.job}
-                        stage={this.data.stage}
-                        application={this.data.application}
-                        candidate={this.data.candidate}/>
-
-                </div>
-            );
-        }
         return (
             <div className="row" style={{paddingBottom: '60px'}}>
                 <div className="col-md-12">

@@ -27,9 +27,11 @@ JobCandidate = React.createClass({
             "clear": true
         });
 
+        console.log(this.props.checked)
+
         return (
             <li className={containerClass} style={ styles.jobCandidate.container }>
-                <CandidateCheckbox id={app._id} checked={this.props.checked}/>
+                <CandidateCheckbox id={app._id} checked={this.props.checked} onToggleSelectApp={this.props.onToggleSelectApp}/>
 
                 <a href={link} style={ styles.jobCandidate.candidateInfo }>
                     <small className="pull-right text-muted">{ appliedDate }</small>
@@ -60,8 +62,9 @@ CandidateCheckbox = React.createClass({
 
     componentDidMount() {
         var self = this;
+        console.log(12345678)
 
-        var el = React.findDOMNode(this.refs.checkbox);
+        let el = this.refs.checkbox.findDOMNode();
         $(el).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
@@ -69,14 +72,15 @@ CandidateCheckbox = React.createClass({
             $(el).iCheck('check');
         }
 
-        $(el).on('ifClicked', function (event) {
-            self.context.actions.toggleSelectApplication(self.props.id);
+        $(el).on('ifClicked', function() {
+            console.log(112234)
         });
+        //this.props.onToggleSelectApp(self.props.id);
     },
 
     componentWillUpdate(nextProps, nextState) {
         if(this.props.checked != nextProps.checked) {
-            var el = React.findDOMNode(this.refs.checkbox);
+            let el = this.refs.checkbox.findDOMNode();
             if(nextProps.checked) {
                 $(el).iCheck('check');
             } else {
@@ -88,7 +92,7 @@ CandidateCheckbox = React.createClass({
     render() {
         return (
             <div style={styles.jobCandidate.selectBox}>
-                <input type="checkbox" ref="checkbox" className="candidate-select" />
+                <input type="checkbox" ref="checkbox" />
             </div>
         );
     }

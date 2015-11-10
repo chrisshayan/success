@@ -20,7 +20,6 @@ function replacePlaceholder(userId, application, candidate, mail) {
                 case "company":
                 case "mail_signature":
                     var user = Meteor.users.findOne({_id: userId});
-                    console.log(user.emailSignature)
                     var company = user.defaultCompany();
                     if (p1 == "company") {
                         replaces[p1] = company.companyName;
@@ -287,6 +286,47 @@ Meteor.methods({
                             applicationId: application._id
                         };
                         activity.disqualifiedApplication();
+                    }
+                });
+            });
+
+        } catch (e) {
+            debuger(e);
+        }
+    },
+
+
+
+    revertQualifyApplications: function (ids) {
+        try {
+            if (!this.userId) return false;
+            var self = this;
+            this.unblock();
+
+            check(ids, [String]);
+
+            _.each(ids, function (_id) {
+                Meteor.defer(function () {
+                    var application = Collections.Applications.findOne({_id: _id});
+                    if (!application) return;
+                    var conditions = {
+                        _id: _id
+                    };
+                    var modifier = {
+                        $set: {
+                            disqualified: false
+                        }
+                    }
+                    var result = Collections.Applications.update(conditions, modifier);
+                    if (result) {
+                        // Log activity
+                        var activity = new Activity();
+                        activity.companyId = application.companyId;
+                        activity.createdBy = self.userId;
+                        activity.data = {
+                            applicationId: _id
+                        };
+                        activity.revertApplication();
                     }
                 });
             });

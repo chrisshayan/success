@@ -1,4 +1,4 @@
-JobHiringProcess = Radium(React.createClass({
+JobHiringProcess = React.createClass({
     contextTypes: {
         selectApplication: React.PropTypes.func
     },
@@ -20,7 +20,7 @@ JobHiringProcess = Radium(React.createClass({
 
     handleSwitchStage(stage, e) {
         e.preventDefault();
-        //this.context.selectApplication(null);
+        this.context.selectApplication(null);
         Router.go('Job', {
             _id: this.props.job ? this.props.job._id : '',
             stage: stage.alias
@@ -53,4 +53,4 @@ JobHiringProcess = Radium(React.createClass({
             </div>
         );
     }
-}));
+});

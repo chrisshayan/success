@@ -74,6 +74,8 @@ JobCandidateTimeline = React.createClass({
                 };
                 action = <MessageBox onDiscard={this.props.onDiscardMessage} to={to} />
             }
+        } else if(this.props.isScheduleInterview) {
+            action = <ScheduleEvent />
         }
         return (
             <div className="feed-activity-list">
@@ -526,7 +528,7 @@ var ActivityType5 = React.createClass({
         let styles = {
             content: {
                 overflow: 'hidden',
-                height: this.state.isShowMore ? 'auto' : '120px'
+                height: this.state.isShowMore ? 'auto' : '115px'
             }
         };
         let moreLessBtn = null;
