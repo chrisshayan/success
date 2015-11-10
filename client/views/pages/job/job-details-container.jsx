@@ -43,8 +43,12 @@ JobDetailsContainer = React.createClass({
     },
 
     selectApplication(appId) {
-        this.setState({currentAppId: appId});
-
+        $('body').animate({
+            scrollTop: 0
+        }, 'slow');
+        this.setState({
+            currentAppId: appId
+        });
     },
 
     nextApplication(app) {

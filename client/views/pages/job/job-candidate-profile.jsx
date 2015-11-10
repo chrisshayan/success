@@ -42,6 +42,15 @@ JobCandidateProfile = React.createClass({
         window.removeEventListener('resize', this.handleResize);
     },
 
+    componentWillUpdate(nextProps, nextState) {
+        if(this.props.applicationId !=  nextProps.applicationId) {
+            this.setState({
+                isAddingComment: false,
+                isSendingMessage: false
+            });
+        }
+    },
+
     handleResize() {
         let el = this.refs.container.getDOMNode();
         if ($(el).width() != this.state.width) {

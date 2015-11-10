@@ -44,13 +44,15 @@ JobCandidatesContainer = React.createClass({
 
     render() {
         let content = null;
+        let tab1Title = 'QUALIFIED';
         let tab2Title = 'DISQUALIFIED';
         if(this.state.counter.disqualified > 0) {
             tab2Title = `DISQUALIFIED (${this.state.counter.disqualified})`;
         }
+
         content = (
             <Tabs id="job-candidates-container" activeKey={this.state.key} onSelect={this.handleSelect}>
-                <Tab eventKey={1} title="QUALIFIED" className="qualify">
+                <Tab eventKey={1} title={tab1Title} className="qualify">
                     <JobCandidates
                         subCache={Sub1}
                         job={this.props.job}

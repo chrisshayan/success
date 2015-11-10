@@ -8,6 +8,13 @@ JobCandidate = React.createClass({
         this.context.selectApplication(this.props.app._id);
     },
 
+    handleCheckApp() {
+        this.props.onToggleSelectApp(this.props.app._id, true);
+    },
+    handleUncheckApp() {
+        this.props.onToggleSelectApp(this.props.app._id, false);
+    },
+
     render() {
         let app = this.props.app;
 
@@ -29,7 +36,6 @@ JobCandidate = React.createClass({
 
         let appliedTimeago = moment(app.createdAt.toISOString()).fromNow();
         let isCurrentApp = this.props.currentAppId === app._id;
-        let checked = isCurrentApp;
 
         let className = classNames(
             'clearfix',
@@ -45,7 +51,7 @@ JobCandidate = React.createClass({
                         applicationId={app._id}
                         onCheck={this.handleCheckApp}
                         onUncheck={this.handleUncheckApp}
-                        checked={checked}/>
+                        checked={this.props.checked}/>
                 </div>
                 <div className="pull-left border-left" style={styles.content} onClick={this.handleClickApp}>
                     <div className="clearfix">

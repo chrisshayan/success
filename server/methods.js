@@ -21,7 +21,6 @@ function replacePlaceholder(userId, application, candidate, mail) {
                 case "company":
                 case "mail_signature":
                     var user = Meteor.users.findOne({_id: userId});
-                    console.log(user.emailSignature)
                     var company = user.defaultCompany();
                     if (!company) return false;
                     if (p1 == "company") {
@@ -226,6 +225,7 @@ Meteor.methods({
 
      /!**
      * Update application qualify
+
      * @param applicationId {Number}
      *!/
      disqualifyApplication: function (applicationId) {
@@ -300,6 +300,9 @@ Meteor.methods({
      }
      },
      /!**
+     */
+    
+    /*
      * Update application qualify
      * @param applicationId {Number}
      *!/

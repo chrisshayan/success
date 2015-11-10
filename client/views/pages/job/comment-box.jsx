@@ -37,6 +37,7 @@ CommentBox = React.createClass({
         let styles = {
             container: {
                 marginBottom: "20px",
+                borderTop: 'none'
             },
             input: {
                 width: '100%',

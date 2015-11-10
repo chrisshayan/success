@@ -56,7 +56,6 @@ JobCandidateProfileActions = React.createClass({
         };
         Meteor.call('updateApplicationStage', data, (err, result) => {
             if (!err) {
-                this.context.nextApplication();
                 this.context.selectApplication(null);
             }
         });
@@ -113,6 +112,10 @@ JobCandidateProfileActions = React.createClass({
                                         onClick={() => this.props.onToggleSendMessage()}
                                         disabled={this.props.isSendingMessage} >
                                         Send message
+                                    </button>
+
+                                    <button className="btn btn-default btn-outline btn-sm">
+                                        Schedule interview
                                     </button>
 
                                     <button className="btn btn-default btn-outline btn-sm">
