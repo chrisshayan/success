@@ -27,7 +27,7 @@ ecmascript-collections
 es5-shim
 iron:router@1.0.12
 okgrow:router-autoscroll
-react
+react@0.3.0
 react-template-helper
 twbs:bootstrap
 fortawesome:fontawesome

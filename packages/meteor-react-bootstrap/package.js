@@ -17,14 +17,14 @@ var BS_VERSION = '0.27.3',
     CLASSNAMES_VERSION = '2.2.0';
 
 Npm.depends({
-    'externalify': EXTERNALIFY_VERSION,
-    'react-bootstrap': BS_VERSION,
-    'classnames': CLASSNAMES_VERSION
+    'react-bootstrap': '0.23.3', // this library will be browserifyed later
+    'react-dom' : REACT_DOM_VERSION,
+    classnames: CLASSNAMES_VERSION
 });
 
 
 Package.onUse(function (api) {
-    api.use(['react@0.14.1_1', 'cosmos:browserify@0.8.2']);
+    api.use(['react@0.3.0','cosmos:browserify@0.7.0']);
     api.addFiles([
         'bs.browserify.js'
     ], 'client');
