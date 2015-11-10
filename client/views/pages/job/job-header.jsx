@@ -57,6 +57,12 @@ JobHeader = React.createClass({
         Meteor.call('updateJobTags', jobId, tags);
     },
 
+    jobSettingUrl() {
+        return Router.url('teamSettings', {
+            jobId: this.props.job._id
+        });
+    },
+
     render() {
         let styles = {
             title: {
@@ -100,10 +106,15 @@ JobHeader = React.createClass({
                         { this.data.relatedJobs.map(this.renderRelatedJobs) }
 
                     </DropdownButton>
+
+                    <a href={this.jobSettingUrl()} className="btn btn-link">
+                        <i className="fa fa-cogs" /> &nbsp;
+                        setting
+                    </a>
                 </div>
 
-                <div className="col-lg-6 text-right">
-                    <div style={styles.actions}>
+                <div className="col-lg-6 text-right ">
+                    <div style={styles.actions} className="hidden">
                         <a href="#" className="btn btn-primary btn-outline">
                             <i className="fa fa-plus"></i>&nbsp;
                             Add candidate

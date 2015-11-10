@@ -10,7 +10,8 @@ JobCandidateProfile = React.createClass({
         return {
             width: 800,
             isAddingComment: false,
-            isSendingMessage: false
+            isSendingMessage: false,
+            isScheduleInterview: false
         };
     },
 
@@ -43,7 +44,8 @@ JobCandidateProfile = React.createClass({
         if(this.props.applicationId !=  nextProps.applicationId) {
             this.setState({
                 isAddingComment: false,
-                isSendingMessage: false
+                isSendingMessage: false,
+                isScheduleInterview: false
             });
         }
     },
@@ -64,8 +66,9 @@ JobCandidateProfile = React.createClass({
         }
         state['isAddingComment'] = status;
 
-        if(status && this.state.isSendingMessage) {
+        if(status) {
             state['isSendingMessage'] = false;
+            state['isScheduleInterview'] = false;
         }
         this.setState(state);
     },
@@ -77,20 +80,42 @@ JobCandidateProfile = React.createClass({
         }
         state['isSendingMessage'] = status;
 
-        if(status && this.state.isAddingComment) {
+        if(status) {
             state['isAddingComment'] = false;
+            state['isScheduleInterview'] = false;
+        }
+        this.setState(state);
+    },
+
+    handleToggleScheduleInterview(status) {
+        let state = {};
+        if(status === undefined) {
+            status = !this.state.isScheduleInterview;
+        }
+        state['isScheduleInterview'] = status;
+
+        if(status) {
+            state['isAddingComment'] = false;
+            state['isSendingMessage'] = false;
         }
         this.setState(state);
     },
 
     handleSaveComment(text) {
-        console.log(text)
         Meteor.call('addCommentApplication', {
             application: this.props.applicationId,
             content: text
         }, () => {
             this.handleDiscardComment();
         });
+    },
+
+    handleSaveScheduleInterview(event) {
+        Meteor.call('scheduleInterview', this.props.job._id, this.props.applicationId, event, (err, result) => {
+            if(!err)
+                swal("Scheduled interview successfully!", "", "success");
+        });
+        this.handleDiscardScheduleInterview();
     },
 
     handleDiscardComment() {
@@ -117,6 +142,14 @@ JobCandidateProfile = React.createClass({
         this.handleToggleSendMessage(false);
     },
 
+    handleDiscardScheduleInterview() {
+        $('body').animate({
+            scrollTop: 0
+        }, 'slow');
+
+        this.handleToggleScheduleInterview(false);
+    },
+
     render() {
         let content = null;
         if (this.data.isReady) {
@@ -131,9 +164,10 @@ JobCandidateProfile = React.createClass({
                             containerWidth={this.state.width}
                             isAddingComment={this.state.isAddingComment}
                             isSendingMessage={this.state.isSendingMessage}
+                            isScheduleInterview={this.state.isScheduleInterview}
                             onToggleAddComment={this.handleToggleAddComment}
                             onToggleSendMessage={this.handleToggleSendMessage}
-
+                            onToggleScheduleInterview={this.handleToggleScheduleInterview}
                         />
 
                         <JobCandidateProfileContent
@@ -144,11 +178,15 @@ JobCandidateProfile = React.createClass({
                             resume={this.data.resume}
                             isAddingComment={this.state.isAddingComment}
                             isSendingMessage={this.state.isSendingMessage}
+                            isScheduleInterview={this.state.isScheduleInterview}
                             onToggleAddComment={this.handleToggleAddComment}
                             onToggleSendMessage={this.handleToggleSendMessage}
+                            onToggleScheduleInterview={this.handleToggleScheduleInterview}
                             onSaveComment={this.handleSaveComment}
+                            onSaveScheduleInterview={this.handleSaveScheduleInterview}
                             onDiscardComment={this.handleDiscardComment}
                             onDiscardMessage={this.handleDiscardMessage}
+                            onDiscardInterview={this.handleDiscardScheduleInterview}
                         />
                     </div>
                 );

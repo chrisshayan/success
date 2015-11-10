@@ -5,7 +5,6 @@ function transformVNWId(id) {
 }
 
 
-
 Meteor.publish('companyInfo', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
@@ -28,7 +27,7 @@ Meteor.publish('mailTemplates', function () {
 });
 
 Meteor.publish('mailTemplateDetails', function (_id) {
-    if(!this.userId) return null;
+    if (!this.userId) return null;
     check(_id, String);
     var cond = {
         _id: _id,
@@ -123,7 +122,6 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
     };
 
 
-
 //Meteor.publishComposite('getApplications', function (filters, options) {
 //
 //    return {
@@ -183,15 +181,19 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
         options.limit += 10;
     }
     return {
-        find: function() {
+        find: function () {
             return Collections.Activities.find(filters, options);
         },
         children: [
             // publish createdBy info
             {
-                find: function(activity) {
-                    if(!activity) return null;
+                find: function (activity) {
+                    if (!activity) return null;
                     var cond = {_id: activity.createdBy};
+                    if (activity.actionType == 8) {
+                        cond = {_id: {$in: activity.data.interviewers}};
+                    }
+
                     var opt = {
                         limit: 1,
                         fields: {
@@ -200,6 +202,12 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
                         }
                     };
                     return Meteor.users.find(cond, opt);
+                }
+            },
+
+            {
+                find: function () {
+
                 }
             }
         ]
@@ -363,10 +371,10 @@ Meteor.publish('skillSearch', function (q) {
     check(q, String);
     if (!this.userId) return this.ready();
     q = q.trim();
-    if(q.length < 1) return this.ready();
+    if (q.length < 1) return this.ready();
     var option = {
         sort: {skillLength: 1},
         limit: 10
     };
-    return Collections.SkillTerms.find({ $text: { $search: q } }, option);
+    return Collections.SkillTerms.find({$text: {$search: q}}, option);
 });
