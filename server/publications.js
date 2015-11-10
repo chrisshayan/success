@@ -176,14 +176,35 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
 //});
 
 
-Meteor.publish('applicationActivities', function (filters, options) {
+Meteor.publishComposite('applicationActivities', function (filters, options) {
     if (!this.userId) return this.ready();
     check(filters, Object);
     check(options, Object);
-    if (filters.limit) {
-        filters.limit += 10;
+    if (options.limit) {
+        options.limit += 10;
     }
-    return Collections.Activities.find(filters, options);
+    return {
+        find: function() {
+            return Collections.Activities.find(filters, options);
+        },
+        children: [
+            // publish createdBy info
+            {
+                find: function(activity) {
+                    if(!activity) return null;
+                    var cond = {_id: activity.createdBy};
+                    var opt = {
+                        limit: 1,
+                        fields: {
+                            username: 1,
+                            profile: 1
+                        }
+                    };
+                    return Meteor.users.find(cond, opt);
+                }
+            }
+        ]
+    }
 });
 
 /*Meteor.publish("applicationCounter", function (counterName, filters) {

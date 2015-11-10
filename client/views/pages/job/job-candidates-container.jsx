@@ -51,29 +51,23 @@ JobCandidatesContainer = React.createClass({
         content = (
             <Tabs id="job-candidates-container" activeKey={this.state.key} onSelect={this.handleSelect}>
                 <Tab eventKey={1} title="QUALIFIED" className="qualify">
-                    {this.state.key === 1
-                        ? <JobCandidates
-                            subCache={Sub1}
-                            job={this.props.job}
-                            stage={this.props.stage}
-                            disqualified={false}
-                            currentAppId={this.props.currentAppId}
-                            onUpdateCounter={this.updateCounter} />
-
-                        : null}
+                    <JobCandidates
+                        subCache={Sub1}
+                        job={this.props.job}
+                        stage={this.props.stage}
+                        disqualified={false}
+                        currentAppId={this.props.currentAppId}
+                        onUpdateCounter={this.updateCounter} />
                 </Tab>
 
                 <Tab eventKey={2} title={tab2Title}  className="disqualified">
-                    {this.state.key === 2
-                        ? <JobCandidates
-                            subCache={Sub2}
-                            job={this.props.job}
-                            stage={this.props.stage}
-                            disqualified={true}
-                            currentAppId={this.props.currentAppId}
-                            onUpdateCounter={this.updateCounter} />
-
-                        : null}
+                    <JobCandidates
+                        subCache={Sub2}
+                        job={this.props.job}
+                        stage={this.props.stage}
+                        disqualified={true}
+                        currentAppId={this.props.currentAppId}
+                        onUpdateCounter={this.updateCounter} />
                 </Tab>
             </Tabs>
         );

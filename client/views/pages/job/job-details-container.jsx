@@ -1,3 +1,5 @@
+
+
 JobDetailsContainer = React.createClass({
     mixins: [ReactMeteorData],
     getInitialState() {
@@ -19,6 +21,14 @@ JobDetailsContainer = React.createClass({
             stage: stage,
             job: job
         }
+    },
+
+    componentDidMount() {
+        Meteor.call('getCVToken', function(err, token) {
+            if(!err && token) {
+                Session.set('cvToken', token);
+            }
+        });
     },
 
 

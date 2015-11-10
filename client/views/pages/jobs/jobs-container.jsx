@@ -111,6 +111,16 @@ JobList = React.createClass({
         };
     },
 
+    componentDidMount() {
+        Meteor.call('jobListCounter', this.filters(), (err, total) => {
+            if (!err) {
+                if (this.state.total != total) {
+                    this.setState({total: total})
+                }
+            }
+        });
+    },
+
     componentDidUpdate() {
         Meteor.call('jobListCounter', this.filters(), (err, total) => {
             if (!err) {

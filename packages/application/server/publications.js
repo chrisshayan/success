@@ -125,6 +125,7 @@ publications.application = function (appId) {
             if (!user.canViewApplication(appId)) return null;
             var filters = {_id: appId};
             var options = {limit: 1};
+
             return Collection.find(filters, options);
         },
         children: [
@@ -139,6 +140,27 @@ publications.application = function (appId) {
 
                     return candidateCollection.find(filters, options);
                 }
+            },
+
+            {
+                find: function (app) {
+                    var resumeId = app['data'] && app['data']['resumeid'] ? app['data']['resumeid'] : null;
+                    if (resumeId) {
+                        return Collections.Resumes.find({resumeId: resumeId}, {limit: 1});
+                    }
+                    return null;
+                },
+
+                children: [
+                    {
+                        find: function (resume) {
+                            if (resume['data'] && resume['data']['joblevelid']) {
+                                return Meteor.job_levels.find({vnwId: resume['data']['joblevelid'], languageId: 2});
+                            }
+                            return null;
+                        }
+                    }
+                ]
             }
         ]
     }

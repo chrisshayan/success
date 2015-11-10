@@ -132,7 +132,8 @@ JobHeader = React.createClass({
                 fontSize: '15px !important'
             }
         };
-        return <MenuItem key={key} eventKey={key} style={styles.relatedTitle}> {job.title} </MenuItem>
+        let jobUrl = Router.url('Job', {_id: job._id, stage: 'applied'});
+        return <MenuItem key={key} eventKey={key} style={styles.relatedTitle} href={jobUrl}> {job.title} </MenuItem>
     },
 
     renderTag(tag, key) {
