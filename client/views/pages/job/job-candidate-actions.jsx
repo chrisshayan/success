@@ -4,8 +4,7 @@ let {
 
 JobCandidateProfileActions = React.createClass({
     contextTypes: {
-        nextApplication: React.PropTypes.func,
-        selectApplication: React.PropTypes.func,
+        selectApplication: React.PropTypes.func
     },
 
     getInitialState() {
@@ -23,7 +22,7 @@ JobCandidateProfileActions = React.createClass({
     candidateName() {
         let app = this.props.application;
         if (!app || !app.candidateInfo) return '';
-        return app.candidateInfo.fullname;
+        return app.candidateInfo.firstName;
     },
 
     handleDisqualify() {
@@ -76,6 +75,11 @@ JobCandidateProfileActions = React.createClass({
         });
     },
 
+    handleAddComment(e) {
+        e.preventDefault();
+
+    },
+
     render() {
         let styles = {
             actionsContainer: {
@@ -89,20 +93,25 @@ JobCandidateProfileActions = React.createClass({
             <Affix offsetTop={200} className="job-candidate-actions" style={{width: this.props.containerWidth + 'px'}}>
                 <div className="profile-actions" style={styles.actionsContainer}>
                     <div className="row">
-                        <div className="col-sm-6 col-md-6 col-lg-4">
+                        <div className="hidden-xs hidden-sm hidden-md col-lg-2">
                             <div style={{position: 'absolute'}}>
                                 <h2 className="profile-action-title">{this.candidateName()}</h2>
                             </div>
                         </div>
 
-                        <div className="col-sm-6 col-md-6 col-lg-8 pull-right" style={{paddingBottom: '5px'}}>
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-10 pull-right" style={{paddingBottom: '5px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
-                                    <button className="btn btn-default btn-outline btn-sm">
+                                    <button className="btn btn-default btn-outline btn-sm"
+                                        onClick={() => this.props.onToggleAddComment()}
+                                        disabled={this.props.isAddingComment}>
                                         Add comment
                                     </button>
 
-                                    <button className="btn btn-default btn-outline btn-sm">
+                                    <button
+                                        className="btn btn-default btn-outline btn-sm"
+                                        onClick={() => this.props.onToggleSendMessage()}
+                                        disabled={this.props.isSendingMessage} >
                                         Send message
                                     </button>
 

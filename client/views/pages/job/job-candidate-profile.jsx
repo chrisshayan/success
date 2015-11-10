@@ -8,7 +8,9 @@ JobCandidateProfile = React.createClass({
 
     getInitialState() {
         return {
-            width: 600
+            width: 800,
+            isAddingComment: false,
+            isSendingMessage: false
         };
     },
 
@@ -27,17 +29,83 @@ JobCandidateProfile = React.createClass({
 
     componentDidMount() {
         let el = this.refs.container.getDOMNode();
-        let updateWidth = () => {
-            if($(el).width() != this.state.width) {
-                this.setState({
-                    width: $(el).width()
-                });
-            }
-        };
+        $(el).bind('resize', this.handleResize);
+        window.addEventListener('resize', this.handleResize);
+    },
 
-        $(el).on('resize', () => { updateWidth() });
-        $(window).on('resize', () => { updateWidth() });
-        updateWidth();
+    componentWillUnmount: function() {
+        let el = this.refs.container.getDOMNode();
+        $(el).unbind('resize', this.handleResize);
+        window.removeEventListener('resize', this.handleResize);
+    },
+
+    handleResize() {
+        let el = this.refs.container.getDOMNode();
+        if($(el).width() != this.state.width) {
+            this.setState({
+                width: $(el).width()
+            });
+        }
+    },
+
+    handleToggleAddComment(status) {
+        let state = {};
+        if(status === undefined) {
+            status = !this.state.isAddingComment;
+        }
+        state['isAddingComment'] = status;
+
+        if(status && this.state.isSendingMessage) {
+            state['isSendingMessage'] = false;
+        }
+        this.setState(state);
+    },
+
+    handleToggleSendMessage(status) {
+        let state = {};
+        if(status === undefined) {
+            status = !this.state.isSendingMessage;
+        }
+        state['isSendingMessage'] = status;
+
+        if(status && this.state.isAddingComment) {
+            state['isAddingComment'] = false;
+        }
+        this.setState(state);
+    },
+
+    handleSaveComment(text) {
+        console.log(text)
+        Meteor.call('addCommentApplication', {
+            application: this.props.applicationId,
+            content: text
+        }, () => {
+            this.handleDiscardComment();
+        });
+    },
+
+    handleDiscardComment() {
+        $('body').animate({
+            scrollTop: 0
+        }, 'fast');
+
+        this.handleToggleAddComment(false);
+    },
+
+    handleDiscardComment() {
+        $('body').animate({
+            scrollTop: 0
+        }, 'slow');
+
+        this.handleToggleAddComment(false);
+    },
+
+    handleDiscardMessage() {
+        $('body').animate({
+            scrollTop: 0
+        }, 'slow');
+
+        this.handleToggleSendMessage(false);
     },
 
     render() {
@@ -51,14 +119,28 @@ JobCandidateProfile = React.createClass({
                             stage={this.props.stage}
                             application={this.data.application}
                             candidate={this.data.candidate}
-                            containerWidth={this.state.width} />
+                            containerWidth={this.state.width}
+                            isAddingComment={this.state.isAddingComment}
+                            isSendingMessage={this.state.isSendingMessage}
+                            onToggleAddComment={this.handleToggleAddComment}
+                            onToggleSendMessage={this.handleToggleSendMessage}
+
+                        />
 
                         <JobCandidateProfileContent
                             job={this.props.job}
                             stage={this.props.stage}
                             application={this.data.application}
                             candidate={this.data.candidate}
-                            resume={this.data.resume} />
+                            resume={this.data.resume}
+                            isAddingComment={this.state.isAddingComment}
+                            isSendingMessage={this.state.isSendingMessage}
+                            onToggleAddComment={this.handleToggleAddComment}
+                            onToggleSendMessage={this.handleToggleSendMessage}
+                            onSaveComment={this.handleSaveComment}
+                            onDiscardComment={this.handleDiscardComment}
+                            onDiscardMessage={this.handleDiscardMessage}
+                        />
                     </div>
                 );
             } else {

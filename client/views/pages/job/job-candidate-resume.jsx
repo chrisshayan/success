@@ -73,7 +73,21 @@ JobCandidateResumeOffline = React.createClass({
         candidate: React.PropTypes.object.isRequired,
     },
 
+    getInitialState() {
+        return {
+            isViewingCV: false
+        }
+    },
+
+    handleToggleViewCV(e) {
+        e.preventDefault();
+        this.setState({
+            isViewingCV: !this.state.isViewingCV
+        });
+    },
+
     render() {
+        cvLink = "https://docs.google.com/viewer?embedded=true&url=http://images.staging.vietnamworks.com/resumes_sentdirectly/resume/9037/3769037/5e/1e24e0bac7edb2ab7038a77d8024d464.pdf";
         return (
             <div>
                 <div className="row">
@@ -93,20 +107,36 @@ JobCandidateResumeOffline = React.createClass({
 
                 <hr/>
 
-                <div className="row">
-                    <div className="col-md-8 col-md-offset-1">
-                        <button className="btn btn-primary btn-outline">
-                            <i className="fa fa-fw fa-download" ></i>
-                            <span> Download CV</span>
-                        </button>
+                <div className="ibox hidden-print">
+                    <div className="ibox-content">
+                        <h2><i className="fa fa-fw fa-paperclip"></i> Attached CV</h2>
+                        <div className="center-block text-center">
 
-                        &nbsp;
-                        <button className="btn btn-primary btn-outline">
-                            <i className="fa fa-fw fa-download" ></i>
-                            <span> Download CV</span>
-                        </button>
+                            <span className="fa fa-file-pdf-o big-icon"></span><br />
+                            <div className="text-center">
+                                <button type="button" className="btn btn-primary btn-outline m-t-sm" onClick={this.handleToggleViewCV}>
+                                    <i className="fa fa-fw fa-eye"></i> Preview by Google Viewer
+                                </button>
+                                &nbsp;&nbsp;
+                                <a className="btn btn-primary btn-outline m-t-sm" href={this.props.application.resumeFileUrl()} target="_blank">
+                                    <i className="fa fa-fw fa-download" ></i>
+                                    <span> Download CV</span>
+                                </a>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+
+                {!this.state.isViewingCV ? null : (
+                <div className="cv-viewer">
+                    <div className="row">
+                        <div className="col-md-12">
+                            <iframe src={cvLink} style={{border: '1px solid #ddd', width: '100%', height: '1024px', marginTop: '15px'}}></iframe>
+                        </div>
+                    </div>
+                </div> )}
+
             </div>
         );
     }

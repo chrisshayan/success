@@ -88,13 +88,13 @@ JobCandidates = React.createClass({
         if (!this.data.isReady) {
             Loading = <WaveLoading />;
         } else {
-            if(this.state.q.length > 0 && this.data.applications.length <= 0) {
+            if (this.state.q.length > 0 && this.data.applications.length <= 0) {
                 noContent = (
                     <h3 className="no-content">Your search returned no matches</h3>
                 );
             }
 
-            if(this.state.q <= 0 && this.data.applications.length <= 0) {
+            if (this.state.q <= 0 && this.data.applications.length <= 0) {
                 noContent = (
                     <h3 className="no-content">No application</h3>
                 );
@@ -115,15 +115,6 @@ JobCandidates = React.createClass({
             );
         }
 
-
-        let searchBoxStyle = {
-            width: '90%',
-            height: '30px',
-            border: 0,
-            borderBottom: '1px solid #ddd',
-            padding: '5px',
-            outline: 'none'
-        };
         return (
             <div>
                 <JobCandidateListActions
@@ -132,7 +123,7 @@ JobCandidates = React.createClass({
                     onSelectAll={ () => { this.setState({isSelectAll: true}) } }
                     onDeselectAll={ () => { this.setState({isSelectAll: false, selectedItems: [this.props.currentAppId]}) } }/>
 
-                {this.data.applications.map((app, key) => <JobCandidate key={key} app={app} currentAppId={this.props.currentAppId}/>)}
+                {this.data.applications.map(this.renderApp) }
                 {noContent}
                 {Loading}
                 {LoadMore}
@@ -156,8 +147,12 @@ JobCandidates = React.createClass({
         });
     },
 
-
-    renderApplication(app, key) {
-
+    renderApp(app, key) {
+        let checked = this.props.currentAppId || this.state.isSelectAll;
+        return <JobCandidate
+            key={key}
+            app={app}
+            checked={checked}
+            currentAppId={this.props.currentAppId}/>;
     }
 });
