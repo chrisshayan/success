@@ -408,6 +408,8 @@ function processApp(appRows, companyId, sourceId) {
                 candidateInfo.emails = _.without(candidateInfo.emails, null, undefined, '');
 
                 application.candidateInfo = candidateInfo;
+            } else {
+                console.log('missing candidateId : ', row.userid);
             }
             //console.log('insert application:', application.entryId);
 
@@ -424,7 +426,7 @@ function processApp(appRows, companyId, sourceId) {
                 activity.data = {
                     applicationId: aId,
                     source: sourceId,
-                    userId: can._id || row.userid
+                    userId: (can ) ? can._id : row.userid || ''
                 };
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();

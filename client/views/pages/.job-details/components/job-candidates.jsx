@@ -31,10 +31,10 @@ JobCandidates = React.createClass({
     render() {
         var loading = null;
         var loadmoreBtn = null;
-        if(this.context.state.isLoading) {
+        if (this.context.state.isLoading) {
             loading = (
                 <div style={{marginBottom: "10px", textAlign: "center"}}>
-                    <img src="/ring.svg" />
+                    <img src="/ring.svg"/>
                 </div>
             );
         }
@@ -42,31 +42,33 @@ JobCandidates = React.createClass({
             loadmoreBtn = <button className="btn btn-default btn-block btn-sm"
                                   onClick={ ()=> this.context.actions.loadMore() }>load more</button>;
         }
-
         return (
-            <div className="fh-column">
-                <JobCandidatesActions disabled={!this.context.state.selectedItems.length} />
-                <div className="full-height-scroll">
-                    <ul className="list-group elements-list">
-                        {this.context.data.applications.map(this.renderCandidate)}
-                        <li className="clear">
-                            <div style={{height: "120px", padding: "10px 20px 20px 20px"}}>
-                                {loading}
-                                {loadmoreBtn}
-                            </div>
-                        </li>
-                    </ul>
+            <div className="data-">
+                <JobCandidatesActions disabled={!this.context.state.selectedItems.length}/>
+                <div className="fh-column">
+                    <div className="full-height-scroll">
+                        <ul className="list-group elements-list">
+                            {this.context.data.applications.map(this.renderCandidate)}
+                            <li className="clear">
+                                <div style={{height: "120px", padding: "10px 20px 20px 20px"}}>
+                                    {loading}
+                                    {loadmoreBtn}
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         );
+
     },
     renderCandidate(app, key) {
         var checked = false;
         var selected = false;
-        if(this.context.state.selectedItems.indexOf(app._id) >= 0) {
+        if (this.context.state.selectedItems.indexOf(app._id) >= 0) {
             checked = true;
         }
-        if(this.context.state.currentApplication == app._id) {
+        if (this.context.state.currentApplication == app._id) {
             selected = true;
         }
         return <JobCandidate key={key} application={app} selected={selected} checked={checked}/>;
