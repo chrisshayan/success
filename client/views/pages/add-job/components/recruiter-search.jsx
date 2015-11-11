@@ -133,7 +133,7 @@ RecruiterSearch = React.createClass({
                     onChange={(e) => this.setState({q: e.target.value})}
                     onKeyUp={this.handleKeyUp}
                     value={this.state.q}
-                    placeholder="search recruiter..."
+                    placeholder={this.props.placeholder || "search recruiter..."}
                     style={{width: '100%'}}/>
 
                 <div style={ styles.result }>

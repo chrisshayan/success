@@ -76,7 +76,7 @@ JobCandidateTimeline = React.createClass({
                 action = <MessageBox onDiscard={this.props.onDiscardMessage} to={to} />
             }
         } else if(this.props.isScheduleInterview) {
-            action = <ScheduleEvent />
+            action = <ScheduleEvent application={this.props.application} onSave={this.props.onSaveScheduleInterview} onDiscard={this.props.onDiscardInterview} />
         }
         return (
             <div className="feed-activity-list">
@@ -174,6 +174,12 @@ CandidateActivityItem = React.createClass({
                 break;
             case 7:  // added candidate to source
 
+                break;
+
+            case 8:  // Schedule interview
+                content = <ActivityType8
+                    activity={this.props.activity}
+                    creator={this.data.creator}/>
                 break;
         }
         return content;
@@ -634,6 +640,133 @@ var ActivityType6 = React.createClass({
                     <p dangerouslySetInnerHTML={{__html: this.message()}} />
                 </div>
             </div>
+        );
+    }
+});
+
+
+var ActivityType8 = React.createClass({
+    propTypes: {
+        activity: React.PropTypes.object.isRequired,
+        creator: React.PropTypes.object.isRequired,
+    },
+
+    image() {
+        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
+        if (data['avatar']) return {publicId: data['avatar']};
+        return data['firstname'] ? {firstName: data['firstname']} : null;
+    },
+
+    fullName() {
+        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
+        if (!data) return '';
+        return [data['firstname'], data['lastname']].join(' ')
+    },
+
+    timeago() {
+        let d = moment(this.props.activity.createdAt);
+        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
+        if (distance >= 30)
+            return d.format('MMMM Do YYYY, h:mm:ss a');
+        return d.fromNow();
+    },
+
+
+    subject() {
+        let data = this.props.activity['data'] || null;
+        return data.subject;
+    },
+
+    scheduleTime() {
+        let data = this.props.activity['data'] || null;
+        let startTime = new moment(data.startTime);
+        let endTime = new moment(data.endTime);
+        return startTime.format('llll') + ' to ' + endTime.format('h:mm A');
+    },
+
+    location() {
+        let data = this.props.activity['data'] || null;
+        return data.location;
+    },
+    message() {
+        let data = this.props.activity['data'] || null;
+        return '';
+    },
+
+    render() {
+        return (
+            <div className="social-feed-box">
+                <div className="social-avatar">
+                    <a href="" className="pull-left">
+                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
+                    </a>
+
+                    <div className="media-body">
+                        <div className="clearfix">
+                            <a href="#" className="pull-left">
+                                {this.fullName()}
+                            </a>
+                            <small className="pull-left text-muted" style={{margin: '0 5px', lineHeight: '20px'}}>scheduled interview</small>
+                        </div>
+                        <small className="text-muted">{this.timeago()}</small>
+                    </div>
+                </div>
+                <div className="social-body">
+                    <div className="row">
+                        <div className="col-md-2 text-center">
+                            <i className="fa fa-calendar-check-o" style={{fontSize: '40px', paddingTop: '40px'}} />
+                        </div>
+                        <div className="col-md-10 border-left">
+                            <div className="form-horizontal">
+                                <div className="form-group">
+                                    <label className="col-lg-2 control-label">Subject:</label>
+                                    <div className="col-lg-10"><p className="form-control-static">{this.subject()}</p></div>
+                                </div>
+                                <div className="hr-line-dashed" style={{margin: 0}} />
+                                <div className="form-group">
+                                    <label className="col-lg-2 control-label">Time:</label>
+                                    <div className="col-lg-10"><p className="form-control-static">{this.scheduleTime()}</p></div>
+                                </div>
+                                <div className="hr-line-dashed" style={{margin: 0}} />
+                                <div className="form-group">
+                                    <label className="col-lg-2 control-label">Location:</label>
+                                    <div className="col-lg-10"><p className="form-control-static">{this.location()}</p></div>
+                                </div>
+                                <div className="hr-line-dashed" style={{margin: 0}} />
+                                <div className="form-group">
+                                    <label className="col-lg-2 control-label">Interviewers:</label>
+                                    <div className="col-lg-10">
+                                        {this.renderInterviewers()}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    },
+
+    renderInterviewers() {
+        let data = this.props.activity['data'] || null;
+        let name = [];
+        _.each(data.interviewers, function(id) {
+            var u = Meteor.users.findOne({_id: id});
+            if(u) {
+                let n = u.username || u.defaultEmail();
+                if(u['profile']) {
+                    n = [u['profile']['firstname'] || '', u['profile']['lastname'] || '' ].join(' ');
+                    if(u['username']) {
+                        n += '-- @' + u['username'];
+                    }
+                }
+                name.push(n);
+            }
+        });
+        return (
+            <ul className="interviewers-list">
+                {name.map((n, k) => { return <li key={k}><span className="label label-info">{n}</span></li> })}
+            </ul>
         );
     }
 });

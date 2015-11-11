@@ -21,12 +21,16 @@ function replacePlaceholder(userId, application, candidate, mail) {
                 case "company":
                 case "mail_signature":
                     var user = Meteor.users.findOne({_id: userId});
+
                     var company = user.defaultCompany();
                     if (!company) return false;
+
+//                    var company = Collections.CompanySettings.findOne({companyId: application.companyId});
+
                     if (p1 == "company") {
                         replaces[p1] = company.companyName;
                     } else {
-                        replaces[p1] = user.emailSignature;
+                        replaces[p1] = user.emailSignature || '';
                     }
 
                     break;
@@ -301,7 +305,7 @@ Meteor.methods({
      },
      /!**
      */
-    
+
     /*
      * Update application qualify
      * @param applicationId {Number}
@@ -936,5 +940,97 @@ Meteor.methods({
             expireTime: moment(new Date()).add(1, 'day').valueOf()
         };
         return IZToken.encode(tokenData);
+    },
+
+    scheduleInterview(jobId, appId, event) {
+        var self = this;
+        this.unblock();
+        var user = Meteor.users.findOne({_id: this.userId});
+        var job = Collections.Jobs.findOne({_id: jobId});
+        var application = Collections.Applications.findOne({_id: appId});
+        if (!job || !application) return false;
+        var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+        var attendeeEmails = [application.candidateInfo.emails[0]];
+        var attendees = [];
+        attendees.push({
+            cn: application.candidateInfo.fullname,
+            mailTo: application.candidateInfo.emails[0],
+            partStat: "NEEDS-ACTION"
+        });
+
+        _.each(event.interviewers, function (id) {
+            var u = Meteor.users.findOne({_id: id});
+            if (u) {
+                var uName = u.username || u.defaultEmail();
+                if (u['profile']) {
+                    uName = [u['profile']['firstname'] || '', u['profile']['lastname'] || ''].join(' ');
+                }
+                attendees.push({
+                    cn: uName,
+                    mailTo: u.defaultEmail(),
+                    partStat: "NEEDS-ACTION"
+                });
+                attendeeEmails.push(u.defaultEmail())
+            }
+        });
+        var mail = {
+            from: user.defaultEmail(),
+            to: attendeeEmails,
+            subject: event.subject,
+            html: event.html,
+            headers: {
+                "Content-class": "urn:content-classes:calendarmessage"
+            }
+        };
+        mail = replacePlaceholder(self.userId, application, candidate, mail);
+        var activity = new Activity();
+        activity.data = {
+            jobId: jobId,
+            applicationId: appId,
+            interviewers: event.interviewers,
+            scheduleDate: event.scheduleDate,
+            startTime: event.startTime,
+            endTime: event.endTime,
+            location: event.location,
+            subject: event.subject,
+            html: mail.html
+        };
+        activity.companyId = job.companyId;
+        activity.createdAt = new Date();
+        activity.createdBy = this.userId;
+        var activityId = activity.scheduleInterview();
+
+        Meteor.defer(function () {
+            var organizerName = user.username || user.defaultEmail();
+            if (user['profile']) {
+                organizerName = [user['profile']['firstname'] || '', user['profile']['lastname'] || ''].join(' ');
+            }
+            var calOptions = {
+                prodId: "//Vietnamworks//Success",
+                method: "REQUEST",
+                events: [
+                    {
+                        uid: activityId,
+                        summary: event.subject,
+                        dtStart: event.startTime,
+                        dtEnd: event.endTime,
+                        organizer: {cn: organizerName, mailTo: user.defaultEmail()},
+                        attendees: attendees
+                    }
+                ]
+            };
+            var cal = new IcsGenerator(calOptions);
+
+            mail['attachments'] = [
+                {
+                    fileName: 'invite.ics',
+                    contents: cal.toIcsString(),
+                    contentType: 'text/calendar'
+                }
+            ];
+            Email.send(mail);
+        });
+
+        return !!activityId;
     }
 });

@@ -253,22 +253,22 @@ var Applications = {
                             var oldApp = Meteor.applications.findOne(query);
                             oldApp.update(application);
 
-                            /*/!* Log activity *!/
-                             Meteor.defer(function () {
-                             // Log applied activity
-                             var activity = new Activity();
-                             activity.companyId = mongoJob.companyId;
-                             activity.data = {
-                             applicationId: data.entryId,
-                             source: data.source,
-                             userId: row.userid
-                             };
+                            /* Log activity */
+                            /*Meteor.defer(function () {
+                                // Log applied activity
+                                var activity = new Activity();
+                                activity.companyId = mongoJob.companyId;
+                                activity.data = {
+                                    applicationId: data.entryId,
+                                    source: data.source,
+                                    userId: row.userid
+                                };
 
-                             activity.createdAt = formatDatetimeFromVNW(row.createddate);
-                             activity.appliedJob();
+                                activity.createdAt = formatDatetimeFromVNW(row.createddate);
+                                activity.appliedJob();
 
-                             });
-                             */
+                            });*/
+
                         });
                     }
                 }

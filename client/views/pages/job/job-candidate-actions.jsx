@@ -114,7 +114,10 @@ JobCandidateProfileActions = React.createClass({
                                         Send message
                                     </button>
 
-                                    <button className="btn btn-default btn-outline btn-sm">
+                                    <button
+                                        className="btn btn-default btn-outline btn-sm"
+                                        onClick={() => this.props.onToggleScheduleInterview()}
+                                        disabled={this.props.isScheduleInterview} >
                                         Schedule interview
                                     </button>
 

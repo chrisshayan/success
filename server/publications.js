@@ -8,7 +8,7 @@ function transformVNWId(id) {
 Meteor.publish('companyInfo', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
-    
+
     if (!user) return this.ready();
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
@@ -184,15 +184,19 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
         options.limit += 10;
     }
     return {
-        find: function() {
+        find: function () {
             return Collections.Activities.find(filters, options);
         },
         children: [
             // publish createdBy info
             {
-                find: function(activity) {
-                    if(!activity) return null;
+                find: function (activity) {
+                    if (!activity) return null;
                     var cond = {_id: activity.createdBy};
+                    if (activity.actionType == 8) {
+                        cond = {_id: {$in: activity.data.interviewers}};
+                    }
+
                     var opt = {
                         limit: 1,
                         fields: {
@@ -201,6 +205,12 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
                         }
                     };
                     return Meteor.users.find(cond, opt);
+                }
+            },
+
+            {
+                find: function () {
+
                 }
             }
         ]

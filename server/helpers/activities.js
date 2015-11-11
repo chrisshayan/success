@@ -18,6 +18,7 @@ Activity.ACTION_TYPE = {
     SEND_MAIL_TO_CANDIDATE: 5,
     ADD_COMMENT_TO_APPLICATION: 6,
     ADD_CANDIDATE_TO_SOURCED: 7,
+    SCHEDULED_INTERVIEW: 8,
 };
 
 
@@ -65,8 +66,16 @@ Activity.prototype.addCommentApplication = function() {
     this.actionType = Activity.ACTION_TYPE.ADD_COMMENT_TO_APPLICATION;
     this.save();
 }
+
+
 Activity.prototype.addCandidateToSourced = function() {
     this.actionType = Activity.ACTION_TYPE.ADD_CANDIDATE_TO_SOURCED;
     this.save();
 }
+
+Activity.prototype.scheduleInterview = function() {
+    this.actionType = Activity.ACTION_TYPE.SCHEDULED_INTERVIEW;
+    return this.save();
+}
+
 
