@@ -1,24 +1,26 @@
 <template name="hiringTeam">
-    <div class="ibox float-e-margins">
-        <div class="ibox-title">
-            <h5>Hiring Team </h5>
+    <div class="row">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Hiring Team </h5>
 
-        </div>
-        <div class="ibox-content">
-            {{> tabular table=TabularTables.HiringTeam class="table table-striped table-bordered table-condensed"}}
+            </div>
+            <div class="ibox-content">
+                {{> tabular table=TabularTables.HiringTeam class="table table-striped table-bordered table-condensed"}}
 
-            <div class="hr-line-dashed"></div>
-            <div class="row">
-                {{> sendRequest}}
+                <div class="hr-line-dashed"></div>
+                <div class="row">
+                    {{> sendRequest}}
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <template name="hiringTeamActionsCell">
-{{#unless isOwner}}
-    <a href="#" class="btn btn-danger btn-xs remove btn-outline remove"><i class="fa fa-trash text-danger"></i></a>
-{{/unless}}
+    {{#unless isOwner}}
+        <a href="#" class="btn btn-danger btn-xs remove btn-outline remove"><i class="fa fa-trash text-danger"></i></a>
+    {{/unless}}
 </template>
 
 <template name="sendRequest">
