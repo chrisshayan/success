@@ -36,8 +36,6 @@ JobCandidate = React.createClass({
                 "clear": true
             });
 
-        console.log(this.props.checked)
-
         return (
             <li className={containerClass} style={ styles.jobCandidate.container }>
                 <CandidateCheckbox id={app._id} checked={this.props.checked} onToggleSelectApp={this.props.onToggleSelectApp}/>
@@ -55,8 +53,8 @@ JobCandidate = React.createClass({
                         <p className="m-b-none">
                             {matchingScoreLabel}
                             {disqualified ? <span className="label pull-right label-danger"
-                                                  style={ {marginRight: "3px"} }><i
-                                className="fa fa-thumbs-down"></i></span> : null}
+                                                  style={ {marginRight: "3px"} }>
+                                <i className="fa fa-thumbs-down"></i></span> : null}
                             <i className="fa fa-map-marker"></i> { city }
                         </p>
                     </div>
@@ -76,7 +74,7 @@ CandidateCheckbox = React.createClass({
 
 
 
-//        var el = ReactDOM.findDOMNode(this.refs.checkbox);
+//        var el = React.findDOMNode(this.refs.checkbox);
 
         let el = this.refs.checkbox.findDOMNode();
 
@@ -97,7 +95,7 @@ CandidateCheckbox = React.createClass({
 
 /*
         if (this.props.checked != nextProps.checked) {
-            var el = ReactDOM.findDOMNode(this.refs.checkbox);
+            var el = React.findDOMNode(this.refs.checkbox);
             if (nextProps.checked) {
 */
 

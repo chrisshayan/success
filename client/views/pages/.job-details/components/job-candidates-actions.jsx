@@ -60,7 +60,7 @@ JobCandidatesActions = React.createClass({
 var ActionSelectAll = React.createClass({
     componentDidMount() {
         var self = this;
-        var selectEl = ReactDOM.findDOMNode(this.refs.checkbox);
+        var selectEl = React.findDOMNode(this.refs.checkbox);
         $(selectEl).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
@@ -96,7 +96,7 @@ var ActionSearch = React.createClass({
     },
 
     componentDidMount(){
-        ReactDOM.findDOMNode(this.refs.searchInput).focus();
+        React.findDOMNode(this.refs.searchInput).focus();
     },
 
     render() {

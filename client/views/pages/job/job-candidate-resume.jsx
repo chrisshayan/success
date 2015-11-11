@@ -13,6 +13,7 @@ JobCandidateResume = React.createClass({
     },
 
     componentDidMount() {
+        console.log(this.props.application);
         if (this.props.application) {
             this.setState({
                 isReady: true,

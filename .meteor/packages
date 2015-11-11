@@ -27,7 +27,7 @@ ecmascript-collections
 es5-shim
 iron:router@1.0.12
 okgrow:router-autoscroll
-react@0.3.0
+react
 react-template-helper
 twbs:bootstrap
 fortawesome:fontawesome
@@ -59,12 +59,9 @@ lab:mysql-connection-manager
 http
 froatsnook:request
 izzilab:token
-#izzilab:react-bootstrap@0.0.1
-
+izzilab:react-bootstrap@0.0.2
 stevezhu:lodash
 okgrow:analytics
-
-vnw:react-bootstrap
 
 #vnw:core
 vnw:city

@@ -17,6 +17,7 @@ JobCandidateTimeline = React.createClass({
     getMeteorData() {
         let subData = [this.filter(), this.option()];
         let sub = Meteor.subscribe('applicationActivities', ...subData);
+
         return {
             isReady: sub.ready(),
             activities: Collections.Activities.find(...subData).fetch()
@@ -82,7 +83,10 @@ JobCandidateTimeline = React.createClass({
             <div className="feed-activity-list">
                 {action}
                 {this.data.activities.map((activity, key) => {
-                    return <div></div>
+                    return <CandidateActivityItem
+                        activity={activity}
+                        application={this.props.application}
+                        candidate={this.props.candidate} key={key}/>
                     } )}
 
                 {loadmore}
@@ -117,14 +121,12 @@ CandidateActivityItem = React.createClass({
     },
 
     componentWillMount() {
-        console.log('here componentWillMount');
         this.setState({
             type: this.props.activity.actionType
         });
     },
 
     componentWillReceiveProps(nextProps) {
-        console.log('here');
         this.setState({
             type: nextProps.activity.actionType
         });
