@@ -34,14 +34,14 @@ JobCandidateProfile = React.createClass({
         window.addEventListener('resize', this.handleResize);
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         let el = this.refs.container.getDOMNode();
         $(el).unbind('resize', this.handleResize);
         window.removeEventListener('resize', this.handleResize);
     },
 
     componentWillUpdate(nextProps, nextState) {
-        if(this.props.applicationId !=  nextProps.applicationId) {
+        if (this.props.applicationId != nextProps.applicationId) {
             this.setState({
                 isAddingComment: false,
                 isSendingMessage: false,
@@ -51,22 +51,24 @@ JobCandidateProfile = React.createClass({
     },
 
     handleResize() {
-        let el = this.refs.container.getDOMNode();
-        if($(el).width() != this.state.width) {
-            this.setState({
-                width: $(el).width()
-            });
-        }
+        /*let el = this.refs.container.getDOMNode();
+
+         if($(el).width() != this.state.width) {
+         this.setState({
+         width: $(el).width()
+         });
+         }
+         */
     },
 
     handleToggleAddComment(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isAddingComment;
         }
         state['isAddingComment'] = status;
 
-        if(status) {
+        if (status) {
             state['isSendingMessage'] = false;
             state['isScheduleInterview'] = false;
         }
@@ -75,12 +77,12 @@ JobCandidateProfile = React.createClass({
 
     handleToggleSendMessage(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isSendingMessage;
         }
         state['isSendingMessage'] = status;
 
-        if(status) {
+        if (status) {
             state['isAddingComment'] = false;
             state['isScheduleInterview'] = false;
         }
@@ -89,12 +91,12 @@ JobCandidateProfile = React.createClass({
 
     handleToggleScheduleInterview(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isScheduleInterview;
         }
         state['isScheduleInterview'] = status;
 
-        if(status) {
+        if (status) {
             state['isAddingComment'] = false;
             state['isSendingMessage'] = false;
         }
@@ -112,7 +114,7 @@ JobCandidateProfile = React.createClass({
 
     handleSaveScheduleInterview(event) {
         Meteor.call('scheduleInterview', this.props.job._id, this.props.applicationId, event, (err, result) => {
-            if(!err)
+            if (!err)
                 swal("Scheduled interview successfully!", "", "success");
         });
         this.handleDiscardScheduleInterview();

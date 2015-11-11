@@ -321,7 +321,8 @@ body.body-small .footer.fixed {
   -moz-border-top-colors: none;
   background: none;
   border-color: #DDDDDD #DDDDDD rgba(0, 0, 0, 0);
-  border-bottom: @gray;
+  /*border-bottom: @gray;*/
+  border-bottom: rgba(255,255,255,1);
   border-image: none;
   border-style: solid;
   border-width: 1px;
@@ -531,7 +532,8 @@ code {
   border-color: @border-color;
   border-image: none;
   border-style: solid solid none;
-  border-width: 1px 0px;
+  border-width: 1px 0;
+  border-top: none;
 }
 
 .ibox-footer {
