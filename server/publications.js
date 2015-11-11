@@ -43,7 +43,9 @@ Meteor.publish('mailTemplateDetails', function (_id) {
  * Publications for job details page *
  *************************************/
 Meteor.publish('companySettings', function () {
+    //TODO : fix companyID
     var user = Meteor.users.findOne({_id: this.userId});
+    if (!user || !user.companyId) return this.ready();
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 

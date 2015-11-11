@@ -89,7 +89,7 @@ JobCandidateProfileActions = React.createClass({
             }
         };
         return (
-            <Affix offsetTop={200} className="job-candidate-actions" style={{width: this.props.containerWidth + 'px'}}>
+            <Affix offsetTop={200} className="job-candidate-actions" style={{width: '100%'}}>
                 <div className="profile-actions" style={styles.actionsContainer}>
                     <div className="row">
                         <div className="hidden-xs hidden-sm hidden-md col-lg-2">
@@ -98,26 +98,27 @@ JobCandidateProfileActions = React.createClass({
                             </div>
                         </div>
 
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-10 pull-right" style={{paddingBottom: '5px'}}>
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-10 pull-right"
+                             style={{paddingBottom: '5px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
                                     <button className="btn btn-default btn-outline btn-sm"
-                                        onClick={() => this.props.onToggleAddComment()}
-                                        disabled={this.props.isAddingComment}>
+                                            onClick={() => this.props.onToggleAddComment()}
+                                            disabled={this.props.isAddingComment}>
                                         Add comment
                                     </button>
 
                                     <button
                                         className="btn btn-default btn-outline btn-sm"
                                         onClick={() => this.props.onToggleSendMessage()}
-                                        disabled={this.props.isSendingMessage} >
+                                        disabled={this.props.isSendingMessage}>
                                         Send message
                                     </button>
 
                                     <button
                                         className="btn btn-default btn-outline btn-sm"
                                         onClick={() => this.props.onToggleScheduleInterview()}
-                                        disabled={this.props.isScheduleInterview} >
+                                        disabled={this.props.isScheduleInterview}>
                                         Schedule interview
                                     </button>
 
@@ -148,7 +149,7 @@ JobCandidateProfileActions = React.createClass({
 
                                     <button type="button" className="btn btn-primary btn-outline btn-sm dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span className="caret" />
+                                        <span className="caret"/>
                                     </button>
                                     {this.renderMoveAbilities()}
 

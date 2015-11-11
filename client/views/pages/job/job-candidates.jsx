@@ -92,12 +92,12 @@ JobCandidates = React.createClass({
 
     handleToggleSelectApp(appId, check) {
         let selectedItems = this.state.selectedItems;
-        if(check) {
+        if (check) {
             selectedItems.push(appId);
         } else {
             selectedItems = _.without(selectedItems, appId);
         }
-        if(!_.isEqual(selectedItems, this.state.selectedItems)) {
+        if (!_.isEqual(selectedItems, this.state.selectedItems)) {
             this.setState({selectedItems: selectedItems});
         }
     },
@@ -113,6 +113,17 @@ JobCandidates = React.createClass({
         this.setState({
             selectedItems: [this.props.currentAppId]
         });
+    },
+
+    initializeAppContainerStyle(){
+        var height = 115
+            , row = 5;
+
+        return {
+            height: height * row + 'px',
+            'overflow-x': 'hidden'
+
+        };
     },
 
     handleBulkDisqualify() {
@@ -182,10 +193,10 @@ JobCandidates = React.createClass({
     },
 
     render() {
-        let Loading = null,
-            LoadMore = null,
-            noContent = null
-        action = null;
+        let Loading = null
+            , LoadMore = null
+            , noContent = null
+            , action = null;
 
         if (!this.data.isReady) {
             Loading = <WaveLoading />;
@@ -219,9 +230,12 @@ JobCandidates = React.createClass({
 
         if (this.state.isSendBulkMessage) {
             action =
-                <BulkMessageBox to={this.bulkMessageTo()} show={this.state.isSendBulkMessage} onDiscard={this.handleDiscardBulkSendMessage}/>
+                <BulkMessageBox to={this.bulkMessageTo()} show={this.state.isSendBulkMessage}
+                                onDiscard={this.handleDiscardBulkSendMessage}/>
         }
 
+        var appContainerStyle = this.initializeAppContainerStyle();
+        
         return (
             <div>
                 <JobCandidateListActions
@@ -234,12 +248,13 @@ JobCandidates = React.createClass({
                     onBulkRevertQualify={this.handleBulkRevertQualify}
                     onBulkSendMessage={this.handleBulkSendMessage}
                 />
-
-                {this.data.applications.map(this.renderApp) }
-                {noContent}
-                {Loading}
-                {LoadMore}
-                {action}
+                <div className="result-container" style={appContainerStyle}>
+                    {this.data.applications.map(this.renderApp) }
+                    {noContent}
+                    {Loading}
+                    {LoadMore}
+                    {action}
+                </div>
             </div>
         );
     },

@@ -478,7 +478,12 @@ function processApp(appRows, companyId, sourceId) {
 
                 application.candidateInfo = candidateInfo;
 
+
                 application.candidateId = can._id;
+
+            } else {
+                console.log('missing candidateId : ', row.userid);
+
             }
             //console.log('insert application:', application.entryId);
 
@@ -501,7 +506,8 @@ function processApp(appRows, companyId, sourceId) {
                 activity.data = {
                     applicationId: application._id,
                     source: sourceId,
-                    userId: (can) ? can._id : row.userid
+                    userId: (can ) ? can._id : row.userid || ''
+
                 };
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();

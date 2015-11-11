@@ -87,7 +87,7 @@ TagsInput = React.createClass({
     handleKeyDown(e) {
         switch (e.which) {
             case 8:
-                if(this.state.q.length <= 0) {
+                if (this.state.q.length <= 0) {
                     this.props.onRemoveLastTag && this.props.onRemoveLastTag();
                 }
                 break;
@@ -109,7 +109,8 @@ TagsInput = React.createClass({
         var styles = {
             container: {
                 position: 'relative',
-                display: 'inline-block'
+                display: 'inline-block',
+                width: '100%'
             },
             result: {
                 position: 'absolute',

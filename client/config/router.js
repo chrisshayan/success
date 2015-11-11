@@ -132,7 +132,7 @@ Router.route('/job/:jobId/stage/:stage', {
         if (!this.params.hasOwnProperty('jobId') && !this.params.hasOwnProperty('stage'))
             throw Meteor.Error(404);
         var subs = [
-            Meteor.subscribe('jobDetails', {jobId: this.params.jobId}),
+            Meteor.subscribe('jobDetails', {jobId: this.params.jobId})
             //Meteor.subscribe('mailTemplates')
         ];
 
@@ -291,7 +291,7 @@ Router.route('/settings/mailtemplates', {
     fastRender: true,
     waitOn: function () {
         return [
-            Meteor.subscribe('mailTemplates'),
+            DashboardSubs.subscribe('mailTemplates')
         ];
     },
     action: function () {
@@ -304,7 +304,7 @@ Router.route('/settings/mailtemplates/create', {
     name: "createMailTemplate",
     waitOn: function () {
         return [
-            Meteor.subscribe('mailTemplates')
+            DashboardSubs.subscribe('mailTemplates')
         ];
     },
     action: function () {
@@ -431,9 +431,11 @@ Router.route('/profile', {
 
 Router.route('/job-new/:_id/:stage', {
     name: 'Job',
+    fastRender : true,
     waitOn: function() {
         return [
-            Meteor.subscribe('jobDetails', {jobId: this.params._id})
+            Meteor.subscribe('jobDetails', {jobId: this.params._id}),
+            DashboardSubs.subscribe('mailTemplates')
         ];
     },
     action() {

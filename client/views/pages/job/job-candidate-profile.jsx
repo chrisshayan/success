@@ -54,12 +54,14 @@ JobCandidateProfile = React.createClass({
     },
 
     handleResize() {
+
         let el = this.refs.container.getDOMNode();
         if ($(el).width() != this.state.width) {
             this.setState({
                 width: $(el).width()
             });
         }
+
     },
 
     handleToggleAddComment(status) {
