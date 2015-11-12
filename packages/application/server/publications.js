@@ -148,6 +148,7 @@ publications.application = function (appId) {
                 find: function (app) {
                     var resumeId = app.resumeId;
                     if (resumeId) {
+                        console.log('resumeId', resumeId);
                         return Collections.Resumes.find({resumeId: resumeId}, {limit: 1});
                     }
                     return null;

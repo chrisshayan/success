@@ -94,6 +94,7 @@ JobDetailsContainer = React.createClass({
 
 
     render(){
+        console.log('this.state.currentAppId', this.state.currentAppId);
         return (
             <div className="row" style={{paddingBottom: '60px'}}>
                 <div className="col-md-12">

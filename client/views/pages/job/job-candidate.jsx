@@ -5,6 +5,7 @@ JobCandidate = React.createClass({
 
     handleClickApp(e) {
         e.preventDefault();
+        console.log('ii', this.props.app);
         this.context.selectApplication(this.props.app._id);
     },
 

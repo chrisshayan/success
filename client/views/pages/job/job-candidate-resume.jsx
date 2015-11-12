@@ -13,7 +13,6 @@ JobCandidateResume = React.createClass({
     },
 
     componentDidMount() {
-        console.log(this.props.application);
         if (this.props.application) {
             this.setState({
                 isReady: true,
@@ -36,17 +35,17 @@ JobCandidateResume = React.createClass({
         if (!this.state.isReady) {
             content = <WaveLoading />;
         } else {
-            if (this.state.source == 1) {
+            if (this.state.source.type == 1) {
                 content = <JobCandidateResumeOnline
                     application={this.props.application}
                     candidate={this.props.candidate}
                     resume={this.props.resume}/>;
 
-            } else if (this.state.source == 2) {
+            } else if (this.state.source.type == 2) {
 
                 content = <JobCandidateResumeOffline
-                            application={this.props.application}
-                            candidate={this.props.candidate} />;
+                    application={this.props.application}
+                    candidate={this.props.candidate}/>;
 
             } else if (this.state.source == 3) {
                 content = <JobCandidateResumeFromSuccess />;
@@ -99,7 +98,7 @@ JobCandidateResumeOffline = React.createClass({
 
                                 <blockquote>
                                     <p className="small"
-                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
+                                       dangerouslySetInnerHTML={{__html: this.props.application.toHTMLCoverLetter()}}/>
                                 </blockquote>
                             </div>
                         </div>
@@ -115,12 +114,14 @@ JobCandidateResumeOffline = React.createClass({
 
                             <span className="fa fa-file-pdf-o big-icon"></span><br />
                             <div className="text-center">
-                                <button type="button" className="btn btn-primary btn-outline m-t-sm" onClick={this.handleToggleViewCV}>
+                                <button type="button" className="btn btn-primary btn-outline m-t-sm"
+                                        onClick={this.handleToggleViewCV}>
                                     <i className="fa fa-fw fa-eye"></i> Preview by Google Viewer
                                 </button>
                                 &nbsp;&nbsp;
-                                <a className="btn btn-primary btn-outline m-t-sm" href={this.props.application.resumeFileUrl()} target="_blank">
-                                    <i className="fa fa-fw fa-download" ></i>
+                                <a className="btn btn-primary btn-outline m-t-sm"
+                                   href={this.props.application.resumeFileUrl()} target="_blank">
+                                    <i className="fa fa-fw fa-download"></i>
                                     <span> Download CV</span>
                                 </a>
                             </div>
@@ -133,7 +134,8 @@ JobCandidateResumeOffline = React.createClass({
                 <div className="cv-viewer">
                     <div className="row">
                         <div className="col-md-12">
-                            <iframe src={cvLink} style={{border: '1px solid #ddd', width: '100%', height: '1024px', marginTop: '15px'}}></iframe>
+                            <iframe src={cvLink}
+                                    style={{border: '1px solid #ddd', width: '100%', height: '1024px', marginTop: '15px'}}></iframe>
                         </div>
                     </div>
                 </div> )}
@@ -165,7 +167,8 @@ JobCandidateResumeOnline = React.createClass({
 
     currentJobLevel() {
         let resume = this.props.resume;
-        if (resume['data'] && resume['data']['joblevelid']) {
+
+        if (resume && resume['data'] && resume['data']['joblevelid']) {
             let level = Meteor.job_levels.findOne({vnwId: resume['data']['joblevelid']});
             if (level) return level.name;
         }
@@ -234,7 +237,7 @@ JobCandidateResumeOnline = React.createClass({
 
                                 <blockquote>
                                     <p className="small"
-                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
+                                       dangerouslySetInnerHTML={{__html: this.props.application.toHTMLCoverLetter()}}/>
                                 </blockquote>
                             </div>
                         </div>
@@ -264,7 +267,7 @@ JobCandidateResumeOnline = React.createClass({
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-file-text-o"/>&nbsp;EXPERIENCE</h2>
                                 <ul className="content-list">
-                                    {this.props.resume.experience && this.props.resume.experience.map(this.renderExperience)}
+                                    {this.props.resume && this.props.resume.experience && this.props.resume.experience.map(this.renderExperience)}
                                 </ul>
                             </div>
                         </div>
@@ -275,7 +278,7 @@ JobCandidateResumeOnline = React.createClass({
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-trophy"/>&nbsp;EDUCATION</h2>
                                 <ul className="content-list">
-                                    {this.props.resume.education && this.props.resume.education.map(this.renderEducation)}
+                                    {this.props.resume && this.props.resume.education && this.props.resume.education.map(this.renderEducation)}
                                 </ul>
                             </div>
                         </div>
@@ -292,7 +295,7 @@ JobCandidateResumeOnline = React.createClass({
                                 <div id="vertical-timeline"
                                      className="vertical-container dark-timeline vertical-timeline-content no-margins">
 
-                                    {this.props.resume.reference && this.props.resume.reference.map(this.renderReference)}
+                                    {this.props.resume && this.props.resume.reference && this.props.resume.reference.map(this.renderReference)}
                                 </div>
                             </div>
                         </div>

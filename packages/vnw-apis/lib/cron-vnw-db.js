@@ -426,6 +426,7 @@ function processApp(appRows, companyId, sourceId) {
          'data.lastname': 1
          }
          };*/
+        if(!appRows || !appRows.length ) return;
 
         appRows.forEach(function (row) {
             var appId = row.entryid || row.sdid;
@@ -496,7 +497,7 @@ function processApp(appRows, companyId, sourceId) {
 
 
             /* Log activity */
-            /*Meteor.defer(function () {
+            Meteor.defer(function () {
                 // Log applied activity
                 var activity = new Activity();
                 activity.companyId = companyId;
@@ -509,7 +510,7 @@ function processApp(appRows, companyId, sourceId) {
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();
 
-            });*/
+            });
 
         });
 

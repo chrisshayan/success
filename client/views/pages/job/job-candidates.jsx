@@ -23,6 +23,7 @@ JobCandidates = React.createClass({
     getMeteorData() {
         if (!this.props.job) return {isReady: false, applications: [], total: 0};
         let subData = [this.filter(), this.option()];
+
         let isReady = this.props.subCache.subscribe('getApplications', ...subData).ready();
         return {
             isReady: isReady,
@@ -52,7 +53,7 @@ JobCandidates = React.createClass({
             });
             f['$or'] = searchCriteria;
         }
-        f['jobId'] = this.props.job.jobId;
+        f['source.jobId'] = this.props.job.source.jobId;
         f['stage'] = this.props.stage.id;
         f['disqualified'] = this.props.disqualified;
         return f;
@@ -235,7 +236,7 @@ JobCandidates = React.createClass({
         }
 
         var appContainerStyle = this.initializeAppContainerStyle();
-        
+
         return (
             <div>
                 <JobCandidateListActions

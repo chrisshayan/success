@@ -49,7 +49,7 @@ JobCandidateProfileActions = React.createClass({
 
     handleMoveNextState(e) {
         e.preventDefault();
-
+        console.log('updateApplicationStage', this.props.application);
         let data = {
             application: this.props.application._id,
             stage: this.state.nextStage.id

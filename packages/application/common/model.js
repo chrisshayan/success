@@ -23,6 +23,25 @@ model.prototype.shortCoverLetter = function () {
     return this.coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
 };
 
+model.prototype.toHTMLCoverLetter = function () {
+    var cover = '';
+    if (this.coverLetter)
+        cover = this.coverLetter.replace(/(\r\n|\n)/gi, '<br/>');
+
+    return cover.replace(/\<br\/\>\s?\<br\/\>/g, '<br/>');
+
+};
+
+
+model.prototype.resumeFileUrl = function () {
+    var link = '/';
+    if (Meteor.isClient)
+        link = "downloadresume/" + this.companyId + "/" + this._id + '/' + Session.get('cvToken');
+
+    return Meteor.absoluteUrl(link);
+};
+
+
 model.prototype.link = function () {
     var job = Meteor['jobs'].findOne({jobId: this.source.jobId});
 
@@ -168,7 +187,9 @@ Collection.after.update(function (userId, doc, fieldNames, modifier, options) {
         mod['stages.s' + this.previous.stage] = -1;
         mod['stages.s' + doc.stage] = 1;
 
-        jobCollection.update({'source.jobId': doc.jobId}, {
+        var a = {'source.jobId': doc.source.jobId};
+
+        Meteor.jobs.update(a, {
             $inc: mod
         });
     }

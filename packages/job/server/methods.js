@@ -18,7 +18,7 @@ var methods = {
     },
 
     getJobs: function (filters, options) {
-        console.log(filters, options);
+        //console.log(filters, options);
 
         if (!filters || typeof filters != 'object' || !options || typeof options != 'object')
             return null;
@@ -190,12 +190,12 @@ var methods = {
     },
 
     publishPosition: function (doc) {
-        console.log(doc);
+        console.log('pub', doc);
     },
 
     jobListCounter(filter) {
         if (!this.userId) return 0;
-        console.log(filter);
+        //console.log(filter);
         var user = Meteor.users.findOne({_id: this.userId});
         var permissions = user.jobPermissions();
 
