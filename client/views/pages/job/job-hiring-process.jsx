@@ -19,12 +19,14 @@ JobHiringProcess = React.createClass({
     },
 
     handleSwitchStage(stage, e) {
+        console.log('st', stage);
         e.preventDefault();
+        console.log(this.props.job);
         this.context.selectApplication(null);
-        Router.go('Job', {
-            _id: this.props.job ? this.props.job._id : '',
-            stage: stage.alias
-        });
+        /*Router.go('Job', {
+         _id: this.props.job ? this.props.job._id : '',
+         stage: stage.alias
+         });*/
     },
 
     render() {

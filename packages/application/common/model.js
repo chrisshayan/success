@@ -110,8 +110,8 @@ model.appendSchema({
      }, // 1: is online, 2: sent directly, 3: add manually*/
     stage: {
         type: Number,
-        defaultValue: 0
-    }, // 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
+        defaultValue: 1
+    }, // 0 : source, 1: applied, Default. 2: test assign, 3: Interview, 4: Offer letter, 5: Rejected
     matchingScore: {
         type: Number,
         decimal: true,
@@ -154,7 +154,6 @@ model.appendSchema({
 Collection.after.insert(function (userId, doc) {
     var mod = {};
     mod['stages.s' + doc.stage] = 1;
-    console.log('mod', mod, 'jobID ', doc.source.jobId);
 
     jobCollection.update({'source.jobId': doc.source.jobId}, {
         $inc: mod

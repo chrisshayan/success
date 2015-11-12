@@ -492,11 +492,8 @@ function processApp(appRows, companyId, sourceId) {
 
             //var aId = Meteor.applications.insert(application);
 
-            console.log('app');
-
             application.save();
 
-            console.log('save done');
 
             /* Log activity */
             /*Meteor.defer(function () {
@@ -572,7 +569,7 @@ function processCandidates(candidateList) {
             if (parseTimeToString(candidate.updatedAt) != parseTimeToString(updatedDate)) {
                 candidate.createdAt = formatDatetimeFromVNW(row.createddate);
                 candidate.updatedAt = updatedDate || candidate.createdAt;
-                console.log('save candidate');
+                //console.log('save candidate');
                 //TODO : in the future, the 3rd job will care this one
                 //console.log(candidate);
                 candidate.save();

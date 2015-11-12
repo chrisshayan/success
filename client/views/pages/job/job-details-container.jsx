@@ -98,7 +98,7 @@ JobDetailsContainer = React.createClass({
             <div className="row" style={{paddingBottom: '60px'}}>
                 <div className="col-md-12">
                     <JobHeader job={this.data.job} stage={this.data.stage}/>
-                    <JobHiringProcess jovar currentAppId b={this.data.job} currentStage={this.data.stage}/>
+                    <JobHiringProcess job={this.data.job} currentStage={this.data.stage}/>
                 </div>
                 <div className="col-md-12">
                     <div id="job-content">
