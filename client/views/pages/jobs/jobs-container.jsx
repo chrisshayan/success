@@ -1,242 +1,254 @@
-Sub1 = new SubsManager({
-    cacheLimit: 100,
-    expireIn: 10
-});
+const ESCollection = new Mongo.Collection('es_jobs');
+const SubCache = new SubsManager();
 
-Sub2 = new SubsManager({
-    cacheLimit: 100,
-    expireIn: 10
-});
+const ComponentState = function () {
+    return {
+        forceUpdate: false,
+        inc: 10,
+        limit: 10,
+        counter: {
+            online: 0,
+            expired: 0
+        },
+        q: '',
+        isSearching: false
+    };
+};
 
-Sub3 = new SubsManager({
-    cacheLimit: 100,
-    expireIn: 10
-});
+const HookMixin = {
 
+    componentWillMount() {
+        this.getJobTypeCount();
+    },
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.forceUpdate != this.state.forceUpdate) {
+            this.getJobTypeCount();
+        }
+    }
+};
+
+const ActionMixin = {
+    handle___HandShake(e) {
+        e.preventDefault();
+        this.setState({
+            forceUpdate: !this.state.forceUpdate
+        });
+    },
+    handle___LoadMore(e) {
+        e.preventDefault();
+        this.setState({
+            limit: this.state.limit + this.state.inc
+        });
+    },
+
+    handle___ChangeType(type) {
+        this.setState({
+            limit: this.state.inc,
+            q: '',
+            isSearching: false
+        });
+        Router.go('dashboard', {}, {query: {type: type}});
+    },
+
+    handle___Search(e) {
+        e.preventDefault();
+        this.setState({q: e.target.value});
+    }
+};
+
+const RendererMixin = {
+    render__JobTypes(currentType, counter) {
+        const types = [
+            {name: 'Online', alias: 'online'},
+            {name: 'Expired', alias: 'expired'}
+        ];
+        const menu = [];
+        types.map((t, k) => {
+
+            let cx = classNames('btn', 'btn-sm', 'btn-rounded', {
+                'btn-primary': currentType == t.alias
+            }, {
+                'btn-default': currentType != t.alias
+            });
+            menu.push((
+                <span key={k}>
+                    <a href="#" onClick={() => this.handle___ChangeType(t.alias)} className={cx}>{t.name}
+                        ({counter[t.alias]})</a>&nbsp;
+                </span>
+            ));
+        });
+        return menu;
+    }
+};
+
+const HelperMixin = {
+    getJobTypeCount() {
+        Meteor.call('jobListCount', (err, result) => {
+            if (!err) {
+                this.setState({
+                    counter: result
+                })
+            }
+        });
+    },
+
+    total() {
+        if(this.state.q.length > 0) {
+            const filter = this.jobFilter(this.data.currentType);
+            return ESCollection.find(filter).count();
+        }
+        return this.state.counter[this.data.currentType];
+    },
+
+    jobFilter(currentType) {
+        const q = this.state.q;
+        const filter = {
+            type: currentType
+        };
+        if(q.length > 0) {
+            filter['$or'] = [
+                {
+                    jobTitle: {
+                        $regex: q,
+                        $options: 'i'
+                    }
+                },
+                {
+                    "skills.skillName": {
+                        $regex: q,
+                        $options: 'i'
+                    }
+                },
+            ];
+        }
+        return filter;
+    },
+
+    fetchJobs(currentType) {
+        const filter = this.jobFilter(currentType);
+        const option = {
+            limit: this.state.limit,
+            sort: {jobId: -1}
+        };
+        return ESCollection.find(filter, option).fetch();
+    }
+};
 
 JobsContainer = React.createClass({
-    render() {
-        let styles = {
-            jobsContainer: {
-                padding: '20px 0 60px 0',
-                overflow: 'auto',
-                clear: 'both'
+    mixins: [ReactMeteorData, HookMixin, ActionMixin, RendererMixin, HelperMixin],
+    getInitialState() {
+        return ComponentState();
+    },
+
+    getMeteorData() {
+        const forceUpdate = this.state.forceUpdate;
+        const params = Router.current().params;
+        let currentType = 'online';
+        if (params.query && params.query['type']) {
+            if (['online', 'expired'].indexOf(params.query['type']) >= 0) {
+                currentType = params.query['type'];
             }
+        }
+        const sub = SubCache.subscribe('ESJobs', currentType, this.state.limit, this.state.q, forceUpdate);
+        return {
+            currentType: currentType,
+            isReady: sub.ready(),
+            jobs: this.fetchJobs(currentType)
         };
-        /**
-         * render 3 job lists
-         *
-         */
+    },
+
+
+    render() {
+        let pageTitle = 'My online jobs';
+        if (this.data.currentType == "expired") {
+            pageTitle = "My expired jobs";
+        }
+        let loadMoreBtn = null,
+            loadingIcon = null,
+            isEmpty = this.total() === 0;
+
+        if (!this.data.isReady) {
+            loadingIcon = <WaveLoading />
+        }
+
+        if (this.total() > this.state.limit) {
+            loadMoreBtn = (
+                <div>
+                    <button
+                        className={['btn','btn-small','btn-primary','btn-block'].join(' ')}
+                        onClick={this.handle___LoadMore}>
+                        <i className="fa fa-arrow-down"/>&nbsp;
+                        Load more
+                    </button>
+                </div>
+            );
+        }
         return (
-            <div className="row">
-                <div className="col-md-12">
-                    <PageHeading title="My Jobs" breadcrumb={[]}>
-                        <a href="/job-settings" className="btn btn-primary btn-outline">
-                            <i className="fa fa-plus"></i>&nbsp;
-                            Add new position
-                        </a>
-                    </PageHeading>
+            <div className="row" style={{paddingBottom: '60px'}}>
+                <PageHeading title={pageTitle} breadcrumb={[]}/>
 
-                    <div style={styles.jobsContainer}>
-                        <JobList
-                            status={1}
-                            source={"recruit"}
-                            title={"CUSTOM POSITIONS"}
-                            icon="fa-cloud"
-                            emptyMsg="There is no position here."
-                            subCache={Sub1}
-                            />
+                <div className="animated fadeInUp">
+                    <div className="ibox-content m-b-sm border-bottom">
+                        <div className="row">
+                            <div className="col-md-3">
+                                {this.render__JobTypes(this.data.currentType, this.state.counter)}
+                            </div>
+                            <div className="col-md-1">
+                                <button type="button" className="btn btn-white btn-sm"
+                                        onClick={this.handle___HandShake}>
+                                    <i className="fa fa-refresh"/>&nbsp;
+                                    Refresh
+                                </button>
+                            </div>
 
-                        <JobList
-                            status={1}
-                            source="vnw"
-                            title="PUBLISHED POSITIONS"
-                            icon="fa-cloud"
-                            emptyMsg="There is no position here."
-                            subCache={Sub2}
-                            />
-
-                        <JobList
-                            status={0}
-                            source="vnw"
-                            title="CLOSED POSITIONS"
-                            icon="fa-archive"
-                            emptyMsg="Positions that no longer accepting new applicants will appear here."
-                            subCache={Sub3}
-                            />
-
+                            <div className="col-md-8">
+                                <div className="input-group">
+                                    <input type="text" placeholder="Search" className="input-sm form-control"
+                                           onKeyUp={this.handle___Search}/>
+                                    <span className="input-group-btn">
+                                        <button type="button" className="btn btn-sm btn-primary"> Go!</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <JobList jobs={this.data.jobs}/>
+
+                <div className="col-md-12">
+                    {isEmpty ? <JobListEmpty /> : null}
+                    {loadingIcon}
+                    {loadMoreBtn}
                 </div>
             </div>
         );
     }
 });
 
-/**
- * status=1
- * source="recruit"
- * title="CUSTOM POSITIONS"
- * icon="fa-cloud"
- * emptyMessage="There is no position here."
- */
 JobList = React.createClass({
-    propsType: {
-        status: React.PropTypes.number,
-        source: React.PropTypes.string,
-        title: React.PropTypes.string,
-        icon: React.PropTypes.string,
-        emptyMsg: React.PropTypes.string
-    },
 
     getInitialState() {
         return {
-            inc: 5,
-            limit: 5,
-            total: 0
+            title: 'PUBLISHED POSITIONS',
+            icon: 'fa-cloud',
+            emptyMsg: 'There is no position here.',
+
         };
-    },
-
-    mixins: [ReactMeteorData],
-    getMeteorData() {
-        /**
-         * get jobs follow source and status
-         * get ready state
-         * get job count -> count by handshake
-         */
-        let subData = [this.filters(), this.options()];
-        let isReady = this.props.subCache.subscribe('getJobs', ...subData).ready();
-        return {
-            isReady: isReady,
-            jobs: Collections.Jobs.find(...subData).fetch()
-        };
-    },
-
-    componentDidMount() {
-        Meteor.call('jobListCounter', this.filters(), (err, total) => {
-            if (!err) {
-                if (this.state.total != total) {
-                    this.setState({total: total})
-                }
-            }
-        });
-    },
-
-    componentDidUpdate() {
-        Meteor.call('jobListCounter', this.filters(), (err, total) => {
-            if (!err) {
-                if (this.state.total != total) {
-                    this.setState({total: total})
-                }
-            }
-        });
-    },
-
-    filters() {
-        var filters = {
-            status: this.props.status
-        };
-
-        if (this.props.source) {
-            filters['source'] = this.props.source;
-        }
-
-        var tags = Session.get('jobFilterTags') || [];
-        if (tags.length > 0) {
-            filters['$or'] = [
-                {
-                    title: {
-                        $regex: '(' + tags.join('|') + ')',
-                        $options: 'i'
-                    }
-                },
-                {
-                    tags: {
-                        $regex: '(' + tags.join('|') + ')',
-                        $options: 'i'
-                    }
-                }
-            ];
-        }
-        return filters;
-    },
-
-    options() {
-        return {
-            limit: this.state.limit,
-            sort: {
-                "createdAt": -1
-            }
-        };
-    },
-
-    handleLoadMore() {
-        this.setState({
-            limit: this.state.limit + this.state.inc
-        });
     },
 
     render() {
-        let content = null,
-            loadingIcon = null,
-            loadmoreBtn = null,
-            isEmpty = this.data.isReady && _.isEmpty(this.data.jobs);
-
-        if (!this.data.isReady) {
-            loadingIcon = <WaveLoading />
-        }
-
-        if (this.state.total > this.state.limit) {
-            loadmoreBtn = (
-                <div>
-                    <button
-                        className={['btn','btn-small','btn-primary','btn-block'].join(' ')}
-                        onClick={this.handleLoadMore}>
-                        Load more
-                    </button>
-                </div>
-            );
-        }
-
-        var styles = {
-            container: {
-                overflow: 'auto',
-                clear: 'both',
-                margin: '20px auto 40px auto'
-            }
-        };
         return (
-            <div style={styles.container}>
-                <div className="col-md-12">
-                    <h3>
-                        <i className={"fa " + this.props.icon}></i>&nbsp;
-                        {this.props.title} ({this.state.total})
-                    </h3>
-
-                    <div className="jobs-list">
-                        {isEmpty ? <JobListEmpty emptyMsg={this.props.emptyMsg}/> : this.renderJobs()}
-                        {loadingIcon}
-                        {loadmoreBtn}
-                    </div>
+            <div className="col-md-12">
+                <div className="jobs-list">
+                    {this.props.jobs.map((job, k) => <Job job={job} key={k}/>)}
                 </div>
-            </div>
-        );
-    },
-
-    renderJobs() {
-        return (
-            <div>
-                {this.data.jobs.map((data, key)=> {
-                    return <Job job={data} key={key}/>
-                })}
             </div>
         );
     }
 });
 
 JobListEmpty = React.createClass({
-    propsType: {
-        emptyMsg: React.PropTypes.string
-    },
     getDefaultProps() {
         return {
             emptyMsg: 'There is no position here.'
@@ -275,7 +287,7 @@ WaveLoading = React.createClass({
 
 Job = React.createClass({
     propsType: {
-        job: React.PropTypes.object
+        job: React.PropTypes.object.isRequired
     },
 
     getInitialState() {
@@ -285,19 +297,37 @@ Job = React.createClass({
     },
 
     title() {
-        return this.props.job.title;
+        let title = '';
+        const job = this.props.job;
+        if (job) {
+            if (job && job['jobTitle']) title = job.jobTitle;
+        }
+        return title;
     },
 
-    from() {
-        let createdAt = new moment(this.props.job.createdAt);
-
-        return createdAt.calendar()
+    cities() {
+        let cities = [];
+        const job = this.props.job;
+        if (job.cities) {
+            _.each(job.cities, (c) => {
+                if (c && c.name) cities.push(c.name);
+            });
+        }
+        return cities.join(', ');
     },
 
-    to() {
-        if (!this.props.job['expiredAt']) return '∞';
-        let expiredAt = new moment(this.props.job.expiredAt);
-        return expiredAt.calendar()
+    duration() {
+        let times = [];
+        const job = this.props.job;
+        const createdAt = new moment(job.approvedDate);
+        const expiredAt = new moment(job.expiredDate);
+        if (createdAt.isValid()) {
+            times.push(createdAt.calendar());
+        }
+        if (expiredAt.isValid()) {
+            times.push(expiredAt.calendar());
+        }
+        return times.join(' to ');
     },
 
     link(stage) {
@@ -315,99 +345,49 @@ Job = React.createClass({
         return Router.url('teamSettings', params);
     },
 
-    handleSelectTag(tag) {
-        var jobId = this.props.job._id;
-        var tags = this.props.job.tags || [];
-        tags.push(tag.skillName);
-        tags = _.unique(tags);
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
-    handleRemoveLastTag() {
-        var jobId = this.props.job._id;
-        var tags = this.props.job.tags || [];
-        if (!_.isEmpty(tags)) {
-            tags.pop();
-            tags = _.unique(tags);
-        }
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
-    handleRemoveTag(tag) {
-        let jobId = this.props.job._id,
-            tags = this.props.job.tags;
-        tags = _.without(tags, tag);
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
     render() {
-        let styles = {
-            tags: {
-                height: '34px',
-                lineHeight: '34px',
-                display: 'inline-block',
-                overflow: 'auto'
-            },
-            tagsInput: {
-                float: "left",
-                width: "40%",
-                minWidth: "185px",
-                border: "none",
-                backgroundColor: "rgba(0, 0, 0, 0)",
-                outline: "none",
-                paddingLeft: "5px"
-            }
-        };
         return (
             <div className="job">
-                <div className="panel panel-default">
-                    <div className="panel-heading">
-                        <div className="panel-title clearfix">
-                            <h3 className="pull-left job-title">
-                                <a href={this.link('applied')}>
-                                    {this.props.job.title}
-                                </a>
-                                &nbsp;
-                                <a href={this.settingsLink()} className="btn btn-white btn-xs">
-                                    <i className="fa fa-cogs"></i>
-                                </a>
-
-                            </h3>
-
-                            <span className="pull-right job-posted-timeago">
-                                From {this.from()}
-                                &nbsp;
-                                to {this.to()}
-                            </span>
+                <div className="faq-item">
+                    <div className="row">
+                        <div className="col-md-7">
+                            <a href="#" className="faq-question">
+                                {this.title()}
+                            </a>
+                            <span>ID: {this.props.job.jobId}</span>
                         </div>
-                    </div>
-                    <div className="job-stages">
-                        <div className="row">
-                            {this.state.stages.map(this.renderStage)}
-                        </div>
-                    </div>
-                    <div className="panel-footer job-tags-box">
-                        <div className="panel-title clearfix">
-                            <div style={styles.tags}>
-                                {this.props.job.tags && this.props.job.tags.map(this.renderTag)}
+                        <div className="col-md-5 text-right info">
+                            <div>
+                                {this.cities()}&nbsp;
+                                <i className="fa fa-map-marker"/>
                             </div>
-                            <TagsInput
-                                onSelect={this.handleSelectTag}
-                                onRemoveLastTag={this.handleRemoveLastTag}
-                                placeholder={"click to add labels to your job"}
-                                style={styles.tagsInput}/>
+                            <div>
+                                { this.duration() }&nbsp;
+                                <i className="fa fa-globe"/>
+                            </div>
                         </div>
                     </div>
+                </div>
+
+                <div className="job-stages">
+                    <div className="row">
+                        {this.state.stages.map(this.renderStage)}
+                    </div>
+                </div>
+                <div className="tag-list">
+                    {this.props.job.skills.map(this.renderTag)}
                 </div>
             </div>
         );
     },
 
     renderStage(stage, key) {
-        var stages = this.props.job['stages'] || null;
-        var stageCount = stages && stages[key] ? stages[key] : '-';
+        var extra = this.props.job['extra'] || {};
+        var stages = extra['stage'] || null;
+        var stageCount = stages && stages[stage.alias] ? stages[stage.alias] : '-';
+        var className = classNames('stage', `stage-${stage.alias}`)
         return (
-            <div className="col-sm-2 stage stage-" key={key}>
+            <div className={className} key={key}>
                 <a href={this.link(stage.alias)} className="stage-number">{stageCount}</a>
                 <a href={this.link(stage.alias)} className="stage-label">{stage.label}</a>
             </div>
@@ -415,26 +395,10 @@ Job = React.createClass({
     },
 
     renderTag(tag, key) {
-        var styles = {
-            tag: {
-                marginRight: '3px'
-            },
-            closeBtn: {
-                cursor: 'pointer'
-            }
-        };
-        return (
-            <span
-                className="label"
-                key={key}
-                style={styles.tag}>
-                {tag} &nbsp;
-                <span
-                    onClick={() => {this.handleRemoveTag(tag)}}
-                    style={styles.closeBtn}>
-                    x
-                </span>
-            </span>
-        );
+        var name = '';
+        if (tag['skillName']) {
+            name = tag['skillName'];
+        }
+        return <span key={key} className="tag-item">{name}</span>;
     }
 });

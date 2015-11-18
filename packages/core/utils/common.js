@@ -1,9 +1,9 @@
 Utils.APPLICATION_STAGES = {
-    0: {
-        id: 0,
-        alias: "sourced",
-        label: "Sourced"
-    },
+    //0: {
+    //    id: 0,
+    //    alias: "sourced",
+    //    label: "Sourced"
+    //},
     1: {
         id: 1,
         alias: "applied",

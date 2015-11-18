@@ -4,6 +4,11 @@ function initENV() {
     if (CUSTOM_ENV.hasOwnProperty('RESUME_DETAIL_URL')) {
         Meteor.settings.public['applicationUrl'] = CUSTOM_ENV.RESUME_DETAIL_URL;
     }
+
+
+    if (CUSTOM_ENV.hasOwnProperty('ES_HOST')) {
+        Meteor.settings['elasticsearch']['host'] = CUSTOM_ENV.ES_HOST;
+    }
 }
 
 
@@ -37,12 +42,13 @@ Meteor.startup(function () {
     ////    });
     ////
     //
-    if (process.env.MIGRATION) {
-        Migrations.unlock();
-        Migrations.migrateTo(process.env.MIGRATION);
-    }
+    //if (process.env.MIGRATION) {
+    //    Migrations.unlock();
+    //    Migrations.migrateTo(process.env.MIGRATION);
+    //}
 
-    CRON_VNW.sync();
+
+    //CRON_VNW.sync();
     /*
      CRON_VNW.cronCity();
      CRON_VNW.cronDegree();*/

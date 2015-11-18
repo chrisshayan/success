@@ -79,6 +79,18 @@ JobCandidateResumeOffline = React.createClass({
         }
     },
 
+    componentDidUpdate(prevProps, prevState) {
+        if(prevState.isViewingCV != this.state.isViewingCV) {
+            if(this.state.isViewingCV) {
+                let container = this.refs.viewerContainer.getDOMNode();
+                let scrollTo = $(container).offset().top - 140;
+                $('body').animate({
+                    scrollTop: scrollTo
+                }, 'slow');
+            }
+        }
+    },
+
     handleToggleViewCV(e) {
         e.preventDefault();
         this.setState({
@@ -87,7 +99,7 @@ JobCandidateResumeOffline = React.createClass({
     },
 
     render() {
-        cvLink = "https://docs.google.com/viewer?embedded=true&url=http://images.staging.vietnamworks.com/resumes_sentdirectly/resume/9037/3769037/5e/1e24e0bac7edb2ab7038a77d8024d464.pdf";
+        cvLink = "https://docs.google.com/viewer?embedded=true&url=" + this.props.application.resumeFileUrl();
         return (
             <div>
                 <div className="row">
@@ -129,7 +141,7 @@ JobCandidateResumeOffline = React.createClass({
                 </div>
 
                 {!this.state.isViewingCV ? null : (
-                <div className="cv-viewer">
+                <div className="cv-viewer" ref={"viewerContainer"}>
                     <div className="row">
                         <div className="col-md-12">
                             <iframe src={cvLink} style={{border: '1px solid #ddd', width: '100%', height: '1024px', marginTop: '15px'}}></iframe>
