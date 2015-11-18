@@ -73,8 +73,12 @@ const RendererMixin = {
             });
             menu.push((
                 <span key={k}>
-                    <a href="#" onClick={() => this.handle___ChangeType(t.alias)} className={cx}>{t.name}
-                        ({counter[t.alias]})</a>&nbsp;
+                    <a href="#" onClick={() => this.handle___ChangeType(t.alias)} className={cx}>
+                        {t.name}
+                        &nbsp;
+                        ({counter[t.alias]})
+                    </a>
+                    &nbsp;
                 </span>
             ));
         });
