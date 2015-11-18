@@ -98,7 +98,7 @@ const HelperMixin = {
     },
 
     total() {
-        if(this.state.q.length > 0) {
+        if (this.state.q.length > 0) {
             const filter = this.jobFilter(this.data.currentType);
             return ESCollection.find(filter).count();
         }
@@ -110,7 +110,7 @@ const HelperMixin = {
         const filter = {
             type: currentType
         };
-        if(q.length > 0) {
+        if (q.length > 0) {
             filter['$or'] = [
                 {
                     jobTitle: {
@@ -164,9 +164,21 @@ JobsContainer = React.createClass({
 
 
     render() {
-        let pageTitle = 'My online jobs';
+        let pageTitle = (
+            <span>
+                <span style={{color: "#1AB394"}}>
+                    <i className="fa fa-cloud"/>
+                </span>&nbsp;
+                My online jobs
+            </span>
+        );
         if (this.data.currentType == "expired") {
-            pageTitle = "My expired jobs";
+            pageTitle = (
+                <span>
+                    <i className="fa fa-archive"/>&nbsp;
+                    My expired jobs
+                </span>
+            );
         }
         let loadMoreBtn = null,
             loadingIcon = null,
