@@ -370,7 +370,14 @@ Job = React.createClass({
                             <a href="#" className="faq-question">
                                 {this.title()}
                             </a>
-                            <span>ID: {this.props.job.jobId}</span>
+                            <div>
+                                <span>ID: {this.props.job.jobId}</span>
+                                &nbsp;|&nbsp;
+                                <a href={this.settingsLink()} className="btn btn-xs btn-link">
+                                    <i className="fa fa-cogs" />&nbsp;
+                                    Settings
+                                </a>
+                            </div>
                         </div>
                         <div className="col-md-5 text-right info">
                             <div>
