@@ -424,7 +424,7 @@ function processApp(appRows, companyId, sourceId) {
                 activity.data = {
                     applicationId: aId,
                     source: sourceId,
-                    userId: can._id || row.userid
+                    userId: can ? can._id : row.userid
                 };
                 activity.createdAt = formatDatetimeFromVNW(row.createddate);
                 activity.appliedJob();
@@ -760,7 +760,7 @@ var cronApplications = function () {
 };
 
 CRON_VNW.sync = function () {
-    // remove old sync job
+    /*// remove old sync job
     Collections.SyncQueue.remove({type: {$in: ['cronData', 'cronClosedJob']}});
 
     // add new sync job
@@ -774,7 +774,7 @@ CRON_VNW.sync = function () {
         if (data.companyId == void 0 || data.userId == void 0) return false;
 
         CRON_VNW.addQueueCron('cronData', data)
-    });
+    });*/
 };
 
 CRON_VNW.addQueueCron = function (type, data) {

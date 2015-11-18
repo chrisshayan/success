@@ -49,7 +49,7 @@ SYNC_VNW.syncUser = function (userInfo) {
         companyId: userInfo.companyid
     };
 
-    SYNC_VNW.addQueue('cronData', cronData);
+//    SYNC_VNW.addQueue('cronData', cronData);
 };
 
 

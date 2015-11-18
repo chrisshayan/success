@@ -24,6 +24,10 @@ Package.onUse(function (api) {
         "ecmascript"
     ]);
 
+    //for model
+    api.use(["jagi:astronomy@1.2.2"
+    ]);
+
     api.addFiles('utils/common.js', ['server', 'client']);
     api.addFiles('utils/server.js', 'server');
     api.addFiles('utils/client.js', 'client');
