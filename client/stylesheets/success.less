@@ -367,8 +367,13 @@
 
 .stage {
 	width: 20%;
+	@media (max-width: 768px) {
+		width: 100%/3;
+		border-bottom: 1px solid #ddd;
+	}
+
 	@media (max-width: 480px) {
-		width: 50%;
+		width: 100%/2;
 		border-bottom: 1px solid #ddd;
 	}
 }

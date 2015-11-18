@@ -1,5 +1,5 @@
 Template.updateProfile.helpers({
-    UpdateProfileForm() {
-        return UpdateProfileForm;
+    MyAccountContainer() {
+        return MyAccountContainer;
     }
 })

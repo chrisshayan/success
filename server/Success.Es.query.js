@@ -264,5 +264,18 @@ SuccessESQuery = {
                 }
             ]
         };
+    },
+
+    // get company info by companyId
+    getCompanyInfo(companyId=0) {
+        return {
+            "query": {
+                "term": {
+                    "companyId": {
+                        "value": companyId
+                    }
+                }
+            }
+        };
     }
 };

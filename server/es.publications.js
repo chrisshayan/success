@@ -73,7 +73,6 @@ pubs.ESJobs = function(type, limit, q) {
     });
 };
 
-
 _.each(pubs, (func, name) => {
     Meteor.publish(name, func);
 })

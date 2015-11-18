@@ -17,7 +17,6 @@ Meteor.startup(function () {
 
         if(user) {
             if(user.isCompanyAdmin()) {
-                settingMenu.push({label: "Company Info", icon: "fa-info", route: "companyInfo"});
                 settingMenu.push({
                     label: "Mail templates",
                     icon: "fa-envelope-o",
@@ -25,8 +24,6 @@ Meteor.startup(function () {
                     dependencies: ['createMailTemplate', 'updateMailTemplate']
                 });
                 settingMenu.push({label: "Hiring Team Manage", icon: "fa-users", route: "hiringTeam"});
-
-
                 leftNavItems.push({
                     label: "Settings",
                     icon: "fa-cogs",
@@ -42,11 +39,7 @@ Meteor.startup(function () {
         leftNavItems.push({
             label: "My account",
             icon: "fa-user",
-            route: null,
-            childrens: [
-                {label: "Profile", icon: "fa-user", route: "updateProfile"},
-                {label: "Mail Signature", icon: "fa-at", route: "mailSignature"}
-            ]
+            route: 'updateProfile'
         });
 
         leftNavItems.push({
