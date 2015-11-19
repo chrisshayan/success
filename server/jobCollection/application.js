@@ -20,11 +20,12 @@ var getApplicationByJobId = (job, cb)=> {
     var JobExtraCollection = JobExtra.getCollection();
     var appCollection = Application.getCollection();
     var data = job.data;
+    var jobId = data.jobId;
+
     if (!data.jobId || !data.companyId)
         j.done();
     else {
         try {
-            var jobId = data.jobId;
             var appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);
             var appRows = fetchVNWData(appSql);
 
@@ -76,13 +77,19 @@ var getApplicationByJobId = (job, cb)=> {
                     currentJob.set('stage', stages);
                 }
 
-                currentJob.set('isSynced', true);
+                currentJob.set('syncState', 'synced');
                 currentJob.save();
             }
 
 
         } catch (e) {
             console.log('insert application error :', data);
+
+            if (jobId) {
+                var failedJob = JobExtraCollection.findOne({jobId: jobId});
+                failedJob.set('syncState', 'syncFailed');
+                failedJob.save();
+            }
             console.trace(e);
         }
     }

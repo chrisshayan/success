@@ -26,18 +26,3 @@ class ActiveModel {
 
     }
 }
-
-Application = class Application extends ActiveModel {
-    get collectionName() {
-        return 'vnw_applications';
-    }
-
-    initial() {
-        this.name = '';
-        this.status = 0;
-    }
-
-    get rules() {
-        return [];
-    }
-};

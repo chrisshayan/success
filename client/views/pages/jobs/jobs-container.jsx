@@ -381,37 +381,64 @@ Job = React.createClass({
     },
 
     currentStateStyle() {
-        var isSynced = this.props.job.extra.isSynced;
-
-        return isSynced ? 'isSynced' : 'syncing';
+        return this.props.job.extra.syncState;
     },
+    currentStateLoadingContent(){
+        var state = this.currentStateStyle()
+            , content = '';
 
+        switch (state) {
+            case 'synced' :
+                break;
+            case 'syncing' :
+                content = <WaveLoading/>;
+                break;
+            case 'syncFailed' :
+            default :
+                content = <div className="sk-spinner sk-spinner-wave"><p> SYNC FAILED </p></div>;
+                break;
+
+        }
+
+        return content;
+    },
     render() {
 
         var style = {
-            isSynced: {
-                jobItem: {},
-                loading: {display: 'none'}
+            syncFailed: {
+                jobItem: {position: 'relative'},
+                loading: {
+                    position: 'absolute',
+                    display: 'inherit',
+                    zIndex: 999,
+                    width: '100%',
+                    height: '100%',
+                    opacity: 0.7,
+                    backgroundColor: '#ccc'
+                }
             },
             syncing: {
                 jobItem: {position: 'relative'},
                 loading: {
                     position: 'absolute',
                     display: 'inherit',
-                    'zIndex': 999,
+                    zIndex: 999,
                     width: '100%',
                     height: '100%',
                     opacity: 0.5,
-                    'background-color': '#fff'
+                    backgroundColor: '#fff'
                 }
-
+            },
+            synced: {
+                jobItem: {},
+                loading: {display: 'none'}
             }
         };
 
         return (
             <div className="job" style={style[this.currentStateStyle()].jobItem}>
                 <div style={style[this.currentStateStyle()].loading}>
-                    <WaveLoading />
+                    {this.currentStateLoadingContent()}
                 </div>
                 <div className="faq-item">
                     <div className="row">

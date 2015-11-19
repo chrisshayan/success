@@ -66,9 +66,9 @@ JobExtra = Astro.Class({
                 };
             }
         },
-        isSynced: {
-            type: 'boolean',
-            default: ()=> false
+        syncState: {
+            type: 'string',
+            default: ()=> 'syncing'
         }
     }
 });
