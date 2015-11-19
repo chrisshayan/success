@@ -133,9 +133,7 @@ JobSettingsContainer = React.createClass({
                                             <div className="col-sm-10">
                                                 <div className="float-e-margins animated fadeInRight">
                                                     <div className="content">
-                                                        {/*<JobHiringTeamContainer
-                                                         jobId={this.data.jobId}
-                                                         hiringTeam={this.data.extra.hiringTeam}/>*/}
+                                                        <JobHiringTeam jobId={this.data.jobId} recruiters={this.data.extra.recruiters}/>
                                                     </div>
                                                 </div>
                                             </div>

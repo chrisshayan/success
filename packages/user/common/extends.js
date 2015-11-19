@@ -19,14 +19,21 @@ Meteor.loginWithVNW = function (email, password, callback) {
     });
 };
 
-Meteor.currentRecruiter = function() {
+Meteor.currentRecruiter = function () {
     return {
         email: ""
     }
 };
+User.prototype.fullname = function () {
+    var fullname = '';
+    var profile = this.profile || null;
+    if (profile && profile.firstname && profile.lastname) {
+        fullname = [profile.firstname, profile.lastname].join(' ');
+    }
+    return fullname;
+}
 
-
-User.prototype.isCompanyAdmin = function() {
+User.prototype.isCompanyAdmin = function () {
     return this.roles && this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0;
 };
 
@@ -39,12 +46,12 @@ User.prototype.updateUserInfo = function (data, cb) {
     return Meteor.call('updateUserInfo', data, cb);
 };
 
-User.prototype.defaultCompany = function() {
-    if(this.roles && this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0) {
+User.prototype.defaultCompany = function () {
+    if (this.roles && this.roles.indexOf(UserApi.ROLES.COMPANY_ADMIN) >= 0) {
         return Collections.CompanySettings.findOne({companyId: this.companyId});
     }
     var hiringTeam = Meteor.hiringTeam.findOne({userId: this._id, status: 1});
-    if(hiringTeam) {
+    if (hiringTeam) {
         return Collections.CompanySettings.findOne({companyId: hiringTeam.companyId});
     }
     return false;

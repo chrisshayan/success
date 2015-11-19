@@ -836,79 +836,37 @@ Meteor.methods({
 
     assignJobRecruiter: function (jobId, role, userId) {
         if (this.userId) {
-            var job = Collections.Jobs.findOne({_id: jobId});
-            if (job) {
-                var selector = {},
-                    modifier = {};
+            var Collection = JobExtra.getCollection();
+            var jobExtra = Collection.findOne({jobId: jobId});
+            var user = Meteor.users.findOne({_id: userId});
 
-                var recruiter = _.findWhere(job.recruiters, {userId: userId});
-
-                if (recruiter) {
-                    if (recruiter.roles.indexOf(role) < 0) {
-
-                        selector = {
-                            _id: jobId,
-                            'recruiters.userId': userId
-                        };
-                        modifier = {
-                            $push: {
-                                'recruiters.$.roles': role
-                            }
-                        };
-                    }
-                } else {
-                    selector['_id'] = jobId;
-                    modifier['$push'] = {
-                        recruiters: {
-                            userId: userId,
-                            roles: [role]
-                        }
-                    };
-                }
-                console.log(selector, modifier)
-                if (selector && modifier)
-                    return Collections.Jobs.update(selector, modifier);
+            if (jobExtra && user) {
+                var recruiter = {
+                    userId: user._id,
+                    email: user.defaultEmail(),
+                    name: user.fullname() || user.username || user.defaultEmail() || ''
+                };
+                jobExtra.push(`recruiters.${role}`, recruiter);
+                return jobExtra.save();
             }
         }
-        return null;
+        return false;
     },
 
     unassignJobRecruiter: function (jobId, role, userId) {
         if (this.userId) {
-            var job = Collections.Jobs.findOne({_id: jobId});
-            if (job) {
-                var recruiter = _.findWhere(job.recruiters, {userId: userId});
-                if (recruiter) {
-                    var selector = {
-                            _id: job._id
-                        },
-                        modifier = {};
+            var Collection = JobExtra.getCollection();
+            var jobExtra = Collection.findOne({jobId: jobId});
+            var user = Meteor.users.findOne({_id: userId});
 
-                    if (recruiter.roles.indexOf(role) >= 0) {
-                        if (recruiter.roles.length > 1) {
-                            selector["recruiters.userId"] = userId;
-                            modifier = {
-                                $pull: {
-                                    'recruiters.$.roles': role
-                                }
-                            };
-                        } else {
-                            modifier = {
-                                $pull: {
-                                    'recruiters': {
-                                        userId: userId
-                                    }
-                                }
-                            };
-                        }
-
-                        return Collections.Jobs.update(selector, modifier);
-                    }
-
-                }
+            if (jobExtra && user) {
+                var selector = `recruiters.${role}`;
+                var pullMod = {};
+                pullMod[selector] = {userId};
+                return Collection.update({_id: jobExtra._id}, {$pull: pullMod});
             }
         }
-        return null;
+        return false;
     },
 
     getCompanyByIds: function (idList) {
