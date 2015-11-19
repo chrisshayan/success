@@ -54,10 +54,10 @@ const ActionMixin = {
     handle___SearchFieldKeyUp(e) {
         e.preventDefault();
         const q = e.target.value.trim();
-        if(_.isEmpty(q)) {
+        if (_.isEmpty(q)) {
             this.setState({q: ''});
         } else {
-            if(e.which == 13) {
+            if (e.which == 13) {
                 this.handle___Search(e);
             }
         }
@@ -233,13 +233,14 @@ JobsContainer = React.createClass({
 
                             <div className="col-md-8">
                                 <div className="input-group">
-                                    <input ref="searchInput" type="text" placeholder="Search" className="input-sm form-control"
+                                    <input ref="searchInput" type="text" placeholder="Search"
+                                           className="input-sm form-control"
                                            onKeyUp={this.handle___SearchFieldKeyUp}/>
                                     <span className="input-group-btn">
                                         <button
-                                                type="button"
-                                                className="btn btn-sm btn-primary"
-                                                onClick={this.handle___Search}>
+                                            type="button"
+                                            className="btn btn-sm btn-primary"
+                                            onClick={this.handle___Search}>
                                             Search
                                         </button>
                                     </span>
@@ -379,9 +380,39 @@ Job = React.createClass({
         return Router.url('JobSettings', params);
     },
 
+    currentStateStyle() {
+        var isSynced = this.props.job.extra.isSynced;
+
+        return isSynced ? 'isSynced' : 'syncing';
+    },
+
     render() {
+
+        var style = {
+            isSynced: {
+                jobItem: {},
+                loading: {display: 'none'}
+            },
+            syncing: {
+                jobItem: {position: 'relative'},
+                loading: {
+                    position: 'absolute',
+                    display: 'inherit',
+                    'zIndex': 999,
+                    width: '100%',
+                    height: '100%',
+                    opacity: 0.5,
+                    'background-color': '#fff'
+                }
+
+            }
+        };
+
         return (
-            <div className="job">
+            <div className="job" style={style[this.currentStateStyle()].jobItem}>
+                <div style={style[this.currentStateStyle()].loading}>
+                    <WaveLoading />
+                </div>
                 <div className="faq-item">
                     <div className="row">
                         <div className="col-md-7">
@@ -392,7 +423,7 @@ Job = React.createClass({
                                 <span>ID: {this.props.job.jobId}</span>
                                 &nbsp;|&nbsp;
                                 <a href={this.settingsLink()} className="btn btn-xs btn-link">
-                                    <i className="fa fa-cogs" />&nbsp;
+                                    <i className="fa fa-cogs"/>&nbsp;
                                     Settings
                                 </a>
                             </div>

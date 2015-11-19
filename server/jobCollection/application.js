@@ -58,23 +58,26 @@ var getApplicationByJobId = (job, cb)=> {
 
             var appStages = appCollection.find({jobId: jobId}, {fields: {'stage': 1}}).fetch();
 
-            if (appStages.length) {
-                var count = _.countBy(appStages, 'stage');
 
-                var stages = {
-                    'sourced': count[0] || 0,
-                    'applied': count[1] || 0,
-                    'phone': count[2] || 0,
-                    'interview': count[3] || 0,
-                    'offer': count[4] || 0,
-                    'hired': count[5] || 0
-                };
+            var currentJob = JobExtraCollection.findOne({jobId: jobId});
+            if (currentJob) {
+                if (appStages.length) {
+                    var count = _.countBy(appStages, 'stage');
 
-                var currentJob = JobExtraCollection.findOne({jobId: jobId});
-                if (currentJob) {
+                    var stages = {
+                        'sourced': count[0] || 0,
+                        'applied': count[1] || 0,
+                        'phone': count[2] || 0,
+                        'interview': count[3] || 0,
+                        'offer': count[4] || 0,
+                        'hired': count[5] || 0
+                    };
+
                     currentJob.set('stage', stages);
-                    currentJob.save();
                 }
+
+                currentJob.set('isSynced', true);
+                currentJob.save();
             }
 
 

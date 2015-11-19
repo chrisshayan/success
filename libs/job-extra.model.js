@@ -65,6 +65,10 @@ JobExtra = Astro.Class({
                     recruiter: []
                 };
             }
+        },
+        isSynced: {
+            type: 'boolean',
+            default: ()=> false
         }
     }
 });

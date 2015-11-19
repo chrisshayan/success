@@ -73,7 +73,7 @@ pubs.ESJobs = function (type, limit, q) {
                 var job = _.findWhere(_jobs, {jobId: newDoc.jobId});
                 if (job) {
                     job.extra = newDoc;
-                    self.changed(collName, job.jobId, job)
+                    self.changed(collName, job.jobId, job);
                 }
             }
         });
