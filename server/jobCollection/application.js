@@ -15,6 +15,7 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
+var citiesObj = Meteor.cities.find({languageId: 2}).fetch() || [];
 
 var getApplicationByJobId = (job, cb)=> {
     var JobExtraCollection = JobExtra.getCollection();
@@ -45,13 +46,17 @@ var getApplicationByJobId = (job, cb)=> {
                     application.set('genderId', info.genderId);
                     application.set('dob', info.birthday);
                     application.set('countryId', info.countryId);
-                    application.set('cityId', info.cityId);
-                    var emails = (info.emails) ? info.emails.split('|') : [];
+
+                    if (citiesObj[info.cityId])
+                        application.set('cityName', citiesObj[info.cityId]['name']);
+
+                    var emails = _.unique((info.emails) ? info.emails.split('|') : []);
+
                     application.set('emails', emails);
                     application.set('appliedDate', info.appliedDate);
                 }
 
-                application.set('isDeleted', info.isDeleted); // the only field update
+                application.set('isDeleted', !!(info.isDeleted)); // the only field update
 
                 application.save();
 

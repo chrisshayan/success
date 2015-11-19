@@ -22,7 +22,7 @@ var model = Astro.Class({
             optional: true
         },
         candidateId: {
-            type: 'string',
+            type: 'number',
             optional: true
         },
         companyId: {
@@ -38,8 +38,8 @@ var model = Astro.Class({
             default: ()=> 0
         },
         disqualified: {
-            type: 'boolean',
-            default: ()=> false
+            type: 'array',
+            default: ()=> []
         },
         coverLetter: {
             type: 'string',
@@ -66,16 +66,19 @@ var model = Astro.Class({
             optional: true
         },
         isDeleted: {
-            type: 'number'
-        },
-        cityId: {
-            type: 'number'
+            type: 'boolean',
+            optional: false
         },
         countryId: {
-            type: 'number'
+            type: 'number',
+            optional: true
+        },
+        cityName: {
+            type: 'string',
+            default: ''
         },
         emails: {
-            type: ['string']
+            type: 'array'
         },
         appliedDate: {
             type: 'date',
