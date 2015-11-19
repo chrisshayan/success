@@ -2,3 +2,5 @@
 
 
 Activities = {};
+
+MODULE_NAME = 'activities';

@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'activities',
+    name: 'success:activities',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -13,13 +13,11 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(["vnw:core"]);
-    api.use(["vnw:user"]);
-    api.use(["vnw:company"]);
-    api.use(["vnw:candidate"]);
 
+    api.use(["vnw:core", "vnw:user"]);
+    api.use(["jagi:astronomy@1.2.2"]);
     /* namespace */
-    api.addFiles(['activities.js']);
+    api.addFiles('activities.js');
 
     /* model */
     api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
@@ -28,8 +26,7 @@ Package.onUse(function (api) {
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
-    api.imply(['vnw:core', 'vnw:user', 'vnw:candidate', 'vnw:company']);
-
+    api.imply('vnw:core');
     /* export */
     api.export('Activities');
 
@@ -38,6 +35,6 @@ Package.onUse(function (api) {
 Package.onTest(function (api) {
     api.use('ecmascript');
     api.use('tinytest');
-    api.use('activities');
+    api.use('success:activities');
     api.addFiles('activities-tests.js');
 });
