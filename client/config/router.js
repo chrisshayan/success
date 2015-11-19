@@ -385,32 +385,29 @@ Router.route('/activites', {
  });*/
 
 
-Router.route('/job-settings', {
-    name: 'addJob',
-    waitOn: function () {
-        return DashboardSubs.subscribe('addJobPage');
-    },
+Router.route('/job-settings/:jobId', {
+    name: 'JobSettings',
     action: function () {
-        this.render('AddJob');
+        this.render('JobSettings');
     }
 });
 
-Router.route('/job-settings/:jobId', {
-    name: 'teamSettings',
-    /*template: 'teamSettings',*/
-    waitOn: function () {
-        return [
-            Meteor.subscribe('teamSettings', this.params.jobId),
-            DashboardSubs.subscribe('addJobPage')
-        ];
-    },
-    action: function () {
-        this.render('AddJob');
-    },
-    data: function () {
-        return Collections.Jobs.findOne({_id: this.params.jobId});
-    }
-});
+//Router.route('/job-settings/:jobId', {
+//    name: 'teamSettings',
+//    /*template: 'teamSettings',*/
+//    waitOn: function () {
+//        return [
+//            Meteor.subscribe('teamSettings', this.params.jobId),
+//            DashboardSubs.subscribe('addJobPage')
+//        ];
+//    },
+//    action: function () {
+//        this.render('AddJob');
+//    },
+//    data: function () {
+//        return Collections.Jobs.findOne({_id: this.params.jobId});
+//    }
+//});
 
 
 Router.route('/profile', {

@@ -266,6 +266,18 @@ SuccessESQuery = {
         };
     },
 
+    getJobInfo(jobId=0) {
+      return {
+          "query": {
+              "term": {
+                  "jobId": {
+                      "value": jobId
+                  }
+              }
+          }
+      };
+    },
+
     // get company info by companyId
     getCompanyInfo(companyId=0) {
         return {

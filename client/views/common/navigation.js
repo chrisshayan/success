@@ -21,13 +21,8 @@ Template.navigation.events({
 });
 
 Template.navigation.helpers({
-    company_logo: function () {
-        var user = Meteor.user();
-        if(user) {
-            var company = user.defaultCompany();
-            if(company) return company.logo;
-        }
-        return '';
+    Avatar() {
+        return Avatar;
     },
     displayName: function () {
         var user = Meteor.user();

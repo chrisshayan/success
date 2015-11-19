@@ -12,22 +12,23 @@
             <ul class="nav metismenu" id="side-menu">
                 <li class="nav-header">
                     <div class="profile-element">
-                        {{#if company_logo}}
-                            <span>
-                                <img id="company-logo" alt="image" class="img-circle" src="{{company_logo}}"/>
+                        {{#if currentUser}}
+                            <div style="padding: 0 45px;">
+                                {{> React component=Avatar userId=currentUser._id width=80 height=80 }}
+                            </div>
+
+                            <span class="clear">
+                                <span class="block m-t-xs">
+                                    <strong class="font-bold nav-username">
+                                        {{#if displayName}}
+                                            {{displayName}}
+                                        {{else}}
+                                            {{loggedUsername}}
+                                        {{/if}}
+                                    </strong>
+                                </span>
                             </span>
                         {{/if}}
-                        <span class="clear">
-                            <span class="block m-t-xs">
-                                <strong class="font-bold nav-username">
-                                    {{#if displayName}}
-                                        {{displayName}}
-                                    {{else}}
-                                        {{loggedUsername}}
-                                    {{/if}}
-                                </strong>
-                            </span>
-                        </span>
                     </div>
                     <div class="logo-element">+</div>
                 </li>

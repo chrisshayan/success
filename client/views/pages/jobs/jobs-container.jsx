@@ -51,9 +51,22 @@ const ActionMixin = {
         Router.go('dashboard', {}, {query: {type: type}});
     },
 
+    handle___SearchFieldKeyUp(e) {
+        e.preventDefault();
+        const q = e.target.value.trim();
+        if(_.isEmpty(q)) {
+            this.setState({q: ''});
+        } else {
+            if(e.which == 13) {
+                this.handle___Search(e);
+            }
+        }
+    },
+
     handle___Search(e) {
         e.preventDefault();
-        this.setState({q: e.target.value});
+        const search = this.refs.searchInput.getDOMNode();
+        this.setState({q: search.value});
     }
 };
 
@@ -220,10 +233,15 @@ JobsContainer = React.createClass({
 
                             <div className="col-md-8">
                                 <div className="input-group">
-                                    <input type="text" placeholder="Search" className="input-sm form-control"
-                                           onKeyUp={this.handle___Search}/>
+                                    <input ref="searchInput" type="text" placeholder="Search" className="input-sm form-control"
+                                           onKeyUp={this.handle___SearchFieldKeyUp}/>
                                     <span className="input-group-btn">
-                                        <button type="button" className="btn btn-sm btn-primary"> Go!</button>
+                                        <button
+                                                type="button"
+                                                className="btn btn-sm btn-primary"
+                                                onClick={this.handle___Search}>
+                                            Search
+                                        </button>
                                     </span>
                                 </div>
                             </div>
@@ -356,9 +374,9 @@ Job = React.createClass({
 
     settingsLink() {
         var params = {
-            jobId: this.props.job._id
+            jobId: this.props.job.jobId
         };
-        return Router.url('teamSettings', params);
+        return Router.url('JobSettings', params);
     },
 
     render() {
