@@ -2,8 +2,8 @@
  * Created by HungNguyen on 8/21/15.
  */
 
+var methods = {};
 
-var jobCollection = JobExtra.getCollection();
 
 /**
  * Update application state
@@ -270,6 +270,7 @@ methods.checkApplicationInStage = function (opt) {
 };
 
 methods.applicationStageCount = function (jobId, stage) {
+    var jobCollection = JobExtra.getCollection();
     var result = {
         qualify: 0,
         disqualified: 0
@@ -302,6 +303,7 @@ methods.applicationStageCount = function (jobId, stage) {
 methods.hasApplication = function (jobId, stage) {
     check(jobId, String);
     check(stage, Number);
+    var jobCollection = JobExtra.getCollection();
     var job = jobCollection.findOne({_id: jobId});
     if (job) {
         return Collection.findOne({'source.jobId': job.source.jobId, stage: stage}, {

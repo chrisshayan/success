@@ -2,12 +2,12 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-var moduleName = 'Application';
-var collection = new Mongo.Collection(moduleName);
+var moduleName = 'application';
+var mongoCollection = new Mongo.Collection(moduleName);
 
 var model = Astro.Class({
     name: moduleName,
-    collection: Collection,
+    collection: mongoCollection,
     fields: {
         appId: {
             type: 'number',
@@ -28,10 +28,6 @@ var model = Astro.Class({
         companyId: {
             type: 'number'
         },
-        resumeId: {
-            type: 'number',
-            optional: true
-        },
         stage: {
             type: 'number',
             default: ()=> 1
@@ -45,18 +41,43 @@ var model = Astro.Class({
             type: 'boolean',
             default: ()=> false
         },
-        candidateInfo: {
-            type: 'object',
-            optional: true
-        },
         coverLetter: {
             type: 'string',
+            optional: true
+        },
+        firstname: {
+            type: 'string',
+            optional: true
+        },
+        genderId: {
+            type: 'number',
+            optional: true
+        },
+        lastname: {
+            type: 'string',
+            optional: true
+        },
+        fullname: {
+            type: 'string',
+            optional: true
+        },
+        dob: {
+            type: 'date',
             optional: true
         },
         isDeleted: {
             type: 'number'
         },
-        createdAt: {
+        cityId: {
+            type: 'number'
+        },
+        countryId: {
+            type: 'number'
+        },
+        emails: {
+            type: ['string']
+        },
+        appliedDate: {
             type: 'date',
             default: ()=> new Date()
         },
@@ -93,5 +114,13 @@ var model = Astro.Class({
     } // prototype
 });
 
-Candidate = model;
+
+Application = model;
 Collection = model.getCollection();
+
+
+if (Meteor.isServer) {
+    Collection.before.insert((userId, doc)=> {
+        doc.fullname = [doc.firstname, doc.lastname].join(' ').trim();
+    })
+}

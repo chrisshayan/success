@@ -25,8 +25,7 @@ Package.onUse(function (api) {
     ]);
 
     //for model
-    api.use(["jagi:astronomy@1.2.2"
-    ]);
+    api.use(["jagi:astronomy@1.2.2"]);
 
     api.addFiles('utils/common.js', ['server', 'client']);
     api.addFiles('utils/server.js', 'server');

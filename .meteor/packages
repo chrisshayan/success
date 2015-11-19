@@ -63,16 +63,18 @@ izzilab:react-bootstrap@0.0.2
 stevezhu:lodash
 okgrow:analytics
 
-#vnw:core
+
 vnw:city
 vnw:industries
-vnw:job
-vnw:candidate
-vnw:application
 vnw:migration
 
-vnw:job-criteria
-vnw:sync-data
+#vnw:core
+#vnw:job
+#vnw:candidate
+#vnw:application
+
+#vnw:job-criteria
+#vnw:sync-data
 
 vnw:user
 mizzao:autocomplete
@@ -84,3 +86,6 @@ maxharris9:classnames
 stuke:ics-generator
 brishin:meteor-elasticsearch
 jagi:astronomy
+
+
+success:application

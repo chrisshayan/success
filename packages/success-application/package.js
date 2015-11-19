@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'success-application',
+    name: 'success:application',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -15,7 +15,7 @@ Package.onUse(function (api) {
     api.use('ecmascript');
 
     api.use(["vnw:core", "vnw:user"]);
-
+    api.use(["jagi:astronomy@1.2.2"]);
     /* namespace */
     api.addFiles('success-application.js');
 
@@ -28,7 +28,7 @@ Package.onUse(function (api) {
     /* imply changes */
     api.imply('vnw:core');
     /* export */
-    api.export('Candidate');
+    api.export('Application');
 });
 
 Package.onTest(function (api) {

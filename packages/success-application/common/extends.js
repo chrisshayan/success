@@ -3,7 +3,3 @@
  */
 
 
-Candidate.prototype.applications = function (options) {
-    if (this.source.candidateId == void 0) return [];
-    return Collection.find({candidateId: this.source.candidateId}, options || {}).fetch();
-};
