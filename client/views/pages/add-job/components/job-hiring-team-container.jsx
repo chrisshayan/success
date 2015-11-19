@@ -1,5 +1,7 @@
 JobHiringTeamContainer = React.createClass({
-    mixins: [ReactMeteorData],
+    propTypes: {
+        jobId: React.PropTypes.number.isRequired
+    },
     getInitialState() {
         return {
             inc: 10,
@@ -15,6 +17,7 @@ JobHiringTeamContainer = React.createClass({
             coordinator: [],
             sourcer: []
         };
+
         if (jobId) {
             var sub = Meteor.subscribe('teamSettings', jobId);
             if (sub.ready()) {

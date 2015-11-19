@@ -69,11 +69,10 @@ vnw:industries
 vnw:migration
 
 #vnw:core
-#vnw:job
+vnw:job
 #vnw:candidate
 #vnw:application
-
-#vnw:job-criteria
+vnw:job-criteria
 #vnw:sync-data
 
 vnw:user

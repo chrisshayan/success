@@ -1,3 +1,5 @@
+const Collection = new Mongo.Collection('es_skills');
+
 TagsInput = React.createClass({
     mixins: [ReactMeteorData],
 
@@ -19,7 +21,7 @@ TagsInput = React.createClass({
         return {
             isReady: isReady,
             isSearching: sub ? !sub.ready() : false,
-            skills: Collections.SkillTerms.find(...fetch).fetch()
+            skills: Collection.find(...fetch).fetch()
         };
     },
 

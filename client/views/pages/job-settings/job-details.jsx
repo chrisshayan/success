@@ -164,6 +164,8 @@ JobDetails = React.createClass({
 
             if (!err) {
                 state['data'] = data;
+                // call callback on job loaded
+                this.props.onJobLoaded && this.props.onJobLoaded(data);
             }
 
             this.setState(state);

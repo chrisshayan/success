@@ -10,13 +10,13 @@ PageHeading = React.createClass({
                     {this.props.breadcrumb.map((item, key) => {
                         if(key == this.props.breadcrumb.length-1) {
                             return (
-                                <li className="active">
+                                <li className="active" key={key}>
                                     <strong>{item.label}</strong>
                                 </li>
                             );
                         } else {
                             return (
-                                <li>
+                                <li key={key}>
                                     <a href={item.route}>{item.label}</a>
                                 </li>
                             );

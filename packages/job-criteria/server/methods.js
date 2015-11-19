@@ -4,45 +4,29 @@
 
 
 var methods = {
-    addJobCriteria(jobId, criteriaSetId, criteria) {
+    addJobCriteria(jobId, cate, name) {
         if(!this.userId) return false;
         this.unblock();
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if(!job) return false;
-        var criteriaSet = Meteor.job_criteria_set.findOne({_id: criteriaSetId});
-        if(!criteriaSet) return false;
+        var Collection = JobExtra.getCollection();
+        var extra = Collection.findOne({jobId: jobId});
 
-        try {
-            Meteor.defer(function() {
-                var condCheck = {skillName: {$regex: '^' + criteria + '$', $options:'i'}};
-                if(Collections.SkillTerms.find(condCheck).count() <= 0) {
-                    Collections.SkillTerms.insert({
-                        skillId: null,
-                        skillName: criteria,
-                        skillLength: criteria.length
-                    });
-                }
-            });
-
-            return new JobCriteria({
-                jobId: job._id,
-                companyId: job.companyId,
-                criteriaSetId: criteriaSet._id,
-                label: criteria
-            }).save();
-        } catch (e) {
-            console.log('add Criteria error');
-            console.trace(e);
-            return false;
-        }
+        if(!extra) return false;
+        extra.push(`hiringCriteria.${cate}.criteria`, name);
+        return extra.save();
     },
 
-    removeJobCriteria(_id) {
+    removeJobCriteria(jobId, cate, name) {
         if(!this.userId) return false;
-        var criteria = Meteor.job_criteria.findOne({_id: _id});
-        if(!criteria) return false;
-        return criteria.remove();
-    }
+        console.log('here')
+        this.unblock();
+        var Collection = JobExtra.getCollection();
+        var extra = Collection.findOne({jobId: jobId});
+        if(!extra) return false;
+        var category = `hiringCriteria.${cate}.criteria`;
+        var pullMod = {};
+        pullMod[category] = name;
+        return Collection.update({_id: extra._id}, {$pull: pullMod});
+    },
 
 };
 

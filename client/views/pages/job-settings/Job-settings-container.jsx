@@ -1,29 +1,49 @@
-const {Tabs, Tab} = ReactBootstrap;
 JobSettingsContainer = React.createClass({
+    mixins: [ReactMeteorData],
+
     getInitialState() {
         return {
             breadcrumb: [
-                {label: 'Home', route: '/dashboard'},
-                {label: '[Current job title]', route: null}
+                {label: 'Home', route: '/dashboard'}
             ],
-            currentTab: 1,
-            jobId: null
+            jobTitle: '',
+            currentTab: 1
         };
     },
 
-    componentWillMount() {
+    getMeteorData() {
         const params = Router.current().params;
-        this.setState({jobId: +params.jobId});
+        const jobId = +params['jobId'];
+        let isReady = true,
+            extra = new JobExtra();
+
+        if (params['jobId']) {
+            const sub = Meteor.subscribe('JobExtra', jobId);
+            isReady = sub.ready();
+            if (isReady) {
+                extra = JobExtra.getCollection().findOne({jobId: jobId});
+            }
+        }
+        return {
+            isReady: isReady,
+            jobId: jobId,
+            extra: extra
+        };
     },
 
-    handleSelect(key) {
+    handle___ChangeTab(key) {
         this.setState({currentTab: key});
+    },
+
+    handle___JobLoaded(job) {
+        this.setState({jobTitle: job.jobTitle});
     },
 
     render() {
         return (
             <div>
-                <PageHeading title="Job settings" breadcrumb={this.state.breadcrumb} />
+                <PageHeading title="Job settings"
+                             breadcrumb={this.state.breadcrumb.concat({label: this.state.jobTitle, route: null})}/>
                 <div className="wrapper wrapper-content">
                     <div className="row">
                         <div className="tabs-container">
@@ -32,30 +52,37 @@ JobSettingsContainer = React.createClass({
                                     <li className="active">
                                         <a id="job_tab" data-toggle="tab" href="#job" aria-expanded="true">
                                             <h3>
-                                                <span className="circle-wrapper"><i className="fa fa-fw fa-suitcase"></i></span>
+                                                <span className="circle-wrapper"><i
+                                                    className="fa fa-fw fa-suitcase"></i></span>
                                                 <span className="hidden-xs hidden-sm">THE JOB</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
+                                                why it's great opportunity.</p>
                                         </a>
                                     </li>
 
                                     <li>
-                                        <a id="criteria_tab" data-toggle="tab" href="#hiring-criteria" aria-expanded="true">
+                                        <a id="criteria_tab" data-toggle="tab" href="#hiring-criteria"
+                                           aria-expanded="true">
                                             <h3>
                                                 <span className="circle-wrapper"><i className="fa fa-fw fa-filter"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING CRITERIA</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
+                                                why it's great opportunity.</p>
                                         </a>
                                     </li>
 
                                     <li>
-                                        <a id="hiring_team_tab" data-toggle="tab" href="#hiring-team" aria-expanded="true">
+                                        <a id="hiring_team_tab" data-toggle="tab" href="#hiring-team"
+                                           aria-expanded="true">
                                             <h3>
-                                                <span className="circle-wrapper"><i className="fa fa-fw fa-users"></i></span>
+                                                <span className="circle-wrapper"><i
+                                                    className="fa fa-fw fa-users"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING TEAM</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
+                                                why it's great opportunity.</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -67,11 +94,14 @@ JobSettingsContainer = React.createClass({
                                                 <div className="float-e-margins animated fadeInRight">
                                                     <div className="content">
                                                         <h2>
-                                                            <span className="circle-wrapper"><i className="fa fa-briefcase"></i></span>
+                                                            <span className="circle-wrapper">
+                                                                <i className="fa fa-briefcase"></i>
+                                                            </span>
                                                             The Job
                                                         </h2>
 
-                                                        <JobDetails jobId={this.state.jobId}/>
+                                                        <JobDetails jobId={this.data.jobId}
+                                                                    onJobLoaded={this.handle___JobLoaded}/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -80,15 +110,18 @@ JobSettingsContainer = React.createClass({
 
                                     <div className="tab-pane" id="hiring-criteria">
                                         <div className="panel-body">
-                                            <div className="col-sm-10">
+                                            <div className="col-sm-12">
                                                 <div className="float-e-margins animated fadeInRight">
                                                     <div className="content">
                                                         <h2>
-                                                            <span className="circle-wrapper"><i className="fa fa-filter"></i></span>
+                                                            <span className="circle-wrapper"><i
+                                                                className="fa fa-filter"></i></span>
                                                             Hiring Criteria
                                                         </h2>
 
-
+                                                        <HiringCriteriaContainer
+                                                            jobId={this.data.jobId}
+                                                            hiringCriteria={this.data.extra.hiringCriteria}/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -100,7 +133,9 @@ JobSettingsContainer = React.createClass({
                                             <div className="col-sm-10">
                                                 <div className="float-e-margins animated fadeInRight">
                                                     <div className="content">
-
+                                                        {/*<JobHiringTeamContainer
+                                                         jobId={this.data.jobId}
+                                                         hiringTeam={this.data.extra.hiringTeam}/>*/}
                                                     </div>
                                                 </div>
                                             </div>

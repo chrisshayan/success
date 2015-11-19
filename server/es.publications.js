@@ -85,8 +85,14 @@ pubs.ESJobs = function (type, limit, q) {
     });
 };
 
+pubs.JobExtra = function(jobId) {
+    check(jobId, Number);
+    if(!this.userId) return null;
+    return JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
+};
+
+
 _.each(pubs, (func, name) => {
     Meteor.publish(name, func);
 });
-
 

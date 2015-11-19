@@ -24,15 +24,46 @@ JobExtra = Astro.Class({
             }
         },
         hiringCriteria: {
-            type: 'array',
+            type: 'object',
             default() {
-                return [];
+                return {
+                    skills: {
+                        order: 1,
+                        name: 'Skills',
+                        alias: 'skills',
+                        criteria: []
+                    },
+
+                    personalityTraits: {
+                        order: 2,
+                        name: 'Personality Traits',
+                        alias: 'personalityTraits',
+                        criteria: []
+                    },
+
+                    qualifications: {
+                        order: 3,
+                        name: 'Qualifications',
+                        alias: 'qualifications',
+                        criteria: []
+                    },
+
+                    details: {
+                        order: 4,
+                        name: 'Details',
+                        alias: 'details',
+                        criteria: []
+                    }
+                };
             }
         },
         recruiters: {
-            type: 'array',
+            type: 'object',
             default() {
-                return [];
+                return {
+                    manager: [],
+                    recruiter: []
+                };
             }
         }
     }

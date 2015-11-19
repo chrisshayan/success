@@ -38,7 +38,6 @@ methods.jobListCount = function () {
 
 
 methods.getCompany = function (companyId) {
-    Meteor._sleepForMs(1000)
     let companyInfo = new ESCompanyInfo();
     if (this.userId) {
         try {
