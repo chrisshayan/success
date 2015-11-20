@@ -19,6 +19,8 @@
  *   0 : create
  *   1 : update
  *   2 : delete
+ *   3 : optional
+ *   4 : optional
  *  ]
  */
 
@@ -29,6 +31,8 @@ var CONFIG = {
     'JOB_CREATE': 20,
     'JOB_UPDATE': 21,
     'JOB_DELETE': 22,
+    'JOB_SYNC_DONE': 23,
+    'JOB_SYNC_FAILED': 24,
     'APPLICATION_CREATE': 30,
     'APPLICATION_UPDATE': 31,
     'APPLICATION_DELETE': 32,
@@ -36,8 +40,7 @@ var CONFIG = {
     'CANDIDATE_UPDATE': 41,
     'CANDIDATE_DELETE': 42,
     'COMMENT_CREATE': 50,
-    'COMMENT_UPDATE': 51,
-    'COMMENT_DELETE': 52
+    'EMAiL_CREATE': 60
 };
 
 
