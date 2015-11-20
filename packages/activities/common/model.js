@@ -44,10 +44,11 @@ var model = Astro.Class({
             var content = {
                 appId: appId,
                 candidateId: candidateId,
-                jobId: jobId
+                jobId: jobId,
+                appliedDate: appliedDate
             };
             activity.set('content', content);
-            activity.set('createdAt', appliedDate);
+
 
             activity.save();
 
