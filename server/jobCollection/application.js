@@ -47,6 +47,8 @@ var getApplicationByJobId = (job, cb)=> {
                     application.set('dob', info.birthday);
                     application.set('countryId', info.countryId);
 
+                    info.jobTitle && application.set('jobTitle', info.jobTitle);
+
                     if (citiesObj[info.cityId])
                         application.set('cityName', citiesObj[info.cityId]['name']);
 

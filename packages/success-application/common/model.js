@@ -77,6 +77,10 @@ var model = Astro.Class({
             type: 'string',
             default: ''
         },
+        jobTitle: {
+            type: 'string',
+            default: ''
+        },
         emails: {
             type: 'array'
         },

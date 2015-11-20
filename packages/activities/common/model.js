@@ -13,7 +13,8 @@ var model = Astro.Class({
             type: 'number'
         },
         createBy: {
-            type: 'string'
+            type: 'string',
+            default: 'vnw'
         },
         content: {
             type: 'object',
@@ -39,8 +40,28 @@ var model = Astro.Class({
             var typeCode = Core.getConfig(MODULE_NAME, 'APPLICATION_CREATE');
 
             activity.set('type', typeCode);
-            activity.set('createBy', Meteor.userId());
             activity.set('displayMessage', 'Applied application');
+            var content = {
+                appId: appId,
+                candidateId: candidateId,
+                jobId: jobId,
+                appliedDate: appliedDate
+            };
+            activity.set('content', content);
+
+
+            activity.save();
+
+        },
+        deleteApplication: function () {
+            if (!Meteor.userId()) return false;
+
+            var activity = new model();
+            var typeCode = Core.getConfig(MODULE_NAME, 'APPLICATION_DELETE');
+
+            activity.set('type', typeCode);
+            activity.set('createBy', Meteor.userId());
+            activity.set('displayMessage', 'Application deleted');
             var content = {
                 appId: appId,
                 candidateId: candidateId,
