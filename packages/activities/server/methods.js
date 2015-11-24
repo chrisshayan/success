@@ -40,7 +40,7 @@ var methods = {
         logActivities(typeString, params, message, createBy);
 
     },
-    //jobId, numOfApplications, isByUser
+    //jobId, numOfApplication, isByUser
     syncedJobDone: ({...params}) => {
         let typeString = 'JOB_SYNC_DONE'
             , message = 'Job synced done'
@@ -48,7 +48,7 @@ var methods = {
 
         logActivities(typeString, params, message, createBy);
     },
-    //jobId, numOfApplications, isByUser
+    //jobId, isByUser
     syncedJobFailed: ({...params}) => {
         let typeString = 'JOB_SYNC_FAILED'
             , message = 'Job synced failed'
@@ -62,6 +62,9 @@ var methods = {
             , message = params['message']
             , createBy = Meteor.userId();
 
+        var application = Application.findOne({_id: params.appId});
+        if (!application) return false;
+
         logActivities(typeString, params, message, createBy);
     },
 
@@ -72,6 +75,9 @@ var methods = {
             , createBy = Meteor.userId()
             , params = null;
         arrayAppId.forEach(function (appId) {
+            var application = Application.findOne({_id: params.appId});
+            if (!application) return false;
+
             params = {
                 appId: appId,
                 emailBody: emailBody
@@ -82,16 +88,24 @@ var methods = {
 
     },
 
-    // candidateId,value
-    toggleQualified: (arrayCandidateId, value) => {
+    // candidateId,isQualify
+    toggleQualified: (arrayEffect, isQualify) => {
         let typeString = 'RECRUITER_TOGGLE_QUALIFIED'
             , message = params['value'] ? 'qualified' : 'disqualified'
             , createBy = Meteor.userId()
             , params = null;
-        arrayCandidateId.forEach(function (candidateId) {
+        arrayEffect.forEach(function (item) {
+
+            var application = Application.findOne({_id: params.appId});
+            if (!application) return false;
+
+            application.disqualified = isQualify;
+            application.save();
+
             params = {
-                candidateId: candidateId,
-                value: value
+                candidateId: item.candidateId,
+                appId: item.appId,
+                isQualify: isQualify
             };
 
             logActivities(typeString, params, message, createBy);
@@ -109,7 +123,7 @@ var methods = {
     // appId, candidateId, arrayRecruiter, datetime, emailBody
     scheduleInterview: ({...params})=> {
         let typeString = 'RECRUITER_SCHEDULE'
-            , message = 'Change stage'
+            , message = 'Schedule an interview'
             , createBy = Meteor.userId();
 
         logActivities(typeString, params, message, createBy);

@@ -14,7 +14,7 @@ Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
 
-    api.use(["vnw:core", "vnw:user"]);
+    api.use(["vnw:core", "vnw:user", "success:application"]);
     api.use(["jagi:astronomy@1.2.2"]);
     /* namespace */
     api.addFiles('activities.js');

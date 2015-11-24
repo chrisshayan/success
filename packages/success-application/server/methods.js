@@ -317,3 +317,8 @@ methods.hasApplication = function (jobId, stage) {
 
 
 //Meteor.methods(methods);
+
+
+Meteor.methods({
+    //application, content
+});
