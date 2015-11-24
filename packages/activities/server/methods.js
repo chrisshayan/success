@@ -125,4 +125,9 @@ var methods = {
 
 };
 
-Meteor.methods(methods);
+var _methods = {};
+_.each(methods, function (func, key) {
+    _methods[MODULE_NAME + '.' + key] = func;
+});
+
+Meteor.methods(_methods);
