@@ -5,6 +5,27 @@
 var mongoCollection = new Mongo.Collection(MODULE_NAME);
 
 
+var logActivities = (typeString, content, displayMessage, createBy)=> {
+    if (!Meteor.userId()) return false;
+
+    var activity = new model();
+    var typeCode = Core.getConfig(MODULE_NAME, typeString);
+
+    activity.set('type', typeCode);
+
+    activity.set('content', content);
+
+    createBy && activity.set('createBy', Meteor.userId());
+
+    activity.set('displayMessage', displayMessage);
+
+    Meteor.defer(()=> {
+        activity.save();
+    });
+
+};
+
+
 var model = Astro.Class({
     name: MODULE_NAME,
     collection: mongoCollection,
@@ -33,132 +54,106 @@ var model = Astro.Class({
 
     }, // schema
     methods: {
-        newApplication: function (appId, candidateId, jobId, appliedDate) {
-            if (!Meteor.userId()) return false;
+        //appId, candidateId, jobId, appliedDate
+        newApplication: ({...params}) => {
+            let typeString = 'APPLICATION_CREATE'
+                , message = 'Apply application'
+                , createBy = 'vnw';
 
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'APPLICATION_CREATE');
+            logActivities(typeString, params, message, createBy);
+        },
+        //arrayAppId, jobId
+        deleteApplication: (arrayAppId, jobId) => {
+            let typeString = 'APPLICATION_DELETE'
+                , message = 'Delete application'
+                , createBy = 'vnw';
 
-            activity.set('type', typeCode);
-            activity.set('displayMessage', 'Apply application');
-            var content = {
-                appId: appId,
-                candidateId: candidateId,
-                jobId: jobId,
-                appliedDate: appliedDate
-            };
-            activity.set('content', content);
-
-
-            activity.save();
+            logActivities(typeString, params, message, createBy);
 
         },
-        deleteApplication: function (appId, jobId) {
-            if (!Meteor.userId()) return false;
+        //jobId, numOfApplications, isByUser
+        syncedJobDone: ({...params}) => {
+            let typeString = 'JOB_SYNC_DONE'
+                , message = 'Job synced done'
+                , createBy = params['isByUser'] ? Meteor.userId() : 'vnw';
 
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'APPLICATION_DELETE');
+            logActivities(typeString, params, message, createBy);
+        },
+        //jobId, numOfApplications, isByUser
+        syncedJobFailed: ({...params}) => {
+            let typeString = 'JOB_SYNC_FAILED'
+                , message = 'Job synced failed'
+                , createBy = params['isByUser'] ? Meteor.userId() : 'vnw';
 
-            activity.set('type', typeCode);
+            logActivities(typeString, params, message, createBy);
+        },
+        //appId, candidateId, message
+        addComment: ({...params})=> {
+            let typeString = 'RECRUITER_CREATE_COMMENT'
+                , message = params['message']
+                , createBy = Meteor.userId();
 
+            logActivities(typeString, params, message, createBy);
+        },
 
-            activity.set('content', {
-                appId: appId,
-                jobId: jobId
+        //arrayAppId, emailBody
+        sendMessage: function (arrayAppId, emailBody) {
+            let typeString = 'RECRUITER_CREATE_EMAIL'
+                , message = params['emailBody']
+                , createBy = Meteor.userId()
+                , params = null;
+            arrayAppId.forEach(function (appId) {
+                params = {
+                    appId: appId,
+                    emailBody: emailBody
+                };
+
+                logActivities(typeString, params, message, createBy);
             });
-
-            activity.set('createBy', Meteor.userId());
-            activity.set('displayMessage', 'Delete application ');
-            var content = {
-                appId: appId,
-                candidateId: candidateId,
-                jobId: jobId,
-                appliedDate: appliedDate
-            };
-            activity.set('content', content);
-
-
-            activity.save();
 
         },
-        syncedJobDone: function (jobId, numOfApplications, isByUser) {
-            if (!Meteor.userId()) return false;
 
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'JOB_SYNC_DONE');
+        // candidateId,value
+        toggleQualified: (arrayCandidateId, value) => {
+            let typeString = 'RECRUITER_TOGGLE_QUALIFIED'
+                , message = params['value'] ? 'qualified' : 'disqualified'
+                , createBy = Meteor.userId()
+                , params = null;
+            arrayCandidateId.forEach(function (candidateId) {
+                params = {
+                    candidateId: candidateId,
+                    value: value
+                };
 
-            activity.set('type', typeCode);
-
-            activity.set('content', {
-                jobId: jobId,
-                numberOfApplications: numOfApplications
+                logActivities(typeString, params, message, createBy);
             });
-
-            activity.set('createBy', isByUser ? Meteor.userId() : 'vnw');
-            activity.set('displayMessage', 'Job synced done');
-
-            activity.save();
-
 
         },
-        syncedJobFailed: function (jobId, numOfApplications, isByUser) {
-            if (!Meteor.userId()) return false;
+        //appId, from , to
+        changeStage: ({...params})=> {
+            let typeString = 'APPLICATION_STAGE_UPDATE'
+                , message = 'Change stage'
+                , createBy = Meteor.userId();
 
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'JOB_SYNC_FAILED');
-
-            activity.set('type', typeCode);
-
-            activity.set('content', {
-                jobId: jobId,
-                numberOfApplications: numOfApplications
-            });
-
-            activity.set('createBy', isByUser ? Meteor.userId() : 'vnw');
-            activity.set('displayMessage', 'Job synced failed');
-
-            activity.save();
-
+            logActivities(typeString, params, message, createBy);
         },
-        addComment: function (appId, candidateId, message) {
-            if (!Meteor.userId()) return false;
+        // appId, candidateId, arrayRecruiter, datetime, emailBody
+        scheduleInterview: ({...params})=> {
+            let typeString = 'RECRUITER_SCHEDULE'
+                , message = 'Change stage'
+                , createBy = Meteor.userId();
 
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'COMMENT_CREATE');
-
-            activity.set('type', typeCode);
-
-            activity.set('content', {
-                appId: appId,
-                candidateId: candidateId,
-                commentMessage: message
-            });
-
-            activity.set('createBy', Meteor.userId());
-            activity.set('displayMessage', message);
-
-            activity.save();
-
+            logActivities(typeString, params, message, createBy);
         },
-        sendEmail: function (appId, candidateId, emailBody) {
-            if (!Meteor.userId()) return false;
-            var activity = new model();
-            var typeCode = Core.getConfig(MODULE_NAME, 'EMAIL_CREATE');
+        // ???
+        scoreCandidate: ({...params}) => {
+            let typeString = 'RECRUITER_SCORE_CANDIDATE'
+                , message = 'Scoring candidate'
+                , createBy = Meteor.userId();
 
-            activity.set('type', typeCode);
-
-            activity.set('content', {
-                appId: appId,
-                candidateId: candidateId,
-                emailMessage: emailBody
-            });
-    
-            activity.set('createBy', Meteor.userId());
-            activity.set('displayMessage', emailBody);
-
-            activity.save();
-
+            logActivities(typeString, params, message, createBy);
         }
+
     } // prototype
 });
 

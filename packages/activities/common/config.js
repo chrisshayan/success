@@ -14,6 +14,10 @@
  *    3 : application
  *    4 : candidate
  *    5 : comment
+ *    6 : email
+ *    7 : qualified
+ *    8 : stage
+ *    9 : recruiter
  *  ]
  *  y : [
  *   0 : create
@@ -36,11 +40,15 @@ var CONFIG = {
     'APPLICATION_CREATE': 30,
     'APPLICATION_UPDATE': 31,
     'APPLICATION_DELETE': 32,
+    'APPLICATION_STAGE_UPDATE': 33,
     'CANDIDATE_CREATE': 40,
     'CANDIDATE_UPDATE': 41,
     'CANDIDATE_DELETE': 42,
-    'COMMENT_CREATE': 50,
-    'EMAiL_CREATE': 60
+    'RECRUITER_CREATE_COMMENT': 53,
+    'RECRUITER_CREATE_EMAIL': 54,
+    'RECRUITER_TOGGLE_QUALIFIED': 55,
+    'RECRUITER_SCHEDULE': 56,
+    'RECRUITER_SCORE_CANDIDATE': 57
 };
 
 
