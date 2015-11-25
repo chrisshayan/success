@@ -62,7 +62,7 @@ var methods = {
             , message = params['message']
             , createBy = Meteor.userId();
 
-        var application = Application.findOne({_id: params.appId});
+        var application = Application.findOne({appId: params.appId});
         if (!application) return false;
 
         logActivities(typeString, params, message, createBy);
@@ -75,7 +75,7 @@ var methods = {
             , createBy = Meteor.userId()
             , params = null;
         arrayAppId.forEach(function (appId) {
-            var application = Application.findOne({_id: params.appId});
+            var application = Application.findOne({appId: appId});
             if (!application) return false;
 
             params = {
@@ -91,12 +91,12 @@ var methods = {
     // candidateId,isQualify
     toggleQualified: (arrayEffect, isQualify) => {
         let typeString = 'RECRUITER_TOGGLE_QUALIFIED'
-            , message = params['value'] ? 'qualified' : 'disqualified'
+            , message = isQualify ? 'qualified' : 'disqualified'
             , createBy = Meteor.userId()
             , params = null;
         arrayEffect.forEach(function (item) {
 
-            var application = Application.findOne({_id: params.appId});
+            var application = Application.findOne({appId: item.appId});
             if (!application) return false;
 
             application.disqualified = isQualify;
