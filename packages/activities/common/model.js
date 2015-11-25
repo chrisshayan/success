@@ -5,7 +5,6 @@
 var mongoCollection = new Mongo.Collection(MODULE_NAME);
 
 
-
 var model = Astro.Class({
     name: MODULE_NAME,
     collection: mongoCollection,
@@ -16,6 +15,11 @@ var model = Astro.Class({
         createBy: {
             type: 'string',
             default: 'vnw'
+        },
+        ref: {
+            type: 'object',
+            default: ()=> {
+            }
         },
         content: {
             type: 'object',

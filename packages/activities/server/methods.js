@@ -2,7 +2,7 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-var logActivities = (typeString, content, createBy)=> {
+var logActivities = (typeString, ref, content, createBy)=> {
     if (!this.userId()) return false;
 
     var activity = new Activities();
@@ -10,9 +10,10 @@ var logActivities = (typeString, content, createBy)=> {
 
     activity.set('type', typeCode);
 
-    activity.set('content', content);
+    ref && activity.set('ref', ref);
 
-    createBy = createBy || this.userId();
+    content && activity.set('content', content);
+
     activity.set('createBy', createBy);
 
     Meteor.defer(()=> {
@@ -22,108 +23,144 @@ var logActivities = (typeString, content, createBy)=> {
 };
 
 var methods = {
-    //appId, candidateId, jobId, appliedDate
-    newApplication: ({...params}) => {
+    // ref: {appId, candidateId, jobId}, content: { appliedDate}
+    newApplication: (ref, content) => {
         let typeString = 'APPLICATION_CREATE'
             , createBy = 'vnw';
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
-    //arrayAppId, jobId
-    deleteApplication: ({...params}) => {
+
+    //ref : {arrayAppId, jobId}
+    deleteApplication: (ref) => {
         let typeString = 'APPLICATION_DELETE'
             , createBy = 'vnw';
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, null, createBy);
 
     },
-    //jobId, numOfApplication, isByUser
-    syncedJobDone: ({...params}) => {
+    // ref : {jobId}, content: { numOfApplication, isByUser}
+    syncedJobDone: (ref, content) => {
         let typeString = 'JOB_SYNC_DONE'
-            , createBy = params['isByUser'] ? this.userId() : 'vnw';
+            , createBy = content['isByUser'] ? this.userId() : 'vnw';
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
-    //jobId, isByUser
-    syncedJobFailed: ({...params}) => {
+
+    // ref : {jobId} , content :{ isByUser}
+    syncedJobFailed: (ref, content) => {
         let typeString = 'JOB_SYNC_FAILED'
-            , createBy = params['isByUser'] ? this.userId() : 'vnw';
+            , createBy = content['isByUser'] ? this.userId() : 'vnw';
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
-    //appId, candidateId, message
-    addComment: ({...params})=> {
+
+    // ref : {appId, candidateId} , content : { message }
+    addComment: (ref, content) => {
         let typeString = 'RECRUITER_CREATE_COMMENT'
             , createBy = this.userId();
 
-        var application = Application.findOne({appId: params.appId});
+        var application = Application.findOne({appId: ref.appId});
         if (!application) return false;
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
 
     //arrayAppId, emailBody
     sendMessage: function (arrayAppId, emailBody) {
         let typeString = 'RECRUITER_CREATE_EMAIL'
             , createBy = this.userId()
-            , params = null;
+            , ref = null
+            , content = null;
+
         arrayAppId.forEach(function (appId) {
             var application = Application.findOne({appId: appId});
             if (!application) return false;
 
-            params = {
-                appId: appId,
+            ref = {
+                appId: appId
+            };
+
+            content = {
                 emailBody: emailBody
             };
 
-            logActivities(typeString, params, createBy);
+            logActivities(typeString, ref, content, createBy);
         });
 
     },
 
-    // candidateId,isQualify
-    toggleQualified: (arrayEffect, isQualify) => {
-        let typeString = 'RECRUITER_TOGGLE_QUALIFIED'
+    // arrayAppId
+    disqualified: (arrayEffect) => {
+        let typeString = 'RECRUITER_DISQUALIFIED'
             , createBy = this.userId()
-            , params = null;
-        arrayEffect.forEach(function (item) {
+            , ref = null
+            , content = null;
 
-            var application = Application.findOne({appId: item.appId});
+        arrayEffect.forEach(function (appId) {
+
+            var application = Application.findOne({appId: appId});
             if (!application) return false;
 
-            application.disqualified = isQualify;
+            application.disqualified = true;
             application.save();
 
-            params = {
-                candidateId: item.candidateId,
-                appId: item.appId,
-                isQualify: isQualify
+            ref = {
+                candidateId: application.candidateId,
+                appId: application.appId
             };
 
-            logActivities(typeString, params, createBy);
+            logActivities(typeString, ref, content, createBy);
         });
 
     },
-    //appId, from , to
-    changeStage: ({...params})=> {
+
+    // arrayAppId
+    reverseDisqualified: (arrayEffect) => {
+        let typeString = 'RECRUITER_REVERSE_QUALIFIED'
+            , createBy = this.userId()
+            , ref = null
+            , content = null;
+
+
+        arrayEffect.forEach(function (appId) {
+
+            var application = Application.findOne({appId: appId});
+            if (!application) return false;
+
+            application.disqualified = false;
+            application.save();
+
+            ref = {
+                candidateId: application.candidateId,
+                appId: application.appId
+            };
+
+            logActivities(typeString, ref, content, createBy);
+        });
+
+    },
+
+    //ref : {appId} , conent  : { from , to }
+    changeStage: (ref, content)=> {
         let typeString = 'APPLICATION_STAGE_UPDATE'
             , createBy = this.userId();
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
-    // appId, candidateId, arrayRecruiter, datetime, emailBody
-    scheduleInterview: ({...params})=> {
+    // ref : {appId, candidateId, arrayRecruiter} , content :{ datetime, emailBody}
+    scheduleInterview: (ref, content)=> {
         let typeString = 'RECRUITER_SCHEDULE'
             , createBy = this.userId();
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     },
     // ???
-    scoreCandidate: ({...params}) => {
+    scoreCandidate: (ref, content) => {
         let typeString = 'RECRUITER_SCORE_CANDIDATE'
             , createBy = this.userId();
 
-        logActivities(typeString, params, createBy);
+        logActivities(typeString, ref, content, createBy);
     }
 
 };
