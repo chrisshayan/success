@@ -2,13 +2,12 @@ JobCandidateTimeline = React.createClass({
     mixins: [ReactMeteorData],
 
     propTypes: {
-        application: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired
+        applicationId: React.PropTypes.number.isRequired
     },
 
     getInitialState() {
         return {
-            appId: this.props.application ? this.props.application._id : null,
+            appId: this.props.applicationId ? this.props.applicationId : null,
             inc: 10,
             limit: 10
         };
@@ -19,13 +18,13 @@ JobCandidateTimeline = React.createClass({
         let sub = Meteor.subscribe('applicationActivities', ...subData);
         return {
             isReady: sub.ready(),
-            activities: Collections.Activities.find(...subData).fetch()
+            activities: Activities.find(...subData).fetch()
         };
     },
 
     filter() {
         return {
-            "data.applicationId": this.state.appId
+            "content.applicationId": this.state.appId
         };
     },
 
@@ -46,7 +45,7 @@ JobCandidateTimeline = React.createClass({
     },
 
     hasMore() {
-        return Collections.Activities.find(this.filter()).count() > this.state.limit;
+        return Activities.find(this.filter()).count() > this.state.limit;
     },
 
     render() {

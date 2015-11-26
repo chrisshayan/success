@@ -10,13 +10,13 @@ JobCandidateListActions = React.createClass({
                 {
                     label: 'Applied date',
                     icon: 'fa fa-sort-desc pull-right',
-                    field: 'createdAt',
+                    field: 'appliedDate',
                     type: -1
                 },
                 {
                     label: 'Applied date',
                     icon: 'fa fa-sort-asc pull-right',
-                    field: 'createdAt',
+                    field: 'appliedDate',
                     type: 1
                 },
                 {
@@ -89,6 +89,7 @@ JobCandidateListActions = React.createClass({
                 border: 'none'
             }
         };
+
         return (
             <div>
                 <div className="clearfix border-bottom" style={styles.container}>
@@ -104,6 +105,7 @@ JobCandidateListActions = React.createClass({
                 <div className="clearfix border-bottom" style={{background:'#f9f9f9'}}>
                     <div style={styles.checkallContainer}>
                         <JobCandidateCheckBox
+                            checked={this.props.isSelectedAll}
                             onCheck={this.props.onSelectAll}
                             onUncheck={this.props.onDeselectAll}/>
                     </div>
@@ -119,7 +121,7 @@ JobCandidateListActions = React.createClass({
                                 );
                             })}
                     </DropdownButton>
-                    <DropdownButton bsStyle={'link'} title='Actions' id={"menu-" + Date.now()} className="pull-right">
+                    <DropdownButton disabled={!this.props.hasChecked} bsStyle={'link'} title='Actions' id={"menu-" + Date.now()} className="pull-right">
                         {!this.props.disqualified
                             ? <MenuItem key={0} eventKey={0} onSelect={this.handleDisqualify}>Disqualify</MenuItem>
                             : <MenuItem key={0} eventKey={0} onSelect={this.handleRevertQualify}>Revert qualify</MenuItem>}

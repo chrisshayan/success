@@ -1,6 +1,8 @@
 JobHiringProcess = React.createClass({
-    contextTypes: {
-        selectApplication: React.PropTypes.func
+    propTypes: {
+        jobId: React.PropTypes.number.isRequired,
+        counter: React.PropTypes.object.isRequired,
+        currentStage: React.PropTypes.object.isRequired
     },
 
     getInitialState() {
@@ -11,24 +13,19 @@ JobHiringProcess = React.createClass({
         };
     },
 
-    count(id) {
-        let stages = this.props.job && this.props.job.stages
-            ? this.props.job.stages
-            : {};
-        return stages[id] || '';
+    count(alias) {
+        return this.props.counter[alias] || '';
     },
 
     handleSwitchStage(stage, e) {
         e.preventDefault();
-        this.context.selectApplication(null);
         Router.go('Job', {
-            _id: this.props.job ? this.props.job._id : '',
+            jobId: this.props.jobId,
             stage: stage.alias
         });
     },
 
     render() {
-        let styles = {};
         return (
             <div className="row job-hiring-process">
                 {this.state.stages.map(this.renderStage)}
@@ -47,7 +44,7 @@ JobHiringProcess = React.createClass({
         return (
             <div key={key} className={cx}>
                 <a className="link" onClick={ (e) => this.handleSwitchStage(stage, e) }>
-                    <span className="count">{this.count(stage.id)}</span>
+                    <span className="count">{this.count(stage.alias)}</span>
                     <span className="title">{stage.label}</span>
                 </a>
             </div>

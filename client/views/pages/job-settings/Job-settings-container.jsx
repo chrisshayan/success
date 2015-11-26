@@ -39,11 +39,28 @@ JobSettingsContainer = React.createClass({
         this.setState({jobTitle: job.jobTitle});
     },
 
+    ATSLink() {
+        if (!this.data.jobId) return '';
+        return Router.url('Job', {
+            jobId: this.data.jobId,
+            stage: 'applied'
+        });
+    },
+
     render() {
         return (
             <div>
-                <PageHeading title="Job settings"
-                             breadcrumb={this.state.breadcrumb.concat({label: this.state.jobTitle, route: null})}/>
+                <PageHeading
+                    title="Job settings"
+                    breadcrumb={this.state.breadcrumb.concat({label: this.state.jobTitle, route: null})}>
+
+                    <a href={ this.ATSLink() } className="btn btn-primary btn-outline">
+                        <i className="fa fa-file-text-o"/>&nbsp;
+                        Manage applications
+                    </a>
+
+                </PageHeading>
+
                 <div className="wrapper wrapper-content">
                     <div className="row">
                         <div className="tabs-container">
@@ -68,8 +85,7 @@ JobSettingsContainer = React.createClass({
                                                 <span className="circle-wrapper"><i className="fa fa-fw fa-filter"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING CRITERIA</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
-                                                why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">Figuring out exactly who you’re looking for.</p>
                                         </a>
                                     </li>
 
@@ -81,8 +97,7 @@ JobSettingsContainer = React.createClass({
                                                     className="fa fa-fw fa-users"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING TEAM</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
-                                                why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">Are typically the head of their respective departments, and the person to whom the new hire will directly report.</p>
                                         </a>
                                     </li>
                                 </ul>
@@ -133,7 +148,8 @@ JobSettingsContainer = React.createClass({
                                             <div className="col-sm-10">
                                                 <div className="float-e-margins animated fadeInRight">
                                                     <div className="content">
-                                                        <JobHiringTeam jobId={this.data.jobId} recruiters={this.data.extra.recruiters}/>
+                                                        <JobHiringTeam jobId={this.data.jobId}
+                                                                       recruiters={this.data.extra.recruiters}/>
                                                     </div>
                                                 </div>
                                             </div>

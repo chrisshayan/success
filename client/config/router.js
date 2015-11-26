@@ -421,11 +421,11 @@ Router.route('/profile', {
 });
 
 
-Router.route('/job-new/:_id/:stage', {
+Router.route('/job-new/:jobId/:stage', {
     name: 'Job',
     waitOn: function() {
         return [
-            Meteor.subscribe('jobDetails', {jobId: this.params._id})
+            Meteor.subscribe('jobDetails', +this.params.jobId)
         ];
     },
     action() {

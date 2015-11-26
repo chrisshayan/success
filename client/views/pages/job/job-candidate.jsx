@@ -1,18 +1,26 @@
 JobCandidate = React.createClass({
-    contextTypes: {
-        selectApplication: React.PropTypes.func
-    },
-
-    handleClickApp(e) {
+    /**
+     * change query param when click on application
+     * @param e <Event>
+     */
+    handle__ClickApp(e) {
         e.preventDefault();
-        this.context.selectApplication(this.props.app._id);
+        const params = Router.current().params;
+        const query = _.omit(params.query, 'appAction');
+        query['appId'] = this.props.appId;
+
+        Router.go('Job', params, { query });
     },
 
-    handleCheckApp() {
-        this.props.onToggleSelectApp(this.props.app._id, true);
+    /**
+     * select application for bulk actions
+     */
+    handle__CheckApp() {
+        this.props.actions.toggleCheck(this.props.appId, true);
     },
-    handleUncheckApp() {
-        this.props.onToggleSelectApp(this.props.app._id, false);
+
+    handle__UncheckApp() {
+        this.props.actions.toggleCheck(this.props.appId, false);
     },
 
     render() {
@@ -33,8 +41,8 @@ JobCandidate = React.createClass({
             }
         };
 
-        let appliedTimeago = moment(app.createdAt.toISOString()).fromNow();
-        let isCurrentApp = this.props.currentAppId === app._id;
+        let appliedTimeago = moment(app.appliedDate.toISOString()).fromNow();
+        let isCurrentApp = this.props.currentAppId === app.appId;
 
         let className = classNames(
             'clearfix',
@@ -48,30 +56,54 @@ JobCandidate = React.createClass({
                 <div className="pull-left" style={styles.checkbox}>
                     <JobCandidateCheckBox
                         applicationId={app._id}
-                        onCheck={this.handleCheckApp}
-                        onUncheck={this.handleUncheckApp}
+                        onCheck={this.handle__CheckApp}
+                        onUncheck={this.handle__UncheckApp}
                         checked={this.props.checked}/>
                 </div>
-                <div className="pull-left border-left" style={styles.content} onClick={this.handleClickApp}>
+                <div className="pull-left border-left" style={styles.content} onClick={this.handle__ClickApp}>
                     <div className="clearfix">
                         <span className="pull-right text-muted small">{appliedTimeago}</span>
                         <a style={{color: '#666'}}>
-                            <h4>{app.candidateInfo.fullname}</h4>
+                            <h4>{app.fullname}</h4>
                         </a>
                     </div>
                     <p>{app.shortCoverLetter()}</p>
                     <div className="clearfix">
                         <div className="pull-left text-muted">
                             <i className="fa fa-map-marker"/>&nbsp;
-                            Ho Chi Minh
+                            { app.cityName }
                         </div>
 
-                        <span className="label label-primary pull-right">
-                            {app.matchingScore}
-                        </span>
+                        { this.render__MatchingScore() }
                     </div>
                 </div>
             </div>
+        );
+    },
+
+    render__MatchingScore() {
+        const app = this.props.app;
+        const score = app && app['matchingScore'] ? app['matchingScore'] : 0;
+        if(score <= 0) return null;
+        let labelClass = '';
+
+        if (score > 80) {
+            labelClass = 'label-primary';
+        } else if (score > 60) {
+            labelClass = 'label-info';
+        } else if (score > 40) {
+            labelClass = 'label-success';
+        } else if (score > 20) {
+            labelClass = 'label-warning';
+        } else if (score > 0) {
+            labelClass = 'label-danger';
+        }
+
+        const cx = classNames('label', 'pull-right', labelClass);
+        return (
+            <span className={cx}>
+                {score}
+            </span>
         );
     }
 })

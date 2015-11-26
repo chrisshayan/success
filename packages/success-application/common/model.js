@@ -98,11 +98,11 @@ var model = Astro.Class({
         candidate: function () {
 
         },
-        isExist: (condition) => {
+        isExist(condition) {
             var query = condition || {entryID: this.entryId};
             return !!Collection.findOne(query);
         },
-        matchingScoreLabel: ()=> {
+        matchingScoreLabel() {
             var matchingScore = this.matchingScore || 0;
             if (matchingScore >= 90)
                 return " label-success ";
@@ -115,8 +115,13 @@ var model = Astro.Class({
             else
                 return " hidden ";
         },
-        isSentDirectly: ()=> {
+        isSentDirectly (){
             return this.source.type === 2;
+        },
+
+        shortCoverLetter() {
+            if (!this.coverLetter) return "";
+            return this.coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
         }
     } // prototype
 });

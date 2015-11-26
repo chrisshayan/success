@@ -54,26 +54,6 @@ var methods = {
             });
         });
         return Collections.Jobs.update({_id: job._id}, {$set: {tags: newTags}});
-    },
-
-    /**
-     * check job has application with specific stage
-     * @param jobId
-     * @param stage
-     * @returns {boolean}
-     */
-    hasApplication: function(jobId, stage) {
-        check(jobId, String);
-        check(stage, Number);
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if(job) {
-            return Collections.Applications.findOne({jobId: job.jobId, stage: stage}, {
-                sort: {
-                    createdAt: -1
-                }
-            });
-        }
-        return false;
     }
 };
 

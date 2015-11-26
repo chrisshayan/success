@@ -62,17 +62,20 @@ methods.updateApplicationStage = function (option) {
 };
 
 
-methods.applicationStageCount = function(jobId, stage) {
+methods.applicationStageCount = function (jobId, stageId) {
     var result = {
         qualify: 0,
         disqualified: 0
     };
-    if(this.userId && jobId && stage !== null) {
-        var job = Collections.Jobs.findOne({_id: jobId});
-        if(job) {
-            result['qualify'] = Collections.Applications.find({jobId: job.jobId, stage: stage, disqualified: false}).count();
-            result['disqualified'] = Collections.Applications.find({jobId: job.jobId, stage: stage, disqualified: true}).count();
-        }
+    if (this.userId && jobId && stage !== null) {
+        const stage = Success.APPLICATION_STAGES[stageId],
+            AppCollection = Application.getCollection(),
+            cond1 = {jobId: job.jobId, stage: stage},
+            cond2 = {disqualified: {$nin: [stage.alias]}},
+            cond3 = {disqualified: stage.alias};
+
+        result['qualify'] = AppCollection.find({ ...cond1, cond2 }).count();
+        result['disqualified'] = AppCollection.find({ ...cond1, cond3 }).count();
     }
     return result;
 };

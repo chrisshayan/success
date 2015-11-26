@@ -15,8 +15,6 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
-var citiesObj = Meteor.cities.find({languageId: 2}).fetch() || [];
-
 var getApplicationByJobId = (job, cb)=> {
     var JobExtraCollection = JobExtra.getCollection();
     var appCollection = Application.getCollection();
@@ -48,9 +46,9 @@ var getApplicationByJobId = (job, cb)=> {
                     application.set('countryId', info.countryId);
 
                     info.jobTitle && application.set('jobTitle', info.jobTitle);
-
-                    if (citiesObj[info.cityId])
-                        application.set('cityName', citiesObj[info.cityId]['name']);
+                    const city = Meteor.cities.findOne({vnwId: info.cityId, languageId: 2});
+                    if (city)
+                        application.set('cityName', city.name);
 
                     var emails = _.unique((info.emails) ? info.emails.split('|') : []);
 
@@ -87,7 +85,7 @@ var getApplicationByJobId = (job, cb)=> {
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
 
-                Meteor.call('syncedJobDone', {
+                Meteor.call('activities.syncedJobDone', {
                     jobId: currentJob._id,
                     numOfApplication: appStages.length,
                     isByUser: false
@@ -103,7 +101,7 @@ var getApplicationByJobId = (job, cb)=> {
                 failedJob.set('syncState', 'syncFailed');
                 failedJob.save();
 
-                Meteor.call('syncedJobFailed', {
+                Meteor.call('activities.syncedJobFailed', {
                     jobId: failedJob._id,
                     isByUser: false
                 });

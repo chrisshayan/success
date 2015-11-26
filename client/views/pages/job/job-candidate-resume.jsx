@@ -1,69 +1,22 @@
+const RendererMixin = {};
+
 JobCandidateResume = React.createClass({
+    mixins: [RendererMixin],
     propTypes: {
         application: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
         resume: React.PropTypes.object
     },
 
     getInitialState() {
         return {
-            source: null,
-            isReady: false
+
         };
     },
 
-    componentDidMount() {
-        if (this.props.application) {
-            this.setState({
-                isReady: true,
-                source: this.props.application.source
-            });
-        }
-    },
-
-    componentDidUpdate(prevProps, prevState) {
-        if (!_.isEqual(this.props.application, prevProps.application)) {
-            this.setState({
-                isReady: true,
-                source: this.props.application.source
-            });
-        }
-    },
 
     render() {
-        let content = null;
-        if (!this.state.isReady) {
-            content = <WaveLoading />;
-        } else {
-            if (this.state.source == 1) {
-                content = <JobCandidateResumeOnline
-                    application={this.props.application}
-                    candidate={this.props.candidate}
-                    resume={this.props.resume}/>;
-
-            } else if (this.state.source == 2) {
-
-                content = <JobCandidateResumeOffline
-                            application={this.props.application}
-                            candidate={this.props.candidate} />;
-
-            } else if (this.state.source == 3) {
-                content = <JobCandidateResumeFromSuccess />;
-            }
-        }
-        return (
-            <div id="job-candidate-resume">
-                {content}
-            </div>
-        );
-    }
-});
-
-JobCandidateResumeFromSuccess = React.createClass({
-    render() {
-        return (
-            <h2>Success</h2>
-        );
+        if(_.isEmpty(this.props.resume)) return null;
+        return <JobCandidateResumeOnline resume={this.props.resume} application={this.props.application} />
     }
 });
 
@@ -109,8 +62,8 @@ JobCandidateResumeOffline = React.createClass({
                                 <h2><i className="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
 
                                 <blockquote>
-                                    <p className="small"
-                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
+                                    {/*<p className="small"
+                                     dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>*/}
                                 </blockquote>
                             </div>
                         </div>
@@ -158,7 +111,6 @@ JobCandidateResumeOffline = React.createClass({
 JobCandidateResumeOnline = React.createClass({
     propTypes: {
         application: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
         resume: React.PropTypes.object
     },
 
@@ -166,24 +118,9 @@ JobCandidateResumeOnline = React.createClass({
 
     },
 
-    totalExperiences() {
-        let resume = this.props.resume;
-        let total = resume && resume.yearOfExperience ? resume.yearOfExperience : 0;
-        if (total <= 0) return '';
-        if (total == 1) return '1 year';
-        return `${total} years`;
-    },
-
-    currentJobLevel() {
-        let resume = this.props.resume;
-        if (resume['data'] && resume['data']['joblevelid']) {
-            let level = Meteor.job_levels.findOne({vnwId: resume['data']['joblevelid']});
-            if (level) return level.name;
-        }
-        return '';
-    },
-
     render() {
+        const resume = this.props.resume;
+        console.log(resume)
         return (
             <div>
                 <div className="row">
@@ -200,16 +137,14 @@ JobCandidateResumeOnline = React.createClass({
                                                 <td>
                                                     <strong>Total Years of Experience</strong>
                                                 </td>
-                                                <td>{ this.totalExperiences() }</td>
+                                                <td>{ resume.yearOfExperience }</td>
                                             </tr>
                                             <tr>
                                                 <td>
                                                     <strong>Most Recent Job</strong>
                                                 </td>
                                                 <td>
-                                                    {this.props.resume && this.props.resume.mostRecentPosition
-                                                        ? this.props.resume.mostRecentPosition
-                                                        : ''}
+                                                    { resume.currentJobLevel }
                                                 </td>
 
                                             </tr>
@@ -218,9 +153,7 @@ JobCandidateResumeOnline = React.createClass({
                                                     <strong>Most Recent Company</strong>
                                                 </td>
                                                 <td>
-                                                    {this.props.resume && this.props.resume.mostRecentEmployer
-                                                        ? this.props.resume.mostRecentEmployer
-                                                        : ''}
+                                                    { resume.recentCompany }
                                                 </td>
                                             </tr>
                                             <tr>
@@ -228,7 +161,7 @@ JobCandidateResumeOnline = React.createClass({
                                                     <strong>Current Job Level</strong>
                                                 </td>
                                                 <td>
-                                                    {this.currentJobLevel()}
+                                                    { resume.currentJobLevel }
                                                 </td>
                                             </tr>
                                             </tbody>
@@ -245,37 +178,36 @@ JobCandidateResumeOnline = React.createClass({
 
                                 <blockquote>
                                     <p className="small"
-                                       dangerouslySetInnerHTML={{__html: this.props.application.coverLetter()}}/>
+                                     dangerouslySetInnerHTML={{__html: resume.coverLetter}}/>
                                 </blockquote>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <hr/>
-                {this.props.resume && this.props.resume['careerObjective'] ? (
+                {resume && resume['careerObjective'] ? (
                 <div className="row">
                     <div className="col-md-12">
                         <div className="ibox">
                             <div className="ibox-content">
                                 <h2><i className="fa fa-dot-circle-o"></i> Career Objective </h2>
                                 <blockquote>
-                                    <p dangerouslySetInnerHTML={{__html: this.props.resume.careerObjective}}/>
+                                    <p dangerouslySetInnerHTML={{ __html: resume.careerObjective }}/>
                                 </blockquote>
                             </div>
                         </div>
                     </div>
                 </div>
-                    ) : null }
+                ) : null }
 
-                <hr/>
+                {resume && resume['experience'] ? (
                 <div className="row">
                     <div className="col-md-7">
                         <div className="ibox">
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-file-text-o"/>&nbsp;EXPERIENCE</h2>
                                 <ul className="content-list">
-                                    {this.props.resume.experience && this.props.resume.experience.map(this.renderExperience)}
+                                    {resume.experience && resume.experience.map(this.renderExperience)}
                                 </ul>
                             </div>
                         </div>
@@ -286,15 +218,15 @@ JobCandidateResumeOnline = React.createClass({
                             <div className="ibox-content">
                                 <h2><i className="fa  fa-trophy"/>&nbsp;EDUCATION</h2>
                                 <ul className="content-list">
-                                    {this.props.resume.education && this.props.resume.education.map(this.renderEducation)}
+                                    {resume.education && resume.education.map(this.renderEducation)}
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+                ) : null }
 
-                <hr/>
-
+                {resume && resume['reference'] ? (
                 <div className="row">
                     <div className="col-md-12">
                         <div className="ibox">
@@ -303,32 +235,50 @@ JobCandidateResumeOnline = React.createClass({
                                 <div id="vertical-timeline"
                                      className="vertical-container dark-timeline vertical-timeline-content no-margins">
 
-                                    {this.props.resume.reference && this.props.resume.reference.map(this.renderReference)}
+                                    {resume.reference && resume.reference.map(this.renderReference)}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                ) : null }
+
+                {resume && resume['attachments'] ? (
+                <div className="ibox hidden-print">
+                    <div className="ibox-content">
+                        <h2><i className="fa fa-fw fa-paperclip"></i> Attached CV</h2>
+                        <div className="center-block text-center">
+
+                            <span className="fa fa-file-pdf-o big-icon"></span><br />
+                            <div className="text-center">
+                                <button type="button" className="btn btn-primary btn-outline m-t-sm">
+                                    <i className="fa fa-fw fa-eye"></i> Preview by Google Viewer
+                                </button>
+                                &nbsp;&nbsp;
+                                <a className="btn btn-primary btn-outline m-t-sm" href="#" target="_blank">
+                                    <i className="fa fa-fw fa-download" ></i>
+                                    <span> Download CV</span>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                    ) : null}
             </div>
         );
     },
 
     renderExperience(exp, key) {
-        let dateRange = '';
-        if (exp.isCurrent) {
-            dateRange = `${moment(exp.startDate).calendar()} ~ now`;
-        } else {
-            dateRange = `${moment(exp.startDate).calendar()} - ${moment(exp.endDate).calendar()}`;
-        }
         return (
             <li className="list-item" key={key}>
                 <span className="list-item-icon">
                     <i className="fa fa-circle-o"/>
                 </span>
                 <span className="list-item-text">
-                    <strong>{exp.jobTitle ? exp.jobTitle : ''}</strong> at <strong>{exp.companyName ? exp.companyName : ''}</strong>
+                    <strong>{ exp.position }</strong> at <strong>{ exp.company }</strong>
                     <span className="list-item-info">
-                        <span className="list-item-date">{dateRange}</span>
+                        <span className="list-item-date">{ exp.start } - { exp.end }</span>
                         <p className="small"
                            dangerouslySetInnerHTML={{__html: exp.description}}/>
                     </span>
@@ -338,17 +288,15 @@ JobCandidateResumeOnline = React.createClass({
     },
 
     renderEducation(edu, key) {
-        let dateRange = `${moment(edu.startDate).calendar()} - ${moment(edu.endDate).calendar()}`;
         return (
-
             <li className="list-item" key={key}>
                 <span className="list-item-icon">
                     <i className="fa fa-circle-o"/>
                 </span>
                 <span className="list-item-text">
-                    <strong>{edu.major ? edu.major : ''}</strong> at <strong>{edu.schoolName ? edu.schoolName : ''}</strong>
+                    <strong>{ edu.major }</strong> at <strong>{ edu.school }</strong>
                     <span className="list-item-info">
-                        <span className="list-item-date">{dateRange}</span>
+                        <span className="list-item-date">{ edu.start } - { edu.end }</span>
                         <p className="small"
                            dangerouslySetInnerHTML={{__html: edu.description}}/>
                     </span>

@@ -75,54 +75,15 @@ publications.getJobs = function (filters, options, filterEmailAddress) {
  * @param options.jobId {String}
  * @returns {Cursor}
  */
-publications.jobDetails =  function (opt) {
+publications.jobDetails =  function (jobId) {
     if(!this.userId) return this.ready();
     var self = this;
     var user = Meteor.users.findOne({_id: self.userId});
-    var permissions = user.jobPermissions();
     return {
         find: function() {
-            var cond = {
-                _id: opt.jobId,
-                $or: permissions
-            };
-            return Collections.Jobs.find(cond);
+            return JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
         },
-        children: [
-            // Related jobs
-            {
-                find: function(job) {
-                    var cond = {
-                        _id: {$ne: job._id},
-                        status: job.status,
-                        $or: permissions
-                    };
-                    return Collections.Jobs.find(cond, {limit: 5});
-                }
-            },
-            /**
-             * Publish application and candidate selected
-             */
-            {
-                find: function(job) {
-                    if(job && opt.application) {
-                        return Collections.Applications.find({_id: opt.application}, {limit: 1});
-                    }
-                    return null;
-                },
-
-                children: [
-                    {
-                        find: function(app) {
-                            if(app) {
-                                return Collections.Candidates.find({candidateId: app.candidateId}, {limit: 1});
-                            }
-                            return null;
-                        }
-                    }
-                ]
-            }
-        ]
+        children: []
     }
 };
 

@@ -13,13 +13,13 @@ Publications.getApplications = function (filters, options) {
             //check(filters, Object);
             //check(options, Object);
 
-            filters['isDeleted'] = 0;
+            //filters['isDeleted'] = 0;
             if (!options.hasOwnProperty("limit")) {
                 options['limit'] = 20;
             } else {
                 options['limit'] += 10;
             }
-            return Collections.Applications.find(filters, options);
+            return Application.getCollection().find(filters, options);
         },
         children: [
             //{
@@ -107,49 +107,12 @@ Publications.applicationDetails = function (data) {
 
 Publications.application = function (appId) {
     if (!this.userId || !appId) return this.ready();
-    check(appId, String);
-    var user = Meteor.users.findOne({_id: this.userId});
     return {
         find: function () {
-            if (!user.canViewApplication(appId)) return null;
-            var filters = {_id: appId};
+            var filters = {jobId: appId};
             var options = {limit: 1};
-            return Collections.Applications.find(filters, options);
-        },
-        children: [
-            {
-                find: function (application) {
-                    var filters = {
-                        candidateId: application.candidateId
-                    };
-                    var options = {
-                        limit: 1
-                    };
-                    return Collections.Candidates.find(filters, options);
-                }
-            },
-
-            {
-                find: function (app) {
-                    var resumeId = app['data'] && app['data']['resumeid'] ? app['data']['resumeid'] : null;
-                    if (resumeId) {
-                        return Collections.Resumes.find({resumeId: resumeId}, {limit: 1});
-                    }
-                    return null;
-                },
-
-                children: [
-                    {
-                        find: function (resume) {
-                            if (resume['data'] && resume['data']['joblevelid']) {
-                                return Meteor.job_levels.find({vnwId: resume['data']['joblevelid'], languageId: 2});
-                            }
-                            return null;
-                        }
-                    }
-                ]
-            }
-        ]
+            return Application.find(filters, options);
+        }
     }
 }
 
@@ -157,4 +120,4 @@ Publications.application = function (appId) {
 /**
  * Map to meteor
  */
-//_.each(Publications, (func, name) =>  Meteor.publishComposite(name, func));
+_.each(Publications, (func, name) =>  Meteor.publishComposite(name, func));

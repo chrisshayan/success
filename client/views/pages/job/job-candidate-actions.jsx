@@ -25,58 +25,41 @@ JobCandidateProfileActions = React.createClass({
         return app.candidateInfo.firstName;
     },
 
-    handleDisqualify() {
-        var self = this;
-        Meteor.call('disqualifyApplications', [this.props.application._id], function (err, result) {
-            if (!err) {
-                self.context.selectApplication(null);
-            }
-        });
-    },
-
-    handleRevertQualify() {
-        var self = this;
-        Meteor.call('revertApplication', this.props.application._id, function (err, result) {
-            if (!err) {
-                self.context.selectApplication(null);
-            }
-        });
-    },
-
     nextStage() {
         return this.state.nextStage ? this.state.nextStage.label : '';
     },
 
     handleMoveNextState(e) {
         e.preventDefault();
-
-        let data = {
-            application: this.props.application._id,
-            stage: this.state.nextStage.id
-        };
-        Meteor.call('updateApplicationStage', data, (err, result) => {
-            if (!err) {
-                this.context.selectApplication(null);
-            }
-        });
+        this.props.actions.moveStage(this.state.nextStage.id);
     },
     handleMoveToStage(stageId, e) {
         e.preventDefault();
-
-        let data = {
-            application: this.props.application._id,
-            stage: stageId
-        };
-        Meteor.call('updateApplicationStage', data, (err, result) => {
-            if (!err) {
-                this.context.selectApplication(null);
-            }
-        });
+        this.props.actions.moveStage(stageId);
     },
 
-    handleAddComment(e) {
-        e.preventDefault();
+    isDisqualified() {
+        const is = false
+            , app = this.props.application
+            , stage = this.props.stage;
 
+        if (app) {
+            return app['disqualified'] && app['disqualified'].indexOf(stage.alias) >= 0;
+        }
+        return is;
+    },
+
+    getActionLink(type) {
+        const params = Router.current().params;
+        let query = params.query;
+        if (!query) query = {};
+        query['appAction'] = type;
+        return Router.url('Job', {
+            jobId: this.props.job.jobId,
+            stage: this.props.stage.alias
+        }, {
+            query: query
+        });
     },
 
     render() {
@@ -98,48 +81,37 @@ JobCandidateProfileActions = React.createClass({
                             </div>
                         </div>
 
-                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-10 pull-right" style={{paddingBottom: '5px'}}>
+                        <div className="col-xs-12 col-sm-12 col-md-12 col-lg-12 pull-right"
+                             style={{paddingBottom: '3px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
-                                    <button className="btn btn-default btn-outline btn-sm"
-                                        onClick={() => this.props.onToggleAddComment()}
-                                        disabled={this.props.isAddingComment}>
+                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('comment') }>
                                         Add comment
-                                    </button>
+                                    </a>
 
-                                    <button
-                                        className="btn btn-default btn-outline btn-sm"
-                                        onClick={() => this.props.onToggleSendMessage()}
-                                        disabled={this.props.isSendingMessage} >
+                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('message') }>
                                         Send message
-                                    </button>
+                                    </a>
 
-                                    <button
-                                        className="btn btn-default btn-outline btn-sm"
-                                        onClick={() => this.props.onToggleScheduleInterview()}
-                                        disabled={this.props.isScheduleInterview} >
+                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('scheduleInterview') }>
                                         Schedule interview
-                                    </button>
+                                    </a>
 
-                                    <button className="btn btn-default btn-outline btn-sm">
-                                        Score candidate
-                                    </button>
-                                    {!this.props.application.disqualified ? (
+                                    {this.isDisqualified() === false ? (
                                     <button className="btn btn-default btn-outline btn-sm"
-                                            onClick={this.handleDisqualify}>
+                                            onClick={ this.props.actions.disqualify }>
                                         Disqualify
                                     </button>
                                         ) : (
                                     <button
                                         className="btn btn-primary btn-outline btn-sm"
-                                        onClick={this.handleRevertQualify}>
+                                        onClick={ this.props.actions.revertQualify }>
                                         Revert qualify
                                     </button>
                                         )}
 
                                     <button
                                         className="btn btn-primary btn-outline btn-sm"
-                                        disabled={this.state.disableNextStage}
                                         onClick={this.handleMoveNextState}>
 
                                         <i className="fa fa-arrow-right"/>&nbsp;
@@ -148,7 +120,7 @@ JobCandidateProfileActions = React.createClass({
 
                                     <button type="button" className="btn btn-primary btn-outline btn-sm dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <span className="caret" />
+                                        <span className="caret"/>
                                     </button>
                                     {this.renderMoveAbilities()}
 

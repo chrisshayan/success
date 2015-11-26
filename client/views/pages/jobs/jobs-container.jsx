@@ -367,7 +367,7 @@ Job = React.createClass({
 
     link(stage) {
         var params = {
-            _id: this.props.job._id,
+            jobId: this.props.job.jobId,
             stage: stage
         };
         return Router.url('Job', params);

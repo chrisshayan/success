@@ -10,11 +10,11 @@ JobCandidateCheckBox = React.createClass({
 
         let appId = this.props.applicationId || null;
         $(selectEl).on('ifChecked', () => {
-            this.props.onCheck && this.props.onCheck(appId);
+            this.props.onCheck && this.props.onCheck();
         });
 
         $(selectEl).on('ifUnchecked', () => {
-            this.props.onUncheck && this.props.onUncheck(appId);
+            this.props.onUncheck && this.props.onUncheck();
         });
 
         if (this.props.checked) {

@@ -23,8 +23,7 @@ var model = Astro.Class({
         },
         content: {
             type: 'object',
-            default: ()=> {
-            }
+            default: ()=> {}
         },
         displayMessage: {
             type: 'string',

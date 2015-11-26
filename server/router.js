@@ -84,36 +84,132 @@ Router.route('/webhook/job', {
     }
 });
 
+Astro.createType({
+    name: 'ResumeEducation',
+    constructor: function Type(fieldDefinition) {
 
-Router.route('/webhook/application', {
-    where: 'server',
-    onBeforeAction: authWebhookToken,
-    action: function () {
-        try {
-            var data = this.request.body;
-            check(data, {
-                jobId: Number,
-                entryId: Number,
-                source: Number
-            });
-            var type = null;
-            switch (this.request.method.toLowerCase()) {
-                case 'post':
-                    type = 'addApplication';
-                    break;
-                case 'put':
-                    type = 'updateApplication';
-                    break;
-            }
-            type && SYNC_VNW.addQueue(type, data);
+    },
+    getDefault: function(defaultValue) {
+        return {};
+    },
+    cast: function(value) {},
+    needsCast: function(value) {},
+    plain: function(value) {},
+    needsPlain: function(value) {}
+});
 
-            this.response.writeHead(200);
-            this.response.end(EJSON.stringify({success: true, msg: ''}));
-        } catch (e) {
-            console.trace('Received request to application hook: ', e);
-            this.response.writeHead(400);
-            this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
+Resume = Astro.Class({
+    name: 'Resume',
+    fields: {
+
+        education: {
+            type: 'ResumeEducation',
+            default: () => []
+        },
+
+        skills: {
+            type: 'array',
+            default: () => []
         }
-        return true;
     }
 });
+
+
+Router.route('/api/resume', {
+    where: 'server',
+    action: function () {
+        var resume = createMockupResume();
+        this.response.writeHead(200);
+        this.response.end(EJSON.stringify(resume));
+    }
+});
+
+
+function  createMockupResume() {
+    var resume = {
+        fullname: faker.name.findName(),
+        coverLetter: faker.lorem.paragraph(),
+        phone: [],
+        emails: [],
+        yearOfExperience: _.random(1,10),
+        currentJobLevel: '',
+        careerObjective: '',
+        recentPosition: faker.name.jobTitle(),
+        recentCompany: faker.company.companyName(),
+        skills: faker.lorem.words(),
+        education: [],
+        experience: [],
+        reference: [],
+        attachments: []
+    };
+
+    // add phone
+    _.each(_.range(_.random(0,3)), () => {
+        resume.phone.push(faker.phone.phoneNumber());
+    });
+
+    // add emails
+    _.each(_.range(_.random(0,3)), () => {
+        resume.emails.push(faker.internet.email());
+    });
+
+    // add educations
+    _.each(_.range(_.random(0,3)), () => {
+        const start = new moment();
+        const end = new moment();
+        let step = _.random(12, 24);
+        start.subtract(step,'month');
+        end.subtract(step - _.random(1,12),'month');
+
+        resume.education.push({
+            school: faker.company.companyName(),
+            major: faker.name.jobTitle(),
+            start: start.format('MM/YYYY'),
+            end: end.format('MM/YYYY'),
+            description: faker.lorem.sentences()
+        });
+    });
+
+    // add experience
+    _.each(_.range(_.random(0,3)), () => {
+        const start = new moment();
+        const end = new moment();
+        let step = _.random(12, 24);
+        start.subtract(step,'month');
+        end.subtract(step - _.random(1,12),'month');
+
+        resume.experience.push({
+            company: faker.company.companyName(),
+            position: faker.name.jobTitle(),
+            start: start.format('MM/YYYY'),
+            end: end.format('MM/YYYY'),
+            description: faker.lorem.sentences(),
+            isCurrent: false
+        });
+    })
+
+    if(resume.experience.length > 0) {
+        const currentCompanyIndex = _.random(0, resume.experience.length - 1);
+        resume.experience[currentCompanyIndex].isCurrent = true;
+    }
+
+    // add references
+    _.each(_.range(_.random(0,3)), () => {
+        resume.reference.push({
+            name: faker.name.findName(),
+            title: faker.name.jobTitle(),
+            company: faker.company.companyName(),
+            phone: faker.phone.phoneNumber(),
+            email: faker.internet.email(),
+            description: faker.lorem.sentences()
+        });
+    });
+
+    _.each(_.range(_.random(0,2)), () => {
+        resume.attachments.push({
+           url: 'https://career.berkeley.edu/sites/default/files/pdf/Guide/ResumeLetterWriting.pdf'
+        });
+    });
+
+    return resume;
+}

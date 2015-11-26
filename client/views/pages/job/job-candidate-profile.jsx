@@ -3,12 +3,12 @@ JobCandidateProfile = React.createClass({
     propTypes: {
         job: React.PropTypes.object.isRequired,
         stage: React.PropTypes.object.isRequired,
-        applicationId: React.PropTypes.string
+        applicationId: React.PropTypes.number
     },
 
     getInitialState() {
         return {
-            width: 800,
+            width: 880,
             isAddingComment: false,
             isSendingMessage: false,
             isScheduleInterview: false
@@ -17,31 +17,28 @@ JobCandidateProfile = React.createClass({
 
     getMeteorData() {
         let sub = Meteor.subscribe('application', this.props.applicationId);
-        let app = Collections.Applications.findOne({_id: this.props.applicationId});
-        let can = app ? Collections.Candidates.findOne({candidateId: app.candidateId}) : null;
-        let resume = can ? Collections.Resumes.findOne({resumeId: app.data.resumeid}) : null;
+        let app = Application.getCollection().findOne({appId: this.props.applicationId});
         return {
             isReady: sub.ready(),
-            application: app,
-            candidate: can,
-            resume: resume
+            application: app
         };
     },
 
     componentDidMount() {
         let el = this.refs.container.getDOMNode();
-        $(el).bind('resize', this.handleResize);
-        window.addEventListener('resize', this.handleResize);
+        this.resize();
+        $(el).bind('resize', this.resize);
+        window.addEventListener('resize', this.resize);
     },
 
-    componentWillUnmount: function() {
+    componentWillUnmount: function () {
         let el = this.refs.container.getDOMNode();
-        $(el).unbind('resize', this.handleResize);
-        window.removeEventListener('resize', this.handleResize);
+        $(el).unbind('resize', this.resize);
+        window.removeEventListener('resize', this.resize);
     },
 
     componentWillUpdate(nextProps, nextState) {
-        if(this.props.applicationId !=  nextProps.applicationId) {
+        if (this.props.applicationId != nextProps.applicationId) {
             this.setState({
                 isAddingComment: false,
                 isSendingMessage: false,
@@ -50,23 +47,14 @@ JobCandidateProfile = React.createClass({
         }
     },
 
-    handleResize() {
-        let el = this.refs.container.getDOMNode();
-        if($(el).width() != this.state.width) {
-            this.setState({
-                width: $(el).width()
-            });
-        }
-    },
-
     handleToggleAddComment(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isAddingComment;
         }
         state['isAddingComment'] = status;
 
-        if(status) {
+        if (status) {
             state['isSendingMessage'] = false;
             state['isScheduleInterview'] = false;
         }
@@ -75,12 +63,12 @@ JobCandidateProfile = React.createClass({
 
     handleToggleSendMessage(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isSendingMessage;
         }
         state['isSendingMessage'] = status;
 
-        if(status) {
+        if (status) {
             state['isAddingComment'] = false;
             state['isScheduleInterview'] = false;
         }
@@ -89,12 +77,12 @@ JobCandidateProfile = React.createClass({
 
     handleToggleScheduleInterview(status) {
         let state = {};
-        if(status === undefined) {
+        if (status === undefined) {
             status = !this.state.isScheduleInterview;
         }
         state['isScheduleInterview'] = status;
 
-        if(status) {
+        if (status) {
             state['isAddingComment'] = false;
             state['isSendingMessage'] = false;
         }
@@ -112,7 +100,7 @@ JobCandidateProfile = React.createClass({
 
     handleSaveScheduleInterview(event) {
         Meteor.call('scheduleInterview', this.props.job._id, this.props.applicationId, event, (err, result) => {
-            if(!err)
+            if (!err)
                 swal("Scheduled interview successfully!", "", "success");
         });
         this.handleDiscardScheduleInterview();
@@ -150,44 +138,30 @@ JobCandidateProfile = React.createClass({
         this.handleToggleScheduleInterview(false);
     },
 
+    resize: function() {
+        if (this.refs.container) {
+            const width = this.refs.container.getDOMNode().offsetWidth;
+            if(this.state.width != width) {
+                this.setState({width});
+            }
+        }
+    },
+
     render() {
         let content = null;
         if (this.data.isReady) {
             if (this.data.application) {
                 content = (
+
                     <div className="content">
                         <JobCandidateProfileActions
-                            job={this.props.job}
-                            stage={this.props.stage}
-                            application={this.data.application}
-                            candidate={this.data.candidate}
+                            {...this.props}
                             containerWidth={this.state.width}
-                            isAddingComment={this.state.isAddingComment}
-                            isSendingMessage={this.state.isSendingMessage}
-                            isScheduleInterview={this.state.isScheduleInterview}
-                            onToggleAddComment={this.handleToggleAddComment}
-                            onToggleSendMessage={this.handleToggleSendMessage}
-                            onToggleScheduleInterview={this.handleToggleScheduleInterview}
-                        />
+                            application={this.data.application} />
 
                         <JobCandidateProfileContent
-                            job={this.props.job}
-                            stage={this.props.stage}
-                            application={this.data.application}
-                            candidate={this.data.candidate}
-                            resume={this.data.resume}
-                            isAddingComment={this.state.isAddingComment}
-                            isSendingMessage={this.state.isSendingMessage}
-                            isScheduleInterview={this.state.isScheduleInterview}
-                            onToggleAddComment={this.handleToggleAddComment}
-                            onToggleSendMessage={this.handleToggleSendMessage}
-                            onToggleScheduleInterview={this.handleToggleScheduleInterview}
-                            onSaveComment={this.handleSaveComment}
-                            onSaveScheduleInterview={this.handleSaveScheduleInterview}
-                            onDiscardComment={this.handleDiscardComment}
-                            onDiscardMessage={this.handleDiscardMessage}
-                            onDiscardInterview={this.handleDiscardScheduleInterview}
-                        />
+                            {...this.props}
+                            application={this.data.application} />
                     </div>
                 );
             } else {
@@ -209,3 +183,34 @@ JobCandidateProfile = React.createClass({
         );
     }
 });
+
+/*
+ * job={this.props.job}
+ stage={this.props.stage}
+ application={this.data.application}
+ containerWidth={this.state.width}
+ isAddingComment={this.state.isAddingComment}
+ isSendingMessage={this.state.isSendingMessage}
+ isScheduleInterview={this.state.isScheduleInterview}
+ onToggleAddComment={this.handleToggleAddComment}
+ onToggleSendMessage={this.handleToggleSendMessage}
+ onToggleScheduleInterview={this.handleToggleScheduleInterview}
+ actions={ this.props.actions }
+ * */
+
+/*
+ job={this.props.job}
+ stage={this.props.stage}
+ application={this.data.application}
+ isAddingComment={this.state.isAddingComment}
+ isSendingMessage={this.state.isSendingMessage}
+ isScheduleInterview={this.state.isScheduleInterview}
+ onToggleAddComment={this.handleToggleAddComment}
+ onToggleSendMessage={this.handleToggleSendMessage}
+ onToggleScheduleInterview={this.handleToggleScheduleInterview}
+ onSaveComment={this.handleSaveComment}
+ onSaveScheduleInterview={this.handleSaveScheduleInterview}
+ onDiscardComment={this.handleDiscardComment}
+ onDiscardMessage={this.handleDiscardMessage}
+ onDiscardInterview={this.handleDiscardScheduleInterview}
+ >*/

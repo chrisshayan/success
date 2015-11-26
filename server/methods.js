@@ -218,157 +218,157 @@ Meteor.methods({
         return !!Collections.Applications.find(criteria).count();
     },
 
-
-    /**
-     * Update application qualify
-     * @param applicationId {Number}
-     */
-    disqualifyApplication: function (applicationId) {
-        try {
-            if (!this.userId) return false;
-            this.unblock();
-
-            check(applicationId, String);
-            var conditions = {
-                _id: applicationId
-            };
-            var application = Collections.Applications.findOne(conditions);
-
-            if (!application || application.disqualified == true) return;
-
-            var modifier = {
-                $set: {
-                    disqualified: true
-                }
-            }
-            var result = Collections.Applications.update(conditions, modifier);
-            if (result) {
-                // Log activity
-                var activity = new Activity();
-                activity.companyId = application.companyId;
-                activity.createdBy = this.userId;
-                activity.data = {
-                    applicationId: applicationId
-                };
-                activity.disqualifiedApplication();
-            }
-        } catch (e) {
-            debuger(e);
-        }
-    },
-
-
-    disqualifyApplications: function (ids) {
-        try {
-            if (!this.userId) return false;
-            var self = this;
-            this.unblock();
-
-            check(ids, [String]);
-
-            _.each(ids, function (_id) {
-                Meteor.defer(function () {
-                    var application = Collections.Applications.findOne({_id: _id});
-                    if (!application || application.disqualified == true) return;
-
-                    var modifier = {
-                        $set: {
-                            disqualified: true
-                        }
-                    }
-                    var result = Collections.Applications.update({_id: application._id}, modifier);
-                    if (result) {
-                        // Log activity
-                        var activity = new Activity();
-                        activity.companyId = application.companyId;
-                        activity.createdBy = self.userId;
-                        activity.data = {
-                            applicationId: application._id
-                        };
-                        activity.disqualifiedApplication();
-                    }
-                });
-            });
-
-        } catch (e) {
-            debuger(e);
-        }
-    },
-
-
-
-    revertQualifyApplications: function (ids) {
-        try {
-            if (!this.userId) return false;
-            var self = this;
-            this.unblock();
-
-            check(ids, [String]);
-
-            _.each(ids, function (_id) {
-                Meteor.defer(function () {
-                    var application = Collections.Applications.findOne({_id: _id});
-                    if (!application) return;
-                    var conditions = {
-                        _id: _id
-                    };
-                    var modifier = {
-                        $set: {
-                            disqualified: false
-                        }
-                    }
-                    var result = Collections.Applications.update(conditions, modifier);
-                    if (result) {
-                        // Log activity
-                        var activity = new Activity();
-                        activity.companyId = application.companyId;
-                        activity.createdBy = self.userId;
-                        activity.data = {
-                            applicationId: _id
-                        };
-                        activity.revertApplication();
-                    }
-                });
-            });
-
-        } catch (e) {
-            debuger(e);
-        }
-    },
-    /**
-     * Update application qualify
-     * @param applicationId {Number}
-     */
-    revertApplication: function (applicationId) {
-        try {
-            if (!this.userId) return false;
-            check(applicationId, String);
-            var application = Collections.Applications.findOne({_id: applicationId});
-            if (!application) return;
-            var conditions = {
-                _id: applicationId
-            };
-            var modifier = {
-                $set: {
-                    disqualified: false
-                }
-            }
-            var result = Collections.Applications.update(conditions, modifier);
-            if (result) {
-                // Log activity
-                var activity = new Activity();
-                activity.companyId = application.companyId;
-                activity.createdBy = this.userId;
-                activity.data = {
-                    applicationId: applicationId
-                };
-                activity.revertApplication();
-            }
-        } catch (e) {
-            debuger(e);
-        }
-        return result;
-    },
+    //
+    ///**
+    // * Update application qualify
+    // * @param applicationId {Number}
+    // */
+    //disqualifyApplication: function (applicationId) {
+    //    try {
+    //        if (!this.userId) return false;
+    //        this.unblock();
+    //
+    //        check(applicationId, String);
+    //        var conditions = {
+    //            _id: applicationId
+    //        };
+    //        var application = Collections.Applications.findOne(conditions);
+    //
+    //        if (!application || application.disqualified == true) return;
+    //
+    //        var modifier = {
+    //            $set: {
+    //                disqualified: true
+    //            }
+    //        }
+    //        var result = Collections.Applications.update(conditions, modifier);
+    //        if (result) {
+    //            // Log activity
+    //            var activity = new Activity();
+    //            activity.companyId = application.companyId;
+    //            activity.createdBy = this.userId;
+    //            activity.data = {
+    //                applicationId: applicationId
+    //            };
+    //            activity.disqualifiedApplication();
+    //        }
+    //    } catch (e) {
+    //        debuger(e);
+    //    }
+    //},
+    //
+    //
+    //disqualifyApplications: function (stage, ids) {
+    //    try {
+    //        if (!this.userId) return false;
+    //        var self = this;
+    //        this.unblock();
+    //
+    //        check(ids, [String]);
+    //
+    //        _.each(ids, function (_id) {
+    //            Meteor.defer(function () {
+    //                var application = Application.findOne({appId: appId});
+    //                if (!application || application.disqualified == true) return;
+    //
+    //                var modifier = {
+    //                    $push: {
+    //                        disqualified: stage
+    //                    }
+    //                }
+    //                var result = Application.update({_id: application._id}, modifier);
+    //                if (result) {
+    //                    // Log activity
+    //                    var activity = new Activity();
+    //                    activity.companyId = application.companyId;
+    //                    activity.createdBy = self.userId;
+    //                    activity.data = {
+    //                        applicationId: application._id
+    //                    };
+    //                    activity.disqualifiedApplication();
+    //                }
+    //            });
+    //        });
+    //
+    //    } catch (e) {
+    //        debuger(e);
+    //    }
+    //},
+    //
+    //
+    //
+    //revertQualifyApplications: function (stage, ids) {
+    //    try {
+    //        if (!this.userId) return false;
+    //        var self = this;
+    //        this.unblock();
+    //
+    //        check(ids, [String]);
+    //
+    //        _.each(ids, function (_id) {
+    //            Meteor.defer(function () {
+    //                var application = Collections.Applications.findOne({_id: _id});
+    //                if (!application) return;
+    //                var conditions = {
+    //                    _id: _id
+    //                };
+    //                var modifier = {
+    //                    $pull: {
+    //                        disqualified: stage
+    //                    }
+    //                }
+    //                var result = Collections.Applications.update(conditions, modifier);
+    //                if (result) {
+    //                    // Log activity
+    //                    var activity = new Activity();
+    //                    activity.companyId = application.companyId;
+    //                    activity.createdBy = self.userId;
+    //                    activity.data = {
+    //                        applicationId: _id
+    //                    };
+    //                    activity.revertApplication();
+    //                }
+    //            });
+    //        });
+    //
+    //    } catch (e) {
+    //        debuger(e);
+    //    }
+    //},
+    ///**
+    // * Update application qualify
+    // * @param applicationId {Number}
+    // */
+    //revertApplication: function (applicationId) {
+    //    try {
+    //        if (!this.userId) return false;
+    //        check(applicationId, String);
+    //        var application = Collections.Applications.findOne({_id: applicationId});
+    //        if (!application) return;
+    //        var conditions = {
+    //            _id: applicationId
+    //        };
+    //        var modifier = {
+    //            $set: {
+    //                disqualified: false
+    //            }
+    //        }
+    //        var result = Collections.Applications.update(conditions, modifier);
+    //        if (result) {
+    //            // Log activity
+    //            var activity = new Activity();
+    //            activity.companyId = application.companyId;
+    //            activity.createdBy = this.userId;
+    //            activity.data = {
+    //                applicationId: applicationId
+    //            };
+    //            activity.revertApplication();
+    //        }
+    //    } catch (e) {
+    //        debuger(e);
+    //    }
+    //    return result;
+    //},
 
     /**
      * Update company mail signature
@@ -987,3 +987,20 @@ Meteor.methods({
         return !!activityId;
     }
 });
+
+
+Meteor.methods({
+    getResumeDetails: function(appId) {
+        if(!this.userId) return null;
+        this.unblock();
+        try {
+            const req = HTTP.get('http://localhost:4000/api/resume');
+            if(req.statusCode === 200) {
+                return EJSON.parse(req.content);
+            }
+        } catch (e) {
+            console.trace(e);
+        }
+        return null;
+    }
+})

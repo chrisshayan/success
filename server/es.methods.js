@@ -6,6 +6,14 @@ var ESSearch = Meteor.wrapAsync(function (query, cb) {
     });
 });
 
+var ESSuggest = Meteor.wrapAsync(function (query, cb) {
+    ES.suggest(query).then(function (body) {
+        cb(null, body)
+    }, function (error) {
+        cb(error, {});
+    });
+});
+
 var methods = {};
 methods.jobListCount = function () {
     const counter = {online: 0, expired: 0};
@@ -67,7 +75,7 @@ methods.getJobInfo = function (jobId) {
     let job = new ESJob();
     if (this.userId) {
         try {
-            if(jobId) {
+            if (jobId) {
                 const result = ESSearch({
                     index: 'vietnamworks',
                     type: 'job',
@@ -82,10 +90,16 @@ methods.getJobInfo = function (jobId) {
                         const data = hits[0]['_source'];
                         job = new ESJob(data);
                         const level = Meteor.job_levels.findOne({vnwId: data.jobLevelId});
-                        job.jobLevel =  level && level.name ? level.name : '';
-                        job.cities = Meteor.cities.find({languageId: 2,vnwId: {$in: data.cityList}}, {fields: {name: 1}}).fetch();
+                        job.jobLevel = level && level.name ? level.name : '';
+                        job.cities = Meteor.cities.find({
+                            languageId: 2,
+                            vnwId: {$in: data.cityList}
+                        }, {fields: {name: 1}}).fetch();
                         const industryIds = _.pluck(job.industries, 'industryId');
-                        job.industries = Meteor.industries.find({languageId: 2,vnwId: {$in: industryIds}}, {fields: {name: 1}}).fetch();
+                        job.industries = Meteor.industries.find({
+                            languageId: 2,
+                            vnwId: {$in: industryIds}
+                        }, {fields: {name: 1}}).fetch();
                     }
                 }
             }
@@ -95,5 +109,19 @@ methods.getJobInfo = function (jobId) {
     }
     return job;
 };
+
+methods.suggestSkills = function () {
+    return ESSuggest({
+        index: 'suggester',
+        body: {
+            "skill": {
+                "text": "php",
+                "completion": {
+                    "field": "skillNameSuggest"
+                }
+            }
+        }
+    });
+}
 
 Meteor.methods(methods);

@@ -5,61 +5,13 @@ let {
 
 
 JobHeader = React.createClass({
-    mixins: [ReactMeteorData],
-
     propTypes: {
         job: React.PropTypes.object.isRequired
     },
 
-    getMeteorData() {
-        let job = this.props.job;
-        let filter = {
-            _id: {$ne: job._id},
-            status: job.status
-        };
-        let opt = {
-            limit: 5,
-            sort: {
-                createdAt: -1
-            }
-        };
-        return {
-            relatedJobs: Collections.Jobs.find(filter, opt).fetch()
-        };
-    },
-
-    currentJobTitle() {
-        return this.props.job.title || '';
-    },
-
-    handleSelectTag(tag) {
-        var jobId = this.props.job._id;
-        var tags = this.props.job.tags || [];
-        tags.push(tag.skillName);
-        tags = _.unique(tags);
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
-    handleRemoveLastTag() {
-        var jobId = this.props.job._id;
-        var tags = this.props.job.tags || [];
-        if (!_.isEmpty(tags)) {
-            tags.pop();
-            tags = _.unique(tags);
-        }
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
-    handleRemoveTag(tag) {
-        let jobId = this.props.job._id,
-            tags = this.props.job.tags;
-        tags = _.without(tags, tag);
-        Meteor.call('updateJobTags', jobId, tags);
-    },
-
     jobSettingUrl() {
-        return Router.url('teamSettings', {
-            jobId: this.props.job._id
+        return Router.url('JobSettings', {
+            jobId: this.props.job.jobId
         });
     },
 
@@ -95,15 +47,19 @@ JobHeader = React.createClass({
 
         return (
             <div className="row wrapper border-bottom white-bg">
-                <div className="col-lg-6">
+                <div className="col-lg-12">
                     <DropdownButton
                         id="jobSwitch"
                         bsStyle={'link'}
                         style={styles.title}
-                        title={ this.currentJobTitle() }
+                        title={ this.props.job.jobTitle }
                         key={0}>
 
-                        { this.data.relatedJobs.map(this.renderRelatedJobs) }
+
+                        <MenuItem href="/job-new/561260/applied">Helo </MenuItem>
+                        <MenuItem href="/job-new/561259/applied">Helo </MenuItem>
+                        <MenuItem href="/job-new/561195/applied">Helo </MenuItem>
+                        <MenuItem href="/job-new/561260/applied">Helo </MenuItem>
 
                     </DropdownButton>
 
@@ -113,25 +69,10 @@ JobHeader = React.createClass({
                     </a>
                 </div>
 
-                <div className="col-lg-6 text-right ">
-                    <div style={styles.actions} className="hidden">
-                        <a href="#" className="btn btn-primary btn-outline">
-                            <i className="fa fa-plus"></i>&nbsp;
-                            Add candidate
-                        </a>
-                    </div>
-                </div>
-
                 <div className="col-md-12">
-                    <div style={styles.tags}>
-                        {this.props.job.tags && this.props.job.tags.map(this.renderTag)}
+                    <div style={{paddingBottom: '10px'}}>
+                        {this.props.job.skills && this.props.job.skills.map(this.renderTag)}
                     </div>
-
-                    <TagsInput
-                        onSelect={this.handleSelectTag}
-                        onRemoveLastTag={this.handleRemoveLastTag}
-                        placeholder={"click to add labels to your job"}
-                        style={styles.tagsInput} />
                 </div>
             </div>
         );
@@ -147,22 +88,7 @@ JobHeader = React.createClass({
         return <MenuItem key={key} eventKey={key} style={styles.relatedTitle} href={jobUrl}> {job.title} </MenuItem>
     },
 
-    renderTag(tag, key) {
-        var styles = {
-            tag: {
-                marginRight: '3px'
-            },
-            closeBtn: {
-                cursor: 'pointer'
-            }
-        };
-        return (
-            <span className="label" key={key} style={styles.tag}>
-                {tag} &nbsp;
-                <span onClick={() => {this.handleRemoveTag(tag)}} style={styles.closeBtn}>
-                    x
-                </span>
-            </span>
-        );
+    renderTag(skill, key) {
+        return <span key={key} className="tag-item">{ skill.skillName }</span>;
     }
 });

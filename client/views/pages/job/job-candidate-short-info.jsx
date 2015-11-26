@@ -6,35 +6,32 @@ JobCandidateShortInfo = React.createClass({
         return null;
     },
     fullname() {
-        let can = this.props.application.candidateInfo;
-        return can.fullname;
+        return this.props.application.fullname;
     },
     headline() {
-        let candidate = this.props.candidate.data;
-        return candidate && candidate.jobtitle ? candidate.jobtitle : '';
+        return 'Meteor developer';
     },
     birthday() {
-        let candidate = this.props.candidate.data;
-        return candidate && candidate.birthday ? moment(candidate.birthday).calendar() : '';
+        const app = this.props.application;
+        if (app['dob'])
+            return moment(app.dob).calendar();
+        return '';
     },
     email() {
-        let candidate = this.props.application.candidateInfo;
-        return candidate.emails && candidate.emails.length ? candidate.emails[0] : '';
+        return this.props.application.emails.join(', ');
     },
     city() {
-        let candidate = this.props.candidate.data;
-        return candidate && candidate.city ? candidate.city : '';
+        return this.props.application.cityName;
     },
     phone() {
-        let candidate = this.props.candidate.data;
-        return candidate && candidate.cellphone ? candidate.cellphone : '';
+        return '';
     },
 
     picture() {
         let letter = '';
         let app = this.props.application;
-        if(app && app['candidateInfo'] && app['candidateInfo']['firstName']) {
-            letter = app['candidateInfo']['firstName'][0];
+        if (app && app['firstname']) {
+            letter = app['firstname'][0];
         }
         return `https://placeholdit.imgix.net/~text?txtsize=40&txt=${letter}&w=80&h=80`;
     },
@@ -53,14 +50,6 @@ JobCandidateShortInfo = React.createClass({
                         <div style={{marginBottom: "5px"}}>
                             <img src={this.picture()} alt="" className="img-thumbnail"/>
                         </div>
-                        {this.matchingScore()
-                            ?(  <div>
-                                    <span className="mc-score block text-right small">
-                                        <div>{this.matchingScore()}</div>
-                                        <span className="mc-logo"/>
-                                    </span>
-                        </div> )
-                            : null }
                         {this.props.application.disqualified
                             ? (
                         <div>
@@ -70,13 +59,25 @@ JobCandidateShortInfo = React.createClass({
                     </div>
                     <div className="col-md-10">
                         <div className="ibox">
-                            <div style={{padding: '15px 0'}}>
+                            <div>
                                 <div className="row">
                                     <div className="col-md-6">
                                         <h2 style={styles.clearMP}>
                                             {this.fullname()}
                                         </h2>
                                         <h3>{this.headline()}</h3>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        {this.matchingScore()
+                                            ? (  <div>
+                                                    <span className="mc-score block text-right small">
+                                                        <div>{this.matchingScore()}</div>
+                                                        <span className="mc-logo"/>
+                                                    </span>
+                                                </div>
+                                            )
+                                            : null }
                                     </div>
                                 </div>
 
