@@ -14,7 +14,7 @@ var model = Astro.Class({
         },
         createBy: {
             type: 'string',
-            default: 'vnw'
+            default: ()=> 'vnw'
         },
         ref: {
             type: 'object',
@@ -23,7 +23,8 @@ var model = Astro.Class({
         },
         content: {
             type: 'object',
-            default: ()=> {}
+            default: ()=> {
+            }
         },
         displayMessage: {
             type: 'string',
@@ -45,8 +46,12 @@ Collection = model.getCollection();
 
 
 if (Meteor.isServer) {
-    Collection.before.insert((userId, doc)=> {
-        doc.fullname = [doc.firstname, doc.lastname].join(' ').trim();
+    var AppCollection = Application.getCollection();
+    AppCollection.after.insert(function (userId, doc) {
+        let ref = {appId: doc.appId, candidateId: doc.candidateId, jobId: doc.jobId}
+            , content = {appliedDate: doc.appliedDate};
+
+        Meteor.call('activities.newApplication', ref, content);
     })
 }
 

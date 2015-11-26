@@ -113,6 +113,9 @@ Meteor.methods({
      */
     getApplicationDetails: function (applicationId) {
         try {
+            console.log(this.userId);
+            console.log(Meteor.userId());
+
             if (!this.userId) return false;
             // validate client request
             check(applicationId, String);

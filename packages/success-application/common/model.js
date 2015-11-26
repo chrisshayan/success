@@ -134,5 +134,5 @@ Collection = model.getCollection();
 if (Meteor.isServer) {
     Collection.before.insert((userId, doc)=> {
         doc.fullname = [doc.firstname, doc.lastname].join(' ').trim();
-    })
+    });
 }

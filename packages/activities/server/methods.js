@@ -3,9 +3,10 @@
  */
 
 var logActivities = (typeString, ref, content, createBy)=> {
-    if (!this.userId()) return false;
+    if (!ref.userId) return false;
 
     var activity = new Activities();
+
     var typeCode = Core.getConfig(MODULE_NAME, typeString);
 
     activity.set('type', typeCode);
@@ -14,7 +15,7 @@ var logActivities = (typeString, ref, content, createBy)=> {
 
     content && activity.set('content', content);
 
-    activity.set('createBy', createBy);
+    activity.set('createBy', createBy || ref.userId);
 
     Meteor.defer(()=> {
         activity.save();
@@ -24,7 +25,7 @@ var logActivities = (typeString, ref, content, createBy)=> {
 
 var methods = {
     // ref: {appId, candidateId, jobId}, content: { appliedDate}
-    newApplication: (ref, content) => {
+    newApplication: function (ref, content) {
         let typeString = 'APPLICATION_CREATE'
             , createBy = 'vnw';
 
@@ -32,33 +33,33 @@ var methods = {
     },
 
     //ref : {arrayAppId, jobId}
-    deleteApplication: (ref) => {
+    deleteApplication: function (ref) {
         let typeString = 'APPLICATION_DELETE'
             , createBy = 'vnw';
 
         logActivities(typeString, ref, null, createBy);
 
     },
-    // ref : {jobId}, content: { numOfApplication, isByUser}
-    syncedJobDone: (ref, content) => {
+    // ref : {jobId, userId}, content: { numOfApplication, isByUser}
+    syncedJobDone: function (ref, content) {
         let typeString = 'JOB_SYNC_DONE'
-            , createBy = content['isByUser'] ? this.userId() : 'vnw';
+            , createBy = content['isByUser'] ? null : 'vnw';
 
         logActivities(typeString, ref, content, createBy);
     },
 
-    // ref : {jobId} , content :{ isByUser}
-    syncedJobFailed: (ref, content) => {
+    // ref : {jobId, userId} , content :{ isByUser}
+    syncedJobFailed: function (ref, content) {
         let typeString = 'JOB_SYNC_FAILED'
-            , createBy = content['isByUser'] ? this.userId() : 'vnw';
+            , createBy = content['isByUser'] ? null : 'vnw';
 
         logActivities(typeString, ref, content, createBy);
     },
 
-    // ref : {appId, candidateId} , content : { message }
+    // ref : {appId, candidateId, userId} , content : { message }
     addComment: (ref, content) => {
         let typeString = 'RECRUITER_CREATE_COMMENT'
-            , createBy = this.userId();
+            , createBy = null;
 
         var application = Application.findOne({appId: ref.appId});
         if (!application) return false;
@@ -66,10 +67,10 @@ var methods = {
         logActivities(typeString, ref, content, createBy);
     },
 
-    //arrayAppId, emailBody
-    sendMessage: function (arrayAppId, emailBody) {
+    //arrayAppId, emailBody, userId
+    sendMessage: function (arrayAppId, emailBody, userId) {
         let typeString = 'RECRUITER_CREATE_EMAIL'
-            , createBy = this.userId()
+            , createBy = null
             , ref = null
             , content = null;
 
@@ -78,7 +79,8 @@ var methods = {
             if (!application) return false;
 
             ref = {
-                appId: appId
+                appId: appId,
+                userId: userId
             };
 
             content = {
@@ -90,10 +92,10 @@ var methods = {
 
     },
 
-    // arrayAppId
-    disqualified: (arrayEffect) => {
+    // arrayAppId, userId
+    disqualified: (arrayEffect, userId) => {
         let typeString = 'RECRUITER_DISQUALIFIED'
-            , createBy = this.userId()
+            , createBy = null
             , ref = null
             , content = null;
 
@@ -107,7 +109,8 @@ var methods = {
 
             ref = {
                 candidateId: application.candidateId,
-                appId: application.appId
+                appId: application.appId,
+                userId: userId
             };
 
             logActivities(typeString, ref, content, createBy);
@@ -115,10 +118,10 @@ var methods = {
 
     },
 
-    // arrayAppId
-    reverseDisqualified: (arrayEffect) => {
+    // arrayAppId, userId
+    reverseDisqualified: (arrayEffect, userId) => {
         let typeString = 'RECRUITER_REVERSE_QUALIFIED'
-            , createBy = this.userId()
+            , createBy = null
             , ref = null
             , content = null;
 
@@ -133,7 +136,8 @@ var methods = {
 
             ref = {
                 candidateId: application.candidateId,
-                appId: application.appId
+                appId: application.appId,
+                userId: userId
             };
 
             logActivities(typeString, ref, content, createBy);
@@ -141,24 +145,24 @@ var methods = {
 
     },
 
-    //ref : {appId} , conent  : { from , to }
+    //ref : {appId, userId} , conent  : { from , to }
     changeStage: (ref, content)=> {
         let typeString = 'APPLICATION_STAGE_UPDATE'
-            , createBy = this.userId();
+            , createBy = null;
 
         logActivities(typeString, ref, content, createBy);
     },
     // ref : {appId, candidateId, arrayRecruiter} , content :{ datetime, emailBody}
     scheduleInterview: (ref, content)=> {
         let typeString = 'RECRUITER_SCHEDULE'
-            , createBy = this.userId();
+            , createBy = null;
 
         logActivities(typeString, ref, content, createBy);
     },
     // ???
     scoreCandidate: (ref, content) => {
         let typeString = 'RECRUITER_SCORE_CANDIDATE'
-            , createBy = this.userId();
+            , createBy = null;
 
         logActivities(typeString, ref, content, createBy);
     }

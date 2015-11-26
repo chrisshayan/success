@@ -3,6 +3,8 @@
  */
 
 
+var self = this;
+
 var VNW_QUERIES = Meteor.settings.cronQueries;
 
 var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
@@ -15,11 +17,12 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
-var getApplicationByJobId = (job, cb)=> {
-    var JobExtraCollection = JobExtra.getCollection();
-    var appCollection = Application.getCollection();
-    var data = job.data;
-    var jobId = data.jobId;
+var getApplicationByJobId = function (job, cb) {
+    var JobExtraCollection = JobExtra.getCollection()
+        , appCollection = Application.getCollection()
+        , data = job.data
+        , jobId = data.jobId
+        , userId = data.userId;
 
     if (!data.jobId || !data.companyId)
         j.done();
@@ -86,10 +89,13 @@ var getApplicationByJobId = (job, cb)=> {
                 currentJob.save();
 
                 Meteor.call('activities.syncedJobDone', {
-                    jobId: currentJob._id,
-                    numOfApplication: appStages.length,
-                    isByUser: false
-                });
+                        jobId: currentJob.jobId,
+                        userId: userId
+                    },
+                    {
+                        numOfApplication: appStages.length,
+                        isByUser: false
+                    });
             }
 
 
@@ -102,9 +108,12 @@ var getApplicationByJobId = (job, cb)=> {
                 failedJob.save();
 
                 Meteor.call('activities.syncedJobFailed', {
-                    jobId: failedJob._id,
-                    isByUser: false
-                });
+                        jobId: failedJob.jobId,
+                        userId: userId
+                    },
+                    {
+                        isByUser: false
+                    });
 
             }
             console.trace(e);

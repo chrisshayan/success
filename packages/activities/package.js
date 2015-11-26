@@ -26,7 +26,7 @@ Package.onUse(function (api) {
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
     /* imply changes */
-    api.imply('vnw:core');
+    api.imply(['vnw:core', 'vnw:user']);
     /* export */
     api.export('Activities');
 

@@ -53,7 +53,8 @@ pubs.ESJobs = function (type, limit, q) {
 
                 var data = {
                     jobId: extra.jobId,
-                    companyId: extra.companyId
+                    companyId: extra.companyId,
+                    userId: this.userId || this.userId()
                 };
 
                 addToJobCollection('getApplications', data);
@@ -85,9 +86,9 @@ pubs.ESJobs = function (type, limit, q) {
     });
 };
 
-pubs.JobExtra = function(jobId) {
+pubs.JobExtra = function (jobId) {
     check(jobId, Number);
-    if(!this.userId) return null;
+    if (!this.userId) return null;
     return JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
 };
 
