@@ -2,3 +2,5 @@
 
 
 Application = {};
+
+MODULE_NAME = 'application';

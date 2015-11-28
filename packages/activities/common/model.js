@@ -26,11 +26,6 @@ var model = Astro.Class({
             default: ()=> {
             }
         },
-        displayMessage: {
-            type: 'string',
-            optional: true,
-            default: ''
-        },
         createdAt: {
             type: 'date',
             default: ()=> new Date()
@@ -48,8 +43,14 @@ Collection = model.getCollection();
 if (Meteor.isServer) {
     var AppCollection = Application.getCollection();
     AppCollection.after.insert(function (userId, doc) {
-        let ref = {appId: doc.appId, candidateId: doc.candidateId, jobId: doc.jobId}
-            , content = {appliedDate: doc.appliedDate};
+        let ref = {
+            appId: doc.appId,
+            candidateId: doc.candidateId,
+            jobId: doc.jobId
+        }
+            , content = {
+            appliedDate: doc.appliedDate
+        };
 
         Meteor.call('activities.newApplication', ref, content);
     })

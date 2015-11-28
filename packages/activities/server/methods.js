@@ -3,8 +3,6 @@
  */
 
 var logActivities = (typeString, ref, content, createBy)=> {
-    if (!ref.userId) return false;
-
     var activity = new Activities();
 
     var typeCode = Core.getConfig(MODULE_NAME, typeString);

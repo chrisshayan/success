@@ -3,7 +3,6 @@
  */
 
 
-var CONFIG = {
-};
+var CONFIG = {};
 
-Core.registerConfig('candidate', CONFIG);
+Core.registerConfig(MODULE_NAME, CONFIG);

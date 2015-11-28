@@ -2,11 +2,11 @@
  * Created by HungNguyen on 8/21/15.
  */
 
-var moduleName = 'application';
-var mongoCollection = new Mongo.Collection(moduleName);
+
+var mongoCollection = new Mongo.Collection(MODULE_NAME);
 
 var model = Astro.Class({
-    name: moduleName,
+    name: MODULE_NAME,
     collection: mongoCollection,
     fields: {
         appId: {
