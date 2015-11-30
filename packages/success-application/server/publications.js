@@ -109,7 +109,7 @@ Publications.application = function (appId) {
     if (!this.userId || !appId) return this.ready();
     return {
         find: function () {
-            var filters = {jobId: appId};
+            var filters = {appId: appId};
             var options = {limit: 1};
             return Application.find(filters, options);
         }
