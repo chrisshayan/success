@@ -3,6 +3,15 @@
  */
 
 
+function formatDatetimeFromVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = 420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
+
 var mongoCollection = new Mongo.Collection(MODULE_NAME);
 
 var model = Astro.Class({
@@ -90,7 +99,7 @@ var model = Astro.Class({
         },
         updatedAt: {
             type: 'date',
-            optional: true
+            default: ()=> new Date()
         }
 
     }, // schema
@@ -148,7 +157,8 @@ if (Meteor.isServer) {
             type: Activities.TYPE['APPLICATION_CREATE'],
             ref: ref,
             content: content,
-            createdBy: doc.appliedDate
+            createdBy: createdBy,
+            createdAt: formatDatetimeFromVNW(doc.appliedDate)
         });
         activity.save();
 

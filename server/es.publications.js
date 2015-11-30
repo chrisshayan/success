@@ -53,8 +53,7 @@ pubs.ESJobs = function (type, limit, q) {
 
                 var data = {
                     jobId: extra.jobId,
-                    companyId: extra.companyId,
-                    userId: this.userId || this.userId()
+                    companyId: extra.companyId
                 };
 
                 addToJobCollection('getApplications', data);

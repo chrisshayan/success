@@ -40,13 +40,13 @@ Router.onBeforeAction(Iron.Router.bodyParser.json({limit: '50mb'}));
 function authWebhookToken() {
     try {
         var token = this.request.headers['x-access-token'];
-        if(!token || !IZToken.decode(token)) {
+        if (!token || !IZToken.decode(token)) {
             this.response.writeHead(400);
             this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
         } else {
             this.next();
         }
-    }  catch (e) {
+    } catch (e) {
         console.trace('Received request to application hook: ', e);
         this.response.writeHead(400);
         this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
@@ -89,13 +89,17 @@ Astro.createType({
     constructor: function Type(fieldDefinition) {
 
     },
-    getDefault: function(defaultValue) {
+    getDefault: function (defaultValue) {
         return {};
     },
-    cast: function(value) {},
-    needsCast: function(value) {},
-    plain: function(value) {},
-    needsPlain: function(value) {}
+    cast: function (value) {
+    },
+    needsCast: function (value) {
+    },
+    plain: function (value) {
+    },
+    needsPlain: function (value) {
+    }
 });
 
 Resume = Astro.Class({
@@ -114,6 +118,45 @@ Resume = Astro.Class({
     }
 });
 
+Router.route('/webhook/application', {
+    where: 'server',
+    onBeforeAction: authWebhookToken,
+    action: function () {
+        try {
+            var data = this.request.body
+                , cond = false;
+            check(data, {
+                jobId: Number,
+                entryId: Number,
+                source: Number
+            });
+            var type = null;
+            switch (this.request.method.toLowerCase()) {
+                case 'post':
+                    type = 'addApplication';
+                    cond = Application.findOne({appId: data.appId});
+                    break;
+                case 'put':
+                    type = 'updateApplication';
+                    break;
+            }
+            if (data.jobId
+                && JobExtra.findOne({jobId: data.jobId})
+                && !cond) {
+                type && SYNC_VNW.addQueue(type, data);
+            }
+
+            this.response.writeHead(200);
+            this.response.end(EJSON.stringify({success: true, msg: ''}));
+        } catch (e) {
+            console.trace('Received request to application hook: ', e);
+            this.response.writeHead(400);
+            this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
+        }
+        return true;
+    }
+});
+
 
 Router.route('/api/resume', {
     where: 'server',
@@ -125,13 +168,13 @@ Router.route('/api/resume', {
 });
 
 
-function  createMockupResume() {
+function createMockupResume() {
     var resume = {
         fullname: faker.name.findName(),
         coverLetter: faker.lorem.paragraph(),
         phone: [],
         emails: [],
-        yearOfExperience: _.random(1,10),
+        yearOfExperience: _.random(1, 10),
         currentJobLevel: '',
         careerObjective: '',
         recentPosition: faker.name.jobTitle(),
@@ -144,22 +187,22 @@ function  createMockupResume() {
     };
 
     // add phone
-    _.each(_.range(_.random(0,3)), () => {
+    _.each(_.range(_.random(0, 3)), () => {
         resume.phone.push(faker.phone.phoneNumber());
     });
 
     // add emails
-    _.each(_.range(_.random(0,3)), () => {
+    _.each(_.range(_.random(0, 3)), () => {
         resume.emails.push(faker.internet.email());
     });
 
     // add educations
-    _.each(_.range(_.random(0,3)), () => {
+    _.each(_.range(_.random(0, 3)), () => {
         const start = new moment();
         const end = new moment();
         let step = _.random(12, 24);
-        start.subtract(step,'month');
-        end.subtract(step - _.random(1,12),'month');
+        start.subtract(step, 'month');
+        end.subtract(step - _.random(1, 12), 'month');
 
         resume.education.push({
             school: faker.company.companyName(),
@@ -171,12 +214,12 @@ function  createMockupResume() {
     });
 
     // add experience
-    _.each(_.range(_.random(0,3)), () => {
+    _.each(_.range(_.random(0, 3)), () => {
         const start = new moment();
         const end = new moment();
         let step = _.random(12, 24);
-        start.subtract(step,'month');
-        end.subtract(step - _.random(1,12),'month');
+        start.subtract(step, 'month');
+        end.subtract(step - _.random(1, 12), 'month');
 
         resume.experience.push({
             company: faker.company.companyName(),
@@ -188,13 +231,13 @@ function  createMockupResume() {
         });
     })
 
-    if(resume.experience.length > 0) {
+    if (resume.experience.length > 0) {
         const currentCompanyIndex = _.random(0, resume.experience.length - 1);
         resume.experience[currentCompanyIndex].isCurrent = true;
     }
 
     // add references
-    _.each(_.range(_.random(0,3)), () => {
+    _.each(_.range(_.random(0, 3)), () => {
         resume.reference.push({
             name: faker.name.findName(),
             title: faker.name.jobTitle(),
@@ -205,9 +248,9 @@ function  createMockupResume() {
         });
     });
 
-    _.each(_.range(_.random(0,2)), () => {
+    _.each(_.range(_.random(0, 2)), () => {
         resume.attachments.push({
-           url: 'https://career.berkeley.edu/sites/default/files/pdf/Guide/ResumeLetterWriting.pdf'
+            url: 'https://career.berkeley.edu/sites/default/files/pdf/Guide/ResumeLetterWriting.pdf'
         });
     });
 

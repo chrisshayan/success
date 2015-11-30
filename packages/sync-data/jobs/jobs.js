@@ -100,33 +100,9 @@ function getApplications(jobId) {
 }
 
 var Jobs = {
-    addJobs: function (jc, cb) {
+    addNewJob: function (jc, cb) {
         try {
-            var data = jc.data; // userId, companyId, jobId
-
-            console.log('start add job: ', data);
-            var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
-
-            if (!mongoJob) {
-                var getJobQuery = sprintf(VNW_QUERIES.pullJob, data.jobId);
-                var cJobs = fetchVNWData(getJobQuery);
-
-                cJobs.forEach(function (row) {
-                    var job = processJob(row, data.companyId);
-                    //Collections.Jobs.insert(job);
-
-                    if (!job.isExist()) {
-                        sJobCollections.addJobtoQueue('updateJob', data);
-                    } else {
-                        Collections.Jobs.insert(job);
-                        getApplications(job.jobId);
-                    }
-
-                });
-                console.log('job added');
-            }
-            console.log('end add job');
-
+            //refresh??
 
             jc.done();
             cb();
@@ -136,32 +112,13 @@ var Jobs = {
         }
 
     },
-    updateJobs: function (jc, cb) {
+    updateJob: function (jc, cb) {
         try {
             var data = jc.data; // userId, companyId, jobId
 
             console.log('start update job: ', data);
 
-            var mongoJob = Collections.Jobs.findOne({jobId: data.jobId});
-
-            if (mongoJob) {
-                var getJobQuery = sprintf(VNW_QUERIES.pullJob, data.jobId);
-                var cJobs = fetchVNWData(getJobQuery);
-
-                if (cJobs.length) {
-
-                    cJobs.forEach(function (row) {
-                        var job = processJob(row, data.companyId);
-
-                        var query = {jobId: data.jobId};
-                        var modifier = {
-                            '$set': job
-                        };
-                        Collections.Jobs.update(query, modifier);
-
-                    });
-                }
-            }
+            //refresh??
 
             jc.done();
             cb();
@@ -174,5 +131,5 @@ var Jobs = {
     }
 };
 
-sJobCollections.registerJobs('addJob', Jobs.addJobs);
-sJobCollections.registerJobs('updateJob', Jobs.updateJobs);
+sJobCollections.registerJobs('addJob', Jobs.addNewJob);
+sJobCollections.registerJobs('updateJob', Jobs.updateJob);

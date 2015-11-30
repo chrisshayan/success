@@ -2,8 +2,14 @@
  * Created by HungNguyen on 11/18/15.
  */
 
-
-var self = this;
+function formatDatetimeFromVNW(datetime) {
+    var d = moment(datetime);
+    var offsetBase = 420;
+    var offsetServer = new Date().getTimezoneOffset();
+    var subtract = offsetBase + offsetServer;
+    d.subtract(subtract, 'minute');
+    return d.toDate();
+}
 
 var VNW_QUERIES = Meteor.settings.cronQueries;
 
@@ -21,8 +27,7 @@ var getApplicationByJobId = function (job, cb) {
     var JobExtraCollection = JobExtra.getCollection()
         , appCollection = Application.getCollection()
         , data = job.data
-        , jobId = data.jobId
-        , userId = data.userId;
+        , jobId = data.jobId;
 
     if (!data.jobId || !data.companyId)
         j.done();
@@ -56,7 +61,7 @@ var getApplicationByJobId = function (job, cb) {
                     var emails = _.unique((info.emails) ? info.emails.split('|') : []);
 
                     application.set('emails', emails);
-                    application.set('appliedDate', info.appliedDate);
+                    application.set('appliedDate', formatDatetimeFromVNW(info.appliedDate));
                 }
 
                 application.set('isDeleted', !!(info.isDeleted)); // the only field update
@@ -87,19 +92,6 @@ var getApplicationByJobId = function (job, cb) {
 
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
-
-                /*let activity = new Activities({
-                    type: Activities.TYPE['JOB_SYNC_DONE'],
-                    ref: {
-                        jobId: currentJob.jobId
-                    },
-                    content: {
-                        numOfApplication: appStages.length
-                    },
-                    createdBy: 'vnw'
-
-                });
-                activity.save();*/
             }
 
 
@@ -110,17 +102,6 @@ var getApplicationByJobId = function (job, cb) {
                 var failedJob = JobExtraCollection.findOne({jobId: jobId});
                 failedJob.set('syncState', 'syncFailed');
                 failedJob.save();
-
-                /*let activity = new Activities({
-                    type: Activities.TYPE['JOB_SYNC_FAILED'],
-                    ref: {
-                        jobId: failedJob.jobId
-                    },
-                    content: {},
-                    createdBy: 'vnw'
-                });
-
-                activity.save();*/
             }
             console.trace(e);
         }

@@ -75,7 +75,7 @@ SuccessESQuery = {
         };
     },
 
-    onlineJob (companyId, keyword="*") {
+    onlineJob (companyId, keyword = "*") {
         return {
             "_source": [
                 "userId",
@@ -173,7 +173,7 @@ SuccessESQuery = {
         };
     },
 
-    expiredJob (companyId, keyword="*") {
+    expiredJob (companyId, keyword = "*") {
         return {
             "_source": [
                 "userId",
@@ -266,20 +266,34 @@ SuccessESQuery = {
         };
     },
 
-    getJobInfo(jobId=0) {
-      return {
-          "query": {
-              "term": {
-                  "jobId": {
-                      "value": jobId
-                  }
-              }
-          }
-      };
+    getJobInfo(jobId = 0) {
+        return {
+            "query": {
+                "term": {
+                    "jobId": {
+                        "value": jobId
+                    }
+                }
+            }
+        };
+    },
+
+    getMultiJobsInfo(arrayJobId = []){
+        return {
+            "query": {
+                "filtered": {
+                    "filter": {
+                        "terms": {
+                            "jobId": arrayJobId
+                        }
+                    }
+                }
+            }
+        }
     },
 
     // get company info by companyId
-    getCompanyInfo(companyId=0) {
+    getCompanyInfo(companyId = 0) {
         return {
             "query": {
                 "term": {
