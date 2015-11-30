@@ -88,7 +88,7 @@ var getApplicationByJobId = function (job, cb) {
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
 
-                let activity = new Activities({
+                /*let activity = new Activities({
                     type: Activities.TYPE['JOB_SYNC_DONE'],
                     ref: {
                         jobId: currentJob.jobId
@@ -99,7 +99,7 @@ var getApplicationByJobId = function (job, cb) {
                     createdBy: 'vnw'
 
                 });
-                activity.save();
+                activity.save();*/
             }
 
 
@@ -111,8 +111,7 @@ var getApplicationByJobId = function (job, cb) {
                 failedJob.set('syncState', 'syncFailed');
                 failedJob.save();
 
-
-                let activity = new Activities({
+                /*let activity = new Activities({
                     type: Activities.TYPE['JOB_SYNC_FAILED'],
                     ref: {
                         jobId: failedJob.jobId
@@ -121,7 +120,7 @@ var getApplicationByJobId = function (job, cb) {
                     createdBy: 'vnw'
                 });
 
-                activity.save();
+                activity.save();*/
             }
             console.trace(e);
         }

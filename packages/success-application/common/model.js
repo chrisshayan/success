@@ -135,25 +135,21 @@ if (Meteor.isServer) {
     Collection.before.insert((userId, doc)=> {
         doc.fullname = [doc.firstname, doc.lastname].join(' ').trim();
     });
-    
+
     Collection.after.insert(function (userId, doc) {
         let createdBy = userId || 'vnw'
             , ref = {
             appId: doc.appId,
             candidateId: doc.candidateId,
             jobId: doc.jobId
-        }
-            , content = {
-            appliedDate: doc.appliedDate
         };
 
         var activity = new Activities({
             type: Activities.TYPE['APPLICATION_CREATE'],
             ref: ref,
             content: content,
-            createdBy: createdBy
+            createdBy: doc.appliedDate
         });
-        console.log('activity', activity);
         activity.save();
 
     })
