@@ -131,12 +131,8 @@ ActivityItem = React.createClass({
 
     render() {
         let content = null;
-        if(this.data.creator) {
+        if(this.data.creator && this.props.activity.type != APPLICATION_CREATE) {
             switch (this.props.activity.type) {
-                case APPLICATION_CREATE:
-
-                    break;
-
                 case APPLICATION_STAGE_UPDATE:
                     content = <ActivityStageUpdate activity={ this.props.activity } creator={this.data.creator}/>;
                     break;
@@ -163,6 +159,9 @@ ActivityItem = React.createClass({
                 case RECRUITER_SCORE_CANDIDATE:
                     break;
             }
+        }
+        if(this.props.activity.type == APPLICATION_CREATE) {
+            content = <ActivityAppliedJob activity={ this.props.activity }/>;
         }
         return content;
     }
