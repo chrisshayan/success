@@ -23,8 +23,8 @@ var methods = {
     sendRequest: function (obj) {
         if (!this.userId) return false;
         try {
-            //console.log(obj);
-            var user = Meteor.users.findOne({_id: this.userId});
+            console.log(Meteor.user);
+            var user = Meteor.user(); //Meteor.users.findOne({_id: this.userId});
             if (!obj['request-email'])
                 return {
                     status: 0,
@@ -46,10 +46,10 @@ var methods = {
             var autoName = generateName(name);
 
             var hiringTeamItem = new HiringTeam();
-            if (Meteor['hiringTeam'].findOne({companyId: user.companyId, email: email}))
+            if (Meteor['hiringTeam'].findOne({email: email}))
                 return {
                     status: 0,
-                    message: 'This email address is exist in your hiring team already'
+                    message: 'This email was exist in a hiring team already.'
                 };
 
             hiringTeamItem.companyId = user.companyId;
@@ -151,10 +151,11 @@ var methods = {
         if (result) {
             var modifier = {
                 '$set': {
-                    status: 1,
+                    status: 1, // active
                     username: user.username,
                     userId: result,
                     name: data.fullname
+                    //companyId :
                 }
             };
 
