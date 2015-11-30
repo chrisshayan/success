@@ -156,7 +156,7 @@ if (Meteor.isServer) {
         var activity = new Activities({
             type: Activities.TYPE['APPLICATION_CREATE'],
             ref: ref,
-            content: content,
+            content: null,
             createdBy: createdBy,
             createdAt: formatDatetimeFromVNW(doc.appliedDate)
         });
