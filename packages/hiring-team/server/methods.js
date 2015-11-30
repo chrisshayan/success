@@ -20,160 +20,160 @@ function generateName(name) {
 }
 
 var methods = {
-    sendRequest: function (obj) {
-        if (!this.userId) return false;
-        try {
-            var user = Meteor.user(); //Meteor.users.findOne({_id: this.userId});
-            if (!obj['request-email'])
-                return {
-                    status: 0,
-                    message: 'Missing content.'
-                };
+        sendRequest: function (obj) {
+            if (!this.userId) return false;
+            try {
+                var user = Meteor.user(); //Meteor.users.findOne({_id: this.userId});
+                if (!obj['request-email'])
+                    return {
+                        status: 0,
+                        message: 'Missing content.'
+                    };
 
 
-            var email = obj['request-email'];
-            var isEmail = email.match(SimpleSchema.RegEx.Email);
-            if (!isEmail)
-                return {
-                    status: 0,
-                    message: 'This email is invalid.'
-                };
+                var email = obj['request-email'];
+                var isEmail = email.match(SimpleSchema.RegEx.Email);
+                if (!isEmail)
+                    return {
+                        status: 0,
+                        message: 'This email is invalid.'
+                    };
 
 
-            var name = email.split('@')[0];
-            var autoUsername = generateUsername(name);
-            var autoName = generateName(name);
+                var name = email.split('@')[0];
+                var autoUsername = generateUsername(name);
+                var autoName = generateName(name);
 
-            var hiringTeamItem = new HiringTeam();
-            if (Meteor['hiringTeam'].findOne({email: email}))
-                return {
-                    status: 0,
-                    message: 'This email was exist in a hiring team already.'
-                };
+                var hiringTeamItem = new HiringTeam();
+                if (Meteor['hiringTeam'].findOne({email: email}))
+                    return {
+                        status: 0,
+                        message: 'This email was exist in a hiring team already.'
+                    };
 
-            hiringTeamItem.companyId = user.companyId;
-            hiringTeamItem.email = email;
-            hiringTeamItem.username = autoUsername;
-            hiringTeamItem.name = autoName;
-            hiringTeamItem.roleId = 'recruiter';
+                hiringTeamItem.companyId = user.companyId;
+                hiringTeamItem.email = email;
+                hiringTeamItem.username = autoUsername;
+                hiringTeamItem.name = autoName;
+                hiringTeamItem.roleId = 'recruiter';
 
-            var company = Collections.CompanySettings.findOne({companyId: user.companyId});
+                var company = Collections.CompanySettings.findOne({companyId: user.companyId});
 
-            //hiringTeamItem.roleId = [];
-            var result = hiringTeamItem.save();
+                //hiringTeamItem.roleId = [];
+                var result = hiringTeamItem.save();
+
+                if (result) {
+                    //send email
+                    Meteor.defer(function () {
+                            //TOO : send email
+                            SSR.compileTemplate('HiringTeamInvitation', Assets.getText('private/hiring-team-invitation.html'));
+                            var link = Meteor.absoluteUrl('active-account/' + hiringTeamItem._id);
+                            var subject = 'Sign up to join hiring team';
+                            var html = SSR.render("HiringTeamInvitation", {
+                                subject: subject,
+                                companyName: company.companyName,
+                                link: link
+                            });
+
+                            var mail = {
+                                from: user.defaultEmail(),
+                                to: email,
+                                subject: subject,
+                                html: html
+                            };
+                            Email.send(mail);
+                        }
+                    );
+
+                    //save to hiringTeam
+
+                    return result;
+                }
+
+
+            } catch (e) {
+                console.trace(e);
+                return false;
+            }
+
+        },
+
+        getCompanyListByUser: function () {
+            var companyIdList = Collection.find({userId: this.userId}).map(function (comp) {
+                return comp.companyId
+            });
+
+            return Meteor.call('getCompanyByIds', companyIdList);
+
+
+        },
+
+        getRequestInfo: function (id) {
+            if (!id) return false;
+            try {
+                return Meteor['hiringTeam'].findOne({_id: id, status: 0});
+            } catch (e) {
+                console.trace(e);
+                return false;
+            }
+        },
+
+        activeAccount(data){
+            check(data, {
+                email: String,
+                key: String,
+                fullname: String,
+                username: String,
+                password: String
+            });
+            var hiringTeamInfo = Meteor['hiringTeam'].findOne({email: data.email});
+
+            var tempName = data.fullname.split(' ');
+            var firstName = tempName.shift();
+            var lastName = tempName.join(' ');
+            var user = {};
+            user.username = data.username;
+            user.email = data.email;
+            user.password = data.password;
+
+            user.profile = {
+                firstname: firstName,
+                lastname: lastName
+            };
+
+            var result = Accounts.createUser(user);
 
             if (result) {
-                //send email
-                Meteor.defer(function () {
-                        //TOO : send email
-                        SSR.compileTemplate('HiringTeamInvitation', Assets.getText('private/hiring-team-invitation.html'));
-                        var link = Meteor.absoluteUrl('active-account/' + hiringTeamItem._id);
-                        var subject = 'Sign up to join hiring team';
-                        var html = SSR.render("HiringTeamInvitation", {
-                            subject: subject,
-                            companyName: company.companyName,
-                            link: link
-                        });
-
-                        var mail = {
-                            from: user.defaultEmail(),
-                            to: email,
-                            subject: subject,
-                            html: html
-                        };
-                        Email.send(mail);
+                Meteor.users.update({
+                    _id: result
+                }, {
+                    '$set': {
+                        companyId: hiringTeamInfo.companyId
                     }
-                );
+                });
 
-                //save to hiringTeam
+                hiringTeamInfo.status = 1;
+                hiringTeamInfo.username = user.username;
+                hiringTeamInfo.userId = result;
+                hiringTeamInfo.name = data.fullname;
+
+                hiringTeamInfo.save();
 
                 return result;
+            } else {
+                console.log('error');
             }
 
 
-        } catch (e) {
-            console.trace(e);
-            return false;
+        },
+
+        validateUserLoginInfo: function (input) {
+            if (typeof input !== 'string') return false;
+            return !!(Meteor.users.findOne({'$or': [{username: input}, {'emails.address': input}]}));
         }
 
-    },
-
-    getCompanyListByUser: function () {
-        var companyIdList = Collection.find({userId: this.userId}).map(function (comp) {
-            return comp.companyId
-        });
-
-        return Meteor.call('getCompanyByIds', companyIdList);
-
-
-    },
-
-    getRequestInfo: function (id) {
-        if (!id) return false;
-        try {
-            console.log(id);
-            return Meteor['hiringTeam'].findOne({_id: id, status: 0});
-        } catch (e) {
-            console.trace(e);
-            return false;
-        }
-    },
-
-    activeAccount(data){
-        check(data, {
-            email: String,
-            key: String,
-            fullname: String,
-            username: String,
-            password: String
-        });
-
-        var tempName = data.fullname.split(' ');
-        var firstName = tempName.shift();
-        var lastName = tempName.join(' ');
-        var user = {};
-        user.username = data.username;
-        user.email = data.email;
-        user.password = data.password;
-
-        user.profile = {
-            firstname: firstName,
-            lastname: lastName
-        };
-
-        var result = Accounts.createUser(user);
-
-        console.log('result create account', result);
-
-        if (result) {
-            var modifier = {
-                '$set': {
-                    status: 1, // active
-                    username: user.username,
-                    userId: result,
-                    name: data.fullname
-                    //companyId :
-                }
-            };
-
-            console.log(modifier);
-
-            Meteor['hiringTeam'].update({_id: data.key}, modifier);
-            console.log(result);
-            return result;
-        } else {
-            console.log('error');
-        }
-
-
-    },
-
-    validateUserLoginInfo: function (input) {
-        if (typeof input !== 'string') return false;
-        return !!(Meteor.users.findOne({'$or': [{username: input}, {'emails.address': input}]}));
     }
-
-};
+    ;
 
 methods.removeHiringTeamRequest = function (requestId) {
     if (!this.userId) return false;
