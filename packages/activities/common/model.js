@@ -61,22 +61,22 @@ var model = Astro.Class({
                     return 'updated stage';
 
                 case RECRUITER_CREATE_COMMENT:
-                    return 'Added a comment';
+                    return 'added a comment';
 
                 case RECRUITER_CREATE_EMAIL:
-                    return 'Sent a message';
+                    return 'sent a message';
 
                 case RECRUITER_SCHEDULE:
-                    return 'Scheduled an interview';
+                    return 'scheduled an interview';
 
                 case RECRUITER_DISQUALIFIED:
-                    return 'Disqualified this candidate';
+                    return 'disqualified this candidate';
 
                 case RECRUITER_REVERSE_QUALIFIED:
-                    return 'Reverted qualify this candidate';
+                    return 'reverted qualify this candidate';
 
                 case RECRUITER_SCORE_CANDIDATE:
-                    return 'Score this candidate';
+                    return 'score this candidate';
 
                 default:
                     return '';

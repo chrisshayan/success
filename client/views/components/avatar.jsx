@@ -26,9 +26,15 @@ Avatar = React.createClass({
 
     getMeteorData() {
         var user = Meteor.users.findOne({_id: this.props.userId});
+        if(!user) {
+            user = {
+                profile: {
+                    avatar: ''
+                }
+            };
+        }
         return {
-            user: user,
-            avatarId: user && user.profile.avatar ? user.profile.avatar : null
+            user: user
         };
     },
 
@@ -51,23 +57,13 @@ Avatar = React.createClass({
                     Meteor.call('removeAvatar', oldId);
                     Meteor.users.update({_id: self.props.userId}, {
                         $set: {
-                            "profile.avatar": result[0].public_id
+                            "profile.avatar": $.cloudinary.url(result[0].public_id)
                         }
                     });
                 }
             });
     },
 
-    getUrl() {
-        var options = {
-            format: 'jpg',
-            width: this.props.width,
-            height: this.props.height,
-            crop: this.props.crop,
-            quality: 100
-        };
-        return $.cloudinary.url(this.data.avatarId, options)
-    },
     render() {
         var styles = {
             avatar: {
@@ -76,7 +72,8 @@ Avatar = React.createClass({
                 lineHeight: this.props.height + 'px',
                 textAlign: 'center',
                 border: '1px solid #ddd',
-                backgroundImage: `url(${this.getUrl()})`,
+                backgroundColor: '#eee',
+                backgroundImage: `url(${this.data.user.profile.avatar})`,
                 backgroundSize: 'cover'
             },
 
@@ -114,6 +111,7 @@ Avatar = React.createClass({
         }
         return (
             <div
+                className="img-circle"
                 style={styles.avatar}
                 onMouseEnter={() => {this.setState({hover: true})}}
                 onMouseLeave={() => {this.setState({hover: false})}}>

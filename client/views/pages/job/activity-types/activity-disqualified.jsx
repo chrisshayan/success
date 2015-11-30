@@ -8,8 +8,8 @@ ActivityDisqualified = React.createClass({
         return (
             <div className="social-feed-box">
                 <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={{name: 'firstName'}}/>
+                    <a href="" className="pull-left avatar-box">
+                        <Avatar upload={false} userId={this.props.creator._id} width={32} height={32}  />
                     </a>
 
                     <div className="media-body">
