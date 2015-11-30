@@ -88,14 +88,18 @@ var getApplicationByJobId = function (job, cb) {
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
 
-                Meteor.call('activities.syncedJobDone', {
-                        jobId: currentJob.jobId,
-                        userId: userId
+                let activity = new Activities({
+                    type: Activities.TYPE['JOB_SYNC_DONE'],
+                    ref: {
+                        jobId: currentJob.jobId
                     },
-                    {
-                        numOfApplication: appStages.length,
-                        isByUser: false
-                    });
+                    content: {
+                        numOfApplication: appStages.length
+                    },
+                    createdBy: 'vnw'
+
+                });
+                activity.save();
             }
 
 
@@ -107,14 +111,17 @@ var getApplicationByJobId = function (job, cb) {
                 failedJob.set('syncState', 'syncFailed');
                 failedJob.save();
 
-                Meteor.call('activities.syncedJobFailed', {
-                        jobId: failedJob.jobId,
-                        userId: userId
-                    },
-                    {
-                        isByUser: false
-                    });
 
+                let activity = new Activities({
+                    type: Activities.TYPE['JOB_SYNC_FAILED'],
+                    ref: {
+                        jobId: failedJob.jobId
+                    },
+                    content: {},
+                    createdBy: 'vnw'
+                });
+
+                activity.save();
             }
             console.trace(e);
         }

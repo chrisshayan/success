@@ -53,4 +53,8 @@ var CONFIG = {
 };
 
 
-Core.registerConfig(MODULE_NAME, CONFIG);
+Activities.TYPE = CONFIG;
+
+
+
+//Core.registerConfig(MODULE_NAME, CONFIG);

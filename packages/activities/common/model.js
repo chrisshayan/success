@@ -12,7 +12,7 @@ var model = Astro.Class({
         type: {
             type: 'number'
         },
-        createBy: {
+        createdBy: {
             type: 'string',
             default: ()=> 'vnw'
         },
@@ -38,23 +38,3 @@ var model = Astro.Class({
 
 Activities = model;
 Collection = model.getCollection();
-
-
-if (Meteor.isServer) {
-    var AppCollection = Application.getCollection();
-    AppCollection.after.insert(function (userId, doc) {
-        let ref = {
-            appId: doc.appId,
-            candidateId: doc.candidateId,
-            jobId: doc.jobId
-        }
-            , content = {
-            appliedDate: doc.appliedDate
-        };
-
-        Meteor.call('activities.newApplication', ref, content);
-    })
-}
-
-
-Activities = model;

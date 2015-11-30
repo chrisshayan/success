@@ -14,13 +14,13 @@ Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
 
-    api.use(["vnw:core", "vnw:user", "success:application"]);
+    api.use(["vnw:core", "vnw:user"]);
     api.use(["jagi:astronomy@1.2.2"]);
     /* namespace */
     api.addFiles('activities.js');
 
     /* model */
-    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
+    api.addFiles(['common/model.js', 'common/config.js', 'common/extends.js']);
 
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);

@@ -267,7 +267,7 @@ JobList = React.createClass({
         return {
             title: 'PUBLISHED POSITIONS',
             icon: 'fa-cloud',
-            emptyMsg: 'There is no position here.',
+            emptyMsg: 'There is no position here.'
 
         };
     },

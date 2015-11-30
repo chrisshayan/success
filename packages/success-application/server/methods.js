@@ -45,8 +45,8 @@ methods.hasApplication = function (jobId, stage) {
 };
 
 
-methods['applications.toggleQualify'] = function (appIds = [], stage = null, status = null) {
-    if (!this.userId || _.isEmpty(appIds) || stage === null || status === null) return false;
+methods['applications.toggleQualify'] = function (appIds = [], stage = null, isQualified = null) {
+    if (!this.userId || _.isEmpty(appIds) || stage === null || isQualified === null) return false;
     const selector = {
         appId: {
             $in: appIds
@@ -54,7 +54,7 @@ methods['applications.toggleQualify'] = function (appIds = [], stage = null, sta
     };
     const modifier = {};
 
-    if (status === true) {
+    if (isQualified === true) {
         modifier['$pull'] = {
             disqualified: stage
         };
@@ -88,7 +88,7 @@ methods['applications.moveStage'] = function (appId, stage = null) {
 
                     jobExtra.inc({
                         [`stage.${fromStage.alias}`]: -1,
-                        [`stage.${toStage.alias}`]: 1,
+                        [`stage.${toStage.alias}`]: 1
                     });
                     jobExtra.save();
                 });
