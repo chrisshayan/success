@@ -2,6 +2,13 @@
  * Created by HungNguyen on 8/21/15.
  */
 
+const USER_FIELDS = {
+    username: 1,
+    emails: 1,
+    profile: 1,
+    companyId: 1,
+    roles: 1
+};
 
 var publications = {
     activities: function (filters, options) {
@@ -13,7 +20,19 @@ var publications = {
                 options['limit'] += 1;
                 return Collection.find(filters, options);
             },
-            children: []
+            children: [
+                {
+                    /**
+                     * publish creator info
+                     */
+                    find(activity = {}) {
+                         if(activity && activity.createdBy) {
+                             return Meteor.users.find({_id: activity.createdBy}, {fields: USER_FIELDS});
+                         }
+                        return null;
+                    }
+                }
+            ]
         }
     }
 };

@@ -51,7 +51,7 @@ JobCandidateProfileActions = React.createClass({
 
     getActionLink(type) {
         const params = Router.current().params;
-        let query = params.query;
+        let query = _.clone(params.query);
         if (!query) query = {};
         query['appAction'] = type;
         return Router.url('Job', {

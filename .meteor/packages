@@ -26,7 +26,7 @@ ecmascript
 ecmascript-collections
 es5-shim
 iron:router@1.0.12
-okgrow:router-autoscroll
+#okgrow:router-autoscroll
 react
 react-template-helper
 twbs:bootstrap
@@ -52,7 +52,6 @@ meteorhacks:subs-manager
 
 reywood:publish-composite
 lab:vnw-apis
-#lab:accounts-vnw
 lab:notifications
 
 lab:mysql-connection-manager
@@ -68,13 +67,8 @@ vnw:city
 vnw:industries
 vnw:migration
 
-#vnw:core
 vnw:job
-#vnw:candidate
-#vnw:application
 vnw:job-criteria
-#vnw:sync-data
-
 vnw:user
 mizzao:autocomplete
 vnw:hiring-team

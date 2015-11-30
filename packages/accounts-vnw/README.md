@@ -1,1 +1,0 @@
-A Login service for Vietnamworks

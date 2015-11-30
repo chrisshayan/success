@@ -6,6 +6,7 @@ const HookMixin = {
             stage: Success.APPLICATION_STAGES[1],
             candidateType: 1,
             currentAppId: null,
+            currentAppAction: null,
             relatedJobs: [],
             resume: null,
             isLoading: true,
@@ -19,18 +20,21 @@ const HookMixin = {
     componentWillMount() {
         this.trackers = [];
         this.trackers.push(Tracker.autorun(() => {
-            const params = Router.current().params,
-                jobId = +params.jobId,
-                currentAppId = params['query'] && params['query']['appId'] ? +params['query']['appId'] : null,
-                stage = _.findWhere(Success.APPLICATION_STAGES, {alias: params.stage}),
-                nextState = {};
-            let candidateType = params['query'] && params['query']['candidateType'] ? +params['query']['candidateType'] : 1;
+            const nextState = {};
+            let {query, jobId, stage} = Router.current().params;
+            let { candidateType, appId, appAction } = query;
+
+            const stageObj = _.findWhere(Success.APPLICATION_STAGES, {alias: stage});
+            if(jobId) jobId = parseInt(jobId);
+            if(appId) appId = parseInt(appId);
+            if(candidateType) candidateType = parseInt(candidateType);
             if ([1, 2].indexOf(candidateType) < 0) candidateType = 1;
 
+            if (!_.isEqual(stageObj, this.state.stage)) nextState['stage'] = stageObj;
             if (jobId != this.state.jobId) nextState['jobId'] = jobId;
             if (candidateType != this.state.candidateType) nextState['candidateType'] = candidateType;
-            if (currentAppId != this.state.currentAppId) nextState['currentAppId'] = currentAppId;
-            if (stage != this.state.stage) nextState['stage'] = stage;
+            if (appId != this.state.currentAppId) nextState['currentAppId'] = appId;
+            if (appAction != this.state.currentAppAction) nextState['currentAppAction'] = appAction;
 
             if (!_.isEmpty(nextState)) {
                 this.setState(nextState);
@@ -45,7 +49,7 @@ const HookMixin = {
         this.handle___GetJobInfo();
         this.handle___GetCVToken();
         this.handle___UpdateAppCounter(this.state.candidateType, null);
-        if(this.state.currentAppId) {
+        if (this.state.currentAppId) {
             this.handle___GetResumeDetails();
         }
     },
@@ -53,13 +57,13 @@ const HookMixin = {
     componentWillUpdate(nextProps, nextState) {
         try {
             this.handle___UpdateAppCounter(nextState.candidateType, this.state.candidateType);
-        } catch(e) {
+        } catch (e) {
 
         }
     },
 
     componentDidUpdate(prevProps, prevState) {
-        if(this.state.currentAppId != prevState.currentAppId) {
+        if (this.state.currentAppId != prevState.currentAppId) {
             this.handle___GetResumeDetails();
         }
     }
@@ -195,7 +199,7 @@ const ActionMixin = {
 
     handle___GetResumeDetails() {
         Meteor.call('getResumeDetails', this.state.currentAppId, (err, result) => {
-            if(!err) {
+            if (!err) {
                 this.setState({
                     resume: result
                 });
@@ -242,6 +246,7 @@ const RendererMixin = {
                             stage={ this.state.stage }
                             applicationId={ this.state.currentAppId }
                             resume={ this.state.resume }
+                            appAction={ this.state.currentAppAction }
                             actions={ this.current__Actions() }
                         />
 

@@ -55,5 +55,4 @@ Meteor.startup(function () {
 
 
     //CRON_VNW.startupSync();
-
 });

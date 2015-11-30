@@ -3,19 +3,22 @@ JobCandidate = React.createClass({
      * change query param when click on application
      * @param e <Event>
      */
-    handle__ClickApp(e) {
+        handle__ClickApp(e) {
         e.preventDefault();
         const params = Router.current().params;
         const query = _.omit(params.query, 'appAction');
         query['appId'] = this.props.appId;
 
-        Router.go('Job', params, { query });
+        Router.go('Job', params, {query});
+        $('body').animate({
+            scrollTop: 0
+        }, 300);
     },
 
     /**
      * select application for bulk actions
      */
-    handle__CheckApp() {
+        handle__CheckApp() {
         this.props.actions.toggleCheck(this.props.appId, true);
     },
 
@@ -68,6 +71,7 @@ JobCandidate = React.createClass({
                         </a>
                     </div>
                     <p>{app.shortCoverLetter()}</p>
+
                     <div className="clearfix">
                         <div className="pull-left text-muted">
                             <i className="fa fa-map-marker"/>&nbsp;
@@ -84,7 +88,7 @@ JobCandidate = React.createClass({
     render__MatchingScore() {
         const app = this.props.app;
         const score = app && app['matchingScore'] ? app['matchingScore'] : 0;
-        if(score <= 0) return null;
+        if (score <= 0) return null;
         let labelClass = '';
 
         if (score > 80) {

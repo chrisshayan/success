@@ -25,14 +25,6 @@ CommentBox = React.createClass({
         ip.value = '';
     },
 
-    handleDiscardClick(e) {
-        e.preventDefault();
-        let ip = this.refs.input.getDOMNode();
-        ip.value = '';
-        this.props.onDiscard && this.props.onDiscard();
-    },
-
-
     render() {
         let styles = {
             container: {
@@ -59,11 +51,12 @@ CommentBox = React.createClass({
                 </textarea>
                 <div className="text-right" style={styles.actions}>
                     <button className="btn btn-primary btn-outline btn-sm" onClick={this.handleSaveClick}>
-                        <i className="fa fa-paper-plane-o" />&nbsp;
+                        <i className="fa fa-paper-plane-o"/>&nbsp;
                         Save
-                    </button>&nbsp;&nbsp;
-                    <button className="btn btn-white btn-outline btn-sm"  onClick={this.handleDiscardClick}>
-                        <i className="fa fa-times" />&nbsp;
+                    </button>
+                    &nbsp;&nbsp;
+                    <button className="btn btn-white btn-outline btn-sm" onClick={this.props.onDiscard}>
+                        <i className="fa fa-times"/>&nbsp;
                         Discard
                     </button>
                 </div>

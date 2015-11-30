@@ -120,7 +120,6 @@ JobCandidateResumeOnline = React.createClass({
 
     render() {
         const resume = this.props.resume;
-        console.log(resume)
         return (
             <div>
                 <div className="row">

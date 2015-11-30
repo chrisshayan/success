@@ -65,10 +65,11 @@ JobCurrentApplication.getActions = function () {
     actions.disqualify = function () {
         if (_.isNumber(this.state.currentAppId)) {
             const currentAppId = this.state.currentAppId;
+            const jobId = this.state.jobId;
             const appIds = [currentAppId];
             const stage = this.state.stage.alias;
 
-            Meteor.call('applications.toggleQualify', appIds, stage, false, (err, result) => {
+            Meteor.call('applications.toggleQualify', jobId, appIds, stage, false, (err, result) => {
                 if (!err && result) {
                     actions.nextApplication(currentAppId);
                 }
@@ -82,11 +83,12 @@ JobCurrentApplication.getActions = function () {
      */
     actions.revertQualify = function () {
         if (_.isNumber(this.state.currentAppId)) {
+            const jobId = this.state.jobId;
             const currentAppId = this.state.currentAppId;
             const appIds = [currentAppId];
             const stage = this.state.stage.alias;
 
-            Meteor.call('applications.toggleQualify', appIds, stage, true, (err, result) => {
+            Meteor.call('applications.toggleQualify', jobId , appIds, stage, true, (err, result) => {
                 if (!err && result) {
                     actions.nextApplication(this.state.currentAppId);
                 }
@@ -112,6 +114,73 @@ JobCurrentApplication.getActions = function () {
                 }
             });
         }
+    }.bind(this);
+
+
+    /**
+     * Close action box and scroll to top
+     * @type {function(this:JobCurrentApplication)}
+     */
+    actions.discardActionBox = function() {
+        const params = Router.current().params
+            , query = _.omit(params.query, 'appAction');
+
+        Router.go('Job', params, { query });
+        // scroll to top
+        $('body').animate({scrollTop: 0}, 300);
+    }.bind(this);
+
+    /**
+     * Add comment to application
+     * @type {function(this:JobCurrentApplication)}
+     */
+    actions.saveComment = function(text) {
+        const jobId = this.state.jobId;
+        const appId = this.state.currentAppId;
+
+        Meteor.call('application.addComment', jobId, appId, text, (err, result) => {
+            if(!err && result) {
+                actions.discardActionBox();
+            } else {
+
+            }
+        });
+    }.bind(this);
+
+    /**
+     * Send message to application
+     * @type {function(this:JobCurrentApplication)}
+     */
+    actions.sendMessage = function(data) {
+        const jobId = this.state.jobId;
+        const appId = this.state.currentAppId;
+
+        Meteor.call('application.sendMessage', jobId, [appId], data, (err, result) => {
+            if(!err && result) {
+                actions.discardActionBox();
+                Notification.success("Emails sent");
+            } else {
+
+            }
+        });
+    }.bind(this);
+
+    /**
+     * save interview events
+     * @param data
+     */
+    actions.scheduleInterview = function(data) {
+        const jobId = this.state.jobId;
+        const appId = this.state.currentAppId;
+
+        Meteor.call('activities.scheduleInterview', jobId, appId, data, (err, result) => {
+            if(!err && result) {
+                actions.discardActionBox();
+                Notification.success("Scheduled interview successfully");
+            } else {
+
+            }
+        });
     }.bind(this);
 
     return actions;

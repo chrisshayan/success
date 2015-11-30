@@ -183,7 +183,7 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
     }
     return {
         find: function () {
-            return Collections.Activities.find(filters, options);
+            return Activities.find(filters, options);
         },
         children: [
             // publish createdBy info

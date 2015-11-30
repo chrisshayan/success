@@ -1,3 +1,14 @@
+const {
+    APPLICATION_CREATE,
+    APPLICATION_STAGE_UPDATE,
+    RECRUITER_CREATE_COMMENT,
+    RECRUITER_CREATE_EMAIL,
+    RECRUITER_DISQUALIFIED,
+    RECRUITER_REVERSE_QUALIFIED,
+    RECRUITER_SCHEDULE,
+    RECRUITER_SCORE_CANDIDATE
+    } = Activities.TYPE;
+
 JobCandidateTimeline = React.createClass({
     mixins: [ReactMeteorData],
 
@@ -14,17 +25,23 @@ JobCandidateTimeline = React.createClass({
     },
 
     getMeteorData() {
+        let appAction = null;
         let subData = [this.filter(), this.option()];
-        let sub = Meteor.subscribe('applicationActivities', ...subData);
+        let sub = Meteor.subscribe('activities', ...subData);
+        let params = Router.current().params;
+        if (params['query'] && params['query']['appAction']) {
+            appAction = params['query']['appAction'];
+        }
         return {
             isReady: sub.ready(),
-            activities: Activities.find(...subData).fetch()
+            activities: Activities.find(...subData).fetch(),
+            appAction: appAction
         };
     },
 
     filter() {
         return {
-            "content.applicationId": this.state.appId
+            "ref.appId": this.state.appId
         };
     },
 
@@ -49,7 +66,8 @@ JobCandidateTimeline = React.createClass({
     },
 
     render() {
-        let loadmore = null;
+        let loadmore = null,
+            action = null;
         if (this.hasMore()) {
             loadmore = (
                 <button
@@ -60,31 +78,18 @@ JobCandidateTimeline = React.createClass({
                 </button>
             );
         }
-        let action = null;
-
-        if(this.props.isAddingComment) {
-            action = <CommentBox onSave={this.props.onSaveComment} onDiscard={this.props.onDiscardComment} />
-        } else if(this.props.isSendingMessage) {
-            let candidateInfo = this.props.application['candidateInfo'] || null;
-            if(candidateInfo) {
-                let to = {
-                    appIds: [this.props.application._id],
-                    emails: [candidateInfo.emails[0]]
-                };
-                action = <MessageBox onDiscard={this.props.onDiscardMessage} to={to} />
-            }
-        } else if(this.props.isScheduleInterview) {
-            action = <ScheduleEvent application={this.props.application} onSave={this.props.onSaveScheduleInterview} onDiscard={this.props.onDiscardInterview} />
+        const actionList = ['comment', 'message', 'scheduleInterview'];
+        if (this.data.appAction && actionList.indexOf(this.data.appAction) >= 0) {
+            action = <JobCandidateActionBox actions={this.props.actions} action={this.data.appAction}
+                                            appId={this.props.applicationId}/>
         }
+
         return (
             <div className="feed-activity-list">
                 {action}
-                {this.data.activities.map((activity, key) => {
-                    return <CandidateActivityItem
-                        activity={activity}
-                        application={this.props.application}
-                        candidate={this.props.candidate} key={key}/>
-                    } )}
+
+                {this.data.activities.map((activity, key) => <ActivityItem key={key} activity={activity}/>)}
+
 
                 {loadmore}
             </div>
@@ -93,12 +98,11 @@ JobCandidateTimeline = React.createClass({
     }
 });
 
+ActivityItem = React.createClass({
 
-CandidateActivityItem = React.createClass({
     mixins: [ReactMeteorData],
     propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
+        activity: React.PropTypes.object.isRequired
     },
 
     getInitialState() {
@@ -108,12 +112,8 @@ CandidateActivityItem = React.createClass({
     },
 
     getMeteorData() {
-        let creator = null;
-        if (this.props.activity['createdBy']) {
-            creator = Meteor.users.findOne({_id: this.props.activity['createdBy']});
-        }
         return {
-            creator: creator
+            creator: this.props.activity.creator()
         };
     },
 
@@ -131,59 +131,43 @@ CandidateActivityItem = React.createClass({
 
     render() {
         let content = null;
-        switch (this.state.type) {
-            case 1: // moved app state
-                content = <ActivityType1
-                    activity={this.props.activity}
-                    application={this.props.application}
-                    candidate={this.props.candidate}
-                    creator={this.data.creator}/>
-                break;
-            case 2: // applied job
-                content = <ActivityType2
-                    activity={this.props.activity}
-                    application={this.props.application}
-                    candidate={this.props.candidate}/>
-                break;
+        if(this.data.creator) {
+            switch (this.props.activity.type) {
+                case APPLICATION_CREATE:
 
-            case 3: // disqualified app
-                content = <ActivityType3
-                    activity={this.props.activity}
-                    creator={this.data.creator}/>
+                    break;
 
-                break;
+                case APPLICATION_STAGE_UPDATE:
+                    content = <ActivityStageUpdate activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
 
-            case 4: // revert qualify app
-                content = <ActivityType4
-                    activity={this.props.activity}
-                    creator={this.data.creator}/>
+                case RECRUITER_CREATE_COMMENT:
+                    content = <ActivityComment activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
 
-                break;
+                case RECRUITER_CREATE_EMAIL:
+                    content = <ActivityMessage activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
 
-            case 5:  // sent mail
-                content = <ActivityType5
-                    activity={this.props.activity}
-                    creator={this.data.creator}/>
-                break;
-            case 6:  // added comment
-                content = <ActivityType6
-                    activity={this.props.activity}
-                    creator={this.data.creator}/>
+                case RECRUITER_SCHEDULE:
+                    break;
 
-                break;
-            case 7:  // added candidate to source
+                case RECRUITER_DISQUALIFIED:
+                    content = <ActivityDisqualified activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
 
-                break;
+                case RECRUITER_REVERSE_QUALIFIED:
+                    content = <ActivityRevertQualify activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
 
-            case 8:  // Schedule interview
-                content = <ActivityType8
-                    activity={this.props.activity}
-                    creator={this.data.creator}/>
-                break;
+                case RECRUITER_SCORE_CANDIDATE:
+                    break;
+            }
         }
         return content;
     }
 });
+
 
 SocialAvatar = React.createClass({
     propTypes: {
@@ -200,7 +184,7 @@ SocialAvatar = React.createClass({
             width: this.props.width || 32,
             height: this.props.height || 32
         };
-        return $.cloudinary.url(publicId, opt)
+        return $.cloudinary.url(publicId, opt);
     },
     render() {
         let content = null;
@@ -219,7 +203,8 @@ SocialAvatar = React.createClass({
                 textAlign: 'center',
                 background: bg || '#ddd',
                 backgroundSize: 'cover',
-                backgroundRepeat: 'no-repeat'
+                backgroundRepeat: 'no-repeat',
+                marginRight: '5px'
             }
         };
 
@@ -231,638 +216,7 @@ SocialAvatar = React.createClass({
             content = <div style={mainStyle}/>;
         }
 
+
         return content;
     }
 });
-
-
-ActivityMixin = {};
-
-var ActivityType1 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        application: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-    icon() {
-        let ic = ['fa'],
-            data = this.props.activity.data;
-        if (!data) return '';
-
-        if (data.fromStage > data.toStage) {
-            ic.push('fa-long-arrow-left');
-        } else {
-            ic.push('fa-long-arrow-right');
-        }
-        return ic.join(' ');
-    },
-
-    message() {
-        let data = this.props.activity.data;
-        if (!data) return '';
-        let from = Success.APPLICATION_STAGES[data.fromStage];
-        let to = Success.APPLICATION_STAGES[data.toStage];
-        return `Moved from <b>${from.label}</b> to <b>${to.label}</b>`;
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <a href="#">
-                            {this.fullName()}
-                        </a>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <div className="activity-info">
-                        <i className={this.icon()}/>
-                        <p className="msg" dangerouslySetInnerHTML={{__html: this.message()}}/>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
-
-
-var ActivityType2 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        candidate: React.PropTypes.object.isRequired,
-        application: React.PropTypes.object.isRequired,
-    },
-
-    firstName() {
-        let data = this.props.candidate && this.props.candidate['data'] ? this.props.candidate.data : null;
-        if (!data) return '';
-        return data['firstname'] ? data['firstname'] : '';
-    },
-
-    fullName() {
-        let data = this.props.candidate && this.props.candidate['data'] ? this.props.candidate.data : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={{firstName: this.firstName()}} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <a href="#">
-                            {this.fullName()}
-                        </a>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-
-                <div className="social-body">
-                    <div className="activity-info">
-                        <i className="fa fa-file-text-o"/>
-                        <strong className="msg">Applied this position</strong>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
-
-var ActivityType3 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-    icon() {
-        return ['fa', 'fa-thumbs-down'].join(' ');
-    },
-
-    message() {
-        return 'Disqualified';
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <a href="#">
-                            {this.fullName()}
-                        </a>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <div className="activity-info">
-                        <i className={this.icon()}/>
-                        <p className="msg" dangerouslySetInnerHTML={{__html: this.message()}}/>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
-
-
-var ActivityType4 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-    icon() {
-        return ['fa', 'fa-thumbs-up'].join(' ');
-    },
-
-    message() {
-        return 'Revert qualify';
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <a href="#">
-                            {this.fullName()}
-                        </a>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <div className="activity-info">
-                        <i className={this.icon()}/>
-                        <p className="msg" dangerouslySetInnerHTML={{__html: this.message()}}/>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-});
-
-
-var ActivityType5 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    getInitialState() {
-        return {
-            isShowMore: false
-        };
-
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-
-    message() {
-        let data = this.props.activity['data'] || null;
-        return data.html;
-    },
-
-    render() {
-        let styles = {
-            content: {
-                overflow: 'hidden',
-                height: this.state.isShowMore ? 'auto' : '115px'
-            }
-        };
-        let moreLessBtn = null;
-        if(this.state.isShowMore) {
-            moreLessBtn = (
-                <button
-                    className="btn btn-link"
-                    onClick={() => this.setState({isShowMore: false}) }>
-                    less
-                </button>
-            );
-        } else {
-            moreLessBtn = (
-                <button
-                    className="btn btn-link"
-                    onClick={() => this.setState({isShowMore: true}) }>
-                    more
-                </button>
-            );
-        }
-
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <div className="clearfix">
-                            <a href="#" className="pull-left">
-                                {this.fullName()}
-                            </a>
-                            <small className="pull-left text-muted" style={{margin: '0 5px', lineHeight: '20px'}}>sent message to candidate</small>
-                        </div>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body" style={styles.content}>
-                    <p dangerouslySetInnerHTML={{__html: this.message()}} />
-                </div>
-                <div className="text-right">
-                    {moreLessBtn}
-                </div>
-            </div>
-        );
-    }
-});
-
-
-var ActivityType6 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-
-    message() {
-        let data = this.props.activity['data'] || null;
-        let content = data['content'] || '';
-        return content.replace(/(\n|\r\n)/g, '<br/>');
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <div className="clearfix">
-                            <a href="#" className="pull-left">
-                                {this.fullName()}
-                            </a>
-                            <small className="pull-left text-muted" style={{margin: '0 5px', lineHeight: '20px'}}>added comment</small>
-                        </div>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <p dangerouslySetInnerHTML={{__html: this.message()}} />
-                </div>
-            </div>
-        );
-    }
-});
-
-
-var ActivityType8 = React.createClass({
-    propTypes: {
-        activity: React.PropTypes.object.isRequired,
-        creator: React.PropTypes.object.isRequired,
-    },
-
-    image() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (data['avatar']) return {publicId: data['avatar']};
-        return data['firstname'] ? {firstName: data['firstname']} : null;
-    },
-
-    fullName() {
-        let data = this.props.creator && this.props.creator['profile'] ? this.props.creator.profile : null;
-        if (!data) return '';
-        return [data['firstname'], data['lastname']].join(' ')
-    },
-
-    timeago() {
-        let d = moment(this.props.activity.createdAt);
-        let distance = Math.ceil((Date.now() - d.valueOf()) / 1000) / 60;
-        if (distance >= 30)
-            return d.format('MMMM Do YYYY, h:mm:ss a');
-        return d.fromNow();
-    },
-
-
-    subject() {
-        let data = this.props.activity['data'] || null;
-        return data.subject;
-    },
-
-    scheduleTime() {
-        let data = this.props.activity['data'] || null;
-        let startTime = new moment(data.startTime);
-        let endTime = new moment(data.endTime);
-        return startTime.format('llll') + ' to ' + endTime.format('h:mm A');
-    },
-
-    location() {
-        let data = this.props.activity['data'] || null;
-        return data.location;
-    },
-    message() {
-        let data = this.props.activity['data'] || null;
-        return '';
-    },
-
-    render() {
-        return (
-            <div className="social-feed-box">
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <SocialAvatar image={this.image()} style={{marginRight: '10px'}}/>
-                    </a>
-
-                    <div className="media-body">
-                        <div className="clearfix">
-                            <a href="#" className="pull-left">
-                                {this.fullName()}
-                            </a>
-                            <small className="pull-left text-muted" style={{margin: '0 5px', lineHeight: '20px'}}>scheduled interview</small>
-                        </div>
-                        <small className="text-muted">{this.timeago()}</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <div className="row">
-                        <div className="col-md-2 text-center">
-                            <i className="fa fa-calendar-check-o" style={{fontSize: '40px', paddingTop: '40px'}} />
-                        </div>
-                        <div className="col-md-10 border-left">
-                            <div className="form-horizontal">
-                                <div className="form-group">
-                                    <label className="col-lg-2 control-label">Subject:</label>
-                                    <div className="col-lg-10"><p className="form-control-static">{this.subject()}</p></div>
-                                </div>
-                                <div className="hr-line-dashed" style={{margin: 0}} />
-                                <div className="form-group">
-                                    <label className="col-lg-2 control-label">Time:</label>
-                                    <div className="col-lg-10"><p className="form-control-static">{this.scheduleTime()}</p></div>
-                                </div>
-                                <div className="hr-line-dashed" style={{margin: 0}} />
-                                <div className="form-group">
-                                    <label className="col-lg-2 control-label">Location:</label>
-                                    <div className="col-lg-10"><p className="form-control-static">{this.location()}</p></div>
-                                </div>
-                                <div className="hr-line-dashed" style={{margin: 0}} />
-                                <div className="form-group">
-                                    <label className="col-lg-2 control-label">Interviewers:</label>
-                                    <div className="col-lg-10">
-                                        {this.renderInterviewers()}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    },
-
-    renderInterviewers() {
-        let data = this.props.activity['data'] || null;
-        let name = [];
-        _.each(data.interviewers, function(id) {
-            var u = Meteor.users.findOne({_id: id});
-            if(u) {
-                let n = u.username || u.defaultEmail();
-                if(u['profile']) {
-                    n = [u['profile']['firstname'] || '', u['profile']['lastname'] || '' ].join(' ');
-                    if(u['username']) {
-                        n += '-- @' + u['username'];
-                    }
-                }
-                name.push(n);
-            }
-        });
-        return (
-            <ul className="interviewers-list">
-                {name.map((n, k) => { return <li key={k}><span className="label label-info">{n}</span></li> })}
-            </ul>
-        );
-    }
-});
-
-
-
-var ActivityTypeN = React.createClass({
-    propTypes: {
-        data: React.PropTypes.object.isRequired
-    },
-    render() {
-        return (
-            <div className="social-feed-box">
-
-                <div className="pull-right social-action dropdown">
-                    <button data-toggle="dropdown" className="dropdown-toggle btn-white">
-                        <i className="fa fa-angle-down"></i>
-                    </button>
-                    <ul className="dropdown-menu m-t-xs">
-                        <li><a href="#">Edit</a></li>
-                        <li><a href="#">Delete</a></li>
-                    </ul>
-                </div>
-                <div className="social-avatar">
-                    <a href="" className="pull-left">
-                        <img alt="image" src="/img/a1.jpg"/>
-                    </a>
-                    <div className="media-body">
-                        <a href="#">
-                            Andrew Williams
-                        </a>
-                        <small className="text-muted">Today 4:21 pm - 12.06.2014</small>
-                    </div>
-                </div>
-                <div className="social-body">
-                    <p>
-                        Many desktop publishing packages and web page editors now use Lorem Ipsum as their
-                        default model text, and a search for 'lorem ipsum' will uncover many web sites still
-                        in their infancy. Packages and web page editors now use Lorem Ipsum as their
-                        default model text.
-                    </p>
-
-                    <div className="btn-group">
-                        <button className="btn btn-white btn-xs"><i className="fa fa-thumbs-up"></i> Like this!
-                        </button>
-                        <button className="btn btn-white btn-xs"><i className="fa fa-comments"></i> Comment</button>
-                        <button className="btn btn-white btn-xs"><i className="fa fa-share"></i> Share</button>
-                    </div>
-                </div>
-                <div className="social-footer">
-                    <div className="social-comment">
-                        <a href="" className="pull-left">
-                            <img alt="image" src="/img/a1.jpg"/>
-                        </a>
-                        <div className="media-body">
-                            <a href="#">
-                                Andrew Williams
-                            </a>
-                            Internet tend to repeat predefined chunks as necessary, making this the first true
-                            generator on the Internet. It uses a dictionary of over 200 Latin words.
-                            <br/>
-                            <a href="#" className="small"><i className="fa fa-thumbs-up"></i> 26 Like this!</a> -
-                            <small className="text-muted">12.06.2014</small>
-                        </div>
-                    </div>
-
-                    <div className="social-comment">
-                        <a href="" className="pull-left">
-                            <img alt="image" src="/img/a2.jpg"/>
-                        </a>
-                        <div className="media-body">
-                            <a href="#">
-                                Andrew Williams
-                            </a>
-                            Making this the first true generator on the Internet. It uses a dictionary of.
-                            <br/>
-                            <a href="#" className="small">
-                                <i className="fa fa-thumbs-up"></i> 11 Like this!
-                            </a> -
-                            <small className="text-muted">10.07.2014</small>
-
-                        </div>
-                    </div>
-
-                    <div className="social-comment">
-                        <a href="" className="pull-left">
-                            <img alt="image" src="/img/a3.jpg"/>
-                        </a>
-                        <div className="media-body">
-                            <textarea className="form-control" placeholder="Write comment..."></textarea>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-        );
-    }
-});
-

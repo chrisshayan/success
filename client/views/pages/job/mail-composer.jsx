@@ -1,5 +1,8 @@
 MailComposer = React.createClass({
-    mixins: [ReactMeteorData],
+    propsType: {
+        templates: React.PropTypes.array.isRequired,
+        emails: React.PropTypes.array.isRequired
+    },
     getInitialState() {
         return {
             mailTemplateError: false,
@@ -8,23 +11,14 @@ MailComposer = React.createClass({
             toError: false
         };
     },
-    getMeteorData() {
-        var templates = [{_id: -1, name: "Select mail template"}];
-        templates = _.union(templates, Collections.MailTemplates.find().fetch());
-        return {
-            templates: templates
-        }
-    },
+
     componentDidMount() {
         // Initialize summernote plugin
-        var to = React.findDOMNode(this.refs.to);
         var subject = React.findDOMNode(this.refs.subject);
         var mailContent = React.findDOMNode(this.refs.mailContent);
-        to.value = this.props.to.emails.join(",");
+
         subject.value = "";
         mailContent.value = "";
-
-        $(to).tagsinput("items");
 
 
         (function (factory) {
@@ -89,7 +83,7 @@ MailComposer = React.createClass({
     changeMailTemplate(e) {
         var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
         var templateId = mailTemplate.value;
-        var template = _.findWhere(this.data.templates, {_id: templateId});
+        var template = _.findWhere(this.props.templates, {_id: templateId});
         if(template) {
             var subject = React.findDOMNode(this.refs.subject);
             var mailContent = React.findDOMNode(this.refs.mailContent);
@@ -103,13 +97,9 @@ MailComposer = React.createClass({
         var validate = false;
         var subject = React.findDOMNode(this.refs.subject);
         var mailContent = React.findDOMNode(this.refs.mailContent);
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
         var data = {
-            mailTemplate: mailTemplate.value,
-            to: this.props.to.appIds,
             subject: subject.value,
-            content: $(mailContent).code(),
-            emailFrom: ""
+            body: $(mailContent).code()
         };
         //validate &= data.to.length > 0;
         if(data.mailTemplate == "-1") {
@@ -137,11 +127,7 @@ MailComposer = React.createClass({
         }
 
         if(validate === true) {
-            Meteor.call('sendMailToCandidates', data, function(err, result){
-                if(err) throw err;
-            });
-            Notification.success("Emails sent");
-            this.props.onDiscard();
+            this.props.onSave && this.props.onSave(data);
         }
 
         e.preventDefault();
@@ -157,7 +143,7 @@ MailComposer = React.createClass({
 
                             <div className="col-sm-10">
                                 <select ref="mailTemplate" className="form-control" onChange={this.changeMailTemplate}>
-                                    {this.data.templates.map( (t,idx) => <option value={t._id} key={idx}>{t.name}</option> )}
+                                    {this.props.templates.map( (t,idx) => <option value={t._id} key={idx}>{t.name}</option> )}
                                 </select>
                                 {this.state.mailTemplateError ? <p className="text-danger">Please choose a mail template</p> : null}
                             </div>
@@ -166,7 +152,7 @@ MailComposer = React.createClass({
                             <label className="col-sm-2 control-label">To:</label>
 
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" ref={"to"} disabled />
+                                {this.props.emails.map((email, key) => <span className="label label-info" key={key}>{email}</span>)}
                             </div>
                         </div>
                         <div className="form-group">

@@ -102,6 +102,7 @@ JobApplications.getActions = function() {
      */
     actions.disqualify = function (appIds = []) {
         const stage = this.state.stage.alias;
+        const jobId = this.state.jobId;
         const apps__selectedItems = this.state.apps__selectedItems;
         swal({
             title: "Are you sure?",
@@ -113,7 +114,7 @@ JobApplications.getActions = function() {
             closeOnConfirm: false,
             html: false
         }, () => {
-            Meteor.call('applications.toggleQualify', apps__selectedItems, stage, false, (err, result) => {
+            Meteor.call('applications.toggleQualify', jobId, apps__selectedItems, stage, false, (err, result) => {
                 if (!err && result) {
                     actions.toggleCheckAll(false);
                     swal("Disqualifed!", "", "success");
@@ -127,6 +128,7 @@ JobApplications.getActions = function() {
      */
     actions.revertQualify = function (appIds = []) {
         const stage = this.state.stage.alias;
+        const jobId = this.state.jobId;
         const apps__selectedItems = this.state.apps__selectedItems;
         swal({
             title: "Are you sure?",
@@ -138,7 +140,7 @@ JobApplications.getActions = function() {
             closeOnConfirm: false,
             html: false
         }, () => {
-            Meteor.call('applications.toggleQualify', apps__selectedItems, stage, true, (err, result) => {
+            Meteor.call('applications.toggleQualify', jobId, apps__selectedItems, stage, true, (err, result) => {
                 if (!err && result) {
                     actions.toggleCheckAll(false);
                     swal("Reverted qualify!", "", "success");

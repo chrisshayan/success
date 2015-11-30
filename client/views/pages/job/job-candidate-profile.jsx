@@ -183,34 +183,3 @@ JobCandidateProfile = React.createClass({
         );
     }
 });
-
-/*
- * job={this.props.job}
- stage={this.props.stage}
- application={this.data.application}
- containerWidth={this.state.width}
- isAddingComment={this.state.isAddingComment}
- isSendingMessage={this.state.isSendingMessage}
- isScheduleInterview={this.state.isScheduleInterview}
- onToggleAddComment={this.handleToggleAddComment}
- onToggleSendMessage={this.handleToggleSendMessage}
- onToggleScheduleInterview={this.handleToggleScheduleInterview}
- actions={ this.props.actions }
- * */
-
-/*
- job={this.props.job}
- stage={this.props.stage}
- application={this.data.application}
- isAddingComment={this.state.isAddingComment}
- isSendingMessage={this.state.isSendingMessage}
- isScheduleInterview={this.state.isScheduleInterview}
- onToggleAddComment={this.handleToggleAddComment}
- onToggleSendMessage={this.handleToggleSendMessage}
- onToggleScheduleInterview={this.handleToggleScheduleInterview}
- onSaveComment={this.handleSaveComment}
- onSaveScheduleInterview={this.handleSaveScheduleInterview}
- onDiscardComment={this.handleDiscardComment}
- onDiscardMessage={this.handleDiscardMessage}
- onDiscardInterview={this.handleDiscardScheduleInterview}
- >*/

@@ -993,6 +993,27 @@ Meteor.methods({
 
 
 Meteor.methods({
+    getSendMessageData(appIds = []) {
+        if(!this.userId) return false;
+        check(appIds, [Number]);
+        const currentUser = Meteor.users.findOne({_id: this.userId});
+        if(!currentUser) return false;
+        const templates = Collections.MailTemplates.find({companyId: currentUser.companyId});
+        const result = {
+            emails: [],
+            templates: templates.fetch()
+        };
+
+        if(!_.isEmpty(appIds)) {
+            const apps = Application.find({appId: {$in: appIds}});
+            _.each(apps.fetch(), (app) => {
+                result.emails.push(app.emails[0]);
+            })
+        }
+
+        return result;
+    },
+
     getResumeDetails: function(appId) {
         if(!this.userId) return null;
         this.unblock();
@@ -1006,4 +1027,4 @@ Meteor.methods({
         }
         return null;
     }
-})
+});
