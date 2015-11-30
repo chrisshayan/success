@@ -1018,7 +1018,7 @@ Meteor.methods({
         if(!this.userId) return null;
         this.unblock();
         try {
-            const req = HTTP.get('http://localhost:3000/api/resume');
+            const req = HTTP.get(Meteor.absoluteUrl() + 'api/resume');
             if(req.statusCode === 200) {
                 return EJSON.parse(req.content);
             }
