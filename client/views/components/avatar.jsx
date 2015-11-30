@@ -89,10 +89,10 @@ Avatar = React.createClass({
         var uploadContent = null;
         if (this.props.upload && this.data.user) {
             // change
-            if (this.data.avatarId) {
+            if (this.data.user.profile.avatar) {
                 if (this.state.hover) {
                     uploadContent = (
-                        <div style={styles.uploadOverlay} className="animated fadeIn">
+                        <div style={styles.uploadOverlay} className="animated fadeIn img-circle">
                             <button className="btn btn-xs btn-outline btn-white" onClick={this.openUploadWidget}>
                                 <i className="fa fa-camera"></i>&nbsp;
                                 change

@@ -160,6 +160,7 @@ JobsContainer = React.createClass({
 
     getMeteorData() {
         const forceUpdate = this.state.forceUpdate;
+
         const params = Router.current().params;
         let currentType = 'online';
         if (params.query && params.query['type']) {
@@ -167,7 +168,7 @@ JobsContainer = React.createClass({
                 currentType = params.query['type'];
             }
         }
-        const sub = SubCache.subscribe('ESJobs', currentType, this.state.limit, this.state.q, forceUpdate);
+        const sub = Meteor.subscribe('ESJobs', currentType, this.state.limit, this.state.q, forceUpdate);
         return {
             currentType: currentType,
             isReady: sub.ready(),
@@ -443,7 +444,7 @@ Job = React.createClass({
                 <div className="faq-item">
                     <div className="row">
                         <div className="col-md-7">
-                            <a href="#" className="faq-question">
+                            <a href={this.link('applied')} className="faq-question">
                                 {this.title()}
                             </a>
                             <div>

@@ -19,12 +19,28 @@ methods.jobListCount = function () {
     const counter = {online: 0, expired: 0};
     if (this.userId) {
         try {
+            const user = Meteor.users.findOne({_id: this.userId});
+            let query = {};
+            if(user.isCompanyAdmin()) {
+                query = SuccessESQuery.jobListCounter(user.companyId);
+            } else {
+                const selector = {
+                    $or: [
+                        {'recruiters.manager.userId': this.userId},
+                        {'recruiters.recruiter.userId': this.userId}
+                    ]
+                };
+                const jobIds = JobExtra.find(selector).map((doc) => doc.jobId)
+                if(_.isEmpty(jobIds)) return counter;
+                query = SuccessESQuery.jobListCounterForRecruiter(user.companyId, jobIds);
+            }
+
             const result = ESSearch({
                 index: 'vietnamworks',
                 type: 'job',
                 from: 0,
                 size: 0,
-                body: SuccessESQuery.jobListCounter(751)
+                body: query
             });
 
             if (result && result['aggregations']) {

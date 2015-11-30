@@ -15,6 +15,8 @@ var pubs = {};
 
 
 pubs.ESJobs = function (type, limit, q) {
+    if(!this.userId) return this.ready();
+    const user = Meteor.users.findOne({_id: this.userId});
     var self = this;
     var handle = null;
     var jobIds = [];
@@ -24,10 +26,27 @@ pubs.ESJobs = function (type, limit, q) {
     var query = {};
     if (!q || q.trim().length <= 0) q = undefined;
 
-    if (type == 'online') {
-        query = SuccessESQuery.onlineJob(751, q)
-    } else if (type == 'expired') {
-        query = SuccessESQuery.expiredJob(751, q)
+    if(user.isCompanyAdmin()) {
+        if (type == 'online') {
+            query = SuccessESQuery.onlineJob(user.companyId, q)
+        } else if (type == 'expired') {
+            query = SuccessESQuery.expiredJob(user.companyId, q)
+        }
+    } else {
+        const selector = {
+            $or: [
+                {'recruiters.manager.userId': this.userId},
+                {'recruiters.recruiter.userId': this.userId}
+            ]
+        };
+        const jobIds = JobExtra.find(selector).map((doc) => doc.jobId);
+        if(_.isEmpty(jobIds)) return this.ready();
+
+        if (type == 'online') {
+            query = SuccessESQuery.onlineJobForRecruiter(user.companyId, q, jobIds)
+        } else if (type == 'expired') {
+            query = SuccessESQuery.expiredJobForRecruiters(user.companyId, q, jobIds)
+        }
     }
 
     const {err, hits} = ESSearch({

@@ -1,12 +1,21 @@
 MyAccountContainer = React.createClass({
+    mixins: [ReactMeteorData],
+
+    getMeteorData() {
+        return {
+            currentUser: Meteor.user()
+        }
+    },
+
     render() {
         return (
             <div>
-                <PageHeading title="My Account" />
+                <PageHeading title="My Account"/>
+
                 <div className="wrapper wrapper-content">
                     <div className="row">
                         <UpdateProfileForm />
-                        <CompanyInfo />
+                        {this.data.currentUser ? <CompanyInfo companyId={this.data.currentUser.companyId}/> : null }
                     </div>
                 </div>
             </div>
@@ -26,7 +35,8 @@ CompanyInfo = React.createClass({
         this.setState({
             isLoading: true
         });
-        Meteor.call('getCompany', 751, (err, data)=> {
+
+        Meteor.call('getCompany', this.props.companyId, (err, data)=> {
             const state = {
                 isLoading: false
             };
@@ -55,6 +65,7 @@ CompanyInfo = React.createClass({
                                     </span>
                                     My Company Profile
                                 </h2>
+
                                 <div className="form-horizontal">
                                     <fieldset className="m-t-lg" aria-hidden="false">
                                         <div className="form-group">
