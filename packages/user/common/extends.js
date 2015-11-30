@@ -12,6 +12,8 @@ Meteor.loginWithVNW = function (email, password, callback) {
                 if (err) throw err;
                 // login: 2
                 Meteor.loginWithPassword({email: email}, password, function (err, result) {
+                    //setup hiring team
+                    Meteor.call('setupDefaultHiringTeam');
                     callback && callback(err, result);
                 });
             });

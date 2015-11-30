@@ -8,8 +8,7 @@ function transformVNWId(id) {
 Meteor.publish('companyInfo', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
-    if (!user) return this.ready();
-
+    if (!user || !user.companyId) return this.ready();
     return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
 });
 

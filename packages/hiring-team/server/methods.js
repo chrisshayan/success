@@ -23,7 +23,6 @@ var methods = {
     sendRequest: function (obj) {
         if (!this.userId) return false;
         try {
-            console.log(Meteor.user);
             var user = Meteor.user(); //Meteor.users.findOne({_id: this.userId});
             if (!obj['request-email'])
                 return {
@@ -62,7 +61,6 @@ var methods = {
 
             //hiringTeamItem.roleId = [];
             var result = hiringTeamItem.save();
-            console.log('hiringTeamItem', hiringTeamItem);
 
             if (result) {
                 //send email
@@ -83,7 +81,6 @@ var methods = {
                             subject: subject,
                             html: html
                         };
-                        console.log('mail', mail);
                         Email.send(mail);
                     }
                 );
@@ -179,13 +176,38 @@ var methods = {
 };
 
 methods.removeHiringTeamRequest = function (requestId) {
-    console.log('remove hiring team');
     if (!this.userId) return false;
     this.unblock();
     var user = Meteor.users.findOne({_id: this.userId});
     var request = Meteor['hiringTeam'].findOne({_id: requestId});
     if (!user || !request) return false;
     return request.remove();
+};
+
+
+methods.setupDefaultHiringTeam = function () {
+    var user = Meteor.users.findOne({_id: Meteor.userId()});
+    var email = user.emails[0].address;
+
+    var hiringTeamItem = new HiringTeam();
+    if (Meteor['hiringTeam'].findOne({email: email}))
+        return {
+            status: 0,
+            message: 'This email address is exist in your hiring team already'
+        };
+
+    hiringTeamItem.companyId = user.companyId;
+    hiringTeamItem.email = email;
+    hiringTeamItem.username = 'admin' + user.companyId;
+    hiringTeamItem.roleId = 'admin';
+    hiringTeamItem.status = 1;
+    hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
+
+    if (!hiringTeamItem.name.length)
+        hiringTeamItem.name = 'admin';
+
+    //hiringTeamItem.roleId = [];
+    hiringTeamItem.save();
 };
 
 Meteor.methods(methods);

@@ -91,7 +91,7 @@ var methods = {
                         }
                     })
                 }
-                Meteor.defer(function() {
+                Meteor.defer(function () {
                     SYNC_VNW.syncUser(vnwData);
                 });
                 var tokenData = {
@@ -118,6 +118,8 @@ var methods = {
             }
             return true;
         }
+
+
     },
 
     getUser: function (userId, filters) {
