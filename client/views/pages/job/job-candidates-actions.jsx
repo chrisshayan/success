@@ -36,28 +36,28 @@ JobCandidateListActions = React.createClass({
         };
     },
 
-    handleSearch(e) {
+    handle__Search(e) {
         e.preventDefault();
         let q = e.target.value.trim();
         this.props.onSearch(q);
     },
 
-    handleSwitchSort(key, sort) {
+    handle__SwitchSort(key, sort) {
         this.setState({
             sortKey: key
         });
         this.props.onSort(sort.field, sort.type);
     },
 
-    handleDisqualify() {
+    handle__Disqualify() {
         this.props.onBulkDisqualify && this.props.onBulkDisqualify();
     },
 
-    handleRevertQualify() {
+    handle__RevertQualify() {
         this.props.onBulkRevertQualify && this.props.onBulkRevertQualify();
     },
 
-    handleSendMessage() {
+    handle__SendMessage() {
         this.props.onBulkSendMessage && this.props.onBulkSendMessage();
     },
 
@@ -99,7 +99,7 @@ JobCandidateListActions = React.createClass({
                             className="form-control"
                             placeholder="Search by name or tags"
                             style={styles.searchBox}
-                            onKeyUp={this.handleSearch}/>
+                            onKeyUp={this.handle__Search}/>
                     </div>
                 </div>
                 <div className="clearfix border-bottom" style={{background:'#f9f9f9'}}>
@@ -113,7 +113,7 @@ JobCandidateListActions = React.createClass({
                                     pullRight={true}>
                         {this.state.sortOptions.map((s, key) => {
                             return (
-                            <MenuItem key={key} eventKey={key} onSelect={() => this.handleSwitchSort(key, s)}>
+                            <MenuItem key={key} eventKey={key} onSelect={() => this.handle__SwitchSort(key, s)}>
                                 {this.state.sortKey === key ? <i className="fa fa-check dropdown-check"/> : null}
                                 {s.label}
                                 <i className={s.icon}/>
@@ -123,10 +123,10 @@ JobCandidateListActions = React.createClass({
                     </DropdownButton>
                     <DropdownButton disabled={!this.props.hasChecked} bsStyle={'link'} title='Actions' id={"menu-" + Date.now()} className="pull-right">
                         {!this.props.disqualified
-                            ? <MenuItem key={0} eventKey={0} onSelect={this.handleDisqualify}>Disqualify</MenuItem>
-                            : <MenuItem key={0} eventKey={0} onSelect={this.handleRevertQualify}>Revert qualify</MenuItem>}
+                            ? <MenuItem key={0} eventKey={0} onSelect={this.handle__Disqualify}>Disqualify</MenuItem>
+                            : <MenuItem key={0} eventKey={0} onSelect={this.handle__RevertQualify}>Revert qualify</MenuItem>}
 
-                        <MenuItem key={1} eventKey={1}  onSelect={this.handleSendMessage}>Send message</MenuItem>
+                        <MenuItem key={1} eventKey={1}  onSelect={this.handle__SendMessage}>Send message</MenuItem>
                     </DropdownButton>
                 </div>
             </div>

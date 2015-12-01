@@ -41,26 +41,26 @@ Publications.lastApplications = function () {
     return {
         find: function () {
             try {
-                var user = Meteor.users.findOne({_id: self.userId});
-                if (!user) return [];
-                var jobPermissions = user.jobPermissions();
-                var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
-                    return r.jobId
-                });
-                jobIds = _.filter(jobIds, (v) => v != void 0);
-
-                var filters = {
-                    jobId: {$in: jobIds},
-                    source: {$ne: 3},
-                    isDeleted: 0
-                };
-
-                var options = {};
-                options['limit'] = 10;
-                options['sort'] = {
-                    createdAt: -1
-                };
-                return Collections.Applications.find(filters, options);
+                //var user = Meteor.users.findOne({_id: self.userId});
+                //if (!user) return [];
+                //var jobPermissions = user.jobPermissions();
+                //var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
+                //    return r.jobId
+                //});
+                //jobIds = _.filter(jobIds, (v) => v != void 0);
+                //
+                //var filters = {
+                //    jobId: {$in: jobIds},
+                //    source: {$ne: 3},
+                //    isDeleted: 0
+                //};
+                //
+                //var options = {};
+                //options['limit'] = 10;
+                //options['sort'] = {
+                //    createdAt: -1
+                //};
+                //return Collections.Applications.find(filters, options);
             } catch (e) {
                 console.trace('Last applications:', e);
                 return null;

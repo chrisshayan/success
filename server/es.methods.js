@@ -65,19 +65,22 @@ methods.getCompany = function (companyId) {
     let companyInfo = new ESCompanyInfo();
     if (this.userId) {
         try {
-            const result = ESSearch({
-                index: 'employerInformation',
-                type: 'company',
-                from: 0,
-                size: 1,
-                body: SuccessESQuery.getCompanyInfo(751)
-            });
+            const user = Meteor.users.findOne({_id: this.userId});
+            if(user && user.companyId) {
+                const result = ESSearch({
+                    index: 'employerInformation',
+                    type: 'company',
+                    from: 0,
+                    size: 1,
+                    body: SuccessESQuery.getCompanyInfo(user.companyId)
+                });
 
-            if (result && result['hits']) {
-                const hits = result['hits']['hits'];
-                if (hits.length > 0) {
-                    const data = hits[0]['_source'];
-                    companyInfo = new ESCompanyInfo(data);
+                if (result && result['hits']) {
+                    const hits = result['hits']['hits'];
+                    if (hits.length > 0) {
+                        const data = hits[0]['_source'];
+                        companyInfo = new ESCompanyInfo(data);
+                    }
                 }
             }
         } catch (e) {

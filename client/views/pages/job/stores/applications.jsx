@@ -11,7 +11,8 @@ JobApplications.getState = function() {
             disqualified: 0
         },
         apps__selectedItems: [],
-        apps__isSelectedAll: false
+        apps__isSelectedAll: false,
+        apps__showSendBulkMessage: false
     }
 };
 
@@ -150,18 +151,37 @@ JobApplications.getActions = function() {
     }.bind(this);
 
     /**
-     * Send message to applications
+     * toggle show send bulk message
      */
-    actions.sendMessage = function (appIds = []) {
-        console.log(1234567)
-        let apps__selectedItems = [];
-        if (!_.isEmpty(appIds)) {
-            apps__selectedItems = appIds;
-        } else {
-            apps__selectedItems = this.state.apps__selectedItems;
+    actions.toggleSendMessage = function (status = null) {
+        if(status === null) {
+            status = !this.state.apps__showSendBulkMessage;
+        }
+        this.setState({
+            apps__showSendBulkMessage: status
+        });
+
+        if(status === false) {
             actions.toggleCheckAll(false);
         }
-        console.log('send message')
+    }.bind(this);
+
+    /**
+     * Send bulk messages
+     * @type {function(this:JobApplications)}
+     */
+    actions.sendMessage = function (data) {
+        const jobId = this.state.jobId;
+        const appIds = this.state.apps__selectedItems;
+
+        Meteor.call('application.sendMessage', jobId, appIds, data, (err, result) => {
+            if(!err && result) {
+                actions.toggleSendMessage(false);
+                Notification.success("Emails sent");
+            } else {
+
+            }
+        });
     }.bind(this);
 
     return actions;

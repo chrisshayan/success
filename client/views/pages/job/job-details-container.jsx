@@ -1,3 +1,5 @@
+const { Modal, Button } = ReactBootstrap;
+
 const HookMixin = {
     getInitialState() {
         let state = {
@@ -46,12 +48,17 @@ const HookMixin = {
     },
 
     componentDidMount() {
+        $('body').animate({
+            scrollTop: 0
+        }, 300);
+
         this.handle___GetJobInfo();
         this.handle___GetCVToken();
         this.handle___UpdateAppCounter(this.state.candidateType, null);
         if (this.state.currentAppId) {
             this.handle___GetResumeDetails();
         }
+
     },
 
     componentWillUpdate(nextProps, nextState) {
@@ -250,6 +257,17 @@ const RendererMixin = {
                             actions={ this.current__Actions() }
                         />
 
+                        <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'}>
+                            <Modal.Header>
+                                <Modal.Title>Send bulk message</Modal.Title>
+                            </Modal.Header>
+                            {this.state.apps__showSendBulkMessage ? (
+                                <MessageBox
+                                    appIds={this.state.apps__selectedItems}
+                                    onSave={this.apps__Actions().sendMessage}
+                                    onDiscard={() => this.apps__Actions().toggleSendMessage(false) } />
+                            ): null}
+                        </Modal>
                     </div>
                 </div>
             </div>

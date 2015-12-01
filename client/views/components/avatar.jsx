@@ -41,6 +41,14 @@ Avatar = React.createClass({
     openUploadWidget() {
         var self = this;
         var oldId = this.data.avatarId;
+        const options = {
+            format: 'jpg',
+            width: 128,
+            height: 128,
+            crop: this.props.crop,
+            quality: 100
+        };
+
         cloudinary.openUploadWidget({
                 cloud_name: 'pim',
                 upload_preset: 'gcvsyt6b',
@@ -57,7 +65,7 @@ Avatar = React.createClass({
                     Meteor.call('removeAvatar', oldId);
                     Meteor.users.update({_id: self.props.userId}, {
                         $set: {
-                            "profile.avatar": $.cloudinary.url(result[0].public_id)
+                            "profile.avatar": $.cloudinary.url(result[0].public_id, options)
                         }
                     });
                 }

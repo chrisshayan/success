@@ -13,6 +13,17 @@ JobCurrentApplication.getActions = function () {
     const actions = {};
 
     /**
+     * Scroll to top
+     * @type {function(this:JobCurrentApplication)}
+     */
+    actions.scrollTop = function(offsetTop = 0) {
+        const $body = $('body');
+        if($body.scrollTop() >= offsetTop) {
+            $('body').animate({scrollTop: 0}, 300);
+        }
+    }.bind(this);
+
+    /**
      * move to next application
      * @param nextIndex <Number>
      */
@@ -35,6 +46,9 @@ JobCurrentApplication.getActions = function () {
         if (nextApp) {
             query['appId'] = nextApp.appId;
         }
+
+        actions.scrollTop(140);
+
         Router.go('Job', params, {query});
     }.bind(this);
 
@@ -103,8 +117,6 @@ JobCurrentApplication.getActions = function () {
      * @param stage <Number>
      */
     actions.moveStage = function (stage) {
-        console.log('move stage', this.state.currentAppId, ' to ', stage)
-
         if (_.isNumber(this.state.currentAppId)) {
             const currentAppId = this.state.currentAppId;
 
@@ -125,9 +137,8 @@ JobCurrentApplication.getActions = function () {
         const params = Router.current().params
             , query = _.omit(params.query, 'appAction');
 
+        actions.scrollTop();
         Router.go('Job', params, { query });
-        // scroll to top
-        $('body').animate({scrollTop: 0}, 300);
     }.bind(this);
 
     /**
