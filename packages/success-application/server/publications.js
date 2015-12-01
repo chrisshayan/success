@@ -35,32 +35,47 @@ Publications.getApplications = function (filters, options) {
  * Publish 10 latest applications of open jobs
  * @returns {*}
  */
-Publications.lastApplications = function () {
+Publications['applications.lastApplications'] = function () {
     if (!this.userId) return null;
-    var self = this;
+    const user = Meteor.users.findOne({_id: this.userId});
+    if (!user || !user['companyId']) return null;
     return {
         find: function () {
             try {
-                //var user = Meteor.users.findOne({_id: self.userId});
-                //if (!user) return [];
-                //var jobPermissions = user.jobPermissions();
-                //var jobIds = Collections.Jobs.find({status: 1, $or: jobPermissions}).map(function (r) {
-                //    return r.jobId
-                //});
-                //jobIds = _.filter(jobIds, (v) => v != void 0);
-                //
-                //var filters = {
-                //    jobId: {$in: jobIds},
-                //    source: {$ne: 3},
-                //    isDeleted: 0
-                //};
-                //
-                //var options = {};
-                //options['limit'] = 10;
-                //options['sort'] = {
-                //    createdAt: -1
-                //};
-                //return Collections.Applications.find(filters, options);
+                let selector = {},
+                    options = {
+                        limit: 10,
+                        sort: {
+                            createdAt: -1
+                        }
+                    };
+
+                if (user.isCompanyAdmin()) {
+                    selector = {
+                        companyId: user.companyId
+                    };
+                } else {
+                    const jobSelector = {
+                        $or: [
+                            {'recruiters.manager.userId': user._id},
+                            {'recruiters.recruiter.userId': user._id}
+                        ]
+                    };
+                    const jobIds = JobExtra.find(jobSelector).map((doc) => doc.jobId);
+                    if(jobIds.length > 0) {
+                        selector = {
+                            companyId: user.companyId,
+                            jobId: {
+                                $in: jobIds
+                            }
+                        };
+                    }
+                }
+
+                if(!_.isEmpty(selector)) {
+                    return Application.find(selector, options);
+                }
+                return null;
             } catch (e) {
                 console.trace('Last applications:', e);
                 return null;

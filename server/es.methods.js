@@ -21,7 +21,7 @@ methods.jobListCount = function () {
         try {
             const user = Meteor.users.findOne({_id: this.userId});
             let query = {};
-            if(user.isCompanyAdmin()) {
+            if (user.isCompanyAdmin()) {
                 query = SuccessESQuery.jobListCounter(user.companyId);
             } else {
                 const selector = {
@@ -31,7 +31,7 @@ methods.jobListCount = function () {
                     ]
                 };
                 const jobIds = JobExtra.find(selector).map((doc) => doc.jobId)
-                if(_.isEmpty(jobIds)) return counter;
+                if (_.isEmpty(jobIds)) return counter;
                 query = SuccessESQuery.jobListCounterForRecruiter(user.companyId, jobIds);
             }
 
@@ -66,7 +66,7 @@ methods.getCompany = function (companyId) {
     if (this.userId) {
         try {
             const user = Meteor.users.findOne({_id: this.userId});
-            if(user && user.companyId) {
+            if (user && user.companyId) {
                 const result = ESSearch({
                     index: 'employerInformation',
                     type: 'company',
@@ -141,6 +141,46 @@ methods.suggestSkills = function () {
             }
         }
     });
-}
+};
+
+methods['ES.lastOpenJobs'] = function () {
+    if (!this.userId) return this.ready();
+    const jobs = [];
+    const user = Meteor.users.findOne({_id: this.userId});
+    let query = {};
+
+    if (user.isCompanyAdmin()) {
+        query = SuccessESQuery.onlineJob(user.companyId)
+    } else {
+        const selector = {
+            $or: [
+                {'recruiters.manager.userId': this.userId},
+                {'recruiters.recruiter.userId': this.userId}
+            ]
+        };
+        const jobIds = JobExtra.find(selector).map((doc) => doc.jobId);
+        if (_.isEmpty(jobIds)) return [];
+        query = SuccessESQuery.onlineJobForRecruiter(user.companyId, null, jobIds)
+    }
+
+    const {err, hits} = ESSearch({
+        index: 'vietnamworks',
+        type: 'job',
+        from: 0,
+        size: 10,
+        body: query
+    });
+
+    if (!err) {
+        const _jobs = _.pluck(hits.hits, '_source');
+        _.each(_jobs, (j) => {
+            var job = new ESJob(j);
+            job.cities = Meteor.cities.find({languageId: 2, vnwId: {$in: j.cityList}}, {fields: {name: 1}}).fetch();
+            jobs.push( job );
+        });
+    }
+
+    return jobs;
+};
 
 Meteor.methods(methods);

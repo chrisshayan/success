@@ -79,5 +79,25 @@ ESJob = Astro.Class({
         extra: {
             type: 'object'
         }
+    },
+
+    methods: {
+        cityLabel() {
+            const cities = _.pluck(this.cities, 'name');
+            return cities.join(', ');
+        },
+
+        expiredAt() {
+            const d = new moment(this.expiredDate);
+            return d.isValid() ? d.format('DD/MM/YYYY') : '';
+        },
+
+        jobUrl() {
+            const params = {
+                jobId: this.jobId,
+                stage: 'applied'
+            };
+            return Router.url('Job', params);
+        }
     }
 });

@@ -1,0 +1,74 @@
+<template name="LastApplications">
+    {{#if isLoading}}
+        {{> waveLoading}}
+    {{else}}
+        {{#each items}}
+            {{> LastApplicationItem}}
+        {{/each}}
+    {{/if}}
+</template>
+
+
+<template name="LastApplicationItem">
+    <div class="sidebar-message last-application">
+        <div class="media-body">
+            <a href="{{ detailsLink }}" class="clearfix">
+                <strong class="pull-left name">{{ fullname }}</strong>
+                <a class="pull-right" href="#">
+                    <small class="text-muted">{{ timeago }}</small>
+                </a>
+            </a>
+            <div class="row">
+                <div class="col-md-1">
+                    <i class="fa fa-briefcase"></i>
+                </div>
+                <div class="col-md-10">
+                    {{ jobTitle }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-1">
+                    <i class="fa fa-thumb-tack"></i>
+                </div>
+                <div class="col-md-10">
+                    {{ stageName }}
+                </div>
+            </div>
+
+            {{#if mobile}}
+                <div class="row">
+                    <div class="col-md-1">
+                        <i class="fa fa-mobile"></i>
+                    </div>
+                    <div class="col-md-10">
+                        {{ mobile }}
+                    </div>
+                </div>
+            {{else}}
+                {{#if phone}}
+                    <div class="row">
+                        <div class="col-md-1">
+                            <i class="fa fa-mobile"></i>
+                        </div>
+                        <div class="col-md-10">
+                            {{ phone }}
+                        </div>
+                    </div>
+                {{/if}}
+            {{/if}}
+
+            <div class="row">
+                <div class="col-md-1">
+                    <i class="fa fa-map-marker"></i>
+                </div>
+                <div class="col-md-10">
+                    {{ cityName }}
+
+                    <span class="label {{ matchingScoreLabel }} pull-right" data-toggle="tooltip" data-placement="bottom"
+                          title="MatchingScore {{ matchingScore }}%">{{ matchingScore }} %</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>

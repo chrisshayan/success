@@ -168,7 +168,9 @@ SuccessESQuery = {
                 "cityList",
                 "numOfViews",
                 "approvedDate",
-                "expiredDate"
+                "expiredDate",
+                "salaryMin",
+                "salaryMax"
             ],
 
             "query": {
@@ -266,7 +268,9 @@ SuccessESQuery = {
                 "cityList",
                 "numOfViews",
                 "approvedDate",
-                "expiredDate"
+                "expiredDate",
+                "salaryMin",
+                "salaryMax"
             ],
 
             "query": {
@@ -369,7 +373,9 @@ SuccessESQuery = {
                 "cityList",
                 "numOfViews",
                 "approvedDate",
-                "expiredDate"
+                "expiredDate",
+                "salaryMin",
+                "salaryMax"
             ],
 
             "query": {
@@ -462,7 +468,9 @@ SuccessESQuery = {
                 "cityList",
                 "numOfViews",
                 "approvedDate",
-                "expiredDate"
+                "expiredDate",
+                "salaryMin",
+                "salaryMax"
             ],
 
             "query": {

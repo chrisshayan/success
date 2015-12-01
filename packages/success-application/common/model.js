@@ -104,9 +104,11 @@ var model = Astro.Class({
 
     }, // schema
     methods: {
-        candidate: function () {
-
+        stageName() {
+            const stage = Success.APPLICATION_STAGES[this.stage];
+            return stage ? stage.label : '';
         },
+
         isExist(condition) {
             var query = condition || {entryID: this.entryId};
             return !!Collection.findOne(query);
@@ -124,6 +126,7 @@ var model = Astro.Class({
             else
                 return " hidden ";
         },
+
         isSentDirectly (){
             return this.source.type === 2;
         },
@@ -131,6 +134,23 @@ var model = Astro.Class({
         shortCoverLetter() {
             if (!this.coverLetter) return "";
             return this.coverLetter.split(/\s+/).splice(0, 14).join(" ") + "...";
+        },
+
+        timeago() {
+            return moment(this.appliedDate).fromNow();
+        },
+
+        detailsLink() {
+            if(Meteor.isClient) {
+                const stage = Success.APPLICATION_STAGES[this.stage] || {label: '', id: '', alias: ''};
+                const params = {
+                    jobId: this.jobId,
+                    stage: stage.alias
+                };
+                const query = { appId: this.appId };
+                return Router.url('Job', params, { query })
+            }
+            return '';
         }
     } // prototype
 });

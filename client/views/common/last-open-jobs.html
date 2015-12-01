@@ -1,0 +1,39 @@
+<template name="LastOpenJobs">
+    <ul class="sidebar-list">
+        {{#if isLoading}}
+            {{> waveLoading}}
+        {{else}}
+            {{#if items}}
+                {{#each items}}
+                    {{> LastOpenJobItem}}
+                {{/each}}
+            {{else}}
+                <h4 class="text-muted">There is no open job.</h4>
+            {{/if}}
+        {{/if}}
+
+    </ul>
+</template>
+
+<template name="LastOpenJobItem">
+    <li>
+        <a href="{{ jobUrl }}">
+            <h4>{{ jobTitle }}</h4>
+            {{#if salaryMax}}
+                $ {{salaryMin}} - {{salaryMax}}
+            {{else}}
+                <span class="text-muted">Negative</span>
+            {{/if}}
+
+            <div class="clearfix">
+                {{#if cities}}
+                <div class="small text-muted m-t-xs pull-right">
+                    <i class="fa fa-map-marker"></i>
+                    {{ cityLabel }}
+                </div>
+                {{/if}}
+                <div class="small text-muted m-t-xs">expired {{ expiredAt }}</div>
+            </div>
+        </a>
+    </li>
+</template>
