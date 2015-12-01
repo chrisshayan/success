@@ -52,6 +52,8 @@ var getApplicationByJobId = function (job, cb) {
                     application.set('genderId', info.genderId);
                     application.set('dob', info.birthday);
                     application.set('countryId', info.countryId);
+                    application.set('phone', info.homephone);
+                    application.set('mobile', info.cellphone);
 
                     info.jobTitle && application.set('jobTitle', info.jobTitle);
                     const city = Meteor.cities.findOne({vnwId: info.cityId, languageId: 2});

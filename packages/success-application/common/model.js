@@ -82,6 +82,14 @@ var model = Astro.Class({
             type: 'number',
             optional: true
         },
+        phone: {
+            type: 'number',
+            optional: true
+        },
+        mobile: {
+            type: 'number',
+            optional: true
+        },
         cityName: {
             type: 'string',
             default: ''
