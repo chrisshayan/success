@@ -16,7 +16,7 @@ JobCandidateProfileContent = React.createClass({
     render() {
         return (
             <div>
-                {/*<JobCandidateShortInfo application={this.props.application}/>*/}
+                <JobCandidateShortInfo application={this.props.application} {...this.props} />
                 <Tabs id="job-candidate-content" activeKey={this.state.key} onSelect={this.handleSelect}>
                     <Tab eventKey={1} title="Timeline">
 

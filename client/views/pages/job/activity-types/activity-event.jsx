@@ -163,9 +163,18 @@ ActivityEvent = React.createClass({
                                     <p className="hr-line-dashed"/>
 
                                     <div className="form-group">
-                                        <label className="col-sm-2 control-label">Body</label>
+                                        <label className="col-sm-2 control-label">Interviewers</label>
 
-                                        <div className="col-sm-10" ref="body">
+                                        <div className="col-sm-10">
+                                            {interviewers}
+                                        </div>
+                                    </div>
+
+
+                                    <p className="hr-line-dashed"/>
+
+                                    <div className="form-group">
+                                        <div className="col-sm-12" ref="body">
                                             <div style={styles.body}>
                                                 <p dangerouslySetInnerHTML={ {__html: content.body} } />
                                             </div>
@@ -175,16 +184,6 @@ ActivityEvent = React.createClass({
                                                     <a onClick={this.handle__MoreLess}>{this.state.more ? 'less': 'more'}</a>
                                                 ) : null}
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <p className="hr-line-dashed"/>
-
-                                    <div className="form-group">
-                                        <label className="col-sm-2 control-label">Interviewers</label>
-
-                                        <div className="col-sm-10">
-                                            {interviewers}
                                         </div>
                                     </div>
                                 </div>
