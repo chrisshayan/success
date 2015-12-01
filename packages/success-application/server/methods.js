@@ -14,6 +14,44 @@ const {
     RECRUITER_SCORE_CANDIDATE
     } = Activities.TYPE;
 
+function replacePlaceholder(user, job, application, mail) {
+    var valid = ["candidate_first_name", "position", "company", "mail_signature"];
+
+    var replaces = {};
+    var placeholders = mail.body.match(/\[\[(\w+)\]\]/gi);
+    _.each(placeholders, function (p) {
+        p1 = p.replace(/\[\[|\]\]/g, "");
+        if (_.indexOf(valid, p1) >= 0) {
+            if (replaces.hasOwnProperty(p)) return;
+            switch (p1) {
+                case "candidate_first_name":
+                    replaces[p1] = application.firstname;
+                    break;
+
+                case "position":
+
+                    replaces[p1] = job.jobTitle;
+                    break;
+
+                case "company":
+                    replaces[p1] = job.companyName;
+                    break;
+                case "mail_signature":
+                    replaces[p1] = user.emailSignature || '';
+                    break;
+            }
+        }
+    });
+
+    _.templateSettings = {
+        interpolate: /\[\[(.+?)\]\]/g
+    };
+    var template = _.template(mail.body);
+    mail.body = template(replaces);
+
+    return mail;
+}
+
 methods.applicationStageCount = function (jobId, stageId) {
     var result = {
         qualify: 0,
@@ -189,9 +227,14 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
     check(appIds, [Number]);
     check(data, Object);
 
+    const user = Meteor.users.findOne({_id: this.userId});
+    const job = JobExtra.findOne({jobId: jobId});
+    if(!user || !job) return false;
+
     _.each(appIds, (appId) => {
         var app = Application.findOne({jobId: jobId, appId: appId});
         if (!app) return false;
+        data = replacePlaceholder(user, job, app, data);
 
         const ref = {
             companyId: app.companyId,
@@ -217,8 +260,12 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     check(appId, Number);
     check(data, Object);
 
+
+    const user = Meteor.users.findOne({_id: this.userId});
+    const job = JobExtra.findOne({jobId: jobId});
     var app = Application.findOne({jobId: jobId, appId: appId});
-    if (!app) return false;
+    if(!user || !job || !app) return false;
+    data = replacePlaceholder(user, job, app, data);
 
     const ref = {
         companyId: app.companyId,

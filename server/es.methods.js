@@ -108,6 +108,7 @@ methods.getJobInfo = function (jobId) {
                     if (hits.length > 0) {
                         const data = hits[0]['_source'];
                         job = new ESJob(data);
+
                         const level = Meteor.job_levels.findOne({vnwId: data.jobLevelId});
                         job.jobLevel = level && level.name ? level.name : '';
                         job.cities = Meteor.cities.find({
@@ -119,6 +120,28 @@ methods.getJobInfo = function (jobId) {
                             languageId: 2,
                             vnwId: {$in: industryIds}
                         }, {fields: {name: 1}}).fetch();
+
+                        /***
+                         * update jobTitle and companyName
+                         * @type {*|{}|any}
+                         */
+                        var extra = JobExtra.findOne({jobId: job.jobId});
+                        if (!extra) {
+                            extra = new JobExtra();
+                            extra.jobId = job.jobId;
+                            extra.companyId = job.companyId;
+                            extra.save();
+                        }
+
+                        if(!_.isEqual(extra.jobTitle, job.jobTitle)) {
+                            extra.set('jobTitle', job.jobTitle);
+                        }
+
+                        const companyName = job.companyName.trim() || job.companyDesc.trim();
+                        if(!_.isEqual(extra.companyName, companyName)) {
+                            extra.set('companyName', companyName);
+                        }
+                        extra.save();
                     }
                 }
             }

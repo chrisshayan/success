@@ -161,6 +161,8 @@ SuccessESQuery = {
             "_source": [
                 "userId",
                 "companyId",
+                "companyName",
+                "companyDesc",
                 "skills.skillName",
                 "jobId",
                 "alias",
@@ -261,6 +263,8 @@ SuccessESQuery = {
             "_source": [
                 "userId",
                 "companyId",
+                "companyName",
+                "companyDesc",
                 "skills.skillName",
                 "jobId",
                 "alias",
@@ -366,6 +370,8 @@ SuccessESQuery = {
             "_source": [
                 "userId",
                 "companyId",
+                "companyName",
+                "companyDesc",
                 "skills.skillName",
                 "jobId",
                 "alias",
@@ -461,6 +467,8 @@ SuccessESQuery = {
             "_source": [
                 "userId",
                 "companyId",
+                "companyDesc",
+                "companyName",
                 "skills.skillName",
                 "jobId",
                 "alias",

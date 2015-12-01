@@ -69,6 +69,20 @@ JobExtra = Astro.Class({
         syncState: {
             type: 'string',
             default: ()=> 'syncing'
+        },
+
+        jobTitle: {
+            type: 'string',
+            default() {
+                return '';
+            }
+        },
+
+        companyName: {
+            type: 'string',
+            default() {
+                return '';
+            }
         }
     }
 });

@@ -77,6 +77,18 @@ pubs.ESJobs = function (type, limit, q) {
 
                 addToJobCollection('getApplications', data);
             }
+
+            if(!_.isEqual(extra.jobTitle, job.jobTitle)) {
+                extra.set('jobTitle', job.jobTitle);
+            }
+
+            const companyName = job.companyName.trim() || job.companyDesc.trim();
+            if(!_.isEqual(extra.companyName, companyName)) {
+                extra.set('companyName', companyName);
+            }
+
+            extra.save();
+
             job.extra = extra;
             job.cities = Meteor.cities.find({languageId: 2, vnwId: {$in: j.cityList}}, {fields: {name: 1}}).fetch();
             job.type = type;

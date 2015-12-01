@@ -5,6 +5,18 @@ ESJob = Astro.Class({
             type: 'number',
             default: 0
         },
+        companyName: {
+            type: 'string',
+            default() {
+                return '';
+            }
+        },
+        companyDesc: {
+            type: 'string',
+            default() {
+                return '';
+            }
+        },
 
         jobId: {
             type: 'number',
