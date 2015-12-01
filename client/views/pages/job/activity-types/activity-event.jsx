@@ -90,17 +90,18 @@ ActivityEvent = React.createClass({
         const styles = {
             body: {
                 height: this.state.hasMore && !this.state.more ? '100px' : 'auto',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                margin: '5px 0'
             },
 
             interviewers: {
-                margin: '5px 0'
+                padding: '10px 0'
             }
         };
 
         let interviewers = null;
         if(content.interviewers.length > 0) {
-            interviewers = <div style={ styles.interviewers }>{content.interviewers.map((userId, key) => <ActivityEventAttendee key={key} userId={userId} />) }</div>;
+            interviewers = <div className="row" style={ styles.interviewers }>{content.interviewers.map((userId, key) => <ActivityEventAttendee key={key} userId={userId} />) }</div>;
         } else {
             interviewers = <p className="form-control-static"><span className="text-muted">There is no interviewers</span></p>
         }
@@ -228,7 +229,7 @@ ActivityEventAttendee = React.createClass({
             }
         };
         return (
-            <div className="clearfix" style={ styles.container }>
+            <div className="col-sm-6" style={ styles.container }>
                 <div className="pull-left" style={ styles.avatar }>
                     <Avatar userId={this.props.userId} width={32} height={32} />
                 </div>

@@ -29,7 +29,7 @@ Meteor.currentRecruiter = function () {
 User.prototype.fullname = function () {
     var fullname = '';
     var profile = this.profile || null;
-    if (profile && profile.firstname && profile.lastname) {
+    if (profile) {
         fullname = [profile.firstname, profile.lastname].join(' ');
     }
     return fullname;

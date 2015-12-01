@@ -21,7 +21,8 @@ JobHeader = React.createClass({
                 fontSize: '24px',
                 fontWeight: 100,
                 margin: '5px 0 0 0',
-                padding: 0
+                padding: 0,
+                float: 'left'
             },
 
             tags: {
@@ -48,25 +49,14 @@ JobHeader = React.createClass({
         return (
             <div className="row wrapper border-bottom white-bg">
                 <div className="col-lg-12">
-                    <DropdownButton
-                        id="jobSwitch"
-                        bsStyle={'link'}
-                        style={styles.title}
-                        title={ this.props.job.jobTitle }
-                        key={0}>
+                    <div className="clearfix">
+                        <h2 id="jobSwitch" style={styles.title}>{this.props.job.jobTitle}</h2>
 
-
-                        <MenuItem href="/job-new/561260/applied">Helo </MenuItem>
-                        <MenuItem href="/job-new/561259/applied">Helo </MenuItem>
-                        <MenuItem href="/job-new/561195/applied">Helo </MenuItem>
-                        <MenuItem href="/job-new/561260/applied">Helo </MenuItem>
-
-                    </DropdownButton>
-
-                    <a href={this.jobSettingUrl()} className="btn btn-link">
-                        <i className="fa fa-cogs" /> &nbsp;
-                        setting
-                    </a>
+                        <a href={this.jobSettingUrl()} className="btn btn-link pull-left">
+                            <i className="fa fa-cogs" /> &nbsp;
+                            setting
+                        </a>
+                    </div>
                 </div>
 
                 <div className="col-md-12">

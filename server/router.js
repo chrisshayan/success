@@ -197,7 +197,7 @@ function createMockupResume() {
     });
 
     // add educations
-    _.each(_.range(_.random(0, 3)), () => {
+    _.each(_.range(_.random(1, 4)), () => {
         const start = new moment();
         const end = new moment();
         let step = _.random(12, 24);
@@ -214,7 +214,7 @@ function createMockupResume() {
     });
 
     // add experience
-    _.each(_.range(_.random(0, 3)), () => {
+    _.each(_.range(_.random(2, 5)), () => {
         const start = new moment();
         const end = new moment();
         let step = _.random(12, 24);
