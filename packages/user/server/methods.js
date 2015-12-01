@@ -21,6 +21,26 @@ var setModifier = function (obj) {
 };
 
 
+function generateUsername(userId) {
+    if (!userId) return null;
+
+    var regEx = new RegExp('^' + userId, 'i');
+    var similarLength = Meteor.users.find({username: regEx}).count();
+    if (similarLength) {
+        userId += similarLength;
+    }
+    return userId.toLowerCase();
+}
+
+function generateName(name) {
+    if (!name) return '';
+
+    return name.replace(/[_\.\d]/g, ' ').trim().split(' ').map(function (word) {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
+
 function updateUser(query, data) {
     return !!(Collection.update(query, data));
 }
@@ -74,6 +94,7 @@ var methods = {
             if (query.length == 1) {
                 vnwData = query[0];
                 var _id = Accounts.createUser({
+                    username: generateUsername(email.split('@')[0]),
                     email: email,
                     password: password,
                     profile: {

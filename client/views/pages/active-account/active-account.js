@@ -81,7 +81,6 @@ Template.activeAccount.helpers({
                 type: 'string',
                 custom: function () {
                     if (Meteor.isClient && this.isSet) {
-                        console.log('active username validate', this.value);
                         Meteor.call("validateUserLoginInfo", this.value, function (error, result) {
                             //console.log('re user', result);
                             if (result)
