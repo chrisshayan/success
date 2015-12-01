@@ -906,6 +906,8 @@ Meteor.methods({
         var application = Collections.Applications.findOne({_id: appId});
         if(!job || !application) return false;
         var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
+
+
         var attendeeEmails = [application.candidateInfo.emails[0]];
         var attendees = [];
         attendees.push({
@@ -929,6 +931,7 @@ Meteor.methods({
                 attendeeEmails.push(u.defaultEmail())
             }
         });
+
         var mail = {
             from: user.defaultEmail(),
             to: attendeeEmails,

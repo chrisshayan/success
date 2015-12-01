@@ -159,6 +159,9 @@ var model = Astro.Class({
                 return Router.url('Job', params, { query })
             }
             return '';
+        },
+        defaultEmail() {
+            return this.emails.length > 0 ? this.emails[0] : '';
         }
     } // prototype
 });

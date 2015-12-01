@@ -101,7 +101,7 @@ methods['applications.toggleQualify'] = function (jobId = 0, appIds = [], stage 
     _.each(appIds, (appId) => {
         const app = Application.findOne({jobId: jobId, appId: appId});
         if (app) {
-            const selector = { _id: app._id };
+            const selector = {_id: app._id};
             const modifier = {};
             const activity = new Activities({
                 ref: {
@@ -133,7 +133,7 @@ methods['applications.toggleQualify'] = function (jobId = 0, appIds = [], stage 
             if (!_.isEmpty(modifier)) {
 
                 const result = Collection.update(selector, modifier);
-                if(result) {
+                if (result) {
                     Meteor.defer(() => {
                         activity.save();
                     });
@@ -229,26 +229,34 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
 
     const user = Meteor.users.findOne({_id: this.userId});
     const job = JobExtra.findOne({jobId: jobId});
-    if(!user || !job) return false;
+    if (!user || !job) return false;
 
-    _.each(appIds, (appId) => {
-        var app = Application.findOne({jobId: jobId, appId: appId});
-        if (!app) return false;
-        data = replacePlaceholder(user, job, app, data);
+    Meteor.defer(() => {
+        _.each(appIds, (appId) => {
+            var app = Application.findOne({jobId: jobId, appId: appId});
+            if (!app) return false;
+            data = replacePlaceholder(user, job, app, data);
+            emailId = Email.send({
+                from: user.defaultEmail(),
+                to: app.defaultEmail(),
+                subject: data.subject,
+                html: data.body
+            });
 
-        const ref = {
-            companyId: app.companyId,
-            jobId: jobId,
-            candidateId: app.candidateId,
-            appId: appId
-        };
+            const ref = {
+                companyId: app.companyId,
+                jobId: jobId,
+                candidateId: app.candidateId,
+                appId: appId
+            };
 
-        new Activities({
-            type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
-            ref: ref,
-            content: data,
-            createdBy: this.userId
-        }).save();
+            new Activities({
+                type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
+                ref: ref,
+                content: data,
+                createdBy: this.userId
+            }).save();
+        });
     });
     return true;
 };
@@ -264,7 +272,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     const user = Meteor.users.findOne({_id: this.userId});
     const job = JobExtra.findOne({jobId: jobId});
     var app = Application.findOne({jobId: jobId, appId: appId});
-    if(!user || !job || !app) return false;
+    if (!user || !job || !app) return false;
     data = replacePlaceholder(user, job, app, data);
 
     const ref = {
@@ -274,12 +282,70 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
         appId: appId
     };
 
-    return new Activities({
+    const activityId = new Activities({
         type: Activities.TYPE.RECRUITER_SCHEDULE,
         ref: ref,
         content: data,
         createdBy: this.userId
     }).save();
+
+    Meteor.defer(() => {
+        var attendees = [];
+        attendees.push({
+            cn: app.fullname,
+            mailTo: app.defaultEmail(),
+            partStat: "NEEDS-ACTION"
+        });
+
+        _.each(data.interviewers, function (id) {
+            var u = Meteor.users.findOne({_id: id});
+            if (u) {
+                var uName = u.fullname() || u.defaultEmail();
+                attendees.push({
+                    cn: uName,
+                    mailTo: u.defaultEmail(),
+                    partStat: "NEEDS-ACTION"
+                });
+            }
+        });
+
+        var organizerName = user.fullname() || user.defaultEmail();
+        var calOptions = {
+            prodId: "//Vietnamworks//Success",
+            method: "REQUEST",
+            events: [
+                {
+                    uid: activityId,
+                    summary: data.subject,
+                    dtStart: data.startTime,
+                    dtEnd: data.endTime,
+                    organizer: {cn: organizerName, mailTo: user.defaultEmail()},
+                    attendees: attendees
+                }
+            ]
+        };
+        var cal = new IcsGenerator(calOptions);
+
+        Email.send({
+            from: user.defaultEmail(),
+            to: _.pluck(attendees, 'mailTo'),
+            subject: data.subject,
+            html: data.body,
+            headers: {
+                "Content-class": "urn:content-classes:calendarmessage"
+            },
+            attachments: [
+                {
+                    fileName: 'invite.ics',
+                    contents: cal.toIcsString(),
+                    contentType: 'text/calendar'
+                }
+            ]
+        });
+
+    });
+
+    return activityId;
 };
 
 
