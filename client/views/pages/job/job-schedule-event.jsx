@@ -1,9 +1,9 @@
 let LinkedStateMixin = React.addons.LinkedStateMixin;
 
 ScheduleEvent = React.createClass({
-    mixins: [ReactMeteorData, LinkedStateMixin],
+    mixins: [LinkedStateMixin],
     propsType: {
-        application: React.PropTypes.object.isRequired
+        appId: React.PropTypes.number.isRequired
     },
     getInitialState() {
         let d = new moment();
@@ -14,6 +14,10 @@ ScheduleEvent = React.createClass({
 
 
         return {
+            isLoading: false,
+            emails: [],
+            templates: [],
+
             mailTemplateError: false,
             subjectError: false,
             contentError: false,
@@ -32,14 +36,10 @@ ScheduleEvent = React.createClass({
             endTime: endTime.format('HH:00'),
         };
     },
-    getMeteorData() {
-        var templates = [{_id: -1, name: "Select mail template"}];
-        templates = _.union(templates, Collections.MailTemplates.find().fetch());
-        return {
-            templates: templates
-        }
-    },
+
     componentDidMount() {
+        this.handle__FetchData();
+
         (function (factory) {
             /* global define */
             if (typeof define === 'function' && define.amd) {
@@ -114,11 +114,25 @@ ScheduleEvent = React.createClass({
         $('.clockpicker').clockpicker();
     },
 
+    handle__FetchData() {
+        this.setState({ isLoading: true });
+        Meteor.call('getScheduleEventData', [this.props.appId], (err, data) => {
+            if(!err) {
+                console.log(data)
+                this.setState({
+                    isLoading: false,
+                    emails: data.emails,
+                    templates: data.templates
+                });
+            }
+        });
+    },
+
 
     changeMailTemplate(e) {
         var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
         var templateId = mailTemplate.value;
-        var template = _.findWhere(this.data.templates, {_id: templateId});
+        var template = _.findWhere(this.state.templates, {_id: templateId});
         if (template) {
             var mailContent = React.findDOMNode(this.refs.mailContent);
             this.setState({subject: template.subject});
@@ -151,7 +165,7 @@ ScheduleEvent = React.createClass({
             startTime: st.isValid() ? st.toDate() : false,
             endTime: et.isValid() ? et.toDate() : false,
             subject: this.state.subject,
-            html: $(mailContent).code()
+            body: $(mailContent).code()
         };
 
         return data;
@@ -211,11 +225,9 @@ ScheduleEvent = React.createClass({
     },
 
     candidateEmail() {
-        let canInfo = this.props.application && this.props.application['candidateInfo']
-            ? this.props.application['candidateInfo']
-            : null;
-        if(canInfo) {
-            return canInfo.fullname + ' -- ' + canInfo.emails[0];
+        const app = this.props.application;
+        if(app) {
+            return app.fullname + ' -- ' + app.emails[0];
         }
         return '';
     },
@@ -230,7 +242,7 @@ ScheduleEvent = React.createClass({
 
                             <div className="col-sm-10">
                                 <select ref="mailTemplate" className="form-control" onChange={this.changeMailTemplate}>
-                                    {this.data.templates.map( (t,idx) => <option value={t._id}
+                                    {this.state.templates.map( (t,idx) => <option value={t._id}
                                                                                  key={idx}>{t.name}</option> )}
                                 </select>
                                 {this.state.mailTemplateError ? <p className="text-danger">Please choose a mail
@@ -241,7 +253,7 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Candidate:</label>
 
                             <div className="col-sm-10">
-                                <span className="label label-primary">{this.candidateEmail()}</span>
+                                {this.state.emails.map((email, key) => <span key={key}><span className="label label-info" >{email}</span>&nbsp;</span>)}
                             </div>
                         </div>
 

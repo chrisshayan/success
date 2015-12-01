@@ -1001,7 +1001,7 @@ Meteor.methods({
         const templates = Collections.MailTemplates.find({companyId: currentUser.companyId});
         const result = {
             emails: [],
-            templates: templates.fetch()
+            templates: [{_id: -1, name: "Select mail template"}, ...templates.fetch()]
         };
 
         if(!_.isEmpty(appIds)) {
@@ -1011,6 +1011,28 @@ Meteor.methods({
             })
         }
 
+        return result;
+    },
+
+    getScheduleEventData(appIds = []) {
+        if(!this.userId) return false;
+        check(appIds, [Number]);
+        const currentUser = Meteor.users.findOne({_id: this.userId});
+        if(!currentUser) return false;
+
+        const templates = Collections.MailTemplates.find({companyId: currentUser.companyId});
+        const result = {
+            emails: [],
+            templates: [{_id: -1, name: "Select mail template"}, ...templates.fetch()]
+        };
+
+        if(!_.isEmpty(appIds)) {
+            const apps = Application.find({appId: {$in: appIds}});
+            _.each(apps.fetch(), (app) => {
+                const name = [app.fullname, app.emails[0]].join(' - ');
+                result.emails.push(name);
+            })
+        }
         return result;
     },
 

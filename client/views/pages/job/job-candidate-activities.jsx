@@ -146,6 +146,7 @@ ActivityItem = React.createClass({
                     break;
 
                 case RECRUITER_SCHEDULE:
+                    content = <ActivityEvent activity={ this.props.activity } creator={this.data.creator}/>;
                     break;
 
                 case RECRUITER_DISQUALIFIED:

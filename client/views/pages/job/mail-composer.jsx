@@ -152,7 +152,7 @@ MailComposer = React.createClass({
                             <label className="col-sm-2 control-label">To:</label>
 
                             <div className="col-sm-10">
-                                {this.props.emails.map((email, key) => <span><span className="label label-info" key={key}>{email}</span>&nbsp;</span>)}
+                                {this.props.emails.map((email, key) => <span key={key}><span className="label label-info">{email}</span>&nbsp;</span>)}
                             </div>
                         </div>
                         <div className="form-group">

@@ -184,10 +184,10 @@ JobCurrentApplication.getActions = function () {
         const jobId = this.state.jobId;
         const appId = this.state.currentAppId;
 
-        Meteor.call('activities.scheduleInterview', jobId, appId, data, (err, result) => {
+        Meteor.call('application.scheduleInterview', jobId, appId, data, (err, result) => {
             if(!err && result) {
+                swal("Scheduled interview successfully", "", "success");
                 actions.discardActionBox();
-                Notification.success("Scheduled interview successfully");
             } else {
 
             }

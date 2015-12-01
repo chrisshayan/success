@@ -182,7 +182,7 @@ methods['application.addComment'] = function (jobId = 0, appId = 0, text = '') {
     }).save();
 };
 
-methods['application.sendMessage'] = function (jobId = [], appIds = [], data = {}) {
+methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}) {
     if (!this.userId) return false;
     this.unblock();
     check(jobId, Number);
@@ -208,6 +208,31 @@ methods['application.sendMessage'] = function (jobId = [], appIds = [], data = {
         }).save();
     });
     return true;
+};
+
+methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data = {}) {
+    if (!this.userId) return false;
+    this.unblock();
+    check(jobId, Number);
+    check(appId, Number);
+    check(data, Object);
+
+    var app = Application.findOne({jobId: jobId, appId: appId});
+    if (!app) return false;
+
+    const ref = {
+        companyId: app.companyId,
+        jobId: jobId,
+        candidateId: app.candidateId,
+        appId: appId
+    };
+
+    return new Activities({
+        type: Activities.TYPE.RECRUITER_SCHEDULE,
+        ref: ref,
+        content: data,
+        createdBy: this.userId
+    }).save();
 };
 
 

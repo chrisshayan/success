@@ -257,7 +257,7 @@ const RendererMixin = {
                             actions={ this.current__Actions() }
                         />
 
-                        <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'}>
+                        <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'} onHide={() =>{}}>
                             <Modal.Header>
                                 <Modal.Title>Send bulk message</Modal.Title>
                             </Modal.Header>
