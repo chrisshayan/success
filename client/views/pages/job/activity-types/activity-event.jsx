@@ -61,9 +61,50 @@ ActivityEvent = React.createClass({
         creator: React.PropTypes.object.isRequired,
         activity: React.PropTypes.object.isRequired,
     },
+
+    getInitialState() {
+        return {
+            hasMore: false,
+            more: false
+        }
+    },
+
+    componentDidMount() {
+        const body = this.refs.body.getDOMNode();
+        if(body.offsetHeight > 120) {
+            this.setState({
+                hasMore: true,
+                more: false
+            });
+        }
+    },
+
+    handle__MoreLess(e) {
+        e.preventDefault();
+        this.setState({more: !this.state.more});
+    },
+
     render() {
         const activity = this.props.activity;
         const content = new ActivityItemEvent(activity.content);
+        const styles = {
+            body: {
+                height: this.state.hasMore && !this.state.more ? '100px' : 'auto',
+                overflow: 'hidden'
+            },
+
+            interviewers: {
+                margin: '5px 0'
+            }
+        };
+
+        let interviewers = null;
+        if(content.interviewers.length > 0) {
+            interviewers = <div style={ styles.interviewers }>{content.interviewers.map((userId, key) => <ActivityEventAttendee key={key} userId={userId} />) }</div>;
+        } else {
+            interviewers = <p className="form-control-static"><span className="text-muted">There is no interviewers</span></p>
+        }
+
         return (
             <div className="social-feed-box activity event">
                 <div className="social-avatar">
@@ -84,7 +125,7 @@ ActivityEvent = React.createClass({
                     <div className="activity-info">
                         <div className="row">
                             <div className="col-md-2 text-center" style={{ paddingTop: '40px' }}>
-                                <i className="fa fa-calendar" style={{fontSize: '30px'}}></i>
+                                <i className="fa fa-calendar" style={{fontSize: '45px'}}></i>
                             </div>
 
                             <div className="col-md-10 border-left">
@@ -124,8 +165,16 @@ ActivityEvent = React.createClass({
                                     <div className="form-group">
                                         <label className="col-sm-2 control-label">Body</label>
 
-                                        <div className="col-sm-10">
-                                            <p dangerouslySetInnerHTML={ {__html: content.body} }></p>
+                                        <div className="col-sm-10" ref="body">
+                                            <div style={styles.body}>
+                                                <p dangerouslySetInnerHTML={ {__html: content.body} } />
+                                            </div>
+
+                                            <div className="text-right">
+                                                {this.state.hasMore ? (
+                                                    <a onClick={this.handle__MoreLess}>{this.state.more ? 'less': 'more'}</a>
+                                                ) : null}
+                                            </div>
                                         </div>
                                     </div>
 
@@ -135,7 +184,7 @@ ActivityEvent = React.createClass({
                                         <label className="col-sm-2 control-label">Interviewers</label>
 
                                         <div className="col-sm-10">
-                                            <p className="form-control-static">{content.interviewers.map((userId, key) => <ActivityEventAttendee key={key} userId={userId} />) }</p>
+                                            {interviewers}
                                         </div>
                                     </div>
                                 </div>

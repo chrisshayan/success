@@ -118,7 +118,6 @@ ScheduleEvent = React.createClass({
         this.setState({ isLoading: true });
         Meteor.call('getScheduleEventData', [this.props.appId], (err, data) => {
             if(!err) {
-                console.log(data)
                 this.setState({
                     isLoading: false,
                     emails: data.emails,
