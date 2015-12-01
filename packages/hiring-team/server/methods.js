@@ -6,7 +6,7 @@ function generateUsername(userId) {
     userId = userId.replace(/[-_]/g, '.');
     var regEx = new RegExp('^' + userId + '$', 'i');
     var similarLength = Meteor['hiringTeam'].find({username: regEx}).count();
-    
+
     while (similarLength && Meteor.users.findOne({username: userId + similarLength})) {
         similarLength++;
     }
@@ -206,7 +206,7 @@ methods.setupDefaultHiringTeam = function () {
 
     hiringTeamItem.companyId = user.companyId;
     hiringTeamItem.email = email;
-    hiringTeamItem.username = 'admin' + user.companyId;
+    hiringTeamItem.username = user.username;
     hiringTeamItem.roleId = 'admin';
     hiringTeamItem.status = 1;
     hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
