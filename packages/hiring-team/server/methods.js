@@ -3,12 +3,17 @@
  */
 
 function generateUsername(userId) {
-    var regEx = new RegExp('^' + userId, 'i');
+    userId = userId.replace(/[-_]/g, '.');
+    var regEx = new RegExp('^' + userId + '$', 'i');
     var similarLength = Meteor['hiringTeam'].find({username: regEx}).count();
-    if (similarLength) {
-        userId += similarLength;
+    
+    while (similarLength && Meteor.users.findOne({username: userId + similarLength})) {
+        similarLength++;
     }
-    return userId.toLowerCase();
+
+    var newUserId = (similarLength) ? userId + similarLength : userId;
+
+    return newUserId.toLowerCase();
 }
 
 function generateName(name) {
@@ -118,7 +123,7 @@ var methods = {
             }
         },
 
-        activeAccount(data){
+        activeAccount: function (data) {
             check(data, {
                 email: String,
                 key: String,
@@ -127,7 +132,9 @@ var methods = {
                 password: String
             });
             var hiringTeamInfo = Meteor['hiringTeam'].findOne({email: data.email});
-
+            if (Meteor.call('validateUserLoginInfo', data.username) !== 0) {
+                return false;
+            }
             var tempName = data.fullname.split(' ');
             var firstName = tempName.shift();
             var lastName = tempName.join(' ');
@@ -168,8 +175,9 @@ var methods = {
         },
 
         validateUserLoginInfo: function (input) {
-            if (typeof input !== 'string') return false;
-            return !!(Meteor.users.findOne({'$or': [{username: input}, {'emails.address': input}]}));
+            var allowRegexp = new RegExp('^[a-zA-Z0-9\.]+$');
+            if (typeof input !== 'string' || !allowRegexp.test(input)) return 2;
+            return (Meteor.users.findOne({'$or': [{username: input}, {'emails.address': input}]})) ? 1 : 0;
         }
 
     }

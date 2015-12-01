@@ -24,7 +24,8 @@ AutoForm.hooks({
 });
 
 SimpleSchema.messages({
-    "notAvailableUsername": "This username isn't available."
+    "notAvailableUsername": "This username isn't available.",
+    "usernameisnotvalid": "this username is  invalid. Only characters, numbers and '.' are allowed."
 });
 
 Template.activeAccount.onCreated(function () {
@@ -82,12 +83,24 @@ Template.activeAccount.helpers({
                 custom: function () {
                     if (Meteor.isClient && this.isSet) {
                         Meteor.call("validateUserLoginInfo", this.value, function (error, result) {
-                            //console.log('re user', result);
-                            if (result)
-                                _Schema.namedContext("activeAccountForm").addInvalidKeys([{
-                                    name: "username",
-                                    type: "notAvailableUsername"
-                                }]);
+                            //console.log('re user', error, result);
+                            switch (result) {
+                                case 0 :
+                                    break;
+                                case 1 :
+                                    _Schema.namedContext("activeAccountForm").addInvalidKeys([{
+                                        name: "username",
+                                        type: "notAvailableUsername"
+                                    }]);
+                                    break;
+                                case 2 :
+                                default:
+                                    _Schema.namedContext("activeAccountForm").addInvalidKeys([{
+                                        name: "username",
+                                        type: "usernameisnotvalid"
+                                    }]);
+                                    break;
+                            }
 
                         });
                     }
