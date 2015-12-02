@@ -1,9 +1,14 @@
 JobCandidate = React.createClass({
+
+    componentDidMount() {
+        $('[data-toggle="tooltip"]').tooltip()
+    },
+
     /**
      * change query param when click on application
      * @param e <Event>
      */
-        handle__ClickApp(e) {
+    handle__ClickApp(e) {
         e.preventDefault();
         const params = Router.current().params;
         const query = _.omit(params.query, 'appAction');
@@ -105,8 +110,8 @@ JobCandidate = React.createClass({
 
         const cx = classNames('label', 'pull-right', labelClass);
         return (
-            <span className={cx}>
-                {score}
+            <span className={cx} data-toggle="tooltip" data-placement="bottom" title={`Matching score: ${score}%`}>
+                {score}%
             </span>
         );
     }
