@@ -183,7 +183,7 @@ methods['ES.lastOpenJobs'] = function () {
         };
         const jobIds = JobExtra.find(selector).map((doc) => doc.jobId);
         if (_.isEmpty(jobIds)) return [];
-        query = SuccessESQuery.onlineJobForRecruiter(user.companyId, null, jobIds)
+        query = SuccessESQuery.onlineJobForRecruiter(user.companyId, '', jobIds)
     }
 
     const {err, hits} = ESSearch({

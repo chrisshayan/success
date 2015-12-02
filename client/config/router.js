@@ -182,35 +182,11 @@ Router.route('/settings/mailtemplates/update/:_id', {
     }
 });
 
-Router.route('/settings/mailsignature', {
-    name: "mailSignature",
-    waitOn: function () {
-        return Meteor.subscribe('companySettings');
-    },
-    action: function () {
-        this.render('mailSignature');
-    },
-    data: function () {
-        return Collections.CompanySettings.findOne();
-    }
-});
-
 
 Router.route('/settings/hiringTeam', {
     name: "hiringTeam",
-    waitOn: function () {
-        return [
-            DashboardSubs.subscribe('companyInfo')
-        ];
-    },
     action: function () {
         this.render('hiringTeam');
-    },
-
-    data: function () {
-        return {
-            companyInfo: Collections.CompanySettings.findOne()
-        };
     }
 });
 
@@ -219,7 +195,6 @@ Router.route('/activites', {
     waitOn: function () {
         return [
             Meteor.subscribe('activities'),
-            Meteor.subscribe('candidateInfo'),
             Meteor.subscribe('jobs')
         ];
     },

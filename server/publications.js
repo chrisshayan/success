@@ -4,14 +4,6 @@ function transformVNWId(id) {
     return +id;
 }
 
-
-Meteor.publish('companyInfo', function () {
-    if (!this.userId) return this.ready();
-    var user = Meteor.users.findOne({_id: this.userId});
-    if (!user || !user.companyId) return this.ready();
-    return Collections.CompanySettings.find({companyId: user.companyId}, {limit: 1});
-});
-
 Meteor.publish('mailTemplates', function () {
     if (!this.userId) return this.ready();
     var user = Meteor.users.findOne({_id: this.userId});
