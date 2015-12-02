@@ -176,9 +176,9 @@ JobCandidateShortInfo = React.createClass({
 
                                     <div className="col-md-5">
                                         <div className="row mgbt-xs-0">
-                                            <label className="col-xs-5 control-label">Phone:</label>
+                                            <label className="col-xs-5 control-label">Mobile:</label>
 
-                                            <div className="col-xs-7 controls">{ app.phone }</div>
+                                            <div className="col-xs-7 controls">{ app.mobile }</div>
                                         </div>
                                     </div>
                                 </div>
