@@ -47,7 +47,6 @@ var methods = {
         var extra = Collection.findOne({jobId: jobId});
 
         if (!extra) return false;
-
         if (!criteriaSuggestion.findOne({templateName: cate, keyword: name})) {
             Meteor.defer(function () {
                 var newItem = new JobCriteriaSuggestion();
@@ -56,9 +55,10 @@ var methods = {
                 newItem.save();
             });
         }
-
-        extra.push(`hiringCriteria.${cate}.criteria`, name);
-        return extra.save();
+        var category = `hiringCriteria.${cate}.criteria`;
+        var pullMod = {};
+        pullMod[category] = name;
+        return Collection.update({_id: extra._id}, {$addToSet: pullMod});
     },
 
     removeJobCriteria(jobId, cate, name) {

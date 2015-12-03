@@ -330,7 +330,7 @@ Router.route('/api/skill/:jobId/:alias/search', {
             } else {
                 results = JobCriteriaSuggestion.collection.find({templateName: this.params.alias}).map(function(r) {
                     return {
-                        id: r._id,
+                        id: r.keyword,
                         text: r.keyword
                     }
                 });
