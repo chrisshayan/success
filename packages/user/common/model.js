@@ -88,6 +88,11 @@ User.appendSchema({
 
     createdAt: {
         type: Date
+    },
+
+    isAssigned: {
+        type: Boolean,
+        defaultValue: false
     }
 });
 

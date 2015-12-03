@@ -6,7 +6,11 @@
                     <div class="ibox">
                         <div class="ibox-content">
                             <h3 class="text-center">Your account's basic information</h3>
-                            {{> quickForm schema=schema id="activeAccountForm"}}
+                            {{#if existUser}}
+                                {{> quickForm schema=existUserSchema id="activeAccountForm"}}
+                            {{else}}
+                                {{> quickForm schema=schema id="activeAccountForm"}}
+                            {{/if}}
                         </div>
                     </div>
                 </div>

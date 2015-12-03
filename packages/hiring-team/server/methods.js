@@ -45,21 +45,29 @@ var methods = {
                     };
 
 
-                var name = email.split('@')[0];
-                var autoUsername = generateUsername(name);
-                var autoName = generateName(name);
-
                 var hiringTeamItem = new HiringTeam();
                 if (Meteor['hiringTeam'].findOne({email: email}))
                     return {
                         status: 0,
                         message: 'This email was exist in a hiring team already.'
                     };
+                var name = email.split('@')[0];
+                var existRecruiter = Meteor.users.findOne({'emails.address': email});
+
+                if (existRecruiter) {
+                    hiringTeamItem.username = existRecruiter.username;
+                    hiringTeamItem.name = [existRecruiter.profile.firstname, existRecruiter.profile.lastname].join(' ');
+
+                } else {
+                    var autoUsername = generateUsername(name);
+                    var autoName = generateName(name);
+                    hiringTeamItem.username = autoUsername;
+                    hiringTeamItem.name = autoName;
+                }
 
                 hiringTeamItem.companyId = user.companyId;
                 hiringTeamItem.email = email;
-                hiringTeamItem.username = autoUsername;
-                hiringTeamItem.name = autoName;
+
                 hiringTeamItem.roleId = 'recruiter';
 
                 var company = Collections.CompanySettings.findOne({companyId: user.companyId});
@@ -116,7 +124,17 @@ var methods = {
         getRequestInfo: function (id) {
             if (!id) return false;
             try {
-                return Meteor['hiringTeam'].findOne({_id: id, status: 0});
+
+                var hiringTeam = Meteor['hiringTeam'].findOne({_id: id, status: 0});
+                if (!hiringTeam) return false;
+
+                var isExistUser = Meteor.users.findOne({'emails.address': hiringTeam.email});
+
+                return {
+                    hiringTeamInfo: hiringTeam,
+                    isExistUser: isExistUser
+                };
+
             } catch (e) {
                 console.trace(e);
                 return false;
@@ -124,44 +142,69 @@ var methods = {
         },
 
         activeAccount: function (data) {
+            //console.log(data);
             check(data, {
                 email: String,
                 key: String,
                 fullname: String,
                 username: String,
-                password: String
+                password: Match.Optional(String)
             });
-            var hiringTeamInfo = Meteor['hiringTeam'].findOne({email: data.email});
-            if (Meteor.call('validateUserLoginInfo', data.username) !== 0) {
-                return false;
-            }
+
             var tempName = data.fullname.split(' ');
             var firstName = tempName.shift();
             var lastName = tempName.join(' ');
-            var user = {};
-            user.username = data.username;
-            user.email = data.email;
-            user.password = data.password;
 
-            user.profile = {
-                firstname: firstName,
-                lastname: lastName
-            };
+            var user = Meteor.users.findOne({'emails.address': data.email});
+            var result = null;
+            //console.log('user', user);
 
-            var result = Accounts.createUser(user);
+            if (!user) {
+                if (Meteor.call('validateUserLoginInfo', data.username) !== 0) {
+                    return false;
+                }
+
+                user = {};
+                user.username = data.username;
+                user.email = data.email;
+                user.password = data.password;
+
+                user.profile = {
+                    firstname: firstName,
+                    lastname: lastName
+                };
+
+                result = Accounts.createUser(user);
+
+            } else {
+
+                result = user._id;
+
+                user.profile = {
+                    firstname: firstName,
+                    lastname: lastName
+                };
+                user.save();
+            }
+            //console.log('result', result);
+
 
             if (result) {
+                var hiringTeamInfo = Meteor['hiringTeam'].findOne({email: data.email});
+
                 Meteor.users.update({
                     _id: result
                 }, {
                     '$set': {
-                        companyId: hiringTeamInfo.companyId
+                        companyId: hiringTeamInfo.companyId,
+                        isAssigned: true
                     }
                 });
 
-                hiringTeamInfo.status = 1;
                 hiringTeamInfo.username = user.username;
+                hiringTeamInfo.status = 1;
                 hiringTeamInfo.userId = result;
+
                 hiringTeamInfo.name = data.fullname;
 
                 hiringTeamInfo.save();
@@ -186,9 +229,16 @@ var methods = {
 methods.removeHiringTeamRequest = function (requestId) {
     if (!this.userId) return false;
     this.unblock();
-    var user = Meteor.users.findOne({_id: this.userId});
     var request = Meteor['hiringTeam'].findOne({_id: requestId});
-    if (!user || !request) return false;
+
+    var user = Meteor.users.findOne({_id: this.userId});
+
+    if (!user || !request)
+        return false;
+
+    user.isAssigned = false;
+    user.save();
+
     return request.remove();
 };
 

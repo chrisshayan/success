@@ -80,15 +80,15 @@ JobHiringTeamGroup = React.createClass({
                     <table className="table table-striped">
                         <tbody>
                         {this.props.recruiters.map((r, key) => <JobHiringTeamGroupItem key={key} recruiter={r}
-                                                                                          onUnassign={this.props.onUnassign}
-                                                                                          role={this.props.role}/>)}
+                                                                                       onUnassign={this.props.onUnassign}
+                                                                                       role={this.props.role}/>)}
                         <tr>
                             <td colSpan="2">
                                 <JobHiringTeamAssignForm
                                     role={this.props.role}
                                     jobId={this.props.jobId}
                                     except={_.pluck(this.props.recruiters, 'userId')}
-                                    onAssign={this.props.onAssign} />
+                                    onAssign={this.props.onAssign}/>
                             </td>
                         </tr>
                         </tbody>
@@ -111,9 +111,13 @@ JobHiringTeamGroupItem = React.createClass({
     },
 
     render() {
+        //console.log('this.props.recruiter', this.props.recruiter);
         return (
             <tr>
-                <td width="*">{ this.props.recruiter.name }</td>
+                <td width="*">
+                    <span>{ this.props.recruiter.name }</span><br/>
+                    <span style={{fontSize:'0.8em'}}>{this.props.recruiter.email}</span>
+                </td>
                 <td width="50px">
                     <button className="btn btn-link btn-sm" onClick={ this.handleTrashClick }>
                         <i className="fa fa-trash"/> remove
