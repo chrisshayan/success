@@ -1,6 +1,6 @@
 const { PropTypes } = React;
 
-TagSearch = React.createClass({
+CriteriaSearch = React.createClass({
     propTypes: {
         onSelect: PropTypes.func
     },
@@ -8,9 +8,9 @@ TagSearch = React.createClass({
     componentDidMount() {
         const $select = $(this.refs.q.getDOMNode());
         $select.select2({
-            placeholder: this.props.placeholder || 'please select',
+            placeholder: this.props.placeholder || 'start typing to find',
             ajax: {
-                url: Meteor.absoluteUrl() + 'api/skill/search',
+                url: `${Meteor.absoluteUrl()}api/skill/${this.props.jobId}/${this.props.alias}/search/`,
                 dataType: 'json',
                 delay: 10,
                 data: function (params) {
@@ -23,7 +23,7 @@ TagSearch = React.createClass({
                 }
 
             },
-            multiple: true,
+            multiple: false,
             tags: true,
             cache: true
         });
@@ -40,12 +40,20 @@ TagSearch = React.createClass({
             $select.focus();
         });
 
+        $select.on('select2:open', function() {
+            $('.select2-search__field').attr('placeholder', 'Start typing to find');
+        });
+        $select.on("select2:close", function() {
+            $('.select2-search__field').attr('placeholder', null);
+        });
     },
 
     render() {
         return (
             <div style={{width: '100%'}}>
-                <select ref="q" style={{width: '100%'}} className="form-control" />
+                <select ref="q" style={{width: '100%'}} className="form-control">
+                    <option></option>
+                </select>
             </div>
         );
     }

@@ -10,7 +10,6 @@ tmpl.onCreated(function () {
         instance.props.set('isLoading', false);
 
         if (!err && items) {
-            console.log(items);
             instance.props.set('items', items);
         }
     });

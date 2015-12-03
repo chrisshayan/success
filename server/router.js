@@ -266,15 +266,19 @@ var ESSuggest = Meteor.wrapAsync(function (query, cb) {
     });
 });
 
-Router.route('/api/skill/search', {
+ESSearch = Meteor.wrapAsync(function (query, cb) {
+    ES.search(query).then(function (body) {
+        cb(null, body)
+    }, function (error) {
+        cb(error, {});
+    });
+});
+
+Router.route('/api/skill/:jobId/:alias/search', {
     where: 'server',
     action: function () {
-        const {q} = this.request.query;
-        let results = [
-            {id: 'php', text: 'php'},
-            {id: 'js', text: 'js'},
-            {id: 'php', text: 'php'},
-        ];
+        const { q } = this.request.query;
+        let results = [];
         if(q && q.length > 0) {
             const req = ESSuggest({
                 index: 'suggester',
@@ -296,6 +300,39 @@ Router.route('/api/skill/search', {
                         id: opt.text,
                         text: opt.text
                     })
+                });
+            }
+        } else {
+            if(this.params.alias === "skills") {
+                if(this.params.jobId) {
+                    const result = ESSearch({
+                        index: 'vietnamworks',
+                        type: 'job',
+                        from: 0,
+                        size: 1,
+                        body: SuccessESQuery.getJobInfo(this.params.jobId)
+                    });
+
+                    if (result && result['hits']) {
+                        const hits = result['hits']['hits'];
+                        if (hits.length > 0) {
+                            const data = hits[0]['_source'];
+                            const job = new ESJob(data);
+                            job.skills.map(function(skill) {
+                               results.push({
+                                   id: skill.skillName,
+                                   text: skill.skillName
+                               })
+                            });
+                        }
+                    }
+                }
+            } else {
+                results = JobCriteriaSuggestion.collection.find({templateName: this.params.alias}).map(function(r) {
+                    return {
+                        id: r._id,
+                        text: r.keyword
+                    }
                 });
             }
         }
