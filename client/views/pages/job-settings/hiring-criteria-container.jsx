@@ -4,8 +4,8 @@ HiringCriteriaContainer = React.createClass({
         hiringCriteria: React.PropTypes.object.isRequired
     },
 
-    handleSelectCriteria(skill, cate) {
-        Meteor.call('addJobCriteria', this.props.jobId, cate, skill.skillName, function(err, result) {
+    handleSelectCriteria(tag, cate) {
+        Meteor.call('addJobCriteria', this.props.jobId, cate, tag, function(err, result) {
 
         });
     },
@@ -28,7 +28,9 @@ HiringCriteriaContainer = React.createClass({
         return (
             <div key={key} className="col-sm-3 col-md-3">
                 <h3>{cate.name}</h3>
-                <TagsInput id={cate.alias} placeholder={cate.hint} onSelect={this.handleSelectCriteria}/>
+
+                <TagSearch placeholder={cate.hint} onSelect={ (tag) => this.handleSelectCriteria(tag, cate.alias)} />
+
                 <div>
                     <ul className="sortable-list connectList agile-list ui-sortable">
                         {cate.criteria.map((name, key) => this.renderCriteria(name, cate.alias, key))}

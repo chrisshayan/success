@@ -256,3 +256,51 @@ function createMockupResume() {
 
     return resume;
 }
+
+
+var ESSuggest = Meteor.wrapAsync(function (query, cb) {
+    ES.suggest(query).then(function (body) {
+        cb(null, body)
+    }, function (error) {
+        cb(error, {});
+    });
+});
+
+Router.route('/api/skill/search', {
+    where: 'server',
+    action: function () {
+        const {q} = this.request.query;
+        let results = [
+            {id: 'php', text: 'php'},
+            {id: 'js', text: 'js'},
+            {id: 'php', text: 'php'},
+        ];
+        if(q && q.length > 0) {
+            const req = ESSuggest({
+                index: 'suggester',
+                body: {
+                    skill : {
+                        "text" : q,
+                        "completion" : {
+                            "field" : "skillNameSuggest"
+                        }
+                    }
+                }
+
+            });
+
+            if(req && req['skill'] && req['skill'].length > 0) {
+                results = [];
+                _.each(req['skill'][0]['options'], function(opt) {
+                    results.push({
+                        id: opt.text,
+                        text: opt.text
+                    })
+                });
+            }
+        }
+
+        this.response.writeHead(200);
+        this.response.end(EJSON.stringify({results: results}));
+    }
+});
