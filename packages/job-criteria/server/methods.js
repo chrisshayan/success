@@ -18,8 +18,8 @@ var methods = {
         if (!criteriaSuggestion.findOne({templateName: cate, keyword: name})) {
             Meteor.defer(function () {
                 var newItem = new JobCriteriaSuggestion();
-                newItem.keyword = name;
                 newItem.templateName = cate;
+                newItem.keyword = name;
                 newItem.save();
             });
         }
