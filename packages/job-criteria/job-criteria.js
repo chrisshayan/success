@@ -2,3 +2,7 @@
 
 
 JobCriteria = {};
+
+JobCriteriaSetTemplate = {};
+
+JobCriteriaSuggestion = {};

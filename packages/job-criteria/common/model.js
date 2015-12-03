@@ -2,6 +2,7 @@
  * JobCriteriaSetTemplate
  */
 JobCriteriaSetTemplate = BaseModel.extendAndSetupCollection("job_criteria_set_templates");
+
 JobCriteriaSetTemplate.appendSchema({
     companyId: {
         type: Number,
@@ -22,6 +23,7 @@ JobCriteriaSetTemplate.appendSchema({
         optional: true
     }
 });
+
 
 /**
  * JobCriteriaSet
@@ -57,6 +59,7 @@ JobCriteriaSet.appendSchema({
 
 });
 
+
 /**
  * contains criteria of criteria set
  */
@@ -79,3 +82,32 @@ JobCriteria.appendSchema({
     }
 
 });
+
+/**
+ * contains criteria of criteria set
+ */
+JobCriteriaSuggestion = BaseModel.extendAndSetupCollection("criteria_suggestion");
+var JCSCollection = JobCriteriaSuggestion.collection;
+JobCriteriaSuggestion.appendSchema({
+    templateName: {
+        type: String
+    },
+    keyword: {
+        type: String
+    },
+    weight: {
+        type: Number,
+        defaultValue: 0
+    }
+});
+
+// do not insert if duplicate
+if (Meteor.isServer) {
+    JCSCollection.before.insert(function (userId, doc) {
+        doc.keyword = doc.keyword.toLowerCase();
+        return !(JCSCollection.findOne({
+            templateId: doc.templateId,
+            keyword: doc.keyword
+        }));
+    })
+}

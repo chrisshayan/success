@@ -55,4 +55,24 @@ Meteor.startup(function () {
 
 
     //CRON_VNW.startupSync();
+
+
+    var criteriaSuggestion = JobCriteriaSuggestion.collection;
+
+    DEFAULT_SUGGESTION_LIST.forEach((item)=> {
+        var length = criteriaSuggestion.find({templateName: item.templateName}).count();
+
+        if (item.setItems.length >= length) {
+            item.setItems.forEach(function (ii) {
+                var suggestList = new JobCriteriaSuggestion();
+                suggestList.templateName = item.templateName;
+                suggestList.keyword = ii;
+
+                suggestList.save();
+            });
+        }
+
+
+    })
 });
+

@@ -24,7 +24,7 @@ Package.onUse(function (api) {
 
     api.imply(['vnw:core']);
     api.imply(['vnw:job']);
-    api.export('JobCriteria');
+    api.export(['JobCriteria', 'JobCriteriaSetTemplate', 'JobCriteriaSuggestion']);
 
 });
 
