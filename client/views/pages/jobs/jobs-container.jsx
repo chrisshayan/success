@@ -3,6 +3,7 @@ const SubCache = new SubsManager();
 
 const ComponentState = function () {
     return {
+        isCounting: false,
         forceUpdate: false,
         inc: 10,
         limit: 10,
@@ -200,20 +201,21 @@ JobsContainer = React.createClass({
 
         if (!this.data.isReady) {
             loadingIcon = <WaveLoading />
+        } else {
+            if (this.total() > this.state.limit) {
+                loadMoreBtn = (
+                    <div>
+                        <button
+                            className={['btn','btn-small','btn-primary','btn-block'].join(' ')}
+                            onClick={this.handle___LoadMore}>
+                            <i className="fa fa-arrow-down"/>&nbsp;
+                            Load more
+                        </button>
+                    </div>
+                );
+            }
         }
 
-        if (this.total() > this.state.limit) {
-            loadMoreBtn = (
-                <div>
-                    <button
-                        className={['btn','btn-small','btn-primary','btn-block'].join(' ')}
-                        onClick={this.handle___LoadMore}>
-                        <i className="fa fa-arrow-down"/>&nbsp;
-                        Load more
-                    </button>
-                </div>
-            );
-        }
         return (
             <div className="row" style={{paddingBottom: '60px'}}>
                 <PageHeading title={pageTitle} breadcrumb={[]}/>

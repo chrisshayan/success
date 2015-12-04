@@ -30,7 +30,7 @@ var getApplicationByJobId = function (job, cb) {
         , jobId = data.jobId;
 
     if (!data.jobId || !data.companyId)
-        j.done();
+        job.done();
     else {
         try {
             var appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);

@@ -95,9 +95,11 @@ const DataMixin = {
             isReady = Meteor.subscribe('getApplications', appsFilter, appsOptions).ready();
 
         return {
+            extra: extra,
             stageCounter: extra.stage,
             isReady: isReady,
-            applications: AppColl.find(appsFilter, appsOptions).fetch()
+            applications: AppColl.find(appsFilter, appsOptions).fetch(),
+            hasMore: Application.find(appsFilter).count() > this.state.apps__limit
         };
     },
 
@@ -238,7 +240,7 @@ const RendererMixin = {
                             job={ this.state.job }
                             stage={ this.state.stage }
                             counter={ this.state.apps__counter }
-                            hasMore={ Application.find(this.filter__apps).count() > this.state.apps__limit }
+                            hasMore={ this.data.hasMore }
                             hasChecked={ this.state.apps__selectedItems.length > 0 }
                             currentAppId={ this.state.currentAppId }
                             candidateType={ this.state.candidateType }
@@ -272,6 +274,29 @@ const RendererMixin = {
                 </div>
             </div>
         );
+    },
+
+    render__Syncing() {
+        return (
+            <div className="row" style={{paddingBottom: '60px'}}>
+                <div className="col-md-12">
+                    <JobHeader job={this.state.job} stage={this.state.stage}/>
+
+                    <JobHiringProcess
+                        jobId={this.state.jobId}
+                        currentStage={this.state.stage}
+                        counter={this.data.stageCounter}/>
+                </div>
+                <div className="col-md-12">
+                    <div id="job-content">
+                        <div className="syncing">
+                            <i className="fa fa-refresh fa-spin"></i>
+                            <h2>Syncing your applications</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 };
 
@@ -279,9 +304,16 @@ JobDetailsContainer = React.createClass({
     mixins: [ReactMeteorData, HookMixin, DataMixin, ActionMixin, RendererMixin],
 
     render(){
+        console.log(this.data.extra.syncState)
         if (this.state.isLoading) {
             return <WaveLoading />;
+        } else {
+            if(this.data.extra && this.data.extra.syncState == 'ready') {
+                return this.render__Syncing();
+            } else {
+                return this.render__Content();
+            }
         }
-        return this.render__Content();
+
     }
 });

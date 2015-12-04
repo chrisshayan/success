@@ -137,6 +137,11 @@ methods.getJobInfo = function (jobId) {
                             extra.set('jobTitle', job.jobTitle);
                         }
 
+                        if(!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
+                            extra.set('numOfApplications', job.numOfApplications);
+                            extra.set('syncState', 'ready');
+                        }
+
                         const companyName = job.companyName.trim() || job.companyDesc.trim();
                         if(!_.isEqual(extra.companyName, companyName)) {
                             extra.set('companyName', companyName);
@@ -167,7 +172,7 @@ methods.suggestSkills = function () {
 };
 
 methods['ES.lastOpenJobs'] = function () {
-    if (!this.userId) return this.ready();
+    if (!this.userId) return [];
     const jobs = [];
     const user = Meteor.users.findOne({_id: this.userId});
     let query = {};

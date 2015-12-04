@@ -88,6 +88,13 @@ ESJob = Astro.Class({
             default: 'online'
         },
 
+        numOfApplications: {
+            type: 'number',
+            default() {
+                return 0;
+            }
+        },
+
         extra: {
             type: 'object'
         }

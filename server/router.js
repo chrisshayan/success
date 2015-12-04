@@ -328,7 +328,7 @@ Router.route('/api/skill/:jobId/:alias/search', {
                     }
                 }
             } else {
-                results = JobCriteriaSuggestion.collection.find({templateName: this.params.alias}).map(function(r) {
+                results = JobCriteriaSuggestion.collection.find({templateName: this.params.alias, isDefault: true}).map(function(r) {
                     return {
                         id: r.keyword,
                         text: r.keyword

@@ -1,8 +1,3 @@
-var addToJobCollection = function (type, data) {
-    Job(Collections.SyncQueue, type, data).save();
-};
-
-
 ESSearch = Meteor.wrapAsync(function (query, cb) {
     ES.search(query).then(function (body) {
         cb(null, body)
@@ -68,18 +63,23 @@ pubs.ESJobs = function (type, limit, q) {
                 extra = new JobExtra();
                 extra.jobId = job.jobId;
                 extra.companyId = job.companyId;
+                extra.numOfApplications = job.numOfApplications;
+                extra.stage.applied = job.numOfApplications;
+                if(extra.numOfApplications <= 0) {
+                    extra.syncState = 'synced';
+                } else {
+                    extra.syncState = 'ready';
+                }
                 extra.save();
-
-                var data = {
-                    jobId: extra.jobId,
-                    companyId: extra.companyId
-                };
-
-                addToJobCollection('getApplications', data);
             }
 
             if(!_.isEqual(extra.jobTitle, job.jobTitle)) {
                 extra.set('jobTitle', job.jobTitle);
+            }
+
+            if(!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
+                extra.set('numOfApplications', job.numOfApplications);
+                extra.set('syncState', 'ready');
             }
 
             const companyName = job.companyName.trim() || job.companyDesc.trim();

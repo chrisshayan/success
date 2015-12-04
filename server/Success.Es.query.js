@@ -172,7 +172,8 @@ SuccessESQuery = {
                 "approvedDate",
                 "expiredDate",
                 "salaryMin",
-                "salaryMax"
+                "salaryMax",
+                "numOfApplications"
             ],
 
             "query": {
@@ -274,7 +275,8 @@ SuccessESQuery = {
                 "approvedDate",
                 "expiredDate",
                 "salaryMin",
-                "salaryMax"
+                "salaryMax",
+                "numOfApplications"
             ],
 
             "query": {
@@ -381,7 +383,8 @@ SuccessESQuery = {
                 "approvedDate",
                 "expiredDate",
                 "salaryMin",
-                "salaryMax"
+                "salaryMax",
+                "numOfApplications"
             ],
 
             "query": {
@@ -478,7 +481,8 @@ SuccessESQuery = {
                 "approvedDate",
                 "expiredDate",
                 "salaryMin",
-                "salaryMax"
+                "salaryMax",
+                "numOfApplications"
             ],
 
             "query": {

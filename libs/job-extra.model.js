@@ -68,7 +68,7 @@ JobExtra = Astro.Class({
         },
         syncState: {
             type: 'string',
-            default: ()=> 'syncing' //syncing, ready , synced, syncfailed
+            default: ()=> 'ready' //syncing, ready , synced, syncfailed
         },
 
         jobTitle: {
@@ -82,6 +82,12 @@ JobExtra = Astro.Class({
             type: 'string',
             default() {
                 return '';
+            }
+        },
+        numOfApplications: {
+            type: 'number',
+            default() {
+                return 0;
             }
         }
     }

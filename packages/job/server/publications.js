@@ -1,3 +1,8 @@
+var addToJobCollection = function (type, data) {
+    Job(Collections.SyncQueue, type, data).save();
+};
+
+
 /**
  * Created by HungNguyen on 8/21/15.
  */
@@ -79,9 +84,20 @@ publications.jobDetails =  function (jobId) {
     if(!this.userId) return this.ready();
     var self = this;
     var user = Meteor.users.findOne({_id: self.userId});
+    var extra = JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
+    _.each(extra.fetch(), function(ex) {
+        if(ex.syncState === 'ready') {
+            var data = {
+                jobId: ex.jobId,
+                companyId: ex.companyId
+            };
+            addToJobCollection('getApplications', data);
+        }
+    });
+
     return {
         find: function() {
-            return JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
+            return extra;
         },
         children: []
     }

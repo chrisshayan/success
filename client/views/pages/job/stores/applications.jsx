@@ -12,7 +12,8 @@ JobApplications.getState = function() {
         },
         apps__selectedItems: [],
         apps__isSelectedAll: false,
-        apps__showSendBulkMessage: false
+        apps__showSendBulkMessage: false,
+        apps__hasMore: false
     }
 };
 
