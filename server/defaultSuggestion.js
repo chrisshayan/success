@@ -10,21 +10,26 @@ DEFAULT_SUGGESTION_LIST = [
     },
     {
         "templateName": "personalityTraits",
-        "setItems": ['Bussiness-driven',
-            'Matunity',
-            'Team oriented']
+        "setItems": ['Business driven',
+            'Maturity',
+            'Team oriented',
+            'Professional',
+            'Resourceful',
+            'Result Oriented',
+            'Self-Motivated',
+            'Tech-savvy',
+            'Relocation necessary',
+            'Salary requirements',
+            'Willingness to travel']
     },
     {
         "templateName": "qualifications",
         "setItems": ['Post-graduate',
-            'MD',
             'MBA',
             'Masters',
-            'JD',
             'High school',
             'Doctorate',
             'Doctor of Pharmacy (PharmD)',
-            'CPA',
             'College',
             'Bachelors',
             'Bachelor of Engineering',
@@ -32,10 +37,10 @@ DEFAULT_SUGGESTION_LIST = [
     },
     {
         "templateName": "details",
-        "setItems": ['Able to work in US',
-            'Availibility',
+        "setItems": ['Availability',
+            'Able to work abroad',
             'Motivated for this job',
-            'Relocation neccessary',
+            'Relocation necessary',
             'Salary requirements',
             'Willingness to travel']
     }

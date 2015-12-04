@@ -588,8 +588,8 @@ Meteor.methods({
     setNumberOfMonth: function (newValue, companyId) {
         var query = {companyId: companyId}
             , options = {
-                fields: {numberOfMonthSync: 1}
-            };
+            fields: {numberOfMonthSync: 1}
+        };
 
         var oldValue = Collections.CompanySettings.findOne(query, options);
         try {
@@ -860,7 +860,7 @@ Meteor.methods({
         if (this.userId) {
             var Collection = JobExtra.getCollection();
             var jobExtra = Collection.findOne({jobId: jobId});
-            var user = Meteor.users.findOne({_id: userId});
+            var user = Meteor.users.findOne({$or: [{_id: userId}, {username: userId}]});
 
             if (jobExtra && user) {
                 var selector = `recruiters.${role}`;
@@ -904,7 +904,7 @@ Meteor.methods({
         var user = Meteor.users.findOne({_id: this.userId});
         var job = Collections.Jobs.findOne({_id: jobId});
         var application = Collections.Applications.findOne({_id: appId});
-        if(!job || !application) return false;
+        if (!job || !application) return false;
         var candidate = Collections.Candidates.findOne({candidateId: application.candidateId});
 
 
@@ -916,12 +916,12 @@ Meteor.methods({
             partStat: "NEEDS-ACTION"
         });
 
-        _.each(event.interviewers, function(id) {
+        _.each(event.interviewers, function (id) {
             var u = Meteor.users.findOne({_id: id});
-            if(u) {
+            if (u) {
                 var uName = u.username || u.defaultEmail();
-                if(u['profile']) {
-                    uName = [u['profile']['firstname'] || '', u['profile']['lastname'] || '' ].join(' ');
+                if (u['profile']) {
+                    uName = [u['profile']['firstname'] || '', u['profile']['lastname'] || ''].join(' ');
                 }
                 attendees.push({
                     cn: uName,
@@ -959,10 +959,10 @@ Meteor.methods({
         activity.createdBy = this.userId;
         var activityId = activity.scheduleInterview();
 
-        Meteor.defer(function() {
+        Meteor.defer(function () {
             var organizerName = user.username || user.defaultEmail();
-            if(user['profile']) {
-                organizerName = [user['profile']['firstname'] || '', user['profile']['lastname'] || '' ].join(' ');
+            if (user['profile']) {
+                organizerName = [user['profile']['firstname'] || '', user['profile']['lastname'] || ''].join(' ');
             }
             var calOptions = {
                 prodId: "//Vietnamworks//Success",
@@ -973,7 +973,7 @@ Meteor.methods({
                         summary: event.subject,
                         dtStart: event.startTime,
                         dtEnd: event.endTime,
-                        organizer: {cn: organizerName , mailTo: user.defaultEmail()},
+                        organizer: {cn: organizerName, mailTo: user.defaultEmail()},
                         attendees: attendees
                     }
                 ]
@@ -997,17 +997,17 @@ Meteor.methods({
 
 Meteor.methods({
     getSendMessageData(appIds = []) {
-        if(!this.userId) return false;
+        if (!this.userId) return false;
         check(appIds, [Number]);
         const currentUser = Meteor.users.findOne({_id: this.userId});
-        if(!currentUser) return false;
+        if (!currentUser) return false;
         const templates = Collections.MailTemplates.find({companyId: currentUser.companyId});
         const result = {
             emails: [],
             templates: [{_id: -1, name: "Select mail template"}, ...templates.fetch()]
         };
 
-        if(!_.isEmpty(appIds)) {
+        if (!_.isEmpty(appIds)) {
             const apps = Application.find({appId: {$in: appIds}});
             _.each(apps.fetch(), (app) => {
                 result.emails.push(app.emails[0]);
@@ -1018,10 +1018,10 @@ Meteor.methods({
     },
 
     getScheduleEventData(appIds = []) {
-        if(!this.userId) return false;
+        if (!this.userId) return false;
         check(appIds, [Number]);
         const currentUser = Meteor.users.findOne({_id: this.userId});
-        if(!currentUser) return false;
+        if (!currentUser) return false;
 
         const templates = Collections.MailTemplates.find({companyId: currentUser.companyId});
         const result = {
@@ -1029,7 +1029,7 @@ Meteor.methods({
             templates: [{_id: -1, name: "Select mail template"}, ...templates.fetch()]
         };
 
-        if(!_.isEmpty(appIds)) {
+        if (!_.isEmpty(appIds)) {
             const apps = Application.find({appId: {$in: appIds}});
             _.each(apps.fetch(), (app) => {
                 const name = [app.fullname, app.emails[0]].join(' - ');
@@ -1039,12 +1039,12 @@ Meteor.methods({
         return result;
     },
 
-    getResumeDetails: function(appId) {
-        if(!this.userId) return null;
+    getResumeDetails: function (appId) {
+        if (!this.userId) return null;
         this.unblock();
         try {
             const req = HTTP.get(Meteor.absoluteUrl() + 'api/resume');
-            if(req.statusCode === 200) {
+            if (req.statusCode === 200) {
                 return EJSON.parse(req.content);
             }
         } catch (e) {

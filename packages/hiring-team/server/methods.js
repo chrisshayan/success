@@ -229,15 +229,30 @@ var methods = {
 methods.removeHiringTeamRequest = function (requestId) {
     if (!this.userId) return false;
     this.unblock();
+
+    var roles = ['manager', 'recruiter'];
     var request = Meteor['hiringTeam'].findOne({_id: requestId});
+    var Collection = JobExtra.getCollection();
 
     var user = Meteor.users.findOne({_id: this.userId});
 
-    if (!user || !request)
+    if (!user || !request || request.roleId === 'admin')
         return false;
 
     user.isAssigned = false;
     user.save();
+
+
+    roles.forEach((role)=> {
+        var selector = `recruiters.${role}`;
+        var pullMod = {};
+        pullMod[selector] = {email: request.email};
+        return Collection.update({}, {
+            $pull: pullMod
+        }, {
+            multi: true
+        });
+    });
 
     return request.remove();
 };

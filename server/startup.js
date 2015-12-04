@@ -62,7 +62,7 @@ Meteor.startup(function () {
     DEFAULT_SUGGESTION_LIST.forEach((item)=> {
         var length = criteriaSuggestion.find({templateName: item.templateName}).count();
 
-        if (item.setItems.length >= length) {
+        if (item.setItems.length > length) {
             item.setItems.forEach(function (ii) {
                 var suggestList = new JobCriteriaSuggestion();
                 suggestList.templateName = item.templateName;
