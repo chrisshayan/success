@@ -96,6 +96,7 @@ var getApplicationByJobId = function (job, cb) {
                 currentJob.save();
             }
 
+            job.done();
 
         } catch (e) {
             console.log('insert application error :', data);
@@ -106,6 +107,7 @@ var getApplicationByJobId = function (job, cb) {
                 failedJob.save();
             }
             console.trace(e);
+            job.fail('sync failed');
         }
     }
     cb();
