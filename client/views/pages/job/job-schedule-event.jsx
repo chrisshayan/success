@@ -147,7 +147,6 @@ ScheduleEvent = React.createClass({
         var scheduleDate = React.findDOMNode(this.refs.scheduleDate);
         var startTime = React.findDOMNode(this.refs.startTime).value.split(':');
         var endTime = React.findDOMNode(this.refs.endTime).value.split(':');
-        console.log(scheduleDate.value)
         var sd = new moment(scheduleDate.value, 'DD/MM/YYYY');
         var st = sd.clone();
         st.hour(startTime[0]);
