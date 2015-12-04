@@ -114,6 +114,26 @@ var methods = {
                 }
                 Meteor.defer(function () {
                     SYNC_VNW.syncUser(vnwData);
+
+                    var user = Meteor.users.findOne({_id: _id});
+
+                    var hiringTeamItem = new HiringTeam();
+                    if (!Meteor['hiringTeam'].findOne({email: email})) {
+
+                        hiringTeamItem.companyId = user.companyId;
+                        hiringTeamItem.email = email;
+                        hiringTeamItem.username = user.username;
+                        hiringTeamItem.roleId = 'admin';
+                        hiringTeamItem.status = 1;
+                        hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
+
+                        if (!hiringTeamItem.name.length)
+                            hiringTeamItem.name = 'admin';
+
+                        //hiringTeamItem.roleId = [];
+                        hiringTeamItem.save();
+                    }
+
                 });
                 var tokenData = {
                     userId: vnwData.userid,

@@ -258,8 +258,13 @@ methods.removeHiringTeamRequest = function (requestId) {
 };
 
 
-methods.setupDefaultHiringTeam = function () {
-    var user = Meteor.users.findOne({_id: Meteor.userId()});
+/*methods.setupDefaultHiringTeam = function () {
+    if (!this.userId) return false;
+
+    var user = Meteor.users.findOne({_id: this.userId});
+    if (user.emails || user.emails[0])
+        return false;
+
     var email = user.emails[0].address;
 
     var hiringTeamItem = new HiringTeam();
@@ -281,6 +286,6 @@ methods.setupDefaultHiringTeam = function () {
 
     //hiringTeamItem.roleId = [];
     hiringTeamItem.save();
-};
+};*/
 
 Meteor.methods(methods);
