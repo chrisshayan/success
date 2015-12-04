@@ -381,28 +381,6 @@ Job = React.createClass({
         return Router.url('JobSettings', params);
     },
 
-    currentStateStyle() {
-        return this.props.job.extra.syncState;
-    },
-    currentStateLoadingContent(){
-        var state = this.currentStateStyle()
-            , content = '';
-
-        switch (state) {
-            case 'synced' :
-                break;
-            case 'syncing' :
-                content = <WaveLoading/>;
-                break;
-            case 'syncFailed' :
-            default :
-                content = <div className="sk-spinner sk-spinner-wave"><p> SYNC FAILED </p></div>;
-                break;
-
-        }
-
-        return content;
-    },
     render() {
 
         var style = {
@@ -437,10 +415,7 @@ Job = React.createClass({
         };
 
         return (
-            <div className="job" style={style[this.currentStateStyle()].jobItem}>
-                <div style={style[this.currentStateStyle()].loading}>
-                    {this.currentStateLoadingContent()}
-                </div>
+            <div className="job">
                 <div className="faq-item">
                     <div className="row">
                         <div className="col-md-7">
