@@ -110,7 +110,7 @@ if (Meteor.isServer) {
     JCSCollection.before.insert(function (userId, doc) {
         doc.keyword = doc.keyword.toLowerCase();
         return !(JCSCollection.findOne({
-            templateId: doc.templateId,
+            templateName: doc.templateName,
             keyword: doc.keyword
         }));
     })
