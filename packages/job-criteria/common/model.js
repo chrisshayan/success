@@ -98,6 +98,10 @@ JobCriteriaSuggestion.appendSchema({
     weight: {
         type: Number,
         defaultValue: 0
+    },
+    isDefault: {
+        type: Boolean,
+        defaultValue: false
     }
 });
 

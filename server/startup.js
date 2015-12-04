@@ -67,6 +67,7 @@ Meteor.startup(function () {
                 var suggestList = new JobCriteriaSuggestion();
                 suggestList.templateName = item.templateName;
                 suggestList.keyword = ii;
+                suggestList.isDefault = true;
 
                 suggestList.save();
             });
