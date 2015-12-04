@@ -133,22 +133,30 @@ methods.getJobInfo = function (jobId) {
                             extra.save();
                         }
 
-                        if(!_.isEqual(extra.jobTitle, job.jobTitle)) {
+                        if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
                             extra.set('jobTitle', job.jobTitle);
                         }
 
-                        if(!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
+                        if (!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
                             extra.set('numOfApplications', job.numOfApplications);
                             extra.set('syncState', 'ready');
                         }
 
                         const companyName = job.companyName.trim() || job.companyDesc.trim();
-                        if(!_.isEqual(extra.companyName, companyName)) {
+                        if (!_.isEqual(extra.companyName, companyName)) {
                             extra.set('companyName', companyName);
                         }
                         extra.save();
                     }
                 }
+            }
+
+            if (extra.syncState === 'ready' && extra.jobId && extra.companyId) {
+                var data = {
+                    jobId: extra.jobId,
+                    companyId: extra.companyId
+                };
+                Job(Collections.SyncQueue, 'getApplications', data).save();
             }
         } catch (e) {
             console.trace(e);
@@ -204,7 +212,7 @@ methods['ES.lastOpenJobs'] = function () {
         _.each(_jobs, (j) => {
             var job = new ESJob(j);
             job.cities = Meteor.cities.find({languageId: 2, vnwId: {$in: j.cityList}}, {fields: {name: 1}}).fetch();
-            jobs.push( job );
+            jobs.push(job);
         });
     }
 

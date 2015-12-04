@@ -85,16 +85,6 @@ publications.jobDetails =  function (jobId) {
     var self = this;
     var user = Meteor.users.findOne({_id: self.userId});
     var extra = JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
-    _.each(extra.fetch(), function(ex) {
-        if(ex.syncState === 'ready') {
-            var data = {
-                jobId: ex.jobId,
-                companyId: ex.companyId
-            };
-            addToJobCollection('getApplications', data);
-        }
-    });
-
     return {
         find: function() {
             return extra;
