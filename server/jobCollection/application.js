@@ -122,8 +122,10 @@ var getApplicationByJobId = function (job, cb) {
 
 
             var currentJob = JobExtraCollection.findOne({jobId: jobId});
+
             if (currentJob) {
-                currentJob.set('stage.applied', currentJob.stage.applied + appRows.length);
+                (data.isUpdate) && currentJob.set('stage.applied', currentJob.stage.applied + appRows.length);
+
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
             }
