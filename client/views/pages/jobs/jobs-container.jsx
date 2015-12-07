@@ -102,9 +102,11 @@ const RendererMixin = {
 
 const HelperMixin = {
     getJobTypeCount() {
+        this.setState({ isCounting: true });
         Meteor.call('jobListCount', (err, result) => {
             if (!err) {
                 this.setState({
+                    isCounting: false,
                     counter: result
                 })
             }
@@ -197,9 +199,9 @@ JobsContainer = React.createClass({
         }
         let loadMoreBtn = null,
             loadingIcon = null,
-            isEmpty = this.total() === 0;
+            isEmpty = !this.state.isCounting && this.total() === 0;
 
-        if (!this.data.isReady) {
+        if (this.state.isCounting) {
             loadingIcon = <WaveLoading />
         } else {
             if (this.total() > this.state.limit) {
