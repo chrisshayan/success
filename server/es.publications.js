@@ -7,7 +7,7 @@ ESSearch = Meteor.wrapAsync(function (query, cb) {
 });
 
 var pubs = {};
-
+const citiesCache = Meteor.cities.find({languageId: 2}, {fields: {name: 1, vnwId: 1}}).fetch();
 
 pubs.ESJobs = function (type, limit, q) {
     if (!this.userId) return this.ready();
@@ -90,7 +90,10 @@ pubs.ESJobs = function (type, limit, q) {
             extra.save();
 
             job.extra = extra;
-            job.cities = Meteor.cities.find({languageId: 2, vnwId: {$in: j.cityList}}, {fields: {name: 1}}).fetch();
+            job.cities = _.filter(citiesCache, function(r) {
+                return  j.cityList.indexOf(r.vnwId) >= 0;
+            });
+
             job.type = type;
             _jobs.push(job);
             this.added(collName, job.jobId, job);
