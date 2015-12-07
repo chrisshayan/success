@@ -129,16 +129,14 @@ methods.getJobInfo = function (jobId) {
                          * @type {*|{}|any}
                          */
                         var extra = JobExtra.findOne({jobId: job.jobId});
-                        if (!extra) {
+                        if (!extra)
                             extra = new JobExtra();
-                            extra.jobId = job.jobId;
-                            extra.companyId = job.companyId;
-                            extra.save();
-                        }
 
-                        if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
+                        extra.set('jobId', job.jobId);
+                        extra.set('companyId', job.companyId);
+
+                        if (!_.isEqual(extra.jobTitle, job.jobTitle))
                             extra.set('jobTitle', job.jobTitle);
-                        }
 
                         if (!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
                             extra.set('numOfApplications', job.numOfApplications);
@@ -146,19 +144,30 @@ methods.getJobInfo = function (jobId) {
                         }
 
                         const companyName = job.companyName.trim() || job.companyDesc.trim();
-                        if (!_.isEqual(extra.companyName, companyName)) {
+
+                        if (!_.isEqual(extra.companyName, companyName))
                             extra.set('companyName', companyName);
-                        }
+
                         extra.save();
                     }
                 }
             }
 
             if (extra.syncState === 'ready' && extra.jobId && extra.companyId) {
-                var data = {
-                    jobId: extra.jobId,
-                    companyId: extra.companyId
-                };
+                var data = {};
+                var appCollection = Application.getCollection();
+                var appsOfJob = appCollection.find({jobId: jobId}).count();
+
+                if (appsOfJob) {
+                    if (appsOfJob >= job.numOfApplications)
+                        return false;
+                    else
+                        data.isUpdate = true;
+                }
+
+                data.jobId = extra.jobId;
+                data.companyId = extra.companyId;
+
                 Job(Collections.SyncQueue, 'getApplications', data).save();
             }
         } catch (e) {

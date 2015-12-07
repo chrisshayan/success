@@ -32,9 +32,23 @@ var getApplicationByJobId = function (job, cb) {
     if (!data.jobId || !data.companyId)
         job.done();
     else {
+        var appSql = '', appRows = [];
         try {
-            var appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);
-            var appRows = fetchVNWData(appSql);
+            if (data.isUpdate) {
+                var options = {
+                    sort: {
+                        appId: -1
+                    }
+                };
+                var lastAppOnline = appCollection.findOne({jobId: jobId, type: 1}, options) || {appId: 0}
+                    , lastAppDirect = appCollection.findOne({jobId: jobId, type: 2}, options) || {appId: 0};
+
+                appSql = sprintf(VNW_QUERIES.getNewApplications, jobId, lastAppOnline.appId, jobId, lastAppDirect.appId);
+
+            } else
+                appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);
+
+            appRows = fetchVNWData(appSql);
 
             appRows.forEach(function (info) {
                 var application = appCollection.findOne({appId: info.appId});
@@ -72,26 +86,44 @@ var getApplicationByJobId = function (job, cb) {
 
             });
 
-            var appStages = appCollection.find({jobId: jobId}, {fields: {'stage': 1}}).fetch();
+            /*var stages = {
+             'sourced': 0,
+             'applied': 0,
+             'phone': 0,
+             'interview': 0,
+             'offer': 0,
+             'hired': 0
+             };
+
+             appCollection.find({jobId: jobId}, {fields: {'stage': 1}}).map(function (app) {
+             switch (app.stage) {
+             case 0:
+             stages['sourced']++;
+             break;
+             case 1:
+             stages['applied']++;
+             break;
+             case 2:
+             stages['phone']++;
+             break;
+             case 3:
+             stages['interview']++;
+             break;
+             case 4:
+             stages['offer']++;
+             break;
+             case 5:
+             stages['hired']++;
+             break;
+             default :
+             break;
+             }
+             });*/
 
 
             var currentJob = JobExtraCollection.findOne({jobId: jobId});
             if (currentJob) {
-                if (appStages.length) {
-                    var count = _.countBy(appStages, 'stage');
-
-                    var stages = {
-                        'sourced': count[0] || 0,
-                        'applied': count[1] || 0,
-                        'phone': count[2] || 0,
-                        'interview': count[3] || 0,
-                        'offer': count[4] || 0,
-                        'hired': count[5] || 0
-                    };
-
-                    currentJob.set('stage', stages);
-                }
-
+                currentJob.set('stage.applied', currentJob.stage.applied + appRows.length);
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
             }

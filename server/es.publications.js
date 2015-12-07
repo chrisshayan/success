@@ -10,8 +10,9 @@ var pubs = {};
 
 
 pubs.ESJobs = function (type, limit, q) {
-    if(!this.userId) return this.ready();
+    if (!this.userId) return this.ready();
     this.unblock();
+
     const user = Meteor.users.findOne({_id: this.userId});
     var self = this;
     var handle = null;
@@ -22,7 +23,7 @@ pubs.ESJobs = function (type, limit, q) {
     var query = {};
     if (!q || q.trim().length <= 0) q = undefined;
 
-    if(user.isCompanyAdmin()) {
+    if (user.isCompanyAdmin()) {
         if (type == 'online') {
             query = SuccessESQuery.onlineJob(user.companyId, q)
         } else if (type == 'expired') {
@@ -36,7 +37,7 @@ pubs.ESJobs = function (type, limit, q) {
             ]
         };
         const jobIds = JobExtra.find(selector).map((doc) => doc.jobId);
-        if(_.isEmpty(jobIds)) return this.ready();
+        if (_.isEmpty(jobIds)) return this.ready();
 
         if (type == 'online') {
             query = SuccessESQuery.onlineJobForRecruiter(user.companyId, q, jobIds)
@@ -66,25 +67,23 @@ pubs.ESJobs = function (type, limit, q) {
                 extra.companyId = job.companyId;
                 extra.numOfApplications = job.numOfApplications;
                 extra.stage.applied = job.numOfApplications;
-                if(extra.numOfApplications <= 0) {
+                if (!extra.numOfApplications)
                     extra.syncState = 'synced';
-                } else {
-                    extra.syncState = 'ready';
-                }
+
                 extra.save();
             }
 
-            if(!_.isEqual(extra.jobTitle, job.jobTitle)) {
+            if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
                 extra.set('jobTitle', job.jobTitle);
             }
 
-            if(!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
+            if (!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
                 extra.set('numOfApplications', job.numOfApplications);
                 extra.set('syncState', 'ready');
             }
 
             const companyName = job.companyName.trim() || job.companyDesc.trim();
-            if(!_.isEqual(extra.companyName, companyName)) {
+            if (!_.isEqual(extra.companyName, companyName)) {
                 extra.set('companyName', companyName);
             }
 
