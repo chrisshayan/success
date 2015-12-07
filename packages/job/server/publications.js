@@ -84,7 +84,7 @@ publications.jobDetails =  function (jobId) {
     if(!this.userId) return this.ready();
     var self = this;
     var user = Meteor.users.findOne({_id: self.userId});
-    var extra = JobExtra.getCollection().find({jobId: jobId}, {limit: 1});
+    var extra = JobExtra.getCollection().find({companyId: user.companyId, jobId: jobId});
     return {
         find: function() {
             return extra;

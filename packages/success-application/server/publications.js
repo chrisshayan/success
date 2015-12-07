@@ -8,6 +8,7 @@ Publications = {};
  */
 Publications.getApplications = function (filters, options) {
     if (!this.userId) return this.ready();
+    this.unblock();
     return {
         find: function () {
             //check(filters, Object);
@@ -37,6 +38,7 @@ Publications.getApplications = function (filters, options) {
  */
 Publications['applications.lastApplications'] = function () {
     if (!this.userId) return null;
+    this.unblock();
     const user = Meteor.users.findOne({_id: this.userId});
     if (!user || !user['companyId']) return null;
     return {
@@ -91,6 +93,7 @@ Publications['applications.lastApplications'] = function () {
  */
 Publications.applicationDetails = function (data) {
     if (!this.userId) return this.ready();
+    this.unblock();
     check(data.application, String);
     var self = this;
     var user = Meteor.users.findOne({_id: this.userId});
@@ -122,11 +125,13 @@ Publications.applicationDetails = function (data) {
 
 Publications.application = function (appId) {
     if (!this.userId || !appId) return this.ready();
+    this.unblock();
+    const user = Meteor.users.findOne({_id: this.userId});
+    if(!user || !user['companyId']) return this.ready();
     return {
         find: function () {
-            var filters = {appId: appId};
-            var options = {limit: 1};
-            return Application.find(filters, options);
+            var filters = {companyId: user.companyId, appId: appId};
+            return Application.find(filters);
         }
     }
 }

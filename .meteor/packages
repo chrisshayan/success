@@ -46,7 +46,7 @@ summernote:summernote
 mpowaga:autoform-summernote
 meteorhacks:fast-render
 meteorhacks:subs-manager
-#meteorhacks:kadira
+meteorhacks:kadira@2.26.3
 #meteorhacks:kadira-profiler
 #kadira:debug
 

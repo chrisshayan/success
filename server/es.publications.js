@@ -11,6 +11,7 @@ var pubs = {};
 
 pubs.ESJobs = function (type, limit, q) {
     if(!this.userId) return this.ready();
+    this.unblock();
     const user = Meteor.users.findOne({_id: this.userId});
     var self = this;
     var handle = null;

@@ -16,6 +16,7 @@ var ESSuggest = Meteor.wrapAsync(function (query, cb) {
 
 var methods = {};
 methods.jobListCount = function () {
+    this.unblock();
     const counter = {online: 0, expired: 0};
     if (this.userId) {
         try {
@@ -62,6 +63,7 @@ methods.jobListCount = function () {
 
 
 methods.getCompany = function (companyId) {
+    this.unblock();
     let companyInfo = new ESCompanyInfo();
     if (this.userId) {
         try {
@@ -91,6 +93,7 @@ methods.getCompany = function (companyId) {
 };
 
 methods.getJobInfo = function (jobId) {
+    this.unblock();
     let job = new ESJob();
     if (this.userId) {
         try {
@@ -166,6 +169,7 @@ methods.getJobInfo = function (jobId) {
 };
 
 methods.suggestSkills = function () {
+    this.unblock();
     return ESSuggest({
         index: 'suggester',
         body: {
@@ -181,6 +185,7 @@ methods.suggestSkills = function () {
 
 methods['ES.lastOpenJobs'] = function () {
     if (!this.userId) return [];
+    this.unblock();
     const jobs = [];
     const user = Meteor.users.findOne({_id: this.userId});
     let query = {};

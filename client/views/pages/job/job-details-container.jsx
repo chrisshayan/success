@@ -1,4 +1,8 @@
 const { Modal, Button } = ReactBootstrap;
+const SubCache = new SubsManager({
+    cacheLimit: 1000,
+    expireIn: 5
+});
 
 const HookMixin = {
     getInitialState() {
@@ -92,7 +96,7 @@ const DataMixin = {
          */
         const appsFilter = this.filter__apps(),
             appsOptions = this.option__apps(),
-            isReady = Meteor.subscribe('getApplications', appsFilter, appsOptions).ready();
+            isReady = SubCache.subscribe('getApplications', appsFilter, appsOptions).ready();
 
         return {
             extra: extra,

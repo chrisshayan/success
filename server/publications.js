@@ -6,11 +6,12 @@ function transformVNWId(id) {
 
 Meteor.publish('mailTemplates', function () {
     if (!this.userId) return this.ready();
+    this.unblock();
     var user = Meteor.users.findOne({_id: this.userId});
-    var company = user.defaultCompany();
+    if(!user || !user.companyId) return null;
 
     return Collections.MailTemplates.find({
-        companyId: company.companyId
+        companyId: user.companyId
     }, {
         sort: {
             createdAt: -1
@@ -167,6 +168,7 @@ var DEFAULT_OPTIONS_VALUES = {limit: 10},
 
 Meteor.publishComposite('applicationActivities', function (filters, options) {
     if (!this.userId) return this.ready();
+    this.unblock();
     check(filters, Object);
     check(options, Object);
     if (options.limit) {
@@ -204,38 +206,6 @@ Meteor.publishComposite('applicationActivities', function (filters, options) {
             }
         ]
     }
-});
-
-Meteor.publish("applicationCounter", function (counterName, filters) {
-    if (!this.userId) return this.ready();
-    var self = this;
-    check(counterName, String);
-    check(filters, Object);
-
-    var count = 0;
-    var initializing = true;
-    var user = Meteor.users.findOne({_id: this.userId}, {fields: {userId: 1, companyId: 1}});
-    if (!user) return;
-    filters['companyId'] = user.companyId;
-    var handle = Collections.Applications.find(filters).observeChanges({
-        added: function (id) {
-            count++;
-            if (!initializing)
-                self.changed("vnw_counts", counterName, {count: count});
-        },
-        removed: function (id) {
-            count--;
-            self.changed("vnw_counts", counterName, {count: count});
-        }
-    });
-
-    initializing = false;
-    self.added("vnw_counts", counterName, {count: count});
-    self.ready();
-
-    self.onStop(function () {
-        handle.stop();
-    });
 });
 
 Meteor.publish("activityCounter", function (counterName, filters) {
@@ -299,6 +269,7 @@ Meteor.publish("activityCounter", function (counterName, filters) {
 
 Meteor.publish('staticModels', function () {
     if (!this.userId) return this.ready();
+    this.unblock();
     var query = {languageId: 2};
 
     return [Collections.Degrees.find(query)
