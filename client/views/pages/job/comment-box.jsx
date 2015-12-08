@@ -9,6 +9,8 @@ CommentBox = React.createClass({
         }, 'slow');
 
         autosize(ip);
+        // focus in textarea
+        ip.focus();
     },
 
     componentWillUnmount() {
