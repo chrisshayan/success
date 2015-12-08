@@ -581,7 +581,6 @@
   }
 }
 
-
 .content .circle-wrapper {
   background: #1ab394;
   color: #fff;
@@ -608,4 +607,38 @@
   padding: 5px 10px;
   font-size: 12px;
   display: inline-block;
+}
+
+.attachment-viewer {
+  width: 100%;
+  height: 900px;
+  margin: 20px auto;
+
+  iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  &.fullscreen {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    margin: 0;
+    padding: 0;
+
+    iframe {
+      width: 830px;
+      height: 100%;
+    }
+
+    .exit-fullscreen {
+      position: absolute;
+      top: 0;
+      margin: 5px;
+    }
+  }
 }

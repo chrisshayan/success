@@ -183,7 +183,7 @@ function createMockupResume() {
         education: [],
         experience: [],
         reference: [],
-        attachments: []
+        attachment: ''
     };
 
     // add phone
@@ -247,12 +247,7 @@ function createMockupResume() {
             description: faker.lorem.sentences()
         });
     });
-
-    _.each(_.range(_.random(0, 2)), () => {
-        resume.attachments.push({
-            url: 'https://career.berkeley.edu/sites/default/files/pdf/Guide/ResumeLetterWriting.pdf'
-        });
-    });
+    resume.attachment = 'http://images.staging.vietnamworks.com/resumes_sentdirectly/resume/9153/3769153/7f/832f2c43bbf457fa69d3dbfe03952b89.pdf';
 
     return resume;
 }
