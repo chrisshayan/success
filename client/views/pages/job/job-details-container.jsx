@@ -308,7 +308,6 @@ JobDetailsContainer = React.createClass({
     mixins: [ReactMeteorData, HookMixin, DataMixin, ActionMixin, RendererMixin],
 
     render(){
-        console.log(this.data.extra.syncState)
         if (this.state.isLoading) {
             return <WaveLoading />;
         } else {

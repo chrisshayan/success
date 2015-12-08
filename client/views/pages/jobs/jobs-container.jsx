@@ -238,7 +238,7 @@ JobsContainer = React.createClass({
 
                             <div className="col-md-8">
                                 <div className="input-group">
-                                    <input ref="searchInput" type="text" placeholder="Search"
+                                    <input ref="searchInput" type="text" placeholder="Search for job title, job tags..."
                                            className="input-sm form-control"
                                            onKeyUp={this.handle___SearchFieldKeyUp}/>
                                     <span className="input-group-btn">
@@ -454,6 +454,7 @@ Job = React.createClass({
                     </div>
                 </div>
                 <div className="tag-list">
+                    <span>Job tags: </span>
                     {this.props.job.skills.map(this.renderTag)}
                 </div>
             </div>

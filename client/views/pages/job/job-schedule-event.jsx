@@ -115,29 +115,47 @@ ScheduleEvent = React.createClass({
         $('.clockpicker').clockpicker();
     },
 
+    selectMailTemplate(templateId) {
+        if (templateId) {
+            var template = _.findWhere(this.state.templates, {_id: templateId});
+            if (template) {
+                var mailContent = React.findDOMNode(this.refs.mailContent);
+                this.setState({subject: template.subject});
+                $(mailContent).code(template.htmlBody);
+            }
+        }
+    },
+
+    handle__SelectDefaultTemplate() {
+        const templates = _.filter(this.state.templates, function (r) {
+            return r.name.match(/arrange an interview/i)
+        });
+        if (templates.length > 0) {
+            const templateId = templates[0]['_id'] || '';
+            $(this.refs.mailTemplate.getDOMNode()).val(templateId);
+            this.selectMailTemplate(templateId);
+        }
+    },
+
     handle__FetchData() {
-        this.setState({ isLoading: true });
+        this.setState({isLoading: true});
         Meteor.call('getScheduleEventData', [this.props.appId], (err, data) => {
-            if(!err) {
+            if (!err) {
                 this.setState({
                     isLoading: false,
                     emails: data.emails,
                     templates: data.templates
                 });
+
+                this.handle__SelectDefaultTemplate();
             }
         });
     },
 
-
     changeMailTemplate(e) {
         var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
         var templateId = mailTemplate.value;
-        var template = _.findWhere(this.state.templates, {_id: templateId});
-        if (template) {
-            var mailContent = React.findDOMNode(this.refs.mailContent);
-            this.setState({subject: template.subject});
-            $(mailContent).code(template.htmlBody);
-        }
+        this.selectMailTemplate(templateId);
     },
 
     getFormData() {
@@ -195,7 +213,7 @@ ScheduleEvent = React.createClass({
 
     handleSave(e) {
         e.preventDefault();
-        if(this.validate()) {
+        if (this.validate()) {
             let data = this.getFormData();
             let msg = `
                 <div class="text-left">
@@ -226,7 +244,7 @@ ScheduleEvent = React.createClass({
 
     candidateEmail() {
         const app = this.props.application;
-        if(app) {
+        if (app) {
             return app.fullname + ' -- ' + app.emails[0];
         }
         return '';
@@ -242,8 +260,8 @@ ScheduleEvent = React.createClass({
 
                             <div className="col-sm-10">
                                 <select ref="mailTemplate" className="form-control" onChange={this.changeMailTemplate}>
-                                    {this.state.templates.map( (t,idx) => <option value={t._id}
-                                                                                 key={idx}>{t.name}</option> )}
+                                    {this.state.templates.map((t, idx) => <option value={t._id}
+                                                                                  key={idx}>{t.name}</option>)}
                                 </select>
                                 {this.state.mailTemplateError ? <p className="text-danger">Please choose a mail
                                     template</p> : null}
@@ -253,7 +271,10 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Candidate:</label>
 
                             <div className="col-sm-10">
-                                {this.state.emails.map((email, key) => <span key={key}><span className="label label-info" >{email}</span>&nbsp;</span>)}
+                                <div className="form-control-static">
+                                    {this.state.emails.map((email, key) => <span key={key}><span
+                                        className="label label-info label-mail-to">{email}</span>&nbsp;</span>)}
+                                </div>
                             </div>
                         </div>
 
@@ -277,7 +298,8 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Location:</label>
 
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" placeholder="Enter a location" valueLink={this.linkState('location')}/>
+                                <input type="text" className="form-control" placeholder="Enter a location"
+                                       valueLink={this.linkState('location')}/>
                             </div>
                         </div>
 
@@ -286,7 +308,8 @@ ScheduleEvent = React.createClass({
 
                             <div className="col-sm-4">
                                 <div className="input-group" data-autoclose="true">
-                                    <input type="text" ref="scheduleDate" className="form-control date" placeholder="dd/mm/yyyy" defaultValue={this.state.scheduleDate}/>
+                                    <input type="text" ref="scheduleDate" className="form-control date"
+                                           placeholder="dd/mm/yyyy" defaultValue={this.state.scheduleDate}/>
                                     <span className="input-group-addon">
                                         <span className="fa fa-calendar"></span>
                                     </span>
@@ -295,11 +318,14 @@ ScheduleEvent = React.createClass({
                             <div className="col-sm-6">
                                 <div className="input-daterange input-group">
                                     <div className="input-group clockpicker" data-autoclose="true">
-                                        <input type="text" ref="startTime" className="form-control" defaultValue={this.state.startTime}/>
+                                        <input type="text" ref="startTime" className="form-control"
+                                               defaultValue={this.state.startTime}/>
                                     </div>
                                     <span className="input-group-addon">to</span>
+
                                     <div className="input-group clockpicker" data-autoclose="true">
-                                        <input type="text" ref="endTime" className="form-control" defaultValue={this.state.endTime}/>
+                                        <input type="text" ref="endTime" className="form-control"
+                                               defaultValue={this.state.endTime}/>
                                     </div>
                                 </div>
                             </div>
@@ -339,14 +365,14 @@ ScheduleEvent = React.createClass({
 
     renderInterviewer(u, key) {
         let name = [u.profile.firstname, u.profile.lastname];
-        if(u['username']) {
+        if (u['username']) {
             name.push(`- @${u.username}`)
         }
         return (
             <li key={key}>
                 <span>{name.join(' ')}</span>
                 <span className="btn btn-link" onClick={(e) => this.handleRemoveInterviewer(u, e)}>
-                    <i className="fa fa-times" />
+                    <i className="fa fa-times"/>
                 </span>
             </li>
         );
