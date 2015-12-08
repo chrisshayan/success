@@ -3,7 +3,8 @@ JobCandidateProfile = React.createClass({
     propTypes: {
         job: React.PropTypes.object.isRequired,
         stage: React.PropTypes.object.isRequired,
-        applicationId: React.PropTypes.number
+        applicationId: React.PropTypes.number,
+        tabState: React.PropTypes.number
     },
 
     getInitialState() {
@@ -138,10 +139,10 @@ JobCandidateProfile = React.createClass({
         this.handleToggleScheduleInterview(false);
     },
 
-    resize: function() {
+    resize: function () {
         if (this.refs.container) {
             const width = this.refs.container.getDOMNode().offsetWidth;
-            if(this.state.width != width) {
+            if (this.state.width != width) {
                 this.setState({width});
             }
         }
@@ -157,11 +158,11 @@ JobCandidateProfile = React.createClass({
                         <JobCandidateProfileActions
                             {...this.props}
                             containerWidth={this.state.width}
-                            application={this.data.application} />
+                            application={this.data.application}/>
 
                         <JobCandidateProfileContent
                             {...this.props}
-                            application={this.data.application} />
+                            application={this.data.application}/>
                     </div>
                 );
             } else {

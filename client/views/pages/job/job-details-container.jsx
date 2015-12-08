@@ -16,6 +16,7 @@ const HookMixin = {
             relatedJobs: [],
             resume: null,
             isLoading: true,
+            tabState: 2 // default
         };
 
         state = _.extend(state, JobApplications.getState());
@@ -31,9 +32,9 @@ const HookMixin = {
             let { candidateType, appId, appAction } = query;
 
             const stageObj = _.findWhere(Success.APPLICATION_STAGES, {alias: stage});
-            if(jobId) jobId = parseInt(jobId);
-            if(appId) appId = parseInt(appId);
-            if(candidateType) candidateType = parseInt(candidateType);
+            if (jobId) jobId = parseInt(jobId);
+            if (appId) appId = parseInt(appId);
+            if (candidateType) candidateType = parseInt(candidateType);
             if ([1, 2].indexOf(candidateType) < 0) candidateType = 1;
 
             if (!_.isEqual(stageObj, this.state.stage)) nextState['stage'] = stageObj;
@@ -261,6 +262,8 @@ const RendererMixin = {
                             resume={ this.state.resume }
                             appAction={ this.state.currentAppAction }
                             actions={ this.current__Actions() }
+                            tabState={this.state.tabState}
+                            onChangeTab={(tabState) => { this.setState({tabState}) }}
                         />
 
                         <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'} onHide={() =>{}}>
@@ -268,11 +271,11 @@ const RendererMixin = {
                                 <Modal.Title>Send bulk message</Modal.Title>
                             </Modal.Header>
                             {this.state.apps__showSendBulkMessage ? (
-                                <MessageBox
-                                    appIds={this.state.apps__selectedItems}
-                                    onSave={this.apps__Actions().sendMessage}
-                                    onDiscard={() => this.apps__Actions().toggleSendMessage(false) } />
-                            ): null}
+                            <MessageBox
+                                appIds={this.state.apps__selectedItems}
+                                onSave={this.apps__Actions().sendMessage}
+                                onDiscard={() => this.apps__Actions().toggleSendMessage(false) }/>
+                                ): null}
                         </Modal>
                     </div>
                 </div>
@@ -311,7 +314,7 @@ JobDetailsContainer = React.createClass({
         if (this.state.isLoading) {
             return <WaveLoading />;
         } else {
-            if(this.data.extra && this.data.extra.syncState == 'ready') {
+            if (this.data.extra && this.data.extra.syncState == 'ready') {
                 return this.render__Syncing();
             } else {
                 return this.render__Content();

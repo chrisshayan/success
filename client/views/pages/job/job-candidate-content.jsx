@@ -1,23 +1,21 @@
 let {
     Tabs,
     Tab
-} = ReactBootstrap;
+    } = ReactBootstrap;
 
 JobCandidateProfileContent = React.createClass({
     getInitialState() {
-        return {
-            key: 1
-        };
+        return {};
     },
-
     handleSelect(key) {
-        this.setState({key});
+        this.props.onChangeTab && this.props.onChangeTab(key);
     },
     render() {
+
         return (
             <div>
                 <JobCandidateShortInfo application={this.props.application} {...this.props} />
-                <Tabs id="job-candidate-content" activeKey={this.state.key} onSelect={this.handleSelect}>
+                <Tabs id="job-candidate-content" activeKey={this.props.tabState} onSelect={this.handleSelect}>
                     <Tab eventKey={1} title="Timeline">
 
                         <JobCandidateTimeline {...this.props} />
