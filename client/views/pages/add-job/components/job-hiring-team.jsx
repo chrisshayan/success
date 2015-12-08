@@ -16,8 +16,9 @@ const RendererMixin = {
                 <tr>
                     <th colSpan="2">
                         <h2>
-                            <i className="fa fa-users"/>
-                            &nbsp;
+                            <span className="circle-wrapper">
+                                <i className="fa fa-users"/>
+                            </span>
                             WHO'S RESPONSIBLE FOR THIS JOB
                         </h2>
                     </th>

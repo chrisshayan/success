@@ -31,6 +31,12 @@ JobSettingsContainer = React.createClass({
         };
     },
 
+    componentDidMount() {
+        $('body').animate({
+            scrollTop: 0
+        }, 'normal');
+    },
+
     handle___ChangeTab(key) {
         this.setState({currentTab: key});
     },
@@ -73,8 +79,9 @@ JobSettingsContainer = React.createClass({
                                                     className="fa fa-fw fa-suitcase"></i></span>
                                                 <span className="hidden-xs hidden-sm">THE JOB</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Tell applicants what the job involves and
-                                                why it's great opportunity.</p>
+                                            <p className="hidden-xs hidden-sm">
+                                                This is the job description that candidates are applying to.
+                                            </p>
                                         </a>
                                     </li>
 
@@ -85,7 +92,9 @@ JobSettingsContainer = React.createClass({
                                                 <span className="circle-wrapper"><i className="fa fa-fw fa-filter"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING CRITERIA</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Figuring out exactly who you’re looking for.</p>
+                                            <p className="hidden-xs hidden-sm">
+                                                Define the criteria parameters that will be used to evaluate candidates.
+                                            </p>
                                         </a>
                                     </li>
 
@@ -97,7 +106,9 @@ JobSettingsContainer = React.createClass({
                                                     className="fa fa-fw fa-users"></i></span>
                                                 <span className="hidden-xs hidden-sm">HIRING TEAM</span>
                                             </h3>
-                                            <p className="hidden-xs hidden-sm">Are typically the head of their respective departments, and the person to whom the new hire will directly report.</p>
+                                            <p className="hidden-xs hidden-sm">
+                                                Invite your hiring team, including recruiters, hiring managers and other stakeholders, to make recruitment process.
+                                            </p>
                                         </a>
                                     </li>
                                 </ul>

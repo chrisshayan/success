@@ -120,7 +120,7 @@ const RendererMixin = {
                     <div className="hr-line-dashed"/>
                     <div className="form-group">
                         <label className="col-sm-3 control-label">
-                            Skill Tags
+                            Job Tags
                         </label>
                         <div className="col-sm-9">
                             <p className="form-control-static">
