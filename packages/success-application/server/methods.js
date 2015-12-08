@@ -53,6 +53,8 @@ function replacePlaceholder(user, job, application, mail) {
 }
 
 methods.applicationStageCount = function (jobId, stageId) {
+
+    this.unblock();
     var result = {
         qualify: 0,
         disqualified: 0

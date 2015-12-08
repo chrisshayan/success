@@ -36,13 +36,13 @@ pubs.ESJobs = function (type, limit, q) {
                 {'recruiters.recruiter.userId': this.userId}
             ]
         };
-        const jobIds = JobExtra.find(selector).map((doc) => doc.jobId);
-        if (_.isEmpty(jobIds)) return this.ready();
+        const jobAssignedIds = JobExtra.find(selector).map((doc) => doc.jobId);
+        if (_.isEmpty(jobAssignedIds)) return this.ready();
 
         if (type == 'online') {
-            query = SuccessESQuery.onlineJobForRecruiter(user.companyId, q, jobIds)
+            query = SuccessESQuery.onlineJobForRecruiter(user.companyId, q, jobAssignedIds)
         } else if (type == 'expired') {
-            query = SuccessESQuery.expiredJobForRecruiters(user.companyId, q, jobIds)
+            query = SuccessESQuery.expiredJobForRecruiters(user.companyId, q, jobAssignedIds)
         }
     }
 
@@ -100,17 +100,19 @@ pubs.ESJobs = function (type, limit, q) {
 
         });
 
-        // observe change from extra info
-        var extraInfo = Collection.find({jobId: {$in: jobIds}});
-        handle = extraInfo.observe({
-            changed(newDoc, oldDoc) {
-                var job = _.findWhere(_jobs, {jobId: newDoc.jobId});
-                if (job) {
-                    job.extra = newDoc;
-                    self.changed(collName, job.jobId, job);
+        if(!_.isEmpty(jobIds)) {
+            // observe change from extra info
+            var extraInfo = Collection.find({jobId: {$in: jobIds}});
+            handle = extraInfo.observe({
+                changed(newDoc, oldDoc) {
+                    var job = _.findWhere(_jobs, {jobId: newDoc.jobId});
+                    if (job) {
+                        job.extra = newDoc;
+                        self.changed(collName, job.jobId, job);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     self.ready();

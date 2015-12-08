@@ -46,9 +46,9 @@ summernote:summernote
 mpowaga:autoform-summernote
 meteorhacks:fast-render
 meteorhacks:subs-manager
-meteorhacks:kadira@2.26.3
+#meteorhacks:kadira@2.26.3
 #meteorhacks:kadira-profiler
-#kadira:debug
+#kadira:debug@2.2.4
 
 reywood:publish-composite
 lab:vnw-apis
