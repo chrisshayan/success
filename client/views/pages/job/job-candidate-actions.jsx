@@ -49,17 +49,23 @@ JobCandidateProfileActions = React.createClass({
         return is;
     },
 
-    getActionLink(type) {
+    goActionLink(type) {
         const params = Router.current().params;
         let query = _.clone(params.query);
         if (!query) query = {};
         query['appAction'] = type;
-        return Router.url('Job', {
+        return Router.go('Job', {
             jobId: this.props.job.jobId,
             stage: this.props.stage.alias
         }, {
             query: query
         });
+    },
+
+    onSelectAction(type, e) {
+        e.preventDefault();
+        this.props.onChangeTab && this.props.onChangeTab(1);
+        this.goActionLink(type);
     },
 
     render() {
@@ -85,15 +91,15 @@ JobCandidateProfileActions = React.createClass({
                              style={{paddingBottom: '3px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
-                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('comment') }>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('comment', e)}>
                                         Add comment
                                     </a>
 
-                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('message') }>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('message', e)}>
                                         Send message
                                     </a>
 
-                                    <a className="btn btn-default btn-outline btn-sm " href={ this.getActionLink('scheduleInterview') }>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
                                         Schedule interview
                                     </a>
 
