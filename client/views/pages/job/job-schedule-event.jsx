@@ -100,13 +100,6 @@ ScheduleEvent = React.createClass({
             ]
         });
 
-        let container = this.refs.container.getDOMNode();
-        let scrollTo = $(container).offset().top - 140;
-        $('body').animate({
-            scrollTop: scrollTo
-        }, 'slow');
-
-
         $('.date').datepicker({
             todayBtn: "linked",
             keyboardNavigation: false,
@@ -117,6 +110,17 @@ ScheduleEvent = React.createClass({
         });
 
         $('.clockpicker').clockpicker();
+
+        let container = $("#job-candidate-content");
+        let actionContainer = $('.job-candidate-actions');
+        var body = $("html, body");
+        let scrollTo = 0;
+        if(actionContainer && actionContainer.hasClass('affix')) {
+            scrollTo = container.offset().top - 45;
+        } else {
+            scrollTo = container.offset().top - 50 - 45;
+        }
+        body.stop().animate({scrollTop: scrollTo}, '500', 'swing');
     },
 
     selectMailTemplate(templateId) {

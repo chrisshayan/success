@@ -16,11 +16,6 @@ JobCandidateProfileContent = React.createClass({
             <div>
                 <JobCandidateShortInfo application={this.props.application} {...this.props} />
                 <Tabs id="job-candidate-content" activeKey={this.props.tabState} onSelect={this.handleSelect}>
-                    <Tab eventKey={1} title="Timeline">
-
-                        <JobCandidateTimeline {...this.props} />
-
-                    </Tab>
                     <Tab eventKey={2} title="Profile">
                         <JobCandidateResume
                             job={this.props.job}
@@ -28,6 +23,11 @@ JobCandidateProfileContent = React.createClass({
                             resume={this.props.resume}
                             application={this.props.application}
                         />
+                    </Tab>
+                    <Tab eventKey={1} title="Timeline">
+
+                        <JobCandidateTimeline {...this.props} />
+
                     </Tab>
                     <Tab eventKey={3} title="Scorecard summary">
                         <JobCandidateScorecardSummary />

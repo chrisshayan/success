@@ -4,17 +4,21 @@ CommentBox = React.createClass({
     },
 
     componentDidMount() {
-        let container = this.refs.container.getDOMNode();
-        let ip = this.refs.input.getDOMNode();
-        let scrollTo = $(container).offset().top - $(container).height() - 64;
-
-        $('body').animate({
-            scrollTop: scrollTo
-        }, 'slow');
-
+        var body = $("html, body");
+        let container = $("#job-candidate-content");
+        let actionContainer = $('.job-candidate-actions');
+        let ip = this.refs.txt.getDOMNode();
+        let scrollTo = 0;
+        if(actionContainer && actionContainer.hasClass('affix')) {
+            scrollTo = container.offset().top - 45;
+        } else {
+            scrollTo = container.offset().top - 50 - 45;
+        }
         autosize(ip);
-        // focus in textarea
-        Meteor.setTimeout(() => { ip.focus() }, 500)
+
+        body.stop().animate({scrollTop: scrollTo}, '500', 'swing', function() {
+            ip.focus();
+        });
     },
 
     componentWillUnmount() {
@@ -26,7 +30,7 @@ CommentBox = React.createClass({
 
     handleSaveClick(e) {
         e.preventDefault();
-        let ip = this.refs.input.getDOMNode();
+        let ip = this.refs.txt.getDOMNode();
         this.props.onSave && this.props.onSave(ip.value);
         ip.value = '';
     },
@@ -49,7 +53,7 @@ CommentBox = React.createClass({
         return (
             <div ref="container" style={styles.container}>
                 <textarea
-                    ref="input"
+                    ref="txt"
                     className="form-control"
                     style={styles.input}
                     placeholder="write your note or comment">
