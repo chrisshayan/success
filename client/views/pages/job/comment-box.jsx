@@ -1,4 +1,8 @@
 CommentBox = React.createClass({
+    componentWillMount() {
+        this.props.actions.changeTab(1);
+    },
+
     componentDidMount() {
         let container = this.refs.container.getDOMNode();
         let ip = this.refs.input.getDOMNode();
@@ -10,7 +14,7 @@ CommentBox = React.createClass({
 
         autosize(ip);
         // focus in textarea
-        ip.focus();
+        Meteor.setTimeout(() => { ip.focus() }, 500)
     },
 
     componentWillUnmount() {

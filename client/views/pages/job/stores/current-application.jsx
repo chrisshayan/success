@@ -193,6 +193,9 @@ JobCurrentApplication.getActions = function () {
             }
         });
     }.bind(this);
+    actions.changeTab = function(tabState = 2) {
+        this.setState({tabState});
+    }.bind(this);
 
     return actions;
 };

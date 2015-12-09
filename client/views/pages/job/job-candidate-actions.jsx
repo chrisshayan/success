@@ -64,7 +64,7 @@ JobCandidateProfileActions = React.createClass({
 
     onSelectAction(type, e) {
         e.preventDefault();
-        this.props.onChangeTab && this.props.onChangeTab(1);
+        //this.props.onChangeTab && this.props.onChangeTab(1);
         this.goActionLink(type);
     },
 

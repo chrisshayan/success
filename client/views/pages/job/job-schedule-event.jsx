@@ -37,6 +37,10 @@ ScheduleEvent = React.createClass({
         };
     },
 
+    componentWillMount() {
+        this.props.actions.changeTab(1);
+    },
+
     componentDidMount() {
         this.handle__FetchData();
 

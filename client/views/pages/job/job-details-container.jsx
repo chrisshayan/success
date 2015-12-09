@@ -62,9 +62,9 @@ const HookMixin = {
         this.handle___UpdateAppCounter(this.state.candidateType, null);
         if (this.state.currentAppId) {
             this.handle___GetResumeDetails();
-            if(this.state.currentAppAction) {
-                this.setState({tabState: 1})
-            }
+            //if(this.state.currentAppAction) {
+            //    //this.setState({tabState: 1})
+            //}
         }
     },
 
@@ -79,6 +79,7 @@ const HookMixin = {
     componentDidUpdate(prevProps, prevState) {
         if (this.state.currentAppId != prevState.currentAppId) {
             this.handle___GetResumeDetails();
+            this.current__Actions().changeTab(2);
         }
     }
 

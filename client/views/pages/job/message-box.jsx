@@ -11,6 +11,10 @@ MessageBox = React.createClass({
         };
     },
 
+    componentWillMount() {
+        this.props.actions.changeTab(1);
+    },
+
     componentDidMount() {
         let container = this.refs.container.getDOMNode();
         let scrollTo = $(container).offset().top - 140;
