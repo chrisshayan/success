@@ -1,7 +1,4 @@
-let LinkedStateMixin = React.addons.LinkedStateMixin;
-
 ScheduleEvent = React.createClass({
-    mixins: [LinkedStateMixin],
     propsType: {
         appId: React.PropTypes.number.isRequired
     },
@@ -306,8 +303,13 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Location:</label>
 
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" placeholder="Enter a location"
-                                       valueLink={this.linkState('location')}/>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Enter a location"
+                                    defaultValue={this.state.location}
+                                    onChange={(e) => this.setState({location: e.target.value})}
+                                   />
                             </div>
                         </div>
 
@@ -343,7 +345,11 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Subject:</label>
 
                             <div className="col-sm-10">
-                                <input type="text" className="form-control" valueLink={this.linkState('subject')}/>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    defaultValue={this.state.subject}
+                                    onChange={(e) => this.setState({subject: e.target.value})}/>
                                 {this.state.subjectError ? <p className="text-danger">Please input mail
                                     subject</p> : null}
                             </div>
