@@ -303,13 +303,7 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Location:</label>
 
                             <div className="col-sm-10">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Enter a location"
-                                    defaultValue={this.state.location}
-                                    onChange={(e) => this.setState({location: e.target.value})}
-                                   />
+                                <GooglePlaceInput onChange={(loc) => this.setState({location: loc})}/>
                             </div>
                         </div>
 
@@ -389,6 +383,32 @@ ScheduleEvent = React.createClass({
                     <i className="fa fa-times"/>
                 </span>
             </li>
+        );
+    }
+});
+
+GooglePlaceInput = React.createClass({
+    componentDidMount: function () {
+        var input = this.refs.searchField.getDOMNode();
+        var options = {componentRestrictions: {country: 'vn'}};
+        this.autocomplete = new google.maps.places.Autocomplete(input, options);
+        this.autocomplete.addListener('place_changed', this.handleChange);
+    },
+
+    componentWillUnmount: function () {
+        delete this.autocomplete;
+    },
+
+    handleChange() {
+        this.props.onChange && this.props.onChange(this.refs.searchField.getDOMNode().value);
+    },
+
+    render: function () {
+        return (
+            <input type="text" className="form-control" ref="searchField"
+                   placeholder="Enter a location"
+                   onChange={this.handleChange}
+            />
         );
     }
 });
