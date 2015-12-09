@@ -319,6 +319,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
                 {
                     uid: activityId,
                     summary: data.subject,
+                    location: data.location,
                     dtStart: data.startTime,
                     dtEnd: data.endTime,
                     organizer: {cn: organizerName, mailTo: user.defaultEmail()},

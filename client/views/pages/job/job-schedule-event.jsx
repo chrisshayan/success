@@ -35,7 +35,7 @@ ScheduleEvent = React.createClass({
     },
 
     componentWillMount() {
-        this.props.actions.changeTab(1);
+        this.props.actions.changeTab(2);
     },
 
     componentDidMount() {
@@ -125,7 +125,8 @@ ScheduleEvent = React.createClass({
             var template = _.findWhere(this.state.templates, {_id: templateId});
             if (template) {
                 var mailContent = React.findDOMNode(this.refs.mailContent);
-                this.setState({subject: template.subject});
+                var subject = React.findDOMNode(this.refs.subject);
+                $(subject).val(template.subject);
                 $(mailContent).code(template.htmlBody);
             }
         }
@@ -187,7 +188,7 @@ ScheduleEvent = React.createClass({
             scheduleDate: sd.isValid() ? sd.toDate() : false,
             startTime: st.isValid() ? st.toDate() : false,
             endTime: et.isValid() ? et.toDate() : false,
-            subject: this.state.subject,
+            subject: subject.value,
             body: $(mailContent).code()
         };
 
@@ -341,6 +342,7 @@ ScheduleEvent = React.createClass({
                             <div className="col-sm-10">
                                 <input
                                     type="text"
+                                    ref="subject"
                                     className="form-control"
                                     defaultValue={this.state.subject}
                                     onChange={(e) => this.setState({subject: e.target.value})}/>

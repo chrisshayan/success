@@ -1,6 +1,6 @@
 CommentBox = React.createClass({
     componentWillMount() {
-        this.props.actions.changeTab(1);
+        this.props.actions.changeTab(2);
     },
 
     componentDidMount() {

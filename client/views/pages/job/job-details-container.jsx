@@ -14,9 +14,10 @@ const HookMixin = {
             currentAppId: null,
             currentAppAction: null,
             relatedJobs: [],
+            isResumeLoading: false,
             resume: null,
             isLoading: true,
-            tabState: 2 // default
+            tabState: 1 // default
         };
 
         state = _.extend(state, JobApplications.getState());
@@ -215,9 +216,13 @@ const ActionMixin = {
     },
 
     handle___GetResumeDetails() {
+        this.setState({
+            isResumeLoading: true
+        });
         Meteor.call('getResumeDetails', this.state.currentAppId, (err, result) => {
             if (!err) {
                 this.setState({
+                    isResumeLoading: false,
                     resume: result
                 });
             }
@@ -257,17 +262,18 @@ const RendererMixin = {
                             actions={ this.apps__Actions() }
                             isSelectedAll={ this.state.apps__isSelectedAll }
                         />
-
-                        <JobCandidateProfile
-                            job={ this.state.job }
-                            stage={ this.state.stage }
-                            applicationId={ this.state.currentAppId }
-                            resume={ this.state.resume }
-                            appAction={ this.state.currentAppAction }
-                            actions={ this.current__Actions() }
-                            tabState={this.state.tabState}
-                            onChangeTab={(tabState) => { this.setState({tabState}) }}
-                        />
+                        {this.state.isResumeLoading ? <div className="job-candidate-profile"><WaveLoading /></div> : (
+                            <JobCandidateProfile
+                                job={ this.state.job }
+                                stage={ this.state.stage }
+                                applicationId={ this.state.currentAppId }
+                                resume={ this.state.resume }
+                                appAction={ this.state.currentAppAction }
+                                actions={ this.current__Actions() }
+                                tabState={this.state.tabState}
+                                onChangeTab={(tabState) => { this.setState({tabState}) }}
+                                />
+                        )}
 
                         <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'} onHide={() =>{}}>
                             <Modal.Header>
