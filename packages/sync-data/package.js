@@ -14,12 +14,12 @@ Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
     api.use(['stevezhu:lodash', 'lab:vnw-apis']);
-    api.use(['vnw:job', 'vnw:application','vnw:candidate']);
+    api.use(['success:application']);
 
     api.addFiles(['sync-data.js'], 'server');
-    api.addFiles(['jobs/applications.js', 'jobs/jobs.js', 'jobs/candidates.js'], 'server');
+    api.addFiles(['jobs/applications.js', 'jobs/jobs.js'], 'server');
 
-    api.export('sJobCollections')
+    api.export('sJobCollections');
 
 
 });

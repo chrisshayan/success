@@ -103,6 +103,8 @@ var Jobs = {
     addNewJob: function (jc, cb) {
         try {
             //refresh??
+            var data = jc.data;
+            console.log('start insert job : ', data); // jobId, companyId
 
             jc.done();
             cb();

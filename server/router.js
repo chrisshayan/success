@@ -130,19 +130,21 @@ Router.route('/webhook/application', {
                 entryId: Number,
                 source: Number
             });
-            var type = null;
+            var type = 'addApplication';
+
             switch (this.request.method.toLowerCase()) {
                 case 'post':
                     type = 'addApplication';
-                    cond = Application.findOne({appId: data.appId});
+                    cond = Application.findOne({appId: data.entryId});
                     break;
                 case 'put':
                     type = 'updateApplication';
                     break;
             }
-            if (data.jobId
-                && JobExtra.findOne({jobId: data.jobId})
-                && !cond) {
+
+            cond = !!(!cond && JobExtra.findOne({jobId: data.jobId}));
+
+            if (cond) {
                 type && SYNC_VNW.addQueue(type, data);
             }
 
@@ -274,23 +276,23 @@ Router.route('/api/skill/:jobId/:alias/search', {
     action: function () {
         const { q } = this.request.query;
         let results = [];
-        if(q && q.length > 0) {
+        if (q && q.length > 0) {
             const req = ESSuggest({
                 index: 'suggester',
                 body: {
-                    skill : {
-                        "text" : q,
-                        "completion" : {
-                            "field" : "skillNameSuggest"
+                    skill: {
+                        "text": q,
+                        "completion": {
+                            "field": "skillNameSuggest"
                         }
                     }
                 }
 
             });
 
-            if(req && req['skill'] && req['skill'].length > 0) {
+            if (req && req['skill'] && req['skill'].length > 0) {
                 results = [];
-                _.each(req['skill'][0]['options'], function(opt) {
+                _.each(req['skill'][0]['options'], function (opt) {
                     results.push({
                         id: opt.text,
                         text: opt.text
@@ -298,8 +300,8 @@ Router.route('/api/skill/:jobId/:alias/search', {
                 });
             }
         } else {
-            if(this.params.alias === "skills") {
-                if(this.params.jobId) {
+            if (this.params.alias === "skills") {
+                if (this.params.jobId) {
                     const result = ESSearch({
                         index: 'vietnamworks',
                         type: 'job',
@@ -313,17 +315,20 @@ Router.route('/api/skill/:jobId/:alias/search', {
                         if (hits.length > 0) {
                             const data = hits[0]['_source'];
                             const job = new ESJob(data);
-                            job.skills.map(function(skill) {
-                               results.push({
-                                   id: skill.skillName,
-                                   text: skill.skillName
-                               })
+                            job.skills.map(function (skill) {
+                                results.push({
+                                    id: skill.skillName,
+                                    text: skill.skillName
+                                })
                             });
                         }
                     }
                 }
             } else {
-                results = JobCriteriaSuggestion.collection.find({templateName: this.params.alias, isDefault: true}).map(function(r) {
+                results = JobCriteriaSuggestion.collection.find({
+                    templateName: this.params.alias,
+                    isDefault: true
+                }).map(function (r) {
                     return {
                         id: r.keyword,
                         text: r.keyword

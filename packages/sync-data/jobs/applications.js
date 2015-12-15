@@ -58,6 +58,8 @@ function processApplication(info, data) {
         application.set('genderId', info.genderId);
         application.set('dob', info.birthday);
         application.set('countryId', info.countryId);
+        application.set('phone', info.homephone);
+        application.set('mobile', info.cellphone);
 
         info.jobTitle && application.set('jobTitle', info.jobTitle);
         const city = Meteor.cities.findOne({vnwId: info.cityId, languageId: 2});
@@ -67,7 +69,7 @@ function processApplication(info, data) {
         var emails = _.unique((info.emails) ? info.emails.split('|') : []);
 
         application.set('emails', emails);
-        application.set('appliedDate', info.appliedDate);
+        application.set('appliedDate', formatDatetimeFromVNW(info.appliedDate));
     }
 
     application.set('isDeleted', info.isDeleted); // the only field update
@@ -83,7 +85,7 @@ var Applications = {
 
                 console.log('start insert Application : ', data);
 
-                var appSql = sprintf(VNW_QUERIES.getApplicationByAppId, data.appId, data.appId);
+                var appSql = sprintf(VNW_QUERIES.getApplicationByAppId, data.entryId, data.entryId);
                 var rows = fetchVNWData(appSql);
                 rows.forEach(function (app) {
                     let application = processApplication(app, data);
