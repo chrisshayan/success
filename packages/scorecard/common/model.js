@@ -59,7 +59,7 @@ scoreCardModel.prototype.isExist = function (condition) {
             'ref.appId': this.ref.appId
         };
 
-    return Collection.findOne(condition);
+    return ScoreCardCollection.findOne(condition);
 };
 
 ScoreCard = scoreCardModel;
