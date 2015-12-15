@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'scorecard',
+    name: 'vnw:sync-data',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -13,22 +13,20 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(['vnw:core', 'success:application']);
+    api.use(['stevezhu:lodash', 'lab:vnw-apis']);
+    api.use(['vnw:job', 'vnw:application','vnw:candidate']);
 
-    api.addFiles('scorecard.js');
+    api.addFiles(['sync-data.js'], 'server');
+    api.addFiles(['jobs/applications.js', 'jobs/jobs.js', 'jobs/candidates.js'], 'server');
 
-    api.addFiles(['common/config.js', 'common/model.js', 'common/extends.js']);
+    api.export('sJobCollections')
 
-    api.addFiles(['server/publications.js', 'server/methods.js', 'server/startup.js'], ['server']);
 
-    api.imply(['vnw:core']);
-
-    api.export(['ScoreCard']);
 });
 
 Package.onTest(function (api) {
     api.use('ecmascript');
     api.use('tinytest');
-    api.use('scorecard');
-    api.addFiles('scorecard-tests.js');
+    api.use('sync-data');
+    api.addFiles('sync-data-tests.js');
 });

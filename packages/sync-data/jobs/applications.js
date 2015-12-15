@@ -41,59 +41,9 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
 });
 
 
-function processCandidates(candidateId) {
-    if (!candidateId) return false;
-    var getCandidatesSQL = sprintf(VNW_QUERIES.getCandiatesInfo, candidateId);
-    var candidateRows = fetchVNWData(getCandidatesSQL);
-
-    candidateRows.forEach(function (row) {
-        //var candidate = Collections.Candidates.findOne({candidateId: row.userid});
-        var candidate = new Candidate();
-
-        //console.log('new candidate: ', row.userid);
-        //console.log('new', row.userid, row.firstname);
-        //candidate = new Schemas.Candidate();
-        candidate.candidateId = row.userid;
-        candidate.username = row.username;
-        candidate.password = row.password;
-        candidate.firstname = row.firstname;
-        candidate.lastname = row.lastname;
-        candidate.jobTitle = row.jobTitle;
-        candidate.workingCompany = row.workingCompany;
-        candidate.vnwData = row;
-        candidate.data = row;
-        candidate.createdAt = formatDatetimeFromVNW(row.createddate);
-        candidate.updatedAt = formatDatetimeFromVNW(row.lastdateupdated);
-
-        //Collections.Candidates.insert(candidate);
-        if (!candidate.isExist()) {
-            candidate.save();
-        } else {
-            candidate.updateCandidate();
-
-
-            /*//TODO : in the future, the 3rd job will care this one
-             if (!_.isEqual(candidate.data, row)) {
-             Collections.Jobs.update(candidate._id, {
-             $set: {
-             data: row,
-             lastSyncedAt: new Date()
-             }
-             });
-             }*/
-        }
-    })
-}
-
-function processUpdateApplication() {
-}
-
-
-function processApplication(data, info) {
-    var application = Application.findOne({appId: data.appId});
-
+function processApplication(info, data) {
+    var application = Application.findOne({appId: info.appId});
     if (!application) {
-        if (!info) return null;
 
         application = new Application();
         application.set('appId', info.appId);
@@ -120,9 +70,7 @@ function processApplication(data, info) {
         application.set('appliedDate', info.appliedDate);
     }
 
-    var isDeleted = (info) ? !!(info.isDeleted) : !application.isDeleted;
-
-    application.set('isDeleted', isDeleted); // the only field update
+    application.set('isDeleted', info.isDeleted); // the only field update
 
     return application;
 
@@ -136,11 +84,11 @@ var Applications = {
                 console.log('start insert Application : ', data);
 
                 var appSql = sprintf(VNW_QUERIES.getApplicationByAppId, data.appId, data.appId);
-                appSql.forEach(function (app) {
-                    let application = processApplication(app, data.companyId);
+                var rows = fetchVNWData(appSql);
+                rows.forEach(function (app) {
+                    let application = processApplication(app, data);
                     application && application.save();
                 });
-
 
                 console.log('end add application');
                 jc.done();

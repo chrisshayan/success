@@ -2,16 +2,17 @@
  * JobCriteriaSetTemplate
  */
 
-var mongoCollection = new Mongo.Collection(MODULE_NAME);
+var scoreCardCollection = new Mongo.Collection(SCORECARD_MODULE_NAME);
 
-var model = Astro.Class({
-    name: MODULE_NAME,
-    collection: mongoCollection,
+var scoreCardModel = Astro.Class({
+    name: SCORECARD_MODULE_NAME,
+    collection: scoreCardCollection,
     fields: {
         ref: {
             companyId: 'number',
             jobId: 'number',
             appId: 'number',
+            type: 'number',
             candidateId: 'number',
             recruiterId: 'string'
         },
@@ -22,7 +23,8 @@ var model = Astro.Class({
         },
         score_criteria: {
             type: 'array',
-            default: ()=> {}
+            default: ()=> {
+            }
         },
         createdAt: {
             type: 'date',
@@ -40,6 +42,48 @@ var model = Astro.Class({
     methods: {} // prototype
 });
 
+scoreCardModel.prototype.isExist = function (condition) {
+    //noinspection JSUnresolvedVariable
+    condition = condition || {
+            'ref.recruiterId': this.ref.recruiterId,
+            'ref.appId': this.ref.appId
+        };
 
-ScoreCard = model;
-Collection = model.getCollection();
+    return Collection.findOne(condition);
+};
+
+ScoreCard = scoreCardModel;
+ScoreCardCollection = scoreCardModel.getCollection();
+
+
+// Scorecard summary
+
+var summaryCollection = new Mongo.Collection(SUMMARY_MODULE_NAME);
+
+var summaryModel = Astro.Class({
+    name: SUMMARY_MODULE_NAME,
+    collection: summaryCollection,
+    fields: {}, // schema
+    methods: {} // prototype
+});
+
+summaryModel.prototype.isExist = function (condition) {
+    //noinspection JSUnresolvedVariable
+    condition = condition || {
+            'ref.recruiterId': this.ref.recruiterId,
+            'ref.appId': this.ref.appId,
+            'ref.type': this.ref.type
+        };
+
+    return Collection.findOne(condition);
+};
+
+ScoreCardSummary = summaryModel;
+SummaryCollection = summaryModel.getCollection();
+
+
+
+
+
+
+
