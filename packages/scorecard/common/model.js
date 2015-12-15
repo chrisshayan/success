@@ -20,15 +20,15 @@ var scoreCardModel = Astro.Class({
                     recruiterId: null
                 }
             }
-        }
-    },
-    overall: 'number',
-    notes: {
-        type: 'object',
-        default: ()=> {
-            return {
-                keyTakeAways: '',
-                fitCompanyCulture: ''
+        },
+        overall: 'number',
+        notes: {
+            type: 'object',
+            default: ()=> {
+                return {
+                    keyTakeAways: '',
+                    fitCompanyCulture: ''
+                }
             }
         },
         score_criteria: {
@@ -47,12 +47,12 @@ var scoreCardModel = Astro.Class({
             default: ()=> {
                 return new Date()
             }
-        }
-    }, // schema
+        } // schema
+    },
     methods: {} // prototype
 });
 
-scoreCardModel.prototype.isExist = function (condition) {
+scoreCardModel.prototype.existScoreCard = function (condition) {
     //noinspection JSUnresolvedVariable
     condition = condition || {
             'ref.recruiterId': this.ref.recruiterId,
@@ -85,7 +85,7 @@ summaryModel.prototype.isExist = function (condition) {
             'ref.type': this.ref.type
         };
 
-    return Collection.findOne(condition);
+    return SummaryCollection.findOne(condition);
 };
 
 ScoreCardSummary = summaryModel;
