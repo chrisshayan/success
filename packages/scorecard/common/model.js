@@ -9,17 +9,27 @@ var scoreCardModel = Astro.Class({
     collection: scoreCardCollection,
     fields: {
         ref: {
-            companyId: 'number',
-            jobId: 'number',
-            appId: 'number',
-            type: 'number',
-            candidateId: 'number',
-            recruiterId: 'string'
-        },
-        overall: 'number',
-        notes: {
-            keyTakeAways: 'string',
-            fitCompanyCulture: 'string'
+            type: 'object',
+            default: ()=> {
+                return {
+                    companyId: null,
+                    jobId: null,
+                    appId: null,
+                    type: null,
+                    candidateId: null,
+                    recruiterId: null
+                }
+            }
+        }
+    },
+    overall: 'number',
+    notes: {
+        type: 'object',
+        default: ()=> {
+            return {
+                keyTakeAways: '',
+                fitCompanyCulture: ''
+            }
         },
         score_criteria: {
             type: 'array',

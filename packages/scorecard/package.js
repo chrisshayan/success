@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'scorecard',
+    name: 'success:scorecard',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -14,6 +14,7 @@ Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
     api.use(['vnw:core', 'success:application']);
+    api.use(["jagi:astronomy@1.2.2"]);
 
     api.addFiles('scorecard.js');
 
