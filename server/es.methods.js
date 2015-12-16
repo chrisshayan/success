@@ -158,11 +158,8 @@ methods.getJobInfo = function (jobId) {
                 var appCollection = Application.getCollection();
                 var appsOfJob = appCollection.find({jobId: jobId}).count();
 
-                if (appsOfJob) {
-                    if (appsOfJob >= job.numOfApplications)
-                        return false;
-                    else
-                        data.isUpdate = true;
+                if (appsOfJob > 0) {
+                    data.isUpdate = true;
                 }
 
                 data.jobId = extra.jobId;
