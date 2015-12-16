@@ -45,6 +45,7 @@ JobCurrentApplication.getActions = function () {
 
         if (nextApp) {
             query['appId'] = nextApp.appId;
+            query['appType'] = nextApp.appType;
         }
 
         actions.scrollTop(140);

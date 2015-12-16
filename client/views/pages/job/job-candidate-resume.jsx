@@ -61,194 +61,315 @@ JobCandidateResumeOnline = React.createClass({
         const resume = this.props.resume;
         return (
             <div>
-                <div className="row">
-                    <div className="col-md-6">
-                        <div className="ibox">
-                            <div className="ibox-content">
-                                <h2><i className="fa fa-fw fa-list"></i> General Information</h2>
+                {resume.hasGeneralInfo() && this.renderGeneralInfo(resume)}
 
-                                <div className="row">
-                                    <div className="col-sm-12">
-                                        <table className="table m-b-xs m-t">
-                                            <tbody>
-                                            <tr>
-                                                <td>
-                                                    <strong>Total Years of Experience</strong>
-                                                </td>
-                                                <td>{ resume.yearOfExperience }</td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Most Recent Job</strong>
-                                                </td>
-                                                <td>
-                                                    { resume.currentJobLevel }
-                                                </td>
-
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Most Recent Company</strong>
-                                                </td>
-                                                <td>
-                                                    { resume.recentCompany }
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    <strong>Current Job Level</strong>
-                                                </td>
-                                                <td>
-                                                    { resume.currentJobLevel }
-                                                </td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-6">
-                        <div className="ibox">
-                            <div className="">
-                                <h2><i className="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
-
-                                <blockquote>
-                                    <p className="small"
-                                       dangerouslySetInnerHTML={{__html: resume.coverLetter}}/>
-                                </blockquote>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {resume && resume['careerObjective'] ? (
+                {resume.coverLetter() && (
                     <div className="row">
                         <div className="col-md-12">
                             <div className="ibox">
                                 <div className="ibox-content">
-                                    <h2><i className="fa fa-dot-circle-o"></i> Career Objective </h2>
+                                    <h2><i className="fa fa-fw fa-quote-left hidden-print"></i> Cover Letter</h2>
+
                                     <blockquote>
-                                        <p dangerouslySetInnerHTML={{ __html: resume.careerObjective }}/>
+                                        <pre className="cover-letter small"
+                                             dangerouslySetInnerHTML={{__html: resume.coverLetter() }}/>
                                     </blockquote>
                                 </div>
                             </div>
                         </div>
                     </div>
-                ) : null }
+                )}
 
-                {resume && resume['experience'] ? (
-                    <div className="row">
-                        <div className="col-md-7">
-                            <div className="ibox">
-                                <div className="ibox-content">
-                                    <h2><i className="fa  fa-file-text-o"/>&nbsp;EXPERIENCE</h2>
-                                    <ul className="content-list">
-                                        {resume.experience && resume.experience.map(this.renderExperience)}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-md-5">
-                            <div className="ibox">
-                                <div className="ibox-content">
-                                    <h2><i className="fa  fa-trophy"/>&nbsp;EDUCATION</h2>
-                                    <ul className="content-list">
-                                        {resume.education && resume.education.map(this.renderEducation)}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ) : null }
-
-                {resume && resume['reference'] ? (
+                {resume.profileObjective() && (
                     <div className="row">
                         <div className="col-md-12">
                             <div className="ibox">
                                 <div className="ibox-content">
-                                    <h2><i className="fa fa-book"></i> References</h2>
+                                    <h2><i className="fa fa-user"></i> Profile / Objective </h2>
+                                    <blockquote>
+                                        <pre className="cover-letter small"
+                                             dangerouslySetInnerHTML={{ __html: resume.profileObjective() }}/>
+                                    </blockquote>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {resume.educations() && resume.educations().length > 0 && (
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="ibox">
+                                <div className="ibox-content">
+                                    <h2><i className="fa fa-fw fa-graduation-cap"></i> Education &amp; Qualifications
+                                    </h2>
 
                                     <div id="vertical-timeline"
-                                         className="vertical-container dark-timeline vertical-timeline-content no-margins">
-
-                                        {resume.reference && resume.reference.map(this.renderReference)}
+                                         className="vertical-container dark-timeline vertical-timeline-content  no-margins">
+                                        {resume.educations().map(this.renderEducation)}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                ) : null }
+                )}
 
-                {resume && resume['attachment'] ? this.renderAttachment(resume.attachment) : null}
+                {resume.experiences() && resume.experiences().length > 0 && (
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="ibox">
+                                <div className="ibox-content">
+                                    <h2><i className="fa fa-fw fa-bank"></i> Work Experience</h2>
+
+                                    <div id="vertical-timeline"
+                                         className="vertical-container dark-timeline vertical-timeline-content  no-margins">
+                                        {resume.experiences().map(this.renderExperience)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {resume.references() && resume.references().length > 0 && (
+                    <div className="row">
+                        <div className="col-md-12">
+                            <div className="ibox">
+                                <div className="ibox-content">
+                                    <h2><i className="fa fa-fw fa-book"></i> References</h2>
+
+                                    <div id="vertical-timeline"
+                                         className="vertical-container dark-timeline vertical-timeline-content  no-margins">
+                                        {resume.references().map(this.renderReference)}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {resume.hasAttachment() && this.renderAttachment(resume)}
+
+            </div>
+        );
+    },
+
+    renderGeneralInfo(resume) {
+        return (
+            <div className="row">
+                <div className="col-md-12">
+                    <div className="ibox">
+                        <div className="ibox-content">
+                            <h2><i className="fa fa-fw fa-list"></i> General Information</h2>
+
+                            <div className="row">
+                                <div className="col-sm-12">
+                                    <table className="table m-b-xs m-t">
+                                        <tbody>
+                                        {resume.highestDegree() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Highest Education</strong>
+                                                </td>
+                                                <td>{ resume.highestDegree() }</td>
+                                            </tr>
+                                        )}
+
+                                        {resume.yearsExperience() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Total Years of Experience</strong>
+                                                </td>
+                                                <td>{ resume.yearsExperience() } years</td>
+                                            </tr>
+                                        )}
+
+                                        {resume.languageProficiency() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Language Proficiency</strong>
+                                                </td>
+                                                <td>
+                                                    {resume.languageProficiency().map((name, key) => <p
+                                                        key={key}>{ name }</p>)}
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {resume.mostRecentJobTitle() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Most Recent Job</strong>
+                                                </td>
+                                                <td>
+                                                    <div>{ resume.mostRecentJobTitle() }</div>
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {resume.mostRecentCompany() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Most Recent Company</strong>
+                                                </td>
+                                                <td>
+                                                    <div>{ resume.mostRecentCompany() }</div>
+                                                </td>
+
+                                            </tr>
+                                        )}
+
+                                        {resume.currentJobLevel() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Current Job Level</strong>
+                                                </td>
+                                                <td>
+                                                    { resume.currentJobLevel() }
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {resume.expectedJobTitle() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Expected Position</strong>
+                                                </td>
+                                                <td>
+                                                    { resume.expectedJobTitle() }
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {resume.expectedJobLevel() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Expected Job Level</strong>
+                                                </td>
+                                                <td>
+                                                    { resume.expectedJobLevel() }
+                                                </td>
+                                            </tr>
+                                        )}
+
+                                        {resume.expectedLocation() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Expected Work Place</strong>
+                                                </td>
+                                                <td>
+                                                    {resume.expectedLocation().map((name, key) => <p
+                                                        key={key}>{ name }</p>)}
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {resume.expectedIndustry() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Expected Job Category</strong>
+                                                </td>
+                                                <td>
+                                                    { resume.expectedIndustry().map((name, key) => <p
+                                                        key={key}>{ name }</p>) }
+                                                </td>
+                                            </tr>
+                                        )}
+                                        {resume.expectedSalary() && (
+                                            <tr>
+                                                <td>
+                                                    <strong>Expected Salary</strong>
+                                                </td>
+                                                <td>
+                                                    { resume.expectedSalary() } USD
+                                                </td>
+                                            </tr>
+                                        )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         );
     },
 
     renderExperience(exp, key) {
         return (
-            <li className="list-item" key={key}>
-                <span className="list-item-icon">
-                    <i className="fa fa-circle-o"/>
-                </span>
-                <span className="list-item-text">
-                    <strong>{ exp.position }</strong> at <strong>{ exp.company }</strong>
-                    <span className="list-item-info">
-                        <span className="list-item-date">{ exp.start } - { exp.end }</span>
-                        <p className="small"
-                           dangerouslySetInnerHTML={{__html: exp.description}}/>
-                    </span>
-                </span>
-            </li>
-        );
-    },
-
-    renderEducation(edu, key) {
-        return (
-            <li className="list-item" key={key}>
-                <span className="list-item-icon">
-                    <i className="fa fa-circle-o"/>
-                </span>
-                <span className="list-item-text">
-                    <strong>{ edu.major }</strong> at <strong>{ edu.school }</strong>
-                    <span className="list-item-info">
-                        <span className="list-item-date">{ edu.start } - { edu.end }</span>
-                        <p className="small"
-                           dangerouslySetInnerHTML={{__html: edu.description}}/>
-                    </span>
-                </span>
-            </li>
-        );
-    },
-
-    renderReference(ref, key) {
-        return (
-            <div key={key} className="vertical-timeline-block">
-                <div className="vertical-timeline-icon navy-bg">
-                    <i className="fa fa-user"/>
+            <div className="vertical-timeline-block" key={key}>
+                <div className="vertical-timeline-icon blue-bg">
+                    <i className="fa fa-black-tie"></i>
                 </div>
                 <div className="vertical-timeline-content">
-                    <h2 className="m-b-xs">
-                        {ref.name ? ref.name : ''} <br/>
-                        <small>
-                            {ref.title ? ref.title : ''} at &nbsp;
-                            <strong>{ref.companyName ? ref.companyName : ''}</strong>
-                        </small>
-                    </h2>
+                    <h2>{ exp['jobTitle'] || '' }</h2>
                     <span>
-                        Email: {ref.email ? ref.email : ''}
-                        <br/>
-                        Phone number: {ref.phone ? ref.phone : ''}
+                        <small>
+                            { exp['jobLevel'] } at { exp['companyName'] } - { exp['industry'] }
+                        </small>
                     </span>
+
+                    <br/>
+
+                    <span className="vertical-date m-t-n-xs">
+                        <small>{ exp['startDate'] || '' } - { exp['endDate'] == '-0001' ? 'present' : exp['endDate'] }</small>
+                    </span>
+
+                    <br/>
+
+                    <p className="small" dangerouslySetInnerHTML={{__html: exp.description}}/>
                 </div>
             </div>
         );
     },
 
-    renderAttachment(attachment) {
-        const attachmentUrl = `https://docs.google.com/viewer?embedded=true&url=${attachment}`;
+    renderEducation(edu, key) {
+        return (
+            <div className="vertical-timeline-block" key={key}>
+                <div className="vertical-timeline-icon navy-bg">
+                    <i className="fa fa-building"></i>
+                </div>
+                <div className="vertical-timeline-content">
+                    <h2>
+                        { edu['schoolName'] || '' }
+                        { edu['major'] && (<small>- {edu['major'] }</small>) }
+                    </h2>
+                    <span className="vertical-date m-t-n-xs">
+                        <small>{ edu['endDate'] || '' } - { edu['endDate'] || '' }</small>
+                    </span>
+
+                    <br/>
+
+                    <p className="small" dangerouslySetInnerHTML={{__html: edu.description}}/>
+                </div>
+            </div>
+        );
+    },
+
+    renderReference(ref, key) {
+        return (
+            <div className="vertical-timeline-block" key={key}>
+                <div className="vertical-timeline-icon navy-bg">
+                    <i className="fa fa-user"></i>
+                </div>
+                <div className="vertical-timeline-content">
+                    <h2 className="m-b-xs">
+                        { ref['fullName'] || '' }
+                        <small>- { ref['jobTitle'] || '' } at <strong>{ ref['companyName'] || '' }</strong></small>
+                    </h2>
+                        <span>
+                            Email: { ref['email'] || '' }
+                            <br/>
+                            Phone number: { ref['phone'] || '' }
+                        </span>
+                </div>
+            </div>
+        );
+    },
+
+    renderAttachment(resume) {
+        const attachmentUrl = `https://docs.google.com/viewer?embedded=true&url=${resume.attachmentUrl()}`;
 
         const viewerClass = classNames(
             'attachment-viewer',
@@ -258,27 +379,29 @@ JobCandidateResumeOnline = React.createClass({
         );
 
         let viewButtons = null;
-        if (!this.state.isViewCV) {
-            viewButtons = (
-                <button type="button" className="btn btn-primary btn-outline m-t-sm"
-                        onClick={() => this.toggleResumeViewer(true) }>
-                    <i className="fa fa-fw fa-eye"></i> Preview by Google Viewer
-                </button>
-            );
-        } else {
-            viewButtons = (
-                <span>
+        if(resume.canViewAttachment()) {
+            if (!this.state.isViewCV) {
+                viewButtons = (
+                    <button type="button" className="btn btn-primary btn-outline m-t-sm"
+                            onClick={() => this.toggleResumeViewer(true) }>
+                        <i className="fa fa-fw fa-eye"></i> Preview by Google Viewer
+                    </button>
+                );
+            } else {
+                viewButtons = (
+                    <span>
                     <button type="button" className="btn btn-primary btn-outline m-t-sm"
                             onClick={() => this.toggleFullScreen(true) }>
                         <i className="fa fa-fw fa-arrows-alt"></i> Fullscreen
                     </button>
-                    &nbsp;&nbsp;
-                    <button type="button" className="btn btn-primary btn-outline m-t-sm"
-                            onClick={() => this.toggleResumeViewer(false) }>
-                        <i className="fa fa-fw fa-eye-slash"></i> Hide
-                    </button>
+                        &nbsp;&nbsp;
+                        <button type="button" className="btn btn-primary btn-outline m-t-sm"
+                                onClick={() => this.toggleResumeViewer(false) }>
+                            <i className="fa fa-fw fa-eye-slash"></i> Hide
+                        </button>
                 </span>
-            );
+                );
+            }
         }
 
         return (
@@ -293,7 +416,8 @@ JobCandidateResumeOnline = React.createClass({
                         <div className="text-center">
                             {viewButtons}
                             &nbsp;&nbsp;
-                            <a className="btn btn-primary btn-outline m-t-sm" href={attachment} download={attachment} target="_blank">
+                            <a className="btn btn-primary btn-outline m-t-sm" href={resume.attachmentUrl()} download={resume.attachmentUrl()}
+                               target="_blank">
                                 <i className="fa fa-fw fa-download"></i>
                                 <span> Download CV</span>
                             </a>

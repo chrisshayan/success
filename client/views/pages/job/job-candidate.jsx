@@ -13,6 +13,7 @@ JobCandidate = React.createClass({
         const params = Router.current().params;
         const query = _.omit(params.query, 'appAction');
         query['appId'] = this.props.appId;
+        query['appType'] = this.props.appType;
 
         Router.go('Job', params, {query});
         $('body').animate({

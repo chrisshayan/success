@@ -61,6 +61,9 @@ const Model = Astro.Class({
         dob: {
             type: 'date'
         },
+        avatar: {
+            type: 'string'
+        },
 
         disqualified: {
             type: 'array',
@@ -76,6 +79,7 @@ const Model = Astro.Class({
         },
 
         picture() {
+            if(this.avatar) return this.avatar;
             const letter = this.firstname.length > 0 ? this.firstname[0] : '';
             return `https://placeholdit.imgix.net/~text?txtsize=40&txt=${letter}&w=80&h=80`;
         },

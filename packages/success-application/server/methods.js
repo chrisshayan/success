@@ -351,5 +351,16 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     return activityId;
 };
 
+methods['application.updateAvatar'] = function(appId, appType, avatar) {
+
+    const app = Application.findOne({appId: appId, type: appType});
+    console.log(app)
+    if(app) {
+        app.set('avatar', avatar);
+        return app.save();
+    }
+    return false;
+};
+
 
 Meteor.methods(methods);

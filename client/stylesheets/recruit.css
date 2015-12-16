@@ -191,33 +191,6 @@
     top: 5px !important;
 }
 
-.cover-letter {
-    margin: 15px auto;
-    width: 90%;
-}
-
-.cover-letter p {
-    padding: 15px;
-    background-color: #fff;
-    border: 1px solid #f2f2f2;
-    line-height: 28px;
-    text-align: justify;
-    font-family: "Helvetica Neue", "Helvetica", Helvetica, sans-serif;
-    font-size: 14px;
-    height: 100px;
-    overflow: hidden;
-    position: relative;
-}
-
-.cover-letter .more {
-    height: auto;
-    overflow: auto;
-}
-
-.cover-letter .more-coverletter {
-
-}
-
 .application-timeline-content > p {
     height: 50px;
     overflow: hidden;

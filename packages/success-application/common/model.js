@@ -108,6 +108,12 @@ var model = Astro.Class({
         updatedAt: {
             type: 'date',
             default: ()=> new Date()
+        },
+        avatar: {
+            type: 'string',
+            default() {
+                return '';
+            }
         }
 
     }, // schema

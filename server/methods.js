@@ -588,8 +588,8 @@ Meteor.methods({
     setNumberOfMonth: function (newValue, companyId) {
         var query = {companyId: companyId}
             , options = {
-            fields: {numberOfMonthSync: 1}
-        };
+                fields: {numberOfMonthSync: 1}
+            };
 
         var oldValue = Collections.CompanySettings.findOne(query, options);
         try {
@@ -1039,17 +1039,25 @@ Meteor.methods({
         return result;
     },
 
-    getResumeDetails: function (appId) {
+    getResumeDetails: function (appId, appType) {
         if (!this.userId) return null;
         this.unblock();
+        const result = {resume: {}, application: {}};
         try {
-            const req = HTTP.get(Meteor.absoluteUrl() + 'api/resume');
+            let url = Meteor.settings['RESUME_API_URL'];
+            url = url.replace('LANG_ID', 2);
+            url = url.replace('APP_ID', appId);
+            url = url.replace('APP_TYPE', appType);
+            console.log(url)
+            const req = HTTP.get(url);
             if (req.statusCode === 200) {
                 return EJSON.parse(req.content);
+            } else {
+                console.trace(req.content);
             }
         } catch (e) {
             console.trace(e);
         }
-        return null;
+        return result;
     }
 });

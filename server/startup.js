@@ -9,6 +9,10 @@ function initENV() {
     if (CUSTOM_ENV.hasOwnProperty('ES_HOST')) {
         Meteor.settings['elasticsearch']['host'] = CUSTOM_ENV.ES_HOST;
     }
+
+    if (CUSTOM_ENV.hasOwnProperty('RESUME_API_URL')) {
+        Meteor.settings['RESUME_API_URL'] = CUSTOM_ENV.RESUME_API_URL;
+    }
 }
 
 
