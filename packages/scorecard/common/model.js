@@ -33,8 +33,7 @@ var scoreCardModel = Astro.Class({
         },
         score_criteria: {
             type: 'array',
-            default: ()=> {
-            }
+            default: ()=> []
         },
         createdAt: {
             type: 'date',
