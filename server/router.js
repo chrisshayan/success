@@ -41,14 +41,14 @@ function authWebhookToken() {
     try {
         var token = this.request.headers['x-access-token'];
         if (!token || !IZToken.decode(token)) {
-            this.response.writeHead(400);
+            this.response.writeHead(200);
             this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
         } else {
             this.next();
         }
     } catch (e) {
         console.trace('Received request to application hook: ', e);
-        this.response.writeHead(400);
+        this.response.writeHead(200);
         this.response.end(EJSON.stringify({success: false, msg: 'Access token invalid'}));
     }
 }
@@ -78,7 +78,7 @@ Router.route('/webhook/job', {
             this.response.end(EJSON.stringify({success: true, msg: ''}));
         } catch (e) {
             console.trace('Received request to job hook: ', e);
-            this.response.writeHead(400);
+            this.response.writeHead(200);
             this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
         }
     }
@@ -125,6 +125,7 @@ Router.route('/webhook/application', {
         try {
             var data = this.request.body
                 , cond = false;
+            console.trace(data)
             check(data, {
                 jobId: Number,
                 entryId: Number,
@@ -152,7 +153,7 @@ Router.route('/webhook/application', {
             this.response.end(EJSON.stringify({success: true, msg: ''}));
         } catch (e) {
             console.trace('Received request to application hook: ', e);
-            this.response.writeHead(400);
+            this.response.writeHead(200);
             this.response.end(EJSON.stringify({success: false, msg: 'Parameters invalid'}));
         }
         return true;

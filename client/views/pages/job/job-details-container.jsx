@@ -12,6 +12,7 @@ const HookMixin = {
             stage: Success.APPLICATION_STAGES[1],
             candidateType: 1,
             currentAppId: null,
+            currentAppType: null,
             currentAppAction: null,
             relatedJobs: [],
             isResumeLoading: false,
@@ -265,6 +266,7 @@ const RendererMixin = {
                         {this.state.isResumeLoading ? <div className="job-candidate-profile"><WaveLoading /></div> : (
                             <JobCandidateProfile
                                 job={ this.state.job }
+                                extra={ this.data.extra }
                                 stage={ this.state.stage }
                                 applicationId={ this.state.currentAppId }
                                 resume={ this.state.resume }

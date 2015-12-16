@@ -193,9 +193,47 @@ JobCurrentApplication.getActions = function () {
             }
         });
     }.bind(this);
+
+    /**
+     * Submit score card
+     * @param data
+     */
+    actions.submitScorecard = function(data) {
+        const jobId = this.state.jobId;
+        const appId = this.state.currentAppId;
+        const appType = this.state.currentAppType;
+
+        data.jobId = jobId;
+        data.appId = appId;
+        data.type = appType;
+
+        Meteor.call('submitScoreCard', data, (err, result) => {
+            if(!err) {
+                if(result) {
+                    swal("Score candidate successfully", "", "success");
+                    actions.discardActionBox();
+                    return;
+                }
+            }
+            swal("Error", "", "error");
+            console.log(err, result);
+        });
+
+    }.bind(this);
+
+
     actions.changeTab = function(tabState = 2) {
         this.setState({tabState});
     }.bind(this);
+
+
+    actions.changeCurrentAppType = function(currentAppType = null) {
+        if(this.state.currentAppType != currentAppType) {
+            this.setState({ currentAppType });
+        }
+    }.bind(this);
+
+
 
     return actions;
 };

@@ -64,11 +64,11 @@ JobCandidateProfileActions = React.createClass({
 
     onSelectAction(type, e) {
         e.preventDefault();
-        //this.props.onChangeTab && this.props.onChangeTab(1);
         this.goActionLink(type);
     },
 
     render() {
+
         let styles = {
             actionsContainer: {
                 backgroundColor: '#fff',
@@ -101,6 +101,10 @@ JobCandidateProfileActions = React.createClass({
 
                                     <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
                                         Schedule interview
+                                    </a>
+
+                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
+                                        Score candidate
                                     </a>
 
                                     {this.isDisqualified() === false ? (

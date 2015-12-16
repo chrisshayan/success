@@ -127,7 +127,7 @@ JobCandidateShortInfo = React.createClass({
                         <div className="ibox">
                             <div>
                                 <div className="row">
-                                    <div className="col-md-6">
+                                    <div className="col-md-7">
                                         <h2 style={styles.clearMP}>
                                             { app.fullname }
                                         </h2>
@@ -135,7 +135,7 @@ JobCandidateShortInfo = React.createClass({
                                         <h3>{ app.jobTitle }</h3>
                                     </div>
 
-                                    <div className="col-md-6">
+                                    <div className="col-md-5">
                                         {app.matchingScore ? (
                                             <div>
                                                     <span className="mc-score block text-right small">

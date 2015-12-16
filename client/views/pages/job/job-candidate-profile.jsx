@@ -48,6 +48,12 @@ JobCandidateProfile = React.createClass({
         }
     },
 
+    componentDidUpdate() {
+        if(this.data.application) {
+            this.props.actions.changeCurrentAppType(this.data.application.type);
+        }
+    },
+
     handleToggleAddComment(status) {
         let state = {};
         if (status === undefined) {

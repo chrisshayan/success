@@ -42,6 +42,13 @@ var methods = {
             console.trace(e);
             return false;
         }
+    },
+
+    getScoreCard(appId) {
+        return ScoreCardCollection.findOne({
+            "ref.recruiterId": this.userId,
+            "ref.appId": appId
+        })
     }
 };
 

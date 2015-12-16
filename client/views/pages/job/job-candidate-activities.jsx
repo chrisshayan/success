@@ -78,9 +78,9 @@ JobCandidateTimeline = React.createClass({
                 </button>
             );
         }
-        const actionList = ['comment', 'message', 'scheduleInterview'];
+        const actionList = ['comment', 'message', 'scheduleInterview', 'scoreCandidate'];
         if (this.data.appAction && actionList.indexOf(this.data.appAction) >= 0) {
-            action = <JobCandidateActionBox actions={this.props.actions} action={this.data.appAction}
+            action = <JobCandidateActionBox extra={this.props.extra} actions={this.props.actions} action={this.data.appAction}
                                             appId={this.props.applicationId}/>
         }
 
