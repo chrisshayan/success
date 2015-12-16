@@ -40,7 +40,6 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     });
 });
 
-
 function processApplication(info, data) {
     var application = Application.findOne({appId: info.appId});
     if (!application) {
@@ -80,6 +79,7 @@ function processApplication(info, data) {
 
 var Applications = {
         addApplications: function (jc, cb) {
+            var count = 0;
             try {
                 var data = jc.data; // appId, companyId, source, jobId
 
@@ -89,8 +89,21 @@ var Applications = {
                 var rows = fetchVNWData(appSql);
                 rows.forEach(function (app) {
                     let application = processApplication(app, data);
-                    application && application.save();
+                    if (application) {
+                        application.save();
+                        count++;
+
+                    }
                 });
+
+                var currentJob = JobExtra.getCollection().findOne({jobId: data.jobId});
+
+                if (currentJob) {
+                    //TODO : this is workaround for missing handle blacklist features.
+                    currentJob.set('stage.applied', currentJob.stage.applied + count);
+                    currentJob.set('syncState', 'synced');
+                    currentJob.save();
+                }
 
                 console.log('end add application');
                 jc.done();

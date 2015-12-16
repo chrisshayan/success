@@ -27,7 +27,8 @@ var getApplicationByJobId = function (job, cb) {
     var JobExtraCollection = JobExtra.getCollection()
         , appCollection = Application.getCollection()
         , data = job.data
-        , jobId = data.jobId;
+        , jobId = data.jobId
+        , count = 0;
 
     if (!data.jobId || !data.companyId)
         job.done();
@@ -78,6 +79,7 @@ var getApplicationByJobId = function (job, cb) {
 
                     application.set('emails', emails);
                     application.set('appliedDate', formatDatetimeFromVNW(info.appliedDate));
+                    count++;
                 }
 
                 application.set('isDeleted', !!(info.isDeleted)); // the only field update
@@ -125,7 +127,7 @@ var getApplicationByJobId = function (job, cb) {
 
             if (currentJob) {
                 //TODO : this is workaround for missing handle blacklist features.
-                currentJob.set('stage.applied', (data.isUpdate) ? currentJob.stage.applied + appRows.length : appRows.length);
+                currentJob.set('stage.applied', (data.isUpdate) ? currentJob.stage.applied + count : appRows.length);
 
                 currentJob.set('syncState', 'synced');
                 currentJob.save();
