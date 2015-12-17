@@ -352,9 +352,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
 };
 
 methods['application.updateAvatar'] = function(appId, appType, avatar) {
-
     const app = Application.findOne({appId: appId, type: appType});
-    console.log(app)
     if(app) {
         app.set('avatar', avatar);
         return app.save();

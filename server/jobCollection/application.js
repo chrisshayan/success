@@ -88,40 +88,6 @@ var getApplicationByJobId = function (job, cb) {
 
             });
 
-            /*var stages = {
-             'sourced': 0,
-             'applied': 0,
-             'phone': 0,
-             'interview': 0,
-             'offer': 0,
-             'hired': 0
-             };
-
-             appCollection.find({jobId: jobId}, {fields: {'stage': 1}}).map(function (app) {
-             switch (app.stage) {
-             case 0:
-             stages['sourced']++;
-             break;
-             case 1:
-             stages['applied']++;
-             break;
-             case 2:
-             stages['phone']++;
-             break;
-             case 3:
-             stages['interview']++;
-             break;
-             case 4:
-             stages['offer']++;
-             break;
-             case 5:
-             stages['hired']++;
-             break;
-             default :
-             break;
-             }
-             });*/
-
 
             var currentJob = JobExtraCollection.findOne({jobId: jobId});
 
