@@ -197,6 +197,7 @@ const ScoreCardOverall = React.createClass({
         const labelClassname = classNames('btn btn-default btn-outline decision-option col-md-3', {
             active: isChecked
         });
+
         return (
             <label className={labelClassname} key={key}
                    onClick={(e) => this.handleChange(opt.value, e)}>

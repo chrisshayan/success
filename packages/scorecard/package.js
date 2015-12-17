@@ -24,7 +24,7 @@ Package.onUse(function (api) {
 
     api.imply(['vnw:core']);
 
-    api.export(['ScoreCard']);
+    api.export(['ScoreCard', 'SummaryCollection']);
 });
 
 Package.onTest(function (api) {

@@ -30,7 +30,7 @@ JobCandidateProfileContent = React.createClass({
 
                     </Tab>
                     <Tab eventKey={3} title="Scorecard summary">
-                        <JobCandidateScorecardSummary />
+                        <JobCandidateScorecardSummary {...this.props} />
 
                     </Tab>
                 </Tabs>
