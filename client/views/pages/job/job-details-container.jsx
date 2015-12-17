@@ -446,7 +446,7 @@ const HookMixin = {
     },
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.currentAppId != prevState.currentAppId) {
+        if (this.state.currentAppId && this.state.currentAppId != prevState.currentAppId) {
             this.handle___GetResumeDetails();
             this.current__Actions().changeTab(1);
         }

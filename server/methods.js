@@ -1043,11 +1043,11 @@ Meteor.methods({
         if (!this.userId) return null;
         this.unblock();
         const result = {resume: {}, application: {}};
+        let url = Meteor.settings['RESUME_API_URL'];
+        url = url.replace('LANG_ID', 2);
+        url = url.replace('APP_ID', appId);
+        url = url.replace('APP_TYPE', appType);
         try {
-            let url = Meteor.settings['RESUME_API_URL'];
-            url = url.replace('LANG_ID', 2);
-            url = url.replace('APP_ID', appId);
-            url = url.replace('APP_TYPE', appType);
             const req = HTTP.get(url, {timeout: 10000});
             if (req.statusCode === 200) {
                 return EJSON.parse(req.content);
@@ -1055,6 +1055,7 @@ Meteor.methods({
                 console.trace(req.content);
             }
         } catch (e) {
+            console.log(url);
             console.trace(e);
         }
         return result;
