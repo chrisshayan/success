@@ -1048,8 +1048,7 @@ Meteor.methods({
             url = url.replace('LANG_ID', 2);
             url = url.replace('APP_ID', appId);
             url = url.replace('APP_TYPE', appType);
-            console.log(url)
-            const req = HTTP.get(url);
+            const req = HTTP.get(url, {timeout: 10000});
             if (req.statusCode === 200) {
                 return EJSON.parse(req.content);
             } else {
