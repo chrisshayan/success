@@ -136,12 +136,12 @@ if (Meteor.isServer) {
         // overall
 
         var overallObj = {
-            candidateId: doc['ref'].candidateId,
+            recruiterId: doc['ref'].recruiterId,
             value: doc.overall
         };
 
         var overallList = scoreSummary.overalls;
-        let index = _.findIndex(overallList, {candidateId: doc['ref'].candidateId});
+        let index = _.findIndex(overallList, {recruiterId: doc['ref'].recruiterId});
 
         if (index !== -1)
             overallList[index] = overallObj;

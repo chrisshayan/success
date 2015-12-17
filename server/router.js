@@ -125,7 +125,7 @@ Router.route('/webhook/application', {
         try {
             var data = this.request.body
                 , cond = false;
-            console.trace(data)
+
             check(data, {
                 jobId: Number,
                 entryId: Number,

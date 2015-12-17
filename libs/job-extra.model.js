@@ -92,3 +92,49 @@ JobExtra = Astro.Class({
         }
     }
 });
+
+if (Meteor.isServer) {
+    JobExtra.prototype.resetStages = function () {
+
+        var appCollection = Application.getCollection();
+
+        var pipeline = [
+            {
+                $match: {jobId: this.jobId}
+            }
+            , {
+                $group: {
+                    _id: '$stage',
+                    count: {
+                        $sum: 1
+                    }
+                }
+            }, {
+                $sort: {
+                    _id: 1
+                }
+            }
+        ];
+
+        var updatedStages = new Array(6);
+
+        appCollection.aggregate(pipeline).forEach(function (stage) {
+            return updatedStages[stage._id] = stage.count;
+        });
+
+        var newStages = {
+            sourced: updatedStages[0] || 0,
+            applied: updatedStages[1] || 0,
+            phone: updatedStages[2] || 0,
+            interview: updatedStages[3] || 0,
+            offer: updatedStages[4] || 0,
+            hired: updatedStages[5] || 0
+
+        };
+        var sum = _.sum(updatedStages);
+
+        this.set('stage', newStages);
+        this.set('numOfApplications', sum);
+        this.set('syncState', 'synced');
+    };
+}

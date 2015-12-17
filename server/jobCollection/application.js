@@ -92,10 +92,9 @@ var getApplicationByJobId = function (job, cb) {
             var currentJob = JobExtraCollection.findOne({jobId: jobId});
 
             if (currentJob) {
-                //TODO : this is workaround for missing handle blacklist features.
-                currentJob.set('stage.applied', (data.isUpdate) ? currentJob.stage.applied + count : appRows.length);
-
+                currentJob.resetStages();
                 currentJob.set('syncState', 'synced');
+
                 currentJob.save();
             }
 

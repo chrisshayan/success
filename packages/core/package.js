@@ -21,7 +21,8 @@ Package.onUse(function (api) {
         "lab:mysql-connection-manager",
         "reywood:publish-composite",
         "stevezhu:lodash",
-        "ecmascript"
+        "ecmascript",
+        "meteorhacks:aggregate@1.3.0"
     ]);
 
     //for model

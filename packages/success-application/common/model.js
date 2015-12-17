@@ -155,14 +155,14 @@ var model = Astro.Class({
         },
 
         detailsLink() {
-            if(Meteor.isClient) {
+            if (Meteor.isClient) {
                 const stage = Success.APPLICATION_STAGES[this.stage] || {label: '', id: '', alias: ''};
                 const params = {
                     jobId: this.jobId,
                     stage: stage.alias
                 };
-                const query = { appId: this.appId };
-                return Router.url('Job', params, { query })
+                const query = {appId: this.appId};
+                return Router.url('Job', params, {query})
             }
             return '';
         },
