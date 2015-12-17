@@ -115,7 +115,8 @@ methods['applications.toggleQualify'] = function (jobId = 0, appIds = [], stage 
                 content: {
                     stage: _.findWhere(Success.APPLICATION_STAGES, {alias: stage})
                 },
-                createdBy: userId
+                createdBy: userId,
+                createdAt: new Date()
             });
 
             if (isQualified === true) {
@@ -186,7 +187,8 @@ methods['applications.moveStage'] = function (appId, stage = null) {
                             type: Activities.TYPE.APPLICATION_STAGE_UPDATE,
                             ref: ref,
                             content: content,
-                            createdBy: userId
+                            createdBy: userId,
+                            createdAt: new Date()
                         }).save();
                     });
                 }
@@ -218,7 +220,8 @@ methods['application.addComment'] = function (jobId = 0, appId = 0, text = '') {
         type: Activities.TYPE.RECRUITER_CREATE_COMMENT,
         ref: ref,
         content: content,
-        createdBy: this.userId
+        createdBy: this.userId,
+        createdAt: new Date()
     }).save();
 };
 
@@ -256,7 +259,8 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
                 type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
                 ref: ref,
                 content: data,
-                createdBy: this.userId
+                createdBy: this.userId,
+                createdAt: new Date()
             }).save();
         });
     });
@@ -288,7 +292,8 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
         type: Activities.TYPE.RECRUITER_SCHEDULE,
         ref: ref,
         content: data,
-        createdBy: this.userId
+        createdBy: this.userId,
+        createdAt: new Date()
     }).save();
 
     Meteor.defer(() => {

@@ -46,7 +46,7 @@ var model = Astro.Class({
         },
 
         timeago() {
-            return moment(this.createdAt).fromNow();
+            return new moment(this.createdAt).fromNow();
         },
 
         /**
