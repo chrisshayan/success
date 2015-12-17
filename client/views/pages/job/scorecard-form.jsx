@@ -15,8 +15,8 @@ ScoreCardForm = React.createClass({
     },
 
     componentDidMount() {
-        this.initCriteriaState();
         this.getScorecard();
+        this.initCriteriaState();
 
         let container = $("#job-candidate-content");
         let actionContainer = $('.job-candidate-actions');
@@ -28,6 +28,12 @@ ScoreCardForm = React.createClass({
             scrollTo = container.offset().top - 50 - 45;
         }
         body.stop().animate({scrollTop: scrollTo}, '500', 'swing');
+    },
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!_.isEqual(prevState['scorecard'], this.state.scorecard)) {
+            this.initCriteriaState();
+        }
     },
 
     initCriteriaState() {
@@ -44,35 +50,40 @@ ScoreCardForm = React.createClass({
                     };
                 });
             });
-            //if(this.props.scorecard) {
-            //    criteria = _.extends(criteria, this.props.scorecard.criteria);
-            //}
+            if (this.state.scorecard) {
+                _.each(this.state.scorecard.score_criteria, (cri) => {
+                    if (criteria[cri.type] && criteria[cri.type][cri.name]) {
+                        criteria[cri.type][cri.name] = cri;
+                    }
+                });
+            }
             this.setState({criteria});
         }
     },
 
     getScorecard() {
         Meteor.call('getScoreCard', this.props.appId, (err, scorecard) => {
-            if(!err && scorecard) {
+            if (!err && scorecard) {
                 this.setState({
                     overall: scorecard.overall,
-                    notes: scorecard.notes
+                    notes: scorecard.notes,
+                    scorecard: scorecard
                 })
             }
         });
     },
 
     handleChangeOverall(overall) {
-        this.setState({ overall });
+        this.setState({overall});
     },
 
     handleChangeNotes(notes) {
-        this.setState({ notes });
+        this.setState({notes});
     },
 
     handleChangeCriteria(cri) {
         let criteria = this.state.criteria;
-        if(criteria[cri.type] && criteria[cri.type][cri.name]) {
+        if (criteria[cri.type] && criteria[cri.type][cri.name]) {
             criteria[cri.type][cri.name] = cri;
             this.setState({criteria});
         }
@@ -93,11 +104,21 @@ ScoreCardForm = React.createClass({
         this.props.onSave && this.props.onSave(data);
     },
 
+    candidateName() {
+        if (this.props.application) {
+            return this.props.application['fullname'] || '';
+        }
+        return '';
+    },
+
     render() {
         return (
             <div className="scorecard-form">
                 <div className="scorecard-header">
-                    <h2>Bui Lan Scorecard</h2>
+                    <h2>
+                        <span style={{fontWeight: 400}}>{this.candidateName()}</span>&nbsp;
+                        <span style={{fontSize: '20px'}}>Scorecard</span>
+                    </h2>
                 </div>
 
                 <div className="scorecard-overall">
@@ -209,8 +230,10 @@ const ScoreCardNotes = React.createClass({
     componentDidUpdate(prevProps, prevState) {
         if (!_.isEqual(this.props.notes, prevState)) {
             notes = _.pick(this.props.notes, 'keyTakeAways', 'fitCompanyCulture');
-            console.log(notes)
             this.setState(notes);
+            _.each(notes, (val, key) => {
+                this.refs[key] && (this.refs[key].getDOMNode().value = val);
+            });
         }
     },
 
@@ -240,6 +263,7 @@ const ScoreCardNotes = React.createClass({
                 <div className="row">
                     <div className="col-md-12">
                         <textarea
+                            ref="keyTakeAways"
                             rows="3"
                             className="form-control"
                             defaultValue={ this.state.keyTakeAways }
@@ -258,6 +282,7 @@ const ScoreCardNotes = React.createClass({
                 <div className="row">
                     <div className="col-md-12">
                         <textarea
+                            ref="fitCompanyCulture"
                             rows="3"
                             className="form-control"
                             defaultValue={ this.state.fitCompanyCulture }
@@ -282,7 +307,8 @@ const ScoreCardCriteriaSet = React.createClass({
                 <div className="row">
                     <div className="col-md-12">
                         {_.isEmpty(items) ? (
-                            <p className="text-muted" style={{border: '1px dashed #ddd', padding: '10px'}}>There is no criteria</p>
+                            <p className="text-muted" style={{border: '1px dashed #ddd', padding: '10px'}}>There is no
+                                criteria</p>
                         ) : (
                             <table className="table table-bordered">
                                 <tbody>
@@ -325,7 +351,19 @@ ScoreCardCriteria = React.createClass({
             this.setState({
                 note: this.props.criteria['note'],
                 isEditingNode: true
-            })
+            });
+        }
+    },
+
+    componentDidUpdate(prevProps, prevState) {
+        if (!_.isEqual(this.props.criteria, prevProps.criteria)) {
+            this.setState(this.props.criteria);
+            if (this.props.criteria['note']) {
+                this.setState({
+                    isEditingNode: true,
+                    note: this.props.criteria['note']
+                });
+            }
         }
     },
 
@@ -412,7 +450,10 @@ ScoreCardCriteria = React.createClass({
                                 {this.state.points.map(this.renderPoint)}
                             </div>
 
-                            {this.state.isEditingNode && this.renderNoteEditor()}
+                            {this.state.isEditingNode && (
+                                <ScoreCardCriteriaNote note={this.state.note}
+                                                       onChange={(val) => this.handleChangeNote(val)}/>
+                            )}
                         </div>
 
                         <div className="pull-right text-right">
@@ -425,7 +466,7 @@ ScoreCardCriteria = React.createClass({
     },
 
     renderPoint(point, key) {
-        const isChecked = this.props.point && this.props.criteria.point == point.value;
+        const isChecked = this.props.criteria && this.props.criteria.point == point.value;
         const cx = classNames('btn', 'btn-link', {
             active: isChecked
         });
@@ -439,19 +480,39 @@ ScoreCardCriteria = React.createClass({
                 </span>
             </label>
         );
+    }
+});
+
+ScoreCardCriteriaNote = React.createClass({
+    componentDidMount() {
+        const el = this.refs.note.getDOMNode();
+        el.value = this.props.note;
     },
 
-    renderNoteEditor() {
+    componentDidUpdate(prevProps) {
+        if (!_.isEqual(prevProps.note, this.props.note)) {
+            const el = this.refs.note.getDOMNode();
+            el.value = this.props.note;
+        }
+    },
+
+    handleChange(e) {
+        e.preventDefault();
+        this.props.onChange && this.props.onChange(e.target.value);
+    },
+
+    render() {
         const style = {
             margin: '3px'
         };
         return (
             <textarea
+                ref="note"
                 rows="2"
                 className="form-control"
                 style={ style }
                 defaultValue={this.props.note || ''}
-                onBlur={(e) => this.handleChangeNote(e.target.value)} />
+                onBlur={this.handleChange}/>
         );
     }
-});
+})

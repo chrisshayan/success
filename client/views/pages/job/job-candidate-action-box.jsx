@@ -36,6 +36,7 @@ JobCandidateActionBox = React.createClass({
                                 extra={ this.props.extra }
                                 jobId={ this.props.jobId }
                                 appId={ this.props.appId }
+                                application={ this.props.application }
                                 onSave={ this.props.actions.submitScorecard }
                                 onDiscard={this.props.actions.discardActionBox}/>;
                 break;

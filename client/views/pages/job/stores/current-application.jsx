@@ -204,9 +204,9 @@ JobCurrentApplication.getActions = function () {
         const appId = this.state.currentAppId;
         const appType = this.state.currentAppType;
 
-        data.jobId = jobId;
-        data.appId = appId;
-        data.type = appType;
+        data.jobId = +jobId;
+        data.appId = +appId;
+        data.type = +appType;
 
         Meteor.call('submitScoreCard', data, (err, result) => {
             if(!err) {
@@ -224,7 +224,7 @@ JobCurrentApplication.getActions = function () {
 
 
     actions.changeTab = function(tabState = 2) {
-        this.setState({tabState});
+        this.setState({ tabState });
     }.bind(this);
 
 

@@ -425,7 +425,7 @@ JobCandidateResumeOnline = React.createClass({
 
                         {this.state.isViewCV ? (
                             <div className={viewerClass}>
-                                <iframe src={attachmentUrl} frameborder="0"></iframe>
+                                <iframe src={attachmentUrl} frameBorder="0"></iframe>
                                 {this.state.fullscreen ? (
                                     <button type="button" className="btn btn-primary m-t-sm exit-fullscreen"
                                             onClick={() => this.toggleResumeViewer(false) }>
