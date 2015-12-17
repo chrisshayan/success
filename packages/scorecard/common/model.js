@@ -10,7 +10,7 @@ var scoreCardModel = Astro.Class({
     fields: {
         ref: {
             type: 'object',
-            default: ()=> {
+            default() {
                 return {
                     companyId: null,
                     jobId: null,
@@ -24,7 +24,7 @@ var scoreCardModel = Astro.Class({
         overall: 'number',
         notes: {
             type: 'object',
-            default: ()=> {
+            default() {
                 return {
                     keyTakeAways: '',
                     fitCompanyCulture: ''
@@ -33,18 +33,20 @@ var scoreCardModel = Astro.Class({
         },
         score_criteria: {
             type: 'array',
-            default: ()=> []
+            default() {
+                return [];
+            }
         },
         createdAt: {
             type: 'date',
-            default: ()=> {
-                return new Date()
+            default() {
+                return new Date();
             }
         },
         updatedAt: {
             type: 'date',
-            default: ()=> {
-                return new Date()
+            default() {
+                return new Date();
             }
         } // schema
     },
@@ -169,7 +171,7 @@ var summaryModel = Astro.Class({
     fields: {
         ref: {
             type: 'object',
-            default: ()=> {
+            default() {
                 return {
                     appId: null,
                     type: null,
@@ -180,19 +182,25 @@ var summaryModel = Astro.Class({
         },
         all_score_criteria: {
             type: 'array',
-            default: ()=> [] // { name : '', value :'', recruiterId : '' }
+            default() {
+                return []; // { name : '', value :'', recruiterId : '' }
+            }
         },
         notes: {
             type: 'array',
-            default: ()=> []  // item  :  { type :'' , value : '', recruiterId :''}
+            default() {
+                return [];  // item  :  { type :'' , value : '', recruiterId :''}
+            }
         },
         overalls: {
             type: 'array',
-            default: ()=> []
+            default() {
+                return [];
+            }
         },
         updatedAt: {
             type: 'date',
-            default: ()=> {
+            default() {
                 new Date();
             }
         }

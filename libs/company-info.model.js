@@ -3,35 +3,51 @@ ESCompanyInfo = Astro.Class({
     fields: {
         companyId: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
         companyLogoURL: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         companyName: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         companyProfile: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         address: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         contactName: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         contactEmail: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
         website: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         }
     }
 });

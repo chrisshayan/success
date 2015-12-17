@@ -11,7 +11,7 @@ const {
     RECRUITER_REVERSE_QUALIFIED,
     RECRUITER_SCHEDULE,
     RECRUITER_SCORE_CANDIDATE
-} = ACTIVITY_TYPE;
+    } = ACTIVITY_TYPE;
 
 var model = Astro.Class({
     name: MODULE_NAME,
@@ -22,21 +22,27 @@ var model = Astro.Class({
         },
         createdBy: {
             type: 'string',
-            default: ()=> 'vnw'
+            default () {
+                return 'vnw';
+            }
         },
         ref: {
             type: 'object',
-            default: ()=> {
+            default() {
+                return {};
             }
         },
         content: {
             type: 'object',
-            default: ()=> {
+            default () {
+                return {};
             }
         },
         createdAt: {
             type: 'date',
-            default: ()=> new Date()
+            default() {
+                return new Date();
+            }
         }
 
     }, // schema
@@ -95,10 +101,10 @@ var model = Astro.Class({
                     let icon = '';
                     let labelFrom = '';
                     let labelTo = '';
-                    if(this.content['from'] && this.content['to']) {
-                       labelFrom = this.content['from']['label'];
-                       labelTo = this.content['to']['label'];
-                        if(this.content['to']['id'] < this.content['from']['id']) {
+                    if (this.content['from'] && this.content['to']) {
+                        labelFrom = this.content['from']['label'];
+                        labelTo = this.content['to']['label'];
+                        if (this.content['to']['id'] < this.content['from']['id']) {
                             icon = 'fa-long-arrow-left';
                             labelFrom = this.content['to']['label'];
                             labelTo = this.content['from']['label'];

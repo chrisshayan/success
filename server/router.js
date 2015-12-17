@@ -108,12 +108,16 @@ Resume = Astro.Class({
 
         education: {
             type: 'ResumeEducation',
-            default: () => []
+            default() {
+                return [];
+            }
         },
 
         skills: {
             type: 'array',
-            default: () => []
+            default() {
+                return [];
+            }
         }
     }
 });

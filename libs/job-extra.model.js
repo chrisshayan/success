@@ -4,11 +4,15 @@ JobExtra = Astro.Class({
     fields: {
         companyId: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
         jobId: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
         stage: {
             type: 'object',
@@ -68,7 +72,9 @@ JobExtra = Astro.Class({
         },
         syncState: {
             type: 'string',
-            default: ()=> 'ready' //syncing, ready , synced, syncfailed
+            default() {
+                return 'ready';
+            } //syncing, ready , synced, syncfailed
         },
 
         jobTitle: {

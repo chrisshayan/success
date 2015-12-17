@@ -3,7 +3,9 @@ ESJob = Astro.Class({
     fields: {
         companyId: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
         companyName: {
             type: 'string',
@@ -20,72 +22,100 @@ ESJob = Astro.Class({
 
         jobId: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
 
         cities: {
             type: 'array',
-            default: () => []
+            default() {
+                return [];
+            }
         },
 
         jobTitle: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
 
         jobDescription: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
 
         skillExperience: {
             type: 'string',
-            default: ''
+            default() {
+                return '';
+            }
         },
 
         salaryMin: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
 
         salaryMax: {
             type: 'number',
-            default: 0
+            default() {
+                return 0;
+            }
         },
 
         emailAddress: {
             type: 'string',
-            default: 0
+            default() {
+                return '';
+            }
         },
 
         approvedDate: {
             type: 'date',
-            default: 0
+            default() {
+                return new Date();
+            }
         },
 
         expiredDate: {
             type: 'date',
-            default: 0
+            default() {
+                return new Date();
+            }
         },
 
         skills: {
             type: 'array',
-            default: () => []
+            default() {
+                return [];
+            }
         },
 
         industries: {
             type: 'array',
-            default: () => []
+            default() {
+                return [];
+            }
         },
 
         jobLevel: {
             type: 'string',
-            default: () => ''
+            default() {
+                return '';
+            }
         },
 
         type: {
             type: 'string',
-            default: 'online'
+            default() {
+                return 'online';
+            }
         },
 
         numOfApplications: {
