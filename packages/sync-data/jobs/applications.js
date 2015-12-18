@@ -34,9 +34,12 @@ var fetchVNWData = Meteor.wrapAsync(function (query, callback) {
     var conn = mysqlManager.getPoolConnection();
 
     conn.query(query, function (err, rows, fields) {
-        if (err) throw err;
-        conn.release();
-        callback(err, rows);
+        if (err)
+            console.trace(err);
+        else {
+            conn.release();
+            callback(err, rows);
+        }
     });
 });
 
@@ -112,7 +115,7 @@ var Applications = {
             } catch (e) {
                 jc.fail();
                 cb();
-                throw e;
+                console.trace(e);
             }
 
         },

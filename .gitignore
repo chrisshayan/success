@@ -2,8 +2,6 @@
 .meteor/local
 /settings/
 
-.settings/settings.json
-
 packages/vnw-apis/.npm/*
 packages/*/.npm/
 
