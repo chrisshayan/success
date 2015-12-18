@@ -13,25 +13,21 @@ Meteor.startup(function () {
         ];
 
         var user = Meteor.user();
-        var settingMenu = [];
 
-        if(user) {
-            if(user.isCompanyAdmin()) {
-                settingMenu.push({
+        if (user) {
+            if (user.isCompanyAdmin()) {
+
+                leftNavItems.push({
+                    label: "Hiring Team Manage",
+                    icon: "fa-users",
+                    route: "hiringTeam"
+                });
+
+                leftNavItems.push({
                     label: "Mail templates",
                     icon: "fa-envelope-o",
-                    route: "mailTemplates",
-                    dependencies: ['createMailTemplate', 'updateMailTemplate']
+                    route: "mailTemplates"
                 });
-                settingMenu.push({label: "Hiring Team Manage", icon: "fa-users", route: "hiringTeam"});
-                leftNavItems.push({
-                    label: "Settings",
-                    icon: "fa-cogs",
-                    route: null,
-                    childrens: settingMenu
-                });
-
-
             }
         }
 
@@ -51,5 +47,5 @@ Meteor.startup(function () {
 
         return leftNavItems;
     });
-    
+
 });

@@ -13,7 +13,11 @@ sJobCollections = (function () {
         },
         addJobtoQueue: function (type, data) {
             if (typeof type !== 'string') return false;
-            return Job(SyncQueue, type, data).save();
+            var retryOption = {
+                retries: 5,
+                wait: 1 * 60 * 1000
+            };
+            return Job(SyncQueue, type, data).retry(retryOption).save();
         }
     }
 })();

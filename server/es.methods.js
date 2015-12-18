@@ -159,7 +159,10 @@ methods.getJobInfo = function (jobId) {
                             companyId: extra.companyId
                         };
 
-                        Job(Collections.SyncQueue, 'getApplications', data).save();
+                        Job(Collections.SyncQueue, 'getApplications', data).retry({
+                            retries: 5,
+                            wait: 1 * 60 * 1000
+                        }).save();
                     }
 
                 }
