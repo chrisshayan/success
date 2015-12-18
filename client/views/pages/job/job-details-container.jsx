@@ -402,11 +402,12 @@ const HookMixin = {
             const stageObj = _.findWhere(Success.APPLICATION_STAGES, {alias: stage});
             if (jobId) jobId = parseInt(jobId);
             if (appId) appId = parseInt(appId);
+            if (appType) appType = parseInt(appType);
             if (candidateType) candidateType = parseInt(candidateType);
             if ([1, 2].indexOf(candidateType) < 0) candidateType = 1;
 
             if (!_.isEqual(stageObj, this.state.stage)) nextState['stage'] = stageObj;
-            if (jobId != this.state.jobId) nextState['jobId'] = jobId;
+            if (jobId != this.state.jobId) nextState['jobId'] = +jobId;
             if (candidateType != this.state.candidateType) nextState['candidateType'] = candidateType;
             if (appId != this.state.currentAppId) nextState['currentAppId'] = appId;
             if (appType != this.state.currentAppType) nextState['currentAppType'] = appType;

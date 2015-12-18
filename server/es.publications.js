@@ -65,21 +65,12 @@ pubs.ESJobs = function (type, limit, q) {
                 extra = new JobExtra();
                 extra.jobId = job.jobId;
                 extra.companyId = job.companyId;
-                extra.numOfApplications = job.numOfApplications;
                 extra.stage.applied = job.numOfApplications;
-                if (!extra.numOfApplications)
-                    extra.syncState = 'synced';
-
                 extra.save();
             }
 
             if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
                 extra.set('jobTitle', job.jobTitle);
-            }
-
-            if (!_.isEqual(extra.numOfApplications, job.numOfApplications)) {
-                extra.set('numOfApplications', job.numOfApplications);
-                extra.set('syncState', 'ready');
             }
 
             const companyName = job.companyName.trim() || job.companyDesc.trim();

@@ -204,9 +204,9 @@ JobCurrentApplication.getActions = function () {
         const appId = this.state.currentAppId;
         const appType = this.state.currentAppType;
 
-        data.jobId = +jobId;
-        data.appId = +appId;
-        data.type = +appType;
+        data.jobId = jobId;
+        data.appId = appId;
+        data.type = appType;
 
         Meteor.call('submitScoreCard', data, (err, result) => {
             if(!err) {

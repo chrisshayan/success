@@ -190,7 +190,7 @@ var model = Astro.Class({
                         jobId: this.jobId,
                         stage: stage.alias
                     };
-                    const query = {appId: this.appId};
+                    const query = {appId: this.appId, appType: this.type};
                     return Router.url('Job', params, {query})
                 }
                 return '';
@@ -217,10 +217,10 @@ if (Meteor.isServer) {
     Collection.after.insert(function (userId, doc) {
         let createdBy = userId || 'vnw'
             , ref = {
-            appId: doc.appId,
-            candidateId: doc.candidateId,
-            jobId: doc.jobId
-        };
+                appId: doc.appId,
+                candidateId: doc.candidateId,
+                jobId: doc.jobId
+            };
 
         var activity = new Activities({
             type: Activities.TYPE['APPLICATION_CREATE'],
