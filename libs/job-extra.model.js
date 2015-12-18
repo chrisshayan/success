@@ -137,10 +137,11 @@ if (Meteor.isServer) {
             hired: updatedStages[5] || 0
 
         };
-        var sum = _.sum(updatedStages);
+
+        //var sum = _.sum(updatedStages);
 
         this.set('stage', newStages);
-        this.set('numOfApplications', sum);
+        //this.set('numOfApplications', sum);
         this.set('syncState', 'synced');
     };
 }

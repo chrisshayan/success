@@ -150,23 +150,22 @@ methods.getJobInfo = function (jobId) {
 
                         extra.save();
                     }
+
+                    // check if update application
+                    if (extra.syncState === 'ready') {
+                        var data = {
+                            isUpdate: true,
+                            jobId: extra.jobId,
+                            companyId: extra.companyId
+                        };
+
+                        Job(Collections.SyncQueue, 'getApplications', data).save();
+                    }
+
                 }
             }
 
-            if (extra.syncState === 'ready' && extra.jobId && extra.companyId) {
-                var data = {};
-                var appCollection = Application.getCollection();
-                var appsOfJob = appCollection.find({jobId: jobId}).count();
 
-                if (appsOfJob > 0) {
-                    data.isUpdate = true;
-                }
-
-                data.jobId = extra.jobId;
-                data.companyId = extra.companyId;
-
-                Job(Collections.SyncQueue, 'getApplications', data).save();
-            }
         } catch (e) {
             console.trace(e);
         }

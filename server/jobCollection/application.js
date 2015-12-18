@@ -33,65 +33,66 @@ var getApplicationByJobId = function (job, cb) {
     if (!data.jobId || !data.companyId)
         job.done();
     else {
-        var appSql = '', appRows = [];
         try {
-            if (data.isUpdate) {
-                var options = {
-                    sort: {
-                        appId: -1
-                    }
-                };
-                var lastAppOnline = appCollection.findOne({jobId: jobId, type: 1}, options) || {appId: 0}
-                    , lastAppDirect = appCollection.findOne({jobId: jobId, type: 2}, options) || {appId: 0};
-
-                appSql = sprintf(VNW_QUERIES.getNewApplications, jobId, lastAppOnline.appId, jobId, lastAppDirect.appId);
-
-            } else
-                appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);
-
-            appRows = fetchVNWData(appSql);
-
-            appRows.forEach(function (info) {
-                var application = appCollection.findOne({appId: info.appId});
-                if (!application) {
-                    application = new Application();
-                    application.set('appId', info.appId);
-                    application.set('type', info.appType);
-                    application.set('jobId', info.jobId);
-                    application.set('candidateId', info.candidateId);
-                    application.set('companyId', data.companyId);
-                    application.set('matchingScore', info.score);
-                    application.set('coverLetter', info.coverLetter);
-                    application.set('firstname', info.firstname);
-                    application.set('lastname', info.lastname);
-                    application.set('genderId', info.genderId);
-                    application.set('dob', info.birthday);
-                    application.set('countryId', info.countryId);
-                    application.set('phone', info.homephone);
-                    application.set('mobile', info.cellphone);
-
-                    info.jobTitle && application.set('jobTitle', info.jobTitle);
-                    const city = Meteor.cities.findOne({vnwId: info.cityId, languageId: 2});
-                    if (city)
-                        application.set('cityName', city.name);
-
-                    var emails = _.unique((info.emails) ? info.emails.split('|') : []);
-
-                    application.set('emails', emails);
-                    application.set('appliedDate', formatDatetimeFromVNW(info.appliedDate));
-                    count++;
-                }
-
-                application.set('isDeleted', !!(info.isDeleted)); // the only field update
-
-                application.save();
-
-            });
-
-
             var currentJob = JobExtraCollection.findOne({jobId: jobId});
 
             if (currentJob) {
+
+                var appOnline = [{appId: 0}]
+                    , appDirect = [{appId: 0}];
+
+
+                appCollection.find({jobId: jobId}).fetch().forEach(function (app) {
+                    if (app.type === 1)
+                        appOnline.push(app);
+                    else
+                        appDirect.push(app);
+                });
+
+                //    appSql = sprintf(VNW_QUERIES.getApplicationByJobId, jobId, jobId);
+
+                var appSql = sprintf(VNW_QUERIES.getNewApplications, jobId, _.pluck(appOnline, 'appId'), jobId, _.pluck(appDirect, 'appId'));
+
+                var appRows = fetchVNWData(appSql);
+
+                appRows.forEach(function (info) {
+                    var application = appCollection.findOne({appId: info.appId});
+                    if (!application) {
+                        application = new Application();
+                        application.set('appId', info.appId);
+                        application.set('type', info.appType);
+                        application.set('jobId', info.jobId);
+                        application.set('candidateId', info.candidateId);
+                        application.set('companyId', data.companyId);
+                        application.set('matchingScore', info.score);
+                        application.set('coverLetter', info.coverLetter);
+                        application.set('firstname', info.firstname);
+                        application.set('lastname', info.lastname);
+                        application.set('genderId', info.genderId);
+                        application.set('dob', info.birthday);
+                        application.set('countryId', info.countryId);
+                        application.set('phone', info.homephone);
+                        application.set('mobile', info.cellphone);
+
+                        info.jobTitle && application.set('jobTitle', info.jobTitle);
+                        const city = Meteor.cities.findOne({vnwId: info.cityId, languageId: 2});
+                        if (city)
+                            application.set('cityName', city.name);
+
+                        var emails = _.unique((info.emails) ? info.emails.split('|') : []);
+
+                        application.set('emails', emails);
+                        application.set('appliedDate', formatDatetimeFromVNW(info.appliedDate));
+                        count++;
+                    }
+
+                    application.set('isDeleted', !!(info.isDeleted)); // the only field update
+
+                    application.save();
+
+                });
+
+
                 currentJob.resetStages();
                 currentJob.set('syncState', 'synced');
 
@@ -112,6 +113,7 @@ var getApplicationByJobId = function (job, cb) {
             job.fail('sync failed');
         }
     }
+
     cb();
 
 
