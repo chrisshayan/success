@@ -13,11 +13,7 @@
  *    2 : job
  *    3 : application
  *    4 : candidate
- *    5 : comment
- *    6 : email
- *    7 : qualified
- *    8 : stage
- *    9 : recruiter
+ *    5 : recruiter
  *  ]
  *  y : [
  *   0 : create
@@ -49,5 +45,6 @@ ACTIVITY_TYPE = {
     RECRUITER_DISQUALIFIED: 55,
     RECRUITER_REVERSE_QUALIFIED: 551,
     RECRUITER_SCHEDULE: 56,
-    RECRUITER_SCORE_CANDIDATE: 57
+    RECRUITER_SCORE_CANDIDATE: 57,
+    RECRUITER_UPDATE_SCORE_CANDIDATE: 571
 };

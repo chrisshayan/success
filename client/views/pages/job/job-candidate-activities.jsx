@@ -6,7 +6,8 @@ const {
     RECRUITER_DISQUALIFIED,
     RECRUITER_REVERSE_QUALIFIED,
     RECRUITER_SCHEDULE,
-    RECRUITER_SCORE_CANDIDATE
+    RECRUITER_SCORE_CANDIDATE,
+    RECRUITER_UPDATE_SCORE_CANDIDATE
     } = Activities.TYPE;
 
 JobCandidateTimeline = React.createClass({
@@ -137,7 +138,7 @@ ActivityItem = React.createClass({
 
     render() {
         let content = null;
-        if(this.data.creator && this.props.activity.type != APPLICATION_CREATE) {
+        if (this.data.creator && this.props.activity.type != APPLICATION_CREATE) {
             switch (this.props.activity.type) {
                 case APPLICATION_STAGE_UPDATE:
                     content = <ActivityStageUpdate activity={ this.props.activity } creator={this.data.creator}/>;
@@ -164,10 +165,14 @@ ActivityItem = React.createClass({
                     break;
 
                 case RECRUITER_SCORE_CANDIDATE:
+                case RECRUITER_UPDATE_SCORE_CANDIDATE:
+                    content = <RecruiterScoreCandidate activity={ this.props.activity } creator={this.data.creator}/>;
+                    break;
+                default :
                     break;
             }
         }
-        if(this.props.activity.type == APPLICATION_CREATE) {
+        if (this.props.activity.type == APPLICATION_CREATE) {
             content = <ActivityAppliedJob activity={ this.props.activity }/>;
         }
         return content;

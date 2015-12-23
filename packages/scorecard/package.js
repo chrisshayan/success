@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(['vnw:core', 'success:application']);
+    api.use(['vnw:core', 'success:application', 'success:activities']);
     api.use(["stevezhu:lodash", "jagi:astronomy@1.2.2"]);
 
     api.addFiles('scorecard.js');

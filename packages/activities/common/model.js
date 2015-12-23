@@ -10,7 +10,8 @@ const {
     RECRUITER_DISQUALIFIED,
     RECRUITER_REVERSE_QUALIFIED,
     RECRUITER_SCHEDULE,
-    RECRUITER_SCORE_CANDIDATE
+    RECRUITER_SCORE_CANDIDATE,
+    RECRUITER_UPDATE_SCORE_CANDIDATE
     } = ACTIVITY_TYPE;
 
 var model = Astro.Class({
@@ -82,8 +83,10 @@ var model = Astro.Class({
                     return 'reverted qualify this candidate';
 
                 case RECRUITER_SCORE_CANDIDATE:
-                    return 'score this candidate';
+                    return 'Submit score for this candidate';
 
+                case RECRUITER_UPDATE_SCORE_CANDIDATE :
+                    return 'Update score for this candidate';
                 default:
                     return '';
             }
@@ -138,8 +141,10 @@ var model = Astro.Class({
                     return '';
 
                 case RECRUITER_SCORE_CANDIDATE:
-                    return 'Score this candidate';
+                    return 'Submit score for this candidate';
 
+                case RECRUITER_UPDATE_SCORE_CANDIDATE :
+                    return 'Update score for this candidate';
                 default:
                     return '';
             }

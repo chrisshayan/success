@@ -69,90 +69,107 @@ ScoreCardCollection = scoreCardModel.getCollection();
 
 if (Meteor.isServer) {
     var afterSubmitScoreCardHandler = function (userId, doc) {
-
-        var scoreSummary = SummaryCollection.findOne({
-            'ref.appId': doc.ref.appId,
-            'ref.type': doc.ref.type
-        });
-
-        if (!scoreSummary)
-            scoreSummary = new ScoreCardSummary();
-        else
-            scoreSummary.set('updatedAt', new Date());
-
-        // references
-
-        scoreSummary.set('ref', {
-            appId: doc.ref.appId,
-            type: doc.ref.type,
-            companyId: doc.ref.companyId,
-            candidateId: doc.ref.candidateId
-        });
-
-        // score_criteria
-
-        var summaryListScore = scoreSummary['all_score_criteria'];
-
-        _.map(doc['score_criteria'], function (val) {
-            val.recruiterId = doc['ref'].recruiterId;
-            return val;
-        }).forEach(function (item) {
-            let index = _.findIndex(summaryListScore, {
-                recruiterId: item.recruiterId,
-                name: item.name,
-                type: item.type
+        try {
+            var scoreSummary = SummaryCollection.findOne({
+                'ref.appId': doc.ref.appId,
+                'ref.type': doc.ref.type
             });
-            if (index !== -1)
-                summaryListScore[index] = item;
-            else
-                summaryListScore.push(item);
-        });
+            var actionType = Activities.TYPE['RECRUITER_SCORE_CANDIDATE'];
 
+            if (!scoreSummary)
+                scoreSummary = new ScoreCardSummary();
 
-        scoreSummary.set('all_score_criteria', summaryListScore);
-
-
-        // notes
-
-        var summaryListNotes = scoreSummary['notes'];
-        _.map(doc.notes, function (val, key) {
-            return {
-                type: key,
-                content: val,
-                recruiterId: doc['ref'].recruiterId
+            else {
+                scoreSummary.set('updatedAt', new Date());
+                actionType = Activities.TYPE['RECRUITER_UPDATE_SCORE_CANDIDATE']
             }
-        }).forEach(function (item) {
-            let index = _.findIndex(summaryListNotes, {
-                type: item.type,
-                recruiterId: item.recruiterId
+
+            // references
+
+            scoreSummary.set('ref', {
+                appId: doc.ref.appId,
+                type: doc.ref.type,
+                companyId: doc.ref.companyId,
+                candidateId: doc.ref.candidateId
             });
+
+            // score_criteria
+
+            var summaryListScore = scoreSummary['all_score_criteria'];
+
+            _.map(doc['score_criteria'], function (val) {
+                val.recruiterId = doc['ref'].recruiterId;
+                return val;
+            }).forEach(function (item) {
+                let index = _.findIndex(summaryListScore, {
+                    recruiterId: item.recruiterId,
+                    name: item.name,
+                    type: item.type
+                });
+                if (index !== -1)
+                    summaryListScore[index] = item;
+                else
+                    summaryListScore.push(item);
+            });
+
+
+            scoreSummary.set('all_score_criteria', summaryListScore);
+
+
+            // notes
+
+            var summaryListNotes = scoreSummary['notes'];
+            _.map(doc.notes, function (val, key) {
+                return {
+                    type: key,
+                    content: val,
+                    recruiterId: doc['ref'].recruiterId
+                }
+            }).forEach(function (item) {
+                let index = _.findIndex(summaryListNotes, {
+                    type: item.type,
+                    recruiterId: item.recruiterId
+                });
+                if (index !== -1)
+                    summaryListNotes[index] = item;
+                else
+                    summaryListNotes.push(item);
+            });
+
+            scoreSummary.set('notes', summaryListNotes);
+
+
+            // overall
+
+            var overallObj = {
+                recruiterId: doc['ref'].recruiterId,
+                value: doc.overall
+            };
+
+            var overallList = scoreSummary.overalls;
+            let index = _.findIndex(overallList, {recruiterId: doc['ref'].recruiterId});
+
             if (index !== -1)
-                summaryListNotes[index] = item;
+                overallList[index] = overallObj;
             else
-                summaryListNotes.push(item);
-        });
+                overallList.push(overallObj);
 
-        scoreSummary.set('notes', summaryListNotes);
+            scoreSummary.set('overalls', overallList);
 
+            scoreSummary.save();
 
-        // overall
+            var activity = new Activities({
+                type: actionType,
+                ref: doc.ref,
+                content: null,
+                createdBy: userId
+            });
+            activity.save();
 
-        var overallObj = {
-            recruiterId: doc['ref'].recruiterId,
-            value: doc.overall
-        };
+        } catch (e) {
+            console.trace(e);
+        }
 
-        var overallList = scoreSummary.overalls;
-        let index = _.findIndex(overallList, {recruiterId: doc['ref'].recruiterId});
-
-        if (index !== -1)
-            overallList[index] = overallObj;
-        else
-            overallList.push(overallObj);
-
-        scoreSummary.set('overalls', overallList);
-
-        scoreSummary.save();
     };
 
     ScoreCardCollection.after.insert(afterSubmitScoreCardHandler);
