@@ -83,10 +83,10 @@ var model = Astro.Class({
                     return 'reverted qualify this candidate';
 
                 case RECRUITER_SCORE_CANDIDATE:
-                    return 'Submit score for this candidate';
+                    return 'submit score for this candidate';
 
                 case RECRUITER_UPDATE_SCORE_CANDIDATE :
-                    return 'Update score for this candidate';
+                    return 'update score for this candidate';
                 default:
                     return '';
             }
