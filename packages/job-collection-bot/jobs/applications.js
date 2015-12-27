@@ -81,65 +81,64 @@ function processApplication(info, data) {
 }
 
 var Applications = {
-        addApplications: function (jc, cb) {
-            var count = 0;
-            try {
-                var data = jc.data; // appId, companyId, source, jobId
+    addApplications: function (jc, cb) {
+        var count = 0;
+        try {
+            var data = jc.data; // appId, companyId, source, jobId
 
-                console.log('start insert Application : ', data);
+            console.log('start insert Application : ', data);
 
-                var appSql = sprintf(VNW_QUERIES.getApplicationByAppId, data.entryId, data.entryId);
-                var rows = fetchVNWData(appSql);
-                rows.forEach(function (app) {
-                    let application = processApplication(app, data);
-                    if (application) {
-                        application.save();
-                        count++;
+            var appSql = sprintf(VNW_QUERIES.getApplicationByAppId, data.entryId, data.entryId);
+            var rows = fetchVNWData(appSql);
+            rows.forEach(function (app) {
+                let application = processApplication(app, data);
+                if (application) {
+                    application.save();
+                    count++;
 
-                    }
-                });
-
-                var currentJob = JobExtra.getCollection().findOne({jobId: data.jobId});
-
-                if (currentJob) {
-                    currentJob.resetStages();
-                    currentJob.set('syncState', 'synced');
-
-                    currentJob.save();
                 }
+            });
 
-                console.log('end add application');
-                jc.done();
-                cb();
+            var currentJob = JobExtra.getCollection().findOne({jobId: data.jobId});
 
-            } catch (e) {
-                jc.fail();
-                cb();
-                console.trace(e);
+            if (currentJob) {
+                currentJob.resetStages();
+                currentJob.set('syncState', 'synced');
+
+                currentJob.save();
             }
 
-        },
+            console.log('end add application');
+            jc.done();
+            cb();
 
-        updateApplications: function (jc, cb) {
-            try {
-                var data = jc.data; // app, companyId, source
-                console.log('start update Application: ', data);
-
-                let application = processApplication(data);
-                application && application.save();
-
-                jc.done();
-                cb();
-            } catch (e) {
-                jc.fail();
-                cb();
-                throw e;
-            }
-
-
+        } catch (e) {
+            jc.fail();
+            cb();
+            console.trace(e);
         }
+
+    },
+
+    updateApplications: function (jc, cb) {
+        try {
+            var data = jc.data; // app, companyId, source
+            console.log('start update Application: ', data);
+
+            let application = processApplication(data);
+            application && application.save();
+
+            jc.done();
+            cb();
+        } catch (e) {
+            jc.fail();
+            cb();
+            throw e;
+        }
+
+
     }
-    ;
+};
 
 sJobCollections.registerJobs('addApplication', Applications.addApplications);
 sJobCollections.registerJobs('updateApplication', Applications.updateApplications);

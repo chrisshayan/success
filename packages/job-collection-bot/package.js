@@ -1,5 +1,5 @@
 Package.describe({
-    name: 'vnw:sync-data',
+    name: 'vnw:jobcollectionbot',
     version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
@@ -13,11 +13,11 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(['stevezhu:lodash', 'lab:vnw-apis']);
+    api.use(['stevezhu:lodash', 'lab:vnw-apis', 'percolate:synced-cron']);
     api.use(['success:application']);
 
-    api.addFiles(['sync-data.js'], 'server');
-    api.addFiles(['jobs/applications.js', 'jobs/jobs.js'], 'server');
+    api.addFiles(['job-collection-bot.js'], 'server');
+    api.addFiles(['jobs/applications.js', 'jobs/jobs.js', 'jobs/interviews.js'], 'server');
 
     api.export('sJobCollections');
 

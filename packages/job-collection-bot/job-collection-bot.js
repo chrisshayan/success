@@ -11,13 +11,15 @@ sJobCollections = (function () {
 
             return SyncQueue.processJobs(name, options, jobProcessing);
         },
-        addJobtoQueue: function (type, data) {
+        addJobtoQueue: function (type, data, options) {
             if (typeof type !== 'string') return false;
-            var retryOption = {
-                retries: 5,
-                wait: 1 * 60 * 1000
-            };
-            return Job(SyncQueue, type, data).retry(retryOption).save();
+
+            options = options || {
+                    retries: 5,
+                    wait: 1 * 60 * 1000
+                };
+
+            return Job(SyncQueue, type, data).retry(options).save();
         }
     }
 })();
