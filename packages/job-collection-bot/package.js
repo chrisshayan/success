@@ -13,7 +13,7 @@ Package.describe({
 Package.onUse(function (api) {
     api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
-    api.use(['stevezhu:lodash', 'lab:vnw-apis', 'percolate:synced-cron']);
+    api.use(['stevezhu:lodash', 'lab:vnw-apis']);
     api.use(['success:application']);
 
     api.addFiles(['job-collection-bot.js'], 'server');
