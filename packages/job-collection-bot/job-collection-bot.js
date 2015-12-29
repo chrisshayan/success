@@ -11,15 +11,16 @@ sJobCollections = (function () {
 
             return SyncQueue.processJobs(name, options, jobProcessing);
         },
-        addJobtoQueue: function (type, data, options) {
+        addJobtoQueue: function (type, data, options, time) {
             if (typeof type !== 'string') return false;
 
-            options = options || {
-                    retries: 5,
-                    wait: 1 * 60 * 1000
-                };
+            options = _.extend({
+                retries: 5,
+                wait: 1 * 60 * 1000
+            }, options);
 
-            return Job(SyncQueue, type, data).retry(options).save();
+            //console.log(type, data, options, time);
+            return Job(SyncQueue, type, data).retry(options).after(time || new Date()).save();
         }
     }
 })();
