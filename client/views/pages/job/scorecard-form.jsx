@@ -69,6 +69,11 @@ ScoreCardForm = React.createClass({
                     notes: scorecard.notes,
                     scorecard: scorecard
                 })
+            } else {
+                if(Router.current().params.query['initDecision']) {
+                    const overall = +Router.current().params.query['initDecision'];
+                    this.setState({ overall });
+                }
             }
         });
     },

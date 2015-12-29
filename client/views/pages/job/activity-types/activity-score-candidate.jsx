@@ -51,7 +51,7 @@ RecruiterScoreCandidate = React.createClass({
                     </div>
                 </div>
 
-                <div className="social-body">
+                <div ref="body" className="social-body">
                 </div>
             </div>
         );

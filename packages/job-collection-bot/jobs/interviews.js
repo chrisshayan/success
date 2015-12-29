@@ -51,16 +51,32 @@ function remindSubmitScorecardJob(j, cb) {
                 return item.ref.recruiterId;
             });
 
-            var notSubmitScoreCard = _.difference(recruiterIds, submitedScoreCard);
+            const app = Application.findOne({appId: data.ref.appId});
+            if(app) {
+                const stage = Success.APPLICATION_STAGES[app.stage];
+                var notSubmitScoreCard = _.difference(recruiterIds, submitedScoreCard);
 
-            notSubmitScoreCard.forEach(function (recruiterId) {
-                Email.send({
-                    from: data.sender,
-                    to: recruiterGrouped[recruiterId][0].mailTo,
-                    subject: data.subject || 'submit scorecard please tomorrow',
-                    html: data.body || 'this is a test'
+                notSubmitScoreCard.forEach(function (recruiterId) {
+                    const recruiter = Meteor.users.findOne({_id: recruiterId});
+                    if(!recruiter) return;
+
+                    SSR.compileTemplate('ScorecardReminder', Assets.getText('private/scorecard-remind.html'));
+                    var scoreUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
+                    var html = SSR.render("ScorecardReminder", {
+                        recruiter: recruiter.fullname(),
+                        candidate: app.fullname,
+                        scoreUrl: scoreUrl
+                    });
+
+
+                    Email.send({
+                        from: data.sender,
+                        to: recruiterGrouped[recruiterId][0].mailTo,
+                        subject: data.subject || 'submit scorecard please tomorrow',
+                        html: html
+                    });
                 });
-            });
+            }
         }
 
         j.done();
