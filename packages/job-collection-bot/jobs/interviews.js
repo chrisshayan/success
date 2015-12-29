@@ -10,19 +10,40 @@ function remindInterviewJob(j, cb) {
         var emails = _.pluck(data.recruiters, 'mailTo');
 
         if (emails.length) {
-            Email.send({
-                from: data.sender,
-                to: emails,
-                subject: data.subject || 'You have an interview tomorrow',
-                html: data.body || 'this is a test'
-            });
+            const app = Application.findOne({appId: data.ref.appId, type: data.ref.type});
+            const jobExtra = JobExtra.findOne({jobId: data.ref.jobId});
+
+            if(app && jobExtra) {
+                const stage = Success.APPLICATION_STAGES[app.stage];
+                SSR.compileTemplate('InterviewReminder', Assets.getText('private/interview-remind.html'));
+
+                var profileUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
+                const start = moment(data.timeRange.start);
+                const end = moment(data.timeRange.end);
+
+                var html = SSR.render("InterviewReminder", {
+                    position: jobExtra.jobTitle,
+                    candidate: app.fullname,
+                    profileUrl: profileUrl,
+                    location: data.location,
+                    time: start.format('MMMM Do YYYY, h:mma') + ' - ' + end.format('h:mma')
+                });
 
 
-            // Setup submit scorecard reminder
-            var time = new moment(data.timeRange.end);
-            time.add(2, 'hour');
+                Email.send({
+                    from: data.sender,
+                    to: emails,
+                    subject: data.subject || 'You have an interview tomorrow',
+                    html: html
+                });
 
-            sJobCollections.addJobtoQueue('remindSubmitScorecardJob', data, null, time.toDate());
+
+                // Setup submit scorecard reminder
+                var time = new moment(data.timeRange.end);
+                time.add(2, 'hour');
+
+                sJobCollections.addJobtoQueue('remindSubmitScorecardJob', data, null, time.toDate());
+            }
         }
 
         j.done();
