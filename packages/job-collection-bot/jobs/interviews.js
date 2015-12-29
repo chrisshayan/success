@@ -13,10 +13,12 @@ function remindInterviewJob(j, cb) {
             Email.send({
                 from: data.sender,
                 to: emails,
-                subject: data.subject || 'interview tomorrow',
+                subject: data.subject || 'You have an interview tomorrow',
                 html: data.body || 'this is a test'
             });
 
+
+            // Setup submit scorecard reminder
             var time = new moment(data.timeRange.end);
             time.add(2, 'hour');
 
@@ -38,10 +40,10 @@ function remindSubmitScorecardJob(j, cb) {
         var data = j.data;
 
         if (data.recruiters) {
-            var recruiterIds = _.pluck(data.recruiters, 'recruiterId')
-                , recruiterGrouped = _.groupBy(data.recruiters, 'recruiterId');
+            var recruiterIds = _.pluck(data.recruiters, '_id')
+                , recruiterGrouped = _.groupBy(data.recruiters, '_id');
 
-            var submitedScoreCard = ScoreCard.find({
+            var submittedScoreCard = ScoreCard.find({
                 'ref.appId': data.ref.appId,
                 'ref.type': data.ref.type,
                 'ref.recruiterId': {
@@ -51,16 +53,18 @@ function remindSubmitScorecardJob(j, cb) {
                 return item.ref.recruiterId;
             });
 
-            const app = Application.findOne({appId: data.ref.appId});
-            if(app) {
-                const stage = Success.APPLICATION_STAGES[app.stage];
-                var notSubmitScoreCard = _.difference(recruiterIds, submitedScoreCard);
+            const app = Application.findOne({appId: data.ref.appId, type: data.ref.type});
 
+            if (app) {
+                const stage = Success.APPLICATION_STAGES[app.stage];
+                var notSubmitScoreCard = _.difference(recruiterIds, submittedScoreCard);
+                //console.log('notSubmitScoreCard', notSubmitScoreCard);
                 notSubmitScoreCard.forEach(function (recruiterId) {
                     const recruiter = Meteor.users.findOne({_id: recruiterId});
-                    if(!recruiter) return;
+                    if (!recruiter) return;
 
                     SSR.compileTemplate('ScorecardReminder', Assets.getText('private/scorecard-remind.html'));
+
                     var scoreUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
                     var html = SSR.render("ScorecardReminder", {
                         recruiter: recruiter.fullname(),
@@ -68,11 +72,10 @@ function remindSubmitScorecardJob(j, cb) {
                         scoreUrl: scoreUrl
                     });
 
-
                     Email.send({
                         from: data.sender,
                         to: recruiterGrouped[recruiterId][0].mailTo,
-                        subject: data.subject || 'submit scorecard please tomorrow',
+                        subject: data.subject || 'Submit scorecard after interview',
                         html: html
                     });
                 });

@@ -18,7 +18,7 @@ Package.onUse(function (api) {
 
     api.addFiles(['job-collection-bot.js'], 'server');
     api.addFiles(['jobs/applications.js', 'jobs/jobs.js', 'jobs/interviews.js'], 'server');
-
+    api.addAssets('private/scorecard-remind.html', 'server');
     api.export('sJobCollections');
 
 

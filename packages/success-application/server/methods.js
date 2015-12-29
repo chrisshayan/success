@@ -270,7 +270,7 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
 
 methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data = {}) {
     //Meteor.defer(() => {
-    console.log(this.userId, data, appId, jobId);
+
     if (!this.userId) return false;
     this.unblock();
     check(jobId, Number);
@@ -287,7 +287,8 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
         companyId: app.companyId,
         jobId: jobId,
         candidateId: app.candidateId,
-        appId: appId
+        appId: appId,
+        type: app.type
     };
 
     const activityId = new Activities({
@@ -307,7 +308,6 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     });
 
     _.each(data.interviewers, function (id) {
-        console.log(data.interviewers);
         var u = Meteor.users.findOne({_id: id});
         if (u) {
             var uName = u.fullname() || u.defaultEmail();
@@ -373,7 +373,6 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
                 }
             };
 
-            console.log(jobdata);
             var estimateDate = new moment(data.scheduleDate).subtract(1, 'day')
                 , now = new moment();
 
