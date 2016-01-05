@@ -23,7 +23,7 @@ ActivityComment = React.createClass({
 
                 <div className="social-body">
                     <div className="activity-info">
-                        { activity.body() }
+                        <MentionContent content={activity.body()} />
                     </div>
                 </div>
             </div>

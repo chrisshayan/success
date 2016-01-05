@@ -199,12 +199,16 @@ methods['applications.moveStage'] = function (appId, stage = null) {
     return false;
 };
 
+function storeMention(type, typeId, text) {
+
+}
+
 methods['application.addComment'] = function (jobId = 0, appId = 0, text = '') {
     if (!this.userId) return false;
     check(jobId, Number);
     check(appId, Number);
     check(text, String);
-
+    var userId = this.userId;
     var app = Application.findOne({jobId: jobId, appId: appId});
     if (!app) return false;
     const ref = {
@@ -216,13 +220,27 @@ methods['application.addComment'] = function (jobId = 0, appId = 0, text = '') {
     const content = {
         text: text
     };
-    return new Activities({
+
+    const activityId = new Activities({
         type: Activities.TYPE.RECRUITER_CREATE_COMMENT,
         ref: ref,
         content: content,
-        createdBy: this.userId,
+        createdBy: userId,
         createdAt: new Date()
     }).save();
+
+    if(activityId) {
+        Meteor.defer(function() {
+            Mention.generateMentions(
+                ref,
+                Mention.TYPE.ACTIVITY_COMMENT,
+                activityId,
+                text,
+                userId
+            );
+        });
+    }
+    return activityId;
 };
 
 methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}) {

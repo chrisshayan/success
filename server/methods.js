@@ -1042,7 +1042,9 @@ Meteor.methods({
     getResumeDetails: function (appId, appType) {
         if (!this.userId) return null;
         this.unblock();
+
         const result = {resume: {}, application: {}};
+
         let url = Meteor.settings['RESUME_API_URL'];
         url = url.replace('LANG_ID', 2);
         url = url.replace('APP_ID', appId);

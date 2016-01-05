@@ -288,4 +288,16 @@ methods.removeHiringTeamRequest = function (requestId) {
     hiringTeamItem.save();
 };*/
 
+
+methods['hiringTeam.recruiters'] = function() {
+    if(!this.userId) return [];
+    const user = Meteor.users.findOne({_id: this.userId});
+    if(!user || !user.companyId) return [];
+    return Meteor.users.find({companyId: user.companyId}).map(function(r) {
+        return {
+            name: r.fullname() || r.username,
+            username: r.username
+        }
+    });
+};
 Meteor.methods(methods);

@@ -245,3 +245,21 @@ Router.route('/job/:jobId/:stage', {
 		this.render('Job');
 	}
 });
+
+
+/**
+ * Mentions routes
+ */
+Router.route('/@:username', {
+	name: 'Mention.User',
+	action() {
+		this.render('Mention.User');
+	}
+});
+
+Router.route('/hashtag/:hashtag', {
+	name: 'Mention.HashTag',
+	action() {
+		this.render('Mention.HashTag');
+	}
+});

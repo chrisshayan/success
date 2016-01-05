@@ -164,8 +164,13 @@ if (Meteor.isServer) {
                 content: null,
                 createdBy: userId
             });
-            activity.save();
-
+            const activityId = activity.save();
+            if(activityId) {
+                Meteor.defer(() => {
+                    const notes_string = [doc.notes.keyTakeAways, doc.notes.fitCompanyCulture].join(' ');
+                    Mention.generateMentions(doc.ref, Mention.TYPE.ACTIVITY_SCORECARD, activityId, notes_string, userId);
+                });
+            }
         } catch (e) {
             console.trace(e);
         }
@@ -239,10 +244,3 @@ summaryModel.prototype.isExist = function (condition) {
 
 ScoreCardSummary = summaryModel;
 SummaryCollection = summaryModel.getCollection();
-
-
-
-
-
-
-

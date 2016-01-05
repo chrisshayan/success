@@ -11,7 +11,6 @@ Package.describe({
 });
 
 Package.onUse(function (api) {
-    api.versionsFrom('1.2.0.2');
     api.use('ecmascript');
     api.use(['stevezhu:lodash', 'lab:vnw-apis']);
     api.use(['success:application']);
@@ -30,6 +29,4 @@ Package.onUse(function (api) {
 Package.onTest(function (api) {
     api.use('ecmascript');
     api.use('tinytest');
-    api.use('sync-data');
-    api.addFiles('sync-data-tests.js');
 });

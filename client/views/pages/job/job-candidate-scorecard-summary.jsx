@@ -252,7 +252,7 @@ ScoreCardSummaryCriteriaSet = React.createClass({
         return (
             <tr>
                 <td colSpan={2}>
-                    <p class="text-muted" style={style}>There is no criteria</p>
+                    <p className="text-muted" style={style}>There is no criteria</p>
                 </td>
             </tr>
         );

@@ -78,6 +78,5 @@ Meteor.startup(function () {
         }
 
 
-    })
+    });
 });
-

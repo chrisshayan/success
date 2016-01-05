@@ -14,25 +14,17 @@ CommentBox = React.createClass({
         } else {
             scrollTo = container.offset().top - 50 - 45;
         }
-        autosize(ip);
+        //autosize(ip);
 
         body.stop().animate({scrollTop: scrollTo}, '500', 'swing', function() {
             ip.focus();
         });
     },
 
-    componentWillUnmount() {
-        let el = this.refs.container.getDOMNode();
-        var evt = document.createEvent('Event');
-        evt.initEvent('autosize:destroy', true, false);
-        el.dispatchEvent(evt);
-    },
-
     handleSaveClick(e) {
         e.preventDefault();
-        let ip = this.refs.txt.getDOMNode();
-        this.props.onSave && this.props.onSave(ip.value);
-        ip.value = '';
+        const val = this.refs.txt.getValue();
+        this.props.onSave && this.props.onSave(val);
     },
 
     render() {
@@ -52,13 +44,8 @@ CommentBox = React.createClass({
         };
         return (
             <div ref="container" style={styles.container}>
-                <textarea
-                    ref="txt"
-                    className="form-control"
-                    style={styles.input}
-                    placeholder="write your note or comment">
+                <MentionInput ref="txt" placeholder="write your note or comment (mention someone using '@')" style={{height: '80px'}} />
 
-                </textarea>
                 <div className="text-right" style={styles.actions}>
                     <button className="btn btn-primary btn-outline btn-sm" onClick={this.handleSaveClick}>
                         <i className="fa fa-paper-plane-o"/>&nbsp;

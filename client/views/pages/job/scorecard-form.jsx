@@ -268,12 +268,11 @@ const ScoreCardNotes = React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <textarea
+                        <MentionInput
                             ref="keyTakeAways"
-                            rows="3"
-                            className="form-control"
-                            defaultValue={ this.state.keyTakeAways }
-                            onBlur={(e) => this.handleChange('keyTakeAways', e)}/>
+                            value={ this.state.keyTakeAways }
+                            onBlur={(e) => this.handleChange('keyTakeAways', e)}
+                            onChange={(e) => this.handleChange('keyTakeAways', e)} />
                     </div>
                 </div>
                 <br/>
@@ -287,12 +286,17 @@ const ScoreCardNotes = React.createClass({
                 </div>
                 <div className="row">
                     <div className="col-md-12">
-                        <textarea
+                        <MentionInput
                             ref="fitCompanyCulture"
-                            rows="3"
-                            className="form-control"
-                            defaultValue={ this.state.fitCompanyCulture }
-                            onBlur={(e) => this.handleChange('fitCompanyCulture', e)}/>
+                            value={ this.state.fitCompanyCulture }
+                            onBlur={(e) => this.handleChange('fitCompanyCulture', e)}
+                            onChange={(e) => this.handleChange('fitCompanyCulture', e)} />
+                    </div>
+                </div>
+
+                <div className="row">
+                    <div className="col-md-12">
+                        <p className="text-muted">Tip: mention someone using '@'</p>
                     </div>
                 </div>
             </div>

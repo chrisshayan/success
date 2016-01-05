@@ -96,6 +96,15 @@ JobExtra = Astro.Class({
                 return 0;
             }
         }
+    },
+
+    methods: {
+        link() {
+            return Router.url('Job', {
+                stage: 'applied',
+                jobId: this.jobId
+            })
+        }
     }
 });
 
