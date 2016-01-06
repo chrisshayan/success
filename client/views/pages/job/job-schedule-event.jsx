@@ -30,7 +30,7 @@ ScheduleEvent = React.createClass({
             subject: '',
             scheduleDate: d.format('DD/MM/YYYY'),
             startTime: startTime.format('HH:00'),
-            endTime: endTime.format('HH:00'),
+            endTime: endTime.format('HH:00')
         };
     },
 
@@ -112,7 +112,7 @@ ScheduleEvent = React.createClass({
         let actionContainer = $('.job-candidate-actions');
         var body = $("html, body");
         let scrollTo = 0;
-        if(actionContainer && actionContainer.hasClass('affix')) {
+        if (actionContainer && actionContainer.hasClass('affix')) {
             scrollTo = container.offset().top - 45;
         } else {
             scrollTo = container.offset().top - 50 - 45;

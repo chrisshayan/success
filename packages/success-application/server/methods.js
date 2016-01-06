@@ -229,8 +229,8 @@ methods['application.addComment'] = function (jobId = 0, appId = 0, text = '') {
         createdAt: new Date()
     }).save();
 
-    if(activityId) {
-        Meteor.defer(function() {
+    if (activityId) {
+        Meteor.defer(function () {
             Mention.generateMentions(
                 ref,
                 Mention.TYPE.ACTIVITY_COMMENT,
@@ -300,6 +300,27 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     var app = Application.findOne({jobId: jobId, appId: appId});
     if (!user || !job || !app) return false;
     data = replacePlaceholder(user, job, app, data);
+
+    let listRecruiters = job.recruiters.manager.concat(job.recruiters.recruiter).map(function (rec) {
+        return rec.userId;
+    });
+
+    var diff = _.unique(_.difference(data.interviewers, listRecruiters));
+    if (diff.length !== 0) {
+        diff.forEach(function (recId) {
+            let rec = Meteor.users.findOne({_id: recId});
+            if (rec) {
+                var itemInfo = {
+                    userId: rec._id,
+                    email: rec.defaultEmail(),
+                    name: rec.fullname() || rec.username || rec.defaultEmail() || ''
+                };
+                job.push('recruiters.recruiter', itemInfo);
+            }
+        });
+
+        job.save()
+    }
 
     const ref = {
         companyId: app.companyId,
