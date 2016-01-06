@@ -18,6 +18,8 @@ function remindInterviewJob(j, cb) {
                 SSR.compileTemplate('InterviewReminder', Assets.getText('private/interview-remind.html'));
 
                 var profileUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
+                profileUrl += `&utm_source=notification&utm_medium=email&utm_campaign=${jobExtra.jobTitle}`;
+
                 const start = moment(data.timeRange.start);
                 const end = moment(data.timeRange.end);
 
