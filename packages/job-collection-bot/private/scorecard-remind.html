@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Score candidate reminder</title>
     <style>
         /* -------------------------------------
@@ -88,9 +88,11 @@
             color: #999;
             padding: 20px;
         }
+
         .footer a {
             color: #999;
         }
+
         .footer p, .footer a, .footer unsubscribe, .footer td {
             font-size: 12px;
         }
@@ -128,6 +130,7 @@
             margin-bottom: 10px;
             font-weight: normal;
         }
+
         p li, ul li, ol li {
             margin-left: 5px;
             list-style-position: inside;
@@ -196,18 +199,22 @@
             text-align: center;
             border-radius: 3px 3px 0 0;
         }
+
         .alert a {
             color: #fff;
             text-decoration: none;
             font-weight: 500;
             font-size: 16px;
         }
+
         .alert.alert-warning {
             background: #f8ac59;
         }
+
         .alert.alert-bad {
             background: #ed5565;
         }
+
         .alert.alert-good {
             background: #1ab394;
         }
@@ -221,15 +228,19 @@
             text-align: left;
             width: 80%;
         }
+
         .invoice td {
             padding: 5px 0;
         }
+
         .invoice .invoice-items {
             width: 100%;
         }
+
         .invoice .invoice-items td {
             border-top: #eee 1px solid;
         }
+
         .invoice .invoice-items .total td {
             border-top: 2px solid #333;
             border-bottom: 2px solid #333;
@@ -270,8 +281,6 @@
             }
         }
 
-
-
         .btn {
             border-radius: 3px;
         }
@@ -300,10 +309,11 @@
                 <table class="main" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                         <td class="content-wrap">
-                            <table  cellpadding="0" cellspacing="0">
+                            <table cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
-                                        <img class="img-responsive" src="http://images.vietnamworks.com/img/jobseekers/logo.png"/>
+                                        <img class="img-responsive"
+                                             src="http://images.vietnamworks.com/img/jobseekers/logo.png"/>
                                     </td>
                                 </tr>
                                 <tr>
@@ -313,18 +323,21 @@
                                 </tr>
                                 <tr>
                                     <td class="content-block">
-                                        You interviewd <b>{{ candidate }}</b> for your company opening position: <b>{{ position }}</b>
+                                        You interviewd <b>{{ candidate }}</b> for your company opening position:
+                                        <b>{{ position }}</b>
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="content-block">
-                                        Now it is time to provide feedback and fill candidate Scorecard, Did the candidate pass the interview?
+                                        Now it is time to provide feedback and fill candidate Scorecard, Did the
+                                        candidate pass the interview?
                                     </td>
                                 </tr>
                                 <tr>
                                     <td class="content-block aligncenter">
                                         <div class="action-buttons">
-                                            <a href="{{ scoreUrl }}&&initDecision=1" class="btn-primary">Definitely Not</a>
+                                            <a href="{{ scoreUrl }}&&initDecision=1" class="btn-primary">Definitely
+                                                Not</a>
                                             <a href="{{ scoreUrl }}&&initDecision=2" class="btn-primary">No</a>
                                             <a href="{{ scoreUrl }}&&initDecision=3" class="btn-primary">Yes</a>
                                             <a href="{{ scoreUrl }}&&initDecision=4" class="btn-primary">Strong yes</a>
@@ -338,10 +351,15 @@
                 <div class="footer">
                     <table width="100%">
                         <tr>
-                            <td class="aligncenter content-block">Follow <a href="#">@Company</a> on Twitter.</td>
+                            <td class="aligncenter content-block">
+                                Copyright &copy; Navigos Group Vietnam Joint Stock Company
+                                <br/>
+                                130 Suong Nguyet Anh Street, Ben Thanh Ward, District 1, Ho Chi Minh City, Vietnam
+                            </td>
                         </tr>
                     </table>
-                </div></div>
+                </div>
+            </div>
         </td>
         <td></td>
     </tr>

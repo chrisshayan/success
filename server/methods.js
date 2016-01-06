@@ -820,7 +820,7 @@ Meteor.methods({
         var mapResult = function (doc) {
             doc.char = doc.skillName.length;
             return doc;
-        }
+        };
         var search1 = Collections.SkillTerms.find({
             skillName: searchCond,
             $where: 'this.skillName.length > 0 && this.skillName.split().length < 5'
