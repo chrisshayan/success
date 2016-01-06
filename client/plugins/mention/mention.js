@@ -49,9 +49,7 @@
 						if (itemProps[settings.queryBy[i]]) {
 							var item = itemProps[settings.queryBy[i]].toLowerCase(),
 								usernames = (this.query.toLowerCase()).match(new RegExp(settings.delimiter + '[a-z0-9.]+', "gi")),
-								//usernames = (this.query.toLowerCase()).match(new RegExp('(' + settings.delimiter + '[\w\d\.]+)', "g")),
 								j;
-							console.log(usernames)
 							if ( !! usernames) {
 								for (j = 0; j < usernames.length; j++) {
 									var username = (usernames[j].substring(1)).toLowerCase(),
