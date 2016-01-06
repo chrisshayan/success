@@ -44,7 +44,7 @@ CommentBox = React.createClass({
         };
         return (
             <div ref="container" style={styles.container}>
-                <MentionInput ref="txt" placeholder="write your note or comment (mention someone using '@')" style={{height: '80px'}} />
+                <MentionInput ref="txt" placeholder="write your note or comment (mention someone using '@')" />
 
                 <div className="text-right" style={styles.actions}>
                     <button className="btn btn-primary btn-outline btn-sm" onClick={this.handleSaveClick}>

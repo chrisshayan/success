@@ -83,6 +83,7 @@ MentionHashTag = React.createClass({
 	},
 
 	render() {
+		let notFound = null;
 		let loadMoreBtn = null;
 		if (this.props.hasMore) {
 			loadMoreBtn = (
@@ -93,9 +94,27 @@ MentionHashTag = React.createClass({
 				</button>
 			);
 		}
+
+		if(!this.props.isLoading && _.isEmpty(this.props.items)) {
+			notFound = (
+				<div style={{
+					border: '2px dashed #ccc',
+					textAlign: 'center',
+					width: '100%',
+					margin: '10px auto',
+					padding: '15px'
+				}}>
+					<h2 style={{
+						margin: 0,
+						fontSize: '20px'
+						}}>Not found</h2>
+				</div>
+			);
+		}
 		return (
 			<div className="animated fadeInUp">
 				<div className="col-md-8 col-md-offset-2">
+					{notFound}
 					<div className="feed-activity-list">
 						{this.props.items.map(this.renderItem)}
 					</div>
