@@ -53,7 +53,7 @@ MentionInput = React.createClass({
 			$(el.getDOMNode()).textareaHighlighter({
 				matches: [
 					{
-						match:      /\B@\w+/g,
+						match:      /\B(@[\w\d\.\_]+)/g,
 						matchClass: 'mention people'
 					},
 

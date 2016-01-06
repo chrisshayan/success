@@ -8,7 +8,7 @@
  * @param createdBy
  */
 Mention.generateMentions = function (ref, type, typeId, text, createdBy) {
-	var usernames = text.match(/\B@\w+/g);
+	var usernames = text.match(/\B(@[\w\d\.]+)/g);
 	var hashtags = text.match(/\B#\w+/g);
 
 	// insert mention user
