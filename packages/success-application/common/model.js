@@ -217,10 +217,11 @@ if (Meteor.isServer) {
     Collection.after.insert(function (userId, doc) {
         let createdBy = userId || 'vnw'
             , ref = {
-                appId: doc.appId,
-                candidateId: doc.candidateId,
-                jobId: doc.jobId
-            };
+            appId: doc.appId,
+            candidateId: doc.candidateId,
+            jobId: doc.jobId,
+            companyId: doc.companyId
+        };
 
         var activity = new Activities({
             type: Activities.TYPE['APPLICATION_CREATE'],

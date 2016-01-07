@@ -2,6 +2,7 @@
  * Created by HungNguyen on 10/1/15.
  */
 
+/*
 var _ = lodash;
 
 function formatDatetimeFromVNW(datetime) {
@@ -134,4 +135,4 @@ var Jobs = {
 };
 
 sJobCollections.registerJobs('addJob', Jobs.addNewJob);
-sJobCollections.registerJobs('updateJob', Jobs.updateJob);
+sJobCollections.registerJobs('updateJob', Jobs.updateJob);*/

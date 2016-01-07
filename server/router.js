@@ -145,12 +145,18 @@ Router.route('/webhook/application', {
                 case 'put':
                     type = 'updateApplication';
                     break;
+                default:
+                    break;
             }
 
-            cond = !!(!cond && JobExtra.findOne({jobId: data.jobId}));
+            if (type) {
+                var job = JobExtra.findOne({jobId: data.jobId});
+                cond = !!(!cond && job);
 
-            if (cond) {
-                type && SYNC_VNW.addQueue(type, data);
+                if (cond) {
+                    data.companyId = job.companyId;
+                    sJobCollections.addJobtoQueue(type, data);
+                }
             }
 
             this.response.writeHead(200);
