@@ -12,6 +12,10 @@ AutoForm.hooks({
                 }
                 //console.log(userId);
                 if (userId) {
+                    GAnalytics.event(['Recruiter', userId].join(':'),
+                        'confirmed:hiring_Team_request'
+                    );
+
                     if (doc.password)
                         Meteor.loginWithPassword(doc.email, doc.password, function (err, result) {
                             if (err) throw err;

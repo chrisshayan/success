@@ -1,5 +1,5 @@
 JobApplications = {};
-JobApplications.getState = function() {
+JobApplications.getState = function () {
     return {
         apps__base: 10,
         apps__limit: 10,
@@ -17,10 +17,10 @@ JobApplications.getState = function() {
     }
 };
 
-JobApplications.getActions = function() {
+JobApplications.getActions = function () {
     const actions = {};
 
-    actions.resetState = function() {
+    actions.resetState = function () {
         this.setState(JobApplications.getState());
     }.bind(this);
 
@@ -120,6 +120,11 @@ JobApplications.getActions = function() {
                 if (!err && result) {
                     actions.toggleCheckAll(false);
                     swal("Disqualifed!", "", "success");
+
+                    GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                        'qualify:disqualified:bulk',
+                        ['appId'].concat(apps__selectedItems).join(':')
+                    );
                 }
             });
         });
@@ -146,6 +151,11 @@ JobApplications.getActions = function() {
                 if (!err && result) {
                     actions.toggleCheckAll(false);
                     swal("Reverted qualify!", "", "success");
+
+                    GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                        'qualify:revert_disqualified:bulk',
+                        ['appId'].concat(apps__selectedItems).join(':')
+                    );
                 }
             });
         });
@@ -155,14 +165,14 @@ JobApplications.getActions = function() {
      * toggle show send bulk message
      */
     actions.toggleSendMessage = function (status = null) {
-        if(status === null) {
+        if (status === null) {
             status = !this.state.apps__showSendBulkMessage;
         }
         this.setState({
             apps__showSendBulkMessage: status
         });
 
-        if(status === false) {
+        if (status === false) {
             actions.toggleCheckAll(false);
         }
     }.bind(this);
@@ -176,7 +186,7 @@ JobApplications.getActions = function() {
         const appIds = this.state.apps__selectedItems;
 
         Meteor.call('application.sendMessage', jobId, appIds, data, (err, result) => {
-            if(!err && result) {
+            if (!err && result) {
                 actions.toggleSendMessage(false);
                 Notification.success("Emails sent");
             } else {

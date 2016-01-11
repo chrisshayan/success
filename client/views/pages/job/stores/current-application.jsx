@@ -16,9 +16,9 @@ JobCurrentApplication.getActions = function () {
      * Scroll to top
      * @type {function(this:JobCurrentApplication)}
      */
-    actions.scrollTop = function(offsetTop = 0) {
+    actions.scrollTop = function (offsetTop = 0) {
         const $body = $('body');
-        if($body.scrollTop() >= offsetTop) {
+        if ($body.scrollTop() >= offsetTop) {
             $('body').animate({scrollTop: 0}, 300);
         }
     }.bind(this);
@@ -30,14 +30,14 @@ JobCurrentApplication.getActions = function () {
     actions.nextApplication = function (prevAppId = null) {
         let nextIndex = 0;
         let nextApp = null;
-        if(prevAppId !== null) {
-            nextIndex = _.findIndex(this.data.applications, (a)=>  a.appId == prevAppId);
+        if (prevAppId !== null) {
+            nextIndex = _.findIndex(this.data.applications, (a)=> a.appId == prevAppId);
         }
-        while(true) {
+        while (true) {
             nextApp = this.data.applications[nextIndex];
-            if(nextApp && nextApp.appId != prevAppId) break;
+            if (nextApp && nextApp.appId != prevAppId) break;
             nextIndex++;
-            if(nextIndex > this.data.applications.length || nextIndex > 1000) break;
+            if (nextIndex > this.data.applications.length || nextIndex > 1000) break;
         }
 
         const params = Router.current().params
@@ -87,6 +87,11 @@ JobCurrentApplication.getActions = function () {
             Meteor.call('applications.toggleQualify', jobId, appIds, stage, false, (err, result) => {
                 if (!err && result) {
                     actions.nextApplication(currentAppId);
+
+                    GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                        'qualify:disqualified',
+                        ['appId'].concat(appIds).join(':')
+                    );
                 }
             });
         }
@@ -103,9 +108,13 @@ JobCurrentApplication.getActions = function () {
             const appIds = [currentAppId];
             const stage = this.state.stage.alias;
 
-            Meteor.call('applications.toggleQualify', jobId , appIds, stage, true, (err, result) => {
+            Meteor.call('applications.toggleQualify', jobId, appIds, stage, true, (err, result) => {
                 if (!err && result) {
                     actions.nextApplication(this.state.currentAppId);
+                    GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                        'qualify:revert_disqualified',
+                        ['appId'].concat(appIds).join(':')
+                    );
                 }
             });
         }
@@ -124,6 +133,11 @@ JobCurrentApplication.getActions = function () {
             Meteor.call('applications.moveStage', currentAppId, stage, (err, result) => {
                 if (!err && result) {
                     actions.nextApplication(currentAppId);
+
+                    GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                        'moveStage',
+                        ['appId', currentAppId, 'stage', stage].join(':')
+                    );
                 }
             });
         }
@@ -134,25 +148,31 @@ JobCurrentApplication.getActions = function () {
      * Close action box and scroll to top
      * @type {function(this:JobCurrentApplication)}
      */
-    actions.discardActionBox = function() {
+    actions.discardActionBox = function () {
         const params = Router.current().params
             , query = _.omit(params.query, 'appAction');
 
         actions.scrollTop();
-        Router.go('Job', params, { query });
+        Router.go('Job', params, {query});
     }.bind(this);
 
     /**
      * Add comment to application
      * @type {function(this:JobCurrentApplication)}
      */
-    actions.saveComment = function(text) {
+    actions.saveComment = function (text) {
         const jobId = this.state.jobId;
         const appId = this.state.currentAppId;
 
         Meteor.call('application.addComment', jobId, appId, text, (err, result) => {
-            if(!err && result) {
+            if (!err && result) {
                 actions.discardActionBox();
+
+                GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                    'submit_info:add_comment',
+                    ['appId', appId].join(':')
+                );
+
             } else {
 
             }
@@ -163,14 +183,22 @@ JobCurrentApplication.getActions = function () {
      * Send message to application
      * @type {function(this:JobCurrentApplication)}
      */
-    actions.sendMessage = function(data) {
+    actions.sendMessage = function (data) {
         const jobId = this.state.jobId;
         const appId = this.state.currentAppId;
 
         Meteor.call('application.sendMessage', jobId, [appId], data, (err, result) => {
-            if(!err && result) {
+            if (!err && result) {
                 actions.discardActionBox();
                 Notification.success("Emails sent");
+
+                // eventvalue = 'sendMessage' = 1
+                GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                    'submit_info:send_email',
+                    ['appId', appId].join(':')
+                );
+
+
             } else {
 
             }
@@ -181,14 +209,21 @@ JobCurrentApplication.getActions = function () {
      * save interview events
      * @param data
      */
-    actions.scheduleInterview = function(data) {
+    actions.scheduleInterview = function (data) {
         const jobId = this.state.jobId;
         const appId = this.state.currentAppId;
 
         Meteor.call('application.scheduleInterview', jobId, appId, data, (err, result) => {
-            if(!err && result) {
+            if (!err && result) {
                 swal("Scheduled interview successfully", "", "success");
                 actions.discardActionBox();
+
+                // eventvalue = 'schedule' = 2
+                GAnalytics.event(['Recruiter', Meteor.userId()].join(':'),
+                    'submit_info:schedule_interview',
+                    ['appId', appId].join(':')
+                );
+
             } else {
 
             }
@@ -199,7 +234,7 @@ JobCurrentApplication.getActions = function () {
      * Submit score card
      * @param data
      */
-    actions.submitScorecard = function(data) {
+    actions.submitScorecard = function (data) {
         const jobId = this.state.jobId;
         const appId = this.state.currentAppId;
         const appType = this.state.currentAppType;
@@ -209,8 +244,8 @@ JobCurrentApplication.getActions = function () {
         data.type = appType;
 
         Meteor.call('submitScoreCard', data, (err, result) => {
-            if(!err) {
-                if(result) {
+            if (!err) {
+                if (result) {
                     swal("Score candidate successfully", "", "success");
                     actions.discardActionBox();
                     return;
@@ -223,17 +258,16 @@ JobCurrentApplication.getActions = function () {
     }.bind(this);
 
 
-    actions.changeTab = function(tabState = 2) {
-        this.setState({ tabState });
+    actions.changeTab = function (tabState = 2) {
+        this.setState({tabState});
     }.bind(this);
 
 
-    actions.changeCurrentAppType = function(currentAppType = null) {
-        if(this.state.currentAppType != currentAppType) {
-            this.setState({ currentAppType });
+    actions.changeCurrentAppType = function (currentAppType = null) {
+        if (this.state.currentAppType != currentAppType) {
+            this.setState({currentAppType});
         }
     }.bind(this);
-
 
 
     return actions;
