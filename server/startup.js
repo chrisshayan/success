@@ -13,6 +13,14 @@ function initENV() {
     if (CUSTOM_ENV.hasOwnProperty('RESUME_API_URL')) {
         Meteor.settings['RESUME_API_URL'] = CUSTOM_ENV.RESUME_API_URL;
     }
+    if (CUSTOM_ENV.hasOwnProperty('GA_ID')) {
+        Meteor.settings['public']['ga'] = {
+            "account": CUSTOM_ENV.GA_ID,
+            "trackInterests": true,
+            "trackInPage": true,
+            "trackUserId": true
+        };
+    }
 }
 
 
