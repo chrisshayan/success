@@ -59,7 +59,6 @@ froatsnook:request
 izzilab:token
 izzilab:react-bootstrap@0.0.2
 stevezhu:lodash
-okgrow:analytics
 
 
 vnw:city
@@ -85,5 +84,6 @@ success:activities
 success:scorecard
 vnw:jobcollectionbot
 digilord:faker
-#tsega:mentions
 success:mentions
+datariot:ganalytics
+manuelschoebel:ms-seo

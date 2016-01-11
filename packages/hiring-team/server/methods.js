@@ -289,11 +289,11 @@ methods.removeHiringTeamRequest = function (requestId) {
 };*/
 
 
-methods['hiringTeam.recruiters'] = function() {
+methods['hiringTeam.recruitersWithoutMySelf'] = function() {
     if(!this.userId) return [];
     const user = Meteor.users.findOne({_id: this.userId});
     if(!user || !user.companyId) return [];
-    return Meteor.users.find({companyId: user.companyId}).map(function(r) {
+    return Meteor.users.find({_id: {$ne: user._id}, companyId: user.companyId}).map(function(r) {
         return {
             name: r.fullname() || r.username,
             username: r.username

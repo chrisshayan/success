@@ -74,6 +74,17 @@ Router.onBeforeAction(function () {
 	, {only: 'login'}
 );
 
+Router.onAfterAction(function(route) {
+	const routeName = Router.current().route.getName();
+	const params = _.toPlainObject(Router.current().params);
+	Meteor.call('getSEOInfo', routeName, params, function(err, info) {
+		if(!err && info) {
+			SEO.set(info);
+			GAnalytics.pageview();
+		}
+	});
+});
+
 /**
  * Landing page
  */

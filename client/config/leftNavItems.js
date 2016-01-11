@@ -18,7 +18,7 @@ Meteor.startup(function () {
             if (user.isCompanyAdmin()) {
 
                 leftNavItems.push({
-                    label: "Hiring Team Manage",
+                    label: "Hiring Team",
                     icon: "fa-users",
                     route: "hiringTeam"
                 });

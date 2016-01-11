@@ -336,6 +336,15 @@ Job = React.createClass({
         };
     },
 
+    jobId() {
+        let jobId = -1;
+        const job = this.props.job;
+        if (job) {
+            if (job && job['jobId']) jobId = job.jobId;
+        }
+        return jobId;
+    },
+
     title() {
         let title = '';
         const job = this.props.job;
@@ -429,7 +438,7 @@ Job = React.createClass({
                             <div>
                                 <span>ID: {this.props.job.jobId}</span>
                                 &nbsp;|&nbsp;
-                                <a href={this.settingsLink()} className="btn btn-xs btn-link">
+                                <a href={this.settingsLink()} onClick={this.handleClick} className="btn btn-xs btn-link">
                                     <i className="fa fa-cogs"/>&nbsp;
                                     Settings
                                 </a>

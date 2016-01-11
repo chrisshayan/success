@@ -15,7 +15,7 @@ Mention.generateMentions = function (ref, type, typeId, text, createdBy) {
 	_.each(_.unique(usernames), function (username) {
 		username = username.replace(/[\@\s]/, '');
 		const _user = Meteor.users.findOne({username: username});
-		if (_user) {
+		if (_user && _user._id != createdBy) {
 			let mention = Mention.findOne({
 				ref:         ref,
 				mentionType: Mention.MENTION_TYPE.USER,

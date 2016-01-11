@@ -17,7 +17,7 @@ MentionInput = React.createClass({
 	fetchUsers() {
 		var isLoading = true;
 		this.setState({isLoading});
-		Meteor.call('hiringTeam.recruiters', (err, users) => {
+		Meteor.call('hiringTeam.recruitersWithoutMySelf', (err, users) => {
 			isLoading = false;
 			this.setState({users, isLoading});
 			this.initMention();
@@ -53,16 +53,17 @@ MentionInput = React.createClass({
 			$(el.getDOMNode()).textareaHighlighter({
 				matches: [
 					{
-						match:      /\B(@[\w\d\.\_]+)/g,
+						match:/\B(\@[a-z0-9\.]+)/gi,
 						matchClass: 'mention people'
 					},
-
 					{
-						match:      /\B#\w+/g,
+						match: /\B#[^&#039;\s]\w+/g,
 						matchClass: 'mention hash'
-					}
+					},
 				]
-			})
+			});
+
+			setTimeout(() => this.refs.content.getDOMNode().focus(), 300);
 		}
 	},
 

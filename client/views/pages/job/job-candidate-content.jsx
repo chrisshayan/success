@@ -7,6 +7,11 @@ JobCandidateProfileContent = React.createClass({
     getInitialState() {
         return {};
     },
+
+    componentDidMount() {
+
+    },
+
     handleSelect(key) {
         this.props.onChangeTab && this.props.onChangeTab(key);
     },
