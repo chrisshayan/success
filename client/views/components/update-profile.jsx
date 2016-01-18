@@ -55,6 +55,16 @@ UpdateProfileForm = React.createClass({
     },
 
     handleToggleClick(e) {
+        // if isEdit == false : start edit page, saved the  textarea into variable originContent.
+        // if isEdit == true  : finish edit page, revert the originContent into textarea.
+        if (this.state.isEditing)
+            $(this.refs.editor.getDOMNode()).code(this.state.originContent);
+        else
+            this.setState({
+                originContent: $(this.refs.editor.getDOMNode()).code()
+            });
+
+
         this.setState({
             isEditing: !this.state.isEditing
         });
