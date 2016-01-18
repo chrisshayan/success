@@ -18,13 +18,8 @@
                     <small class="text-muted">{{ timeago }}</small>
                 </a>
             </a>
-            <div class="row">
-                <div class="col-md-1">
-                    <i class="fa fa-briefcase"></i>
-                </div>
-                <div class="col-md-10">
-                    {{ jobTitle }}
-                </div>
+            <div style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap">
+                Job: {{ job }}
             </div>
 
             <div class="row">

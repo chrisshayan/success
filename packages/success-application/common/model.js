@@ -199,6 +199,10 @@ var model = Astro.Class({
             defaultEmail()
             {
                 return this.emails.length > 0 ? this.emails[0] : '';
+            },
+            job() {
+                const job = JobExtra.findOne({jobId: this.jobId});
+                return job ? job.jobTitle : '';
             }
         } // prototype
     })
