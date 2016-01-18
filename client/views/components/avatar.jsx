@@ -56,7 +56,7 @@ Avatar = React.createClass({
                 cropping: 'server',
                 cropping_aspect_ratio: '1',
                 cropping_coordinates_mode: 'face',
-                sources: ['local', 'url', 'camera'],
+                sources: ['local', 'url'],
                 resource_type: 'image',
                 client_allowed_formats: ["png","gif", "jpeg", "jpg"]
             },

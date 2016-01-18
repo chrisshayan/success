@@ -48,7 +48,7 @@ Publications['applications.lastApplications'] = function () {
                     options = {
                         limit: 10,
                         sort: {
-                            createdAt: -1
+                            appliedDate: -1
                         }
                     };
 

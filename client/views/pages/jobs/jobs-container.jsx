@@ -30,12 +30,13 @@ const HookMixin = {
 };
 
 const ActionMixin = {
-    handle___HandShake(e) {
+    handle___HandShake: _.throttle(function(e) {
         e.preventDefault();
         this.setState({
             forceUpdate: !this.state.forceUpdate
         });
-    },
+    }, 1000),
+
     handle___LoadMore(e) {
         e.preventDefault();
         this.setState({
