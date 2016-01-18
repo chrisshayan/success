@@ -24,7 +24,7 @@ tmpl.helpers({
         return Application.find({}, {
             limit: 10,
             sort: {
-                createdAt: -1
+                appliedDate: -1
             }
         })
     }
