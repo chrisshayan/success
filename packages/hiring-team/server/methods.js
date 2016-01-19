@@ -27,6 +27,8 @@ function generateName(name) {
 var methods = {
         sendRequest: function (obj) {
             if (!this.userId) return false;
+            var autoUsername = '', autoName = '';
+
             try {
                 var user = Meteor.user(); //Meteor.users.findOne({_id: this.userId});
                 if (!obj['request-email'])
@@ -44,9 +46,15 @@ var methods = {
                         message: 'This email is invalid.'
                     };
 
+                // Validate email if it was exist in vnw database
+                var query = "SELECT * FROM tblregistrationinfo WHERE username=\"%s\" LIMIT 1;";
+                var appSql = sprintf(query, email);
+
+                var rows = mysqlManager.fetchVNWData(appSql);
 
                 var hiringTeamItem = new HiringTeam();
-                if (Meteor['hiringTeam'].findOne({email: email}))
+
+                if (Meteor['hiringTeam'].findOne({email: email}) || rows.length)
                     return {
                         status: 0,
                         message: 'This email was exist in a hiring team already.'
@@ -59,8 +67,8 @@ var methods = {
                     hiringTeamItem.name = [existRecruiter.profile.firstname, existRecruiter.profile.lastname].join(' ');
 
                 } else {
-                    var autoUsername = generateUsername(name);
-                    var autoName = generateName(name);
+                    autoUsername = generateUsername(name);
+                    autoName = generateName(name);
                     hiringTeamItem.username = autoUsername;
                     hiringTeamItem.name = autoName;
                 }
@@ -106,6 +114,7 @@ var methods = {
 
             } catch (e) {
                 console.trace(e);
+                console.log(autoUsername, autoName);
                 return false;
             }
 
@@ -259,41 +268,41 @@ methods.removeHiringTeamRequest = function (requestId) {
 
 
 /*methods.setupDefaultHiringTeam = function () {
-    if (!this.userId) return false;
+ if (!this.userId) return false;
 
-    var user = Meteor.users.findOne({_id: this.userId});
-    if (user.emails || user.emails[0])
-        return false;
+ var user = Meteor.users.findOne({_id: this.userId});
+ if (user.emails || user.emails[0])
+ return false;
 
-    var email = user.emails[0].address;
+ var email = user.emails[0].address;
 
-    var hiringTeamItem = new HiringTeam();
-    if (Meteor['hiringTeam'].findOne({email: email}))
-        return {
-            status: 0,
-            message: 'This email address is exist in your hiring team already'
-        };
+ var hiringTeamItem = new HiringTeam();
+ if (Meteor['hiringTeam'].findOne({email: email}))
+ return {
+ status: 0,
+ message: 'This email address is exist in your hiring team already'
+ };
 
-    hiringTeamItem.companyId = user.companyId;
-    hiringTeamItem.email = email;
-    hiringTeamItem.username = user.username;
-    hiringTeamItem.roleId = 'admin';
-    hiringTeamItem.status = 1;
-    hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
+ hiringTeamItem.companyId = user.companyId;
+ hiringTeamItem.email = email;
+ hiringTeamItem.username = user.username;
+ hiringTeamItem.roleId = 'admin';
+ hiringTeamItem.status = 1;
+ hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
 
-    if (!hiringTeamItem.name.length)
-        hiringTeamItem.name = 'admin';
+ if (!hiringTeamItem.name.length)
+ hiringTeamItem.name = 'admin';
 
-    //hiringTeamItem.roleId = [];
-    hiringTeamItem.save();
-};*/
+ //hiringTeamItem.roleId = [];
+ hiringTeamItem.save();
+ };*/
 
 
-methods['hiringTeam.recruitersWithoutMySelf'] = function() {
-    if(!this.userId) return [];
+methods['hiringTeam.recruitersWithoutMySelf'] = function () {
+    if (!this.userId) return [];
     const user = Meteor.users.findOne({_id: this.userId});
-    if(!user || !user.companyId) return [];
-    return Meteor.users.find({_id: {$ne: user._id}, companyId: user.companyId}).map(function(r) {
+    if (!user || !user.companyId) return [];
+    return Meteor.users.find({_id: {$ne: user._id}, companyId: user.companyId}).map(function (r) {
         return {
             name: r.fullname() || r.username,
             username: r.username
