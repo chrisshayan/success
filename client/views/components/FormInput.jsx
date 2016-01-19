@@ -13,7 +13,7 @@ FormInput = React.createClass({
 	value() {
 		return this.refs.input
 			? this.refs.input.getDOMNode().value
-			: '' ;
+			: '';
 	},
 
 	clear() {
@@ -28,20 +28,29 @@ FormInput = React.createClass({
 		const {label, type, placeholder, value, error, disabled} = this.props;
 		const containerClass = classNames('form-group', {error: !!error});
 
-		return (
-			<div className={containerClass}>
-				<label className='control-label'>{ label }</label>
+		return label
+				? (
+					<div className={containerClass}>
+						<label className='control-label'>{ label }</label>
 
-				<input
-					ref='input'
-					className='form-control'
-					type={ type }
-					placeholder={ placeholder }
-					disabled={ disabled }
-					defaultValue={ value } />
+						<input
+							ref='input'
+							className='form-control'
+							type={ type }
+							placeholder={ placeholder }
+							disabled={ disabled }
+							defaultValue={ value }/>
 
-				{error && (<p className="msg">{ error }</p>)}
-			</div>
-		);
+						{error && (<p className="msg">{ error }</p>)}
+					</div>
+				) : (
+					<input
+						ref='input'
+						className='form-control'
+						type={ type }
+						placeholder={ placeholder }
+						disabled={ disabled }
+						defaultValue={ value }/>
+				);
 	}
 });
