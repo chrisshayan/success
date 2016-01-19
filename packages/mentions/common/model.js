@@ -23,7 +23,7 @@ Mention = Astro.Class({
 		},
 
 		text: {
-			type: 'string',
+			type: 'string'
 		},
 
 		embed: {

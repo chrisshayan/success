@@ -1,56 +1,59 @@
 FormInput = React.createClass({
-	getDefaultProps() {
-		return {
-			label: '',
-			type: 'text',
-			placeholder: '',
-			value: '',
-			error: null,
-			disabled: false
-		}
-	},
+    getDefaultProps() {
+        return {
+            label: '',
+            type: 'text',
+            placeholder: '',
+            value: '',
+            error: null,
+            disabled: false,
+            hasStatic: false
+        }
+    },
 
-	value() {
-		return this.refs.input
-			? this.refs.input.getDOMNode().value
-			: '';
-	},
+    value() {
+        return this.refs.input
+            ? this.refs.input.getDOMNode().value
+            : '';
+    },
 
-	clear() {
-		this.refs.input.getDOMNode().value = '';
-	},
+    reset(val){
+        this.refs.input.getDOMNode().value = val || this.props.value;
+    },
 
-	focus() {
-		this.refs.input.getDOMNode().focus();
-	},
+    clear() {
+        this.refs.input.getDOMNode().value = '';
 
-	render() {
-		const {label, type, placeholder, value, error, disabled} = this.props;
-		const containerClass = classNames('form-group', {error: !!error});
+    },
 
-		return label
-				? (
-					<div className={containerClass}>
-						<label className='control-label'>{ label }</label>
+    focus() {
+        this.refs.input.getDOMNode().focus();
+    },
 
-						<input
-							ref='input'
-							className='form-control'
-							type={ type }
-							placeholder={ placeholder }
-							disabled={ disabled }
-							defaultValue={ value }/>
+    render() {
+        const {label, type, placeholder, value, error, disabled, isStatic, labelClass, inputClass} = this.props;
+        const containerClass = classNames('form-group', {error: !!error});
 
-						{error && (<p className="msg">{ error }</p>)}
-					</div>
-				) : (
-					<input
-						ref='input'
-						className='form-control'
-						type={ type }
-						placeholder={ placeholder }
-						disabled={ disabled }
-						defaultValue={ value }/>
-				);
-	}
+        return (
+            <div className={containerClass}>
+                <div className={labelClass || 'col-sm-3 control-label'}>
+                    <label>{ label }</label>
+                </div>
+                <div className={inputClass || 'col-sm-9'}>
+                    <input
+                        ref='input'
+                        className='form-control'
+                        type={ isStatic ?  'text' :  type }
+                        placeholder={ placeholder }
+                        disabled={ disabled }
+                        defaultValue={ value }/>
+                    {error && (<p className="msg">{ error }</p>)}
+                    <p hidden={isStatic} className="form-control-static">{value}</p>
+                </div>
+
+            </div>
+
+        )
+
+    }
 });

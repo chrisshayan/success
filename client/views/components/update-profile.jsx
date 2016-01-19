@@ -1,12 +1,54 @@
 var LinkedStateMixin = React.addons.LinkedStateMixin;
 
+updateProfileModel = Astro.Class({
+    'name': 'updateProfile',
+    fields: {
+        /*email: {
+         type: 'string',
+         validator: [
+         Validators.string(),
+         Validators.required('You can\'t leave this empty.')
+         ]
+         },
+         username: {
+         type: 'string',
+         validator: [
+         Validators.string(),
+         Validators.required('You can\'t leave this empty.')
+         ]
+
+         },*/
+        firstName: {
+            type: 'string',
+            validator: [
+                Validators.string(),
+                Validators.required(null, 'First name is required.')
+            ]
+        },
+        lastName: {
+            type: 'string',
+            validator: [
+                Validators.string(),
+                Validators.required(null, 'Last name is required.')
+            ]
+        },
+        signature: {
+            type: 'string',
+            require: false
+        }
+    }
+});
+
+
 UpdateProfileForm = React.createClass({
     mixins: [ReactMeteorData, LinkedStateMixin],
 
     getInitialState() {
         return {
             isEditing: false,
-	        showChangePassword: false,
+            showChangePassword: false,
+            errors: {},
+            isLoading: false
         };
     },
 
@@ -42,7 +84,9 @@ UpdateProfileForm = React.createClass({
 
     firstName() {
         var user = this.data.user;
-        return user && user.profile && user.profile.firstname ? user.profile.firstname : '';
+        return user && user.profile && user.profile.firstname
+            ? user.profile.firstname
+            : '';
     },
 
     lastName() {
@@ -56,10 +100,15 @@ UpdateProfileForm = React.createClass({
     },
 
     handleToggleClick(e) {
+        this.setState({isLoading: false, errors: {}});
+
         // if isEdit == false : start edit page, saved the  textarea into variable originContent.
         // if isEdit == true  : finish edit page, revert the originContent into textarea.
-        if (this.state.isEditing)
+        if (this.state.isEditing) {
             $(this.refs.editor.getDOMNode()).code(this.state.originContent);
+            this.refs.firstName.reset();
+            this.refs.lastName.reset();
+        }
         else
             this.setState({
                 originContent: $(this.refs.editor.getDOMNode()).code()
@@ -74,30 +123,44 @@ UpdateProfileForm = React.createClass({
 
     handleSaveClick(e) {
         e.preventDefault();
-        var firstname = this.refs.firstname.getDOMNode().value;
-        var lastname = this.refs.lastname.getDOMNode().value;
-        var emailSignature = $(this.refs.editor.getDOMNode()).code();
-        Meteor.users.update({_id: this.data.userId}, {
-            $set: {
-                "emailSignature": emailSignature,
-                "profile.lastname": lastname,
-                "profile.firstname": firstname
-            }
+        var model = new updateProfileModel({
+            firstName: this.refs.firstName.value(),
+            lastName: this.refs.lastName.value(),
+            signature: $(this.refs.editor.getDOMNode()).code()
         });
 
-        this.setState({
-            isEditing: false
-        });
-        return;
+        if (model.validate()) {
+            this.setState({isLoading: true});
+
+            Meteor.users.update({_id: this.data.userId}, {
+                $set: {
+                    "emailSignature": model.signature,
+                    "profile.firstname": model.firstName,
+                    "profile.lastname": model.lastName
+                }
+            });
+
+            this.setState({isLoading: false, errors: {}});
+            return this.setState({
+                isEditing: false
+            });
+
+        } else {
+            return this.setState({
+                isLoading: false,
+                errors: model.getValidationErrors()
+            });
+
+        }
     },
 
-	handleDismissChangePassword() {
-		this.setState({showChangePassword: false});
-	},
+    handleDismissChangePassword() {
+        this.setState({showChangePassword: false});
+    },
 
-	handleShowChangePassword() {
-		this.setState({showChangePassword: true});
-	},
+    handleShowChangePassword() {
+        this.setState({showChangePassword: true});
+    },
 
     render() {
         let styles = {
@@ -116,17 +179,22 @@ UpdateProfileForm = React.createClass({
 
         if (this.state.isEditing) {
             buttons.push(<a key={0} style={styles.button} className="btn btn-default btn-outline"
-                            onClick={this.handleToggleClick}>Discard</a>);
-            buttons.push(<button key={1} style={styles.button} className="btn btn-primary btn-outline" type="submit">
+                            onClick={this.handleToggleClick} disabled={this.state.isLoading}>Discard</a>);
+            buttons.push(<button key={1} style={styles.button} className="btn btn-primary btn-outline" type="submit"
+                                 disabled={this.state.isLoading}>
                 Save</button >);
         } else {
             buttons.push(<a key={2} style={styles.button} className="btn btn-primary btn-outline"
                             onClick={this.handleToggleClick}>Edit Account</a>);
-			if(this.data.user && !this.data.user.isCompanyAdmin()) {
-				buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline" onClick={this.handleShowChangePassword}>Change Password</a>);
-				buttons.push(<ChangePasswordDialog onDismiss={this.handleDismissChangePassword} show={this.state.showChangePassword} />)
-			}
+            if (this.data.user && !this.data.user.isCompanyAdmin()) {
+                buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline"
+                                onClick={this.handleShowChangePassword}>Change Password</a>);
+                buttons.push(<ChangePasswordDialog onDismiss={this.handleDismissChangePassword}
+                                                   show={this.state.showChangePassword}/>)
+            }
         }
+
+        const {isLoading, errors} = this.state;
 
         return (
             <div className="ibox-content m-t">
@@ -155,30 +223,29 @@ UpdateProfileForm = React.createClass({
                                         </div>
 
                                         <form className="form-horizontal" onSubmit={this.handleSaveClick}>
-                                            <div className="form-group">
-                                                <label className="col-sm-3 control-label">First Name</label>
+                                            <FormInput
+                                                ref='firstName'
+                                                type='hidden'
+                                                label="First name"
+                                                disabled={ isLoading }
+                                                value={this.firstName()}
+                                                isStatic={this.state.isEditing}
+                                                error={errors.firstName}/>
 
-                                                <div className="col-sm-9">
-                                                    {this.state.isEditing
-                                                        ? <input ref="firstname" type="text" className="form-control"
-                                                                 defaultValue={this.firstName()}/>
-                                                        : <p className="form-control-static">{this.firstName()}</p> }
+                                            <FormInput
+                                                ref='lastName'
+                                                type='hidden'
+                                                disabled={ isLoading }
+                                                label="Last name"
+                                                value={ this.lastName()}
+                                                isStatic={this.state.isEditing}
+                                                error={errors.lastName}/>
+
+
+                                            <div className="form-group">
+                                                <div className="col-sm-3 control-label">
+                                                    <label>Email Address</label>
                                                 </div>
-                                            </div>
-
-                                            <div className="form-group">
-                                                <label className="col-sm-3 control-label">Last Name</label>
-
-                                                <div className="col-sm-9">
-                                                    {this.state.isEditing
-                                                        ? <input ref="lastname" type="text" className="form-control"
-                                                                 defaultValue={this.lastName()}/>
-                                                        : <p className="form-control-static">{this.lastName()}</p> }
-                                                </div>
-                                            </div>
-
-                                            <div className="form-group">
-                                                <label className="col-sm-3 control-label">Email Address</label>
 
                                                 <div className="col-sm-9">
                                                     <p className="form-control-static">
@@ -188,15 +255,18 @@ UpdateProfileForm = React.createClass({
                                             </div>
 
                                             <div className="form-group">
-                                                <label className="col-sm-3 control-label">Username</label>
-
+                                                <div className="col-sm-3 control-label">
+                                                    <label>Username</label>
+                                                </div>
                                                 <div className="col-sm-9">
                                                     <p className="form-control-static">{this.username()}</p>
                                                 </div>
                                             </div>
 
                                             <div className="form-group">
-                                                <label className="col-sm-3 control-label">Mail signature</label>
+                                                <div className="col-sm-3 control-label">
+                                                    <label>Mail signature</label>
+                                                </div>
 
                                                 <div className="col-sm-9">
                                                     <div style={{border:'1px solid #eee', padding: '10px'}}>
@@ -206,8 +276,9 @@ UpdateProfileForm = React.createClass({
                                                 </div>
                                             </div>
                                             <div className="form-group">
-                                                <label className="col-sm-3 control-label"/>
-
+                                                <div className="col-sm-3 control-label">
+                                                    <label/>
+                                                </div>
                                                 <div className="col-sm-9">
                                                     <div className="buttons">
                                                         {buttons}
