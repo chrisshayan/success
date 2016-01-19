@@ -93,7 +93,7 @@ Publications['applications.lastApplications'] = function () {
 			}
 		]
 	}
-};  
+};
 
 /**
  * Publish application details

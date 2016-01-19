@@ -5,7 +5,8 @@ UpdateProfileForm = React.createClass({
 
     getInitialState() {
         return {
-            isEditing: false
+            isEditing: false,
+	        showChangePassword: false,
         };
     },
 
@@ -90,6 +91,14 @@ UpdateProfileForm = React.createClass({
         return;
     },
 
+	handleDismissChangePassword() {
+		this.setState({showChangePassword: false});
+	},
+
+	handleShowChangePassword() {
+		this.setState({showChangePassword: true});
+	},
+
     render() {
         let styles = {
             container: {
@@ -113,7 +122,10 @@ UpdateProfileForm = React.createClass({
         } else {
             buttons.push(<a key={2} style={styles.button} className="btn btn-primary btn-outline"
                             onClick={this.handleToggleClick}>Edit Account</a>);
-            buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline">Change Password</a>);
+			if(this.data.user && !this.data.user.isCompanyAdmin()) {
+				buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline" onClick={this.handleShowChangePassword}>Change Password</a>);
+				buttons.push(<ChangePasswordDialog onDismiss={this.handleDismissChangePassword} show={this.state.showChangePassword} />)
+			}
         }
 
         return (
@@ -121,7 +133,7 @@ UpdateProfileForm = React.createClass({
                 <div id="email-address">
                     <div className="panel-body row">
                         <div className="col-sm-10">
-                            <div className="float-e-margins animated fadeInRight">
+                            <div className="animated fadeInRight">
                                 <div className="content">
                                     <h2>
                                         <span className="circle-wrapper">
