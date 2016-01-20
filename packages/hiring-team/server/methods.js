@@ -57,7 +57,7 @@ var methods = {
                 if (Meteor['hiringTeam'].findOne({email: email}) || rows.length)
                     return {
                         status: 0,
-                        message: 'This email was exist in a hiring team already.'
+                        message: 'This email address exists in hiring team.'
                     };
                 var name = email.split('@')[0];
                 var existRecruiter = Meteor.users.findOne({'emails.address': email});

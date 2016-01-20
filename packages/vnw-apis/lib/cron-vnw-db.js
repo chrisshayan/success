@@ -128,7 +128,7 @@ CRON_VNW.setupHiringTeamOnwerInfo = function (data) {
     if (Meteor['hiringTeam'].findOne({companyId: data.companyId, email: email}))
         return {
             status: 0,
-            message: 'This email address is exist in your hiring team already'
+            message: 'This email address exists in hiring team.'
         };
 
     hiringTeamItem.companyId = data.companyId;

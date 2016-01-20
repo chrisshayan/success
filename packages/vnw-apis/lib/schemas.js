@@ -38,7 +38,7 @@ SimpleSchema.messages({
      * Custom error messages
      */
     movedStageNotAllowTheSame: "From stage and to stage are not allow the same.",
-    mailTemplateAlreadyExists: "Mail template is already exists",
+    mailTemplateAlreadyExists: "Mail template already exists",
     candidateExists: "This candidate is already applied"
 });
 Schemas = {};
