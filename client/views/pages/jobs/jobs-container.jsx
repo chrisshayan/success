@@ -230,11 +230,18 @@ JobsContainer = React.createClass({
                                 {this.render__JobTypes(this.data.currentType, this.state.counter)}
                             </div>
                             <div className="col-md-1">
-                                <button type="button" className="btn btn-white btn-sm"
-                                        onClick={this.handle___HandShake}>
-                                    <i className="fa fa-refresh"/>&nbsp;
-                                    Refresh
-                                </button>
+                                {this.data.isReady ? (
+                                    <button type="button" className="btn btn-white btn-sm"
+                                            onClick={this.handle___HandShake} >
+                                        <i className="fa fa-refresh"/>&nbsp;
+                                        Refresh
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-white btn-sm" disabled={true}>
+                                        <i className="fa fa-refresh"/>&nbsp;
+                                        Loading...
+                                    </button>
+                                )}
                             </div>
 
                             <div className="col-md-8">

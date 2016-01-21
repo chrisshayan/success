@@ -189,7 +189,7 @@ UpdateProfileForm = React.createClass({
             if (this.data.user && !this.data.user.isCompanyAdmin()) {
                 buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline"
                                 onClick={this.handleShowChangePassword}>Change Password</a>);
-                buttons.push(<ChangePasswordDialog onDismiss={this.handleDismissChangePassword}
+                buttons.push(<ChangePasswordDialog key={4} onDismiss={this.handleDismissChangePassword}
                                                    show={this.state.showChangePassword}/>)
             }
         }
