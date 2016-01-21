@@ -164,10 +164,9 @@ methods['applications.moveStage'] = function (appId, stage = null) {
                 Meteor.defer(function () {
                     // update stage counter
 
-                    jobExtra.inc({
-                        [`stage.${fromStage.alias}`]: -1,
-                        [`stage.${toStage.alias}`]: 1
-                    });
+                    jobExtra.set(`stage.${fromStage.alias}`, Math.max(jobExtra.stage[`${fromStage.alias}`] - 1, 0));
+                    jobExtra.set(`stage.${toStage.alias}`, jobExtra.stage[`${toStage.alias}`] + 1);
+
                     jobExtra.save();
                 });
                 const result = app.save();

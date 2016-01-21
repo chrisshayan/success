@@ -91,34 +91,38 @@ JobCandidateProfileActions = React.createClass({
                              style={{paddingBottom: '3px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
-                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('comment', e)}>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('comment', e)}>
                                         Add comment
                                     </a>
 
-                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('message', e)}>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('message', e)}>
                                         Send message
                                     </a>
 
-                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
                                         Schedule interview
                                     </a>
 
-                                    <a className="btn btn-default btn-outline btn-sm " href='#' onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
                                         Score candidate
                                     </a>
 
                                     {this.isDisqualified() === false ? (
-                                    <button className="btn btn-default btn-outline btn-sm"
-                                            onClick={ this.props.actions.disqualify }>
-                                        Disqualify
-                                    </button>
-                                        ) : (
-                                    <button
-                                        className="btn btn-primary btn-outline btn-sm"
-                                        onClick={ this.props.actions.revertQualify }>
-                                        Revert qualify
-                                    </button>
-                                        )}
+                                        <button className="btn btn-default btn-outline btn-sm"
+                                                onClick={ this.props.actions.disqualify }>
+                                            Disqualify
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="btn btn-primary btn-outline btn-sm"
+                                            onClick={ this.props.actions.revertQualify }>
+                                            Revert qualify
+                                        </button>
+                                    )}
 
                                     <button
                                         className="btn btn-primary btn-outline btn-sm"
@@ -144,7 +148,7 @@ JobCandidateProfileActions = React.createClass({
     },
 
     renderMoveAbilities() {
-        let stages = _.sortByOrder(_.toArray(Success.APPLICATION_STAGES), 'id', 'desc');
+        let stages = _.sortByOrder(_.toArray(Success.APPLICATION_STAGES), 'id', 'asc');
         let current = this.props.stage;
         let menu = [];
         let key = 0;

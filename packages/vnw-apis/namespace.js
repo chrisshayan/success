@@ -34,7 +34,7 @@ Success.APPLICATION_STAGES = {
         id: 5,
         alias: "hired",
         label: "Hired"
-    },
+    }
 };
 
 /**
