@@ -642,8 +642,7 @@ const RendererMixin = {
                                 appAction={ this.state.currentAppAction }
                                 actions={ this.current__Actions() }
                                 tabState={this.state.tabState}
-                                onChangeTab={(tabState) => { this.setState({tabState}) }}
-                                />
+                                onChangeTab={(tabState) => { this.setState({tabState}) }} />
                         )}
 
                         <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'} onHide={() =>{}}>

@@ -1,0 +1,16 @@
+<template name="PermissionDenied">
+    <div class="middle-box text-center animated fadeInDown">
+        <h1>403</h1>
+        <h3 class="font-bold">Permission denied</h3>
+
+        <div class="error-desc">
+            <div>
+                Sorry, but you don't have permission to access this page.
+            </div>
+            <br/>
+            <div>
+                <a href="{{pathFor 'dashboard'}}" class="btn btn-primary">Back to dashboard</a>
+            </div>
+        </div>
+    </div>
+</template>

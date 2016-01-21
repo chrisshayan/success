@@ -1129,5 +1129,56 @@ Meteor.methods({
 				break;
 		}
 		return createSEOInfo(title, description);
+	},
+
+	checkAccessPermission({routeName = '', params = {}, queryParams = {}}) {
+		this.unblock();
+		check(routeName, String);
+		if(!this.userId) return false;
+		const currentUser = Meteor.users.findOne({_id: this.userId});
+
+		switch (routeName) {
+			case 'hiringTeam':
+			case 'mailTemplates':
+			case 'updateMailTemplate':
+				// ref functions
+				if(currentUser.isCompanyAdmin()) {
+					return true;
+				}
+				break;
+
+			case 'JobSettings':
+				/**
+				 * Can access this page:
+				 * + is company admin
+				 * + have manager role in this job
+				 */
+				if(currentUser.isCompanyAdmin()) return true;
+				if(params.jobId) {
+					const job = JobExtra.findOne({jobId: +params.jobId});
+					if(job && job.recruiters.manager.indexOf(currentUser._id) >= 0) return true;
+				}
+				break;
+
+			case 'Job':
+				/**
+				 * Can access this page:
+				 * + job in company
+				 * + is company admin
+				 * + have role in this job
+				 */
+				if(params.jobId) {
+					const job = JobExtra.findOne({jobId: +params.jobId});
+					if(job && job.companyId == currentUser.companyId) {
+						// allow if current user is company admin
+						if(currentUser.isCompanyAdmin()) return true;
+						// allow if current user have any role in this job
+						const recruiters = _.pluck(_.merge(job.recruiters.manager, job.recruiters.recruiter), 'userId');
+						if(recruiters.indexOf(currentUser._id) >= 0) return true;
+					}
+				}
+				break;
+		}
+		return false;
 	}
 });
