@@ -652,6 +652,7 @@ const RendererMixin = {
                             </Modal.Header>
                             {this.state.apps__showSendBulkMessage ? (
                                 <MessageBox
+                                    actions={ this.current__Actions() }
                                     appIds={this.state.apps__selectedItems}
                                     onSave={this.apps__Actions().sendMessage}
                                     onDiscard={() => this.apps__Actions().toggleSendMessage(false) }/>
