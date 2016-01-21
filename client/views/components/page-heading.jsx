@@ -4,11 +4,12 @@ PageHeading = React.createClass({
     },
     render() {
         let breadcrumb = null;
-        if(this.props.breadcrumb) {
+        let style = {marginLeft: 0};
+        if (this.props.breadcrumb) {
             breadcrumb = (
                 <ol className="breadcrumb">
                     {this.props.breadcrumb.map((item, key) => {
-                        if(key == this.props.breadcrumb.length-1) {
+                        if (key == this.props.breadcrumb.length - 1) {
                             return (
                                 <li className="active" key={key}>
                                     <strong>{item.label}</strong>
@@ -26,7 +27,7 @@ PageHeading = React.createClass({
             );
         }
         return (
-            <div className="row wrapper border-bottom white-bg page-heading hidden-print">
+            <div className="row wrapper border-bottom white-bg page-heading hidden-print" style={style}>
                 <div className="col-lg-6">
                     <h2>{this.props.title}</h2>
                     {breadcrumb}
