@@ -30,7 +30,7 @@ MentionInput = React.createClass({
 	initMention() {
 		const el = this.refs.content;
 		if (el) {
-			const $el = $(el.getDOMNode());
+			const $el = $(el);
 			$el.mention({
 				emptyQuery:    true,
 				queryBy:       ['name', 'username'],
@@ -50,7 +50,7 @@ MentionInput = React.createClass({
 	initHighLight() {
 		const el = this.refs.content;
 		if (el) {
-			$(el.getDOMNode()).textareaHighlighter({
+			$(el).textareaHighlighter({
 				matches: [
 					{
 						match:/\B(\@[a-z0-9\.]+)/gi,
@@ -63,13 +63,13 @@ MentionInput = React.createClass({
 				]
 			});
 
-			setTimeout(() => this.refs.content.getDOMNode().focus(), 300);
+			setTimeout(() => this.refs.content.focus(), 300);
 		}
 	},
 
 	getValue() {
 		const el = this.refs.content;
-		return el ? el.getDOMNode().value : '';
+		return el ? el.value : '';
 	},
 
 	render() {

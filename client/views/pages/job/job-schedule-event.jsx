@@ -124,8 +124,8 @@ ScheduleEvent = React.createClass({
         if (templateId) {
             var template = _.findWhere(this.state.templates, {_id: templateId});
             if (template) {
-                var mailContent = React.findDOMNode(this.refs.mailContent);
-                var subject = React.findDOMNode(this.refs.subject);
+                var mailContent = this.refs.mailContent;
+                var subject = this.refs.subject;
                 $(subject).val(template.subject);
                 $(mailContent).code(template.htmlBody);
             }
@@ -138,7 +138,7 @@ ScheduleEvent = React.createClass({
         });
         if (templates.length > 0) {
             const templateId = templates[0]['_id'] || '';
-            $(this.refs.mailTemplate.getDOMNode()).val(templateId);
+            $(this.refs.mailTemplate()).val(templateId);
             this.selectMailTemplate(templateId);
         }
     },
@@ -159,18 +159,18 @@ ScheduleEvent = React.createClass({
     },
 
     changeMailTemplate(e) {
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
+        var mailTemplate = this.refs.mailTemplate;
         var templateId = mailTemplate.value;
         this.selectMailTemplate(templateId);
     },
 
     getFormData() {
-        var subject = React.findDOMNode(this.refs.subject);
-        var mailContent = React.findDOMNode(this.refs.mailContent);
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
-        var scheduleDate = React.findDOMNode(this.refs.scheduleDate);
-        var startTime = React.findDOMNode(this.refs.startTime).value.split(':');
-        var endTime = React.findDOMNode(this.refs.endTime).value.split(':');
+        var subject = this.refs.subject;
+        var mailContent = this.refs.mailContent;
+        var mailTemplate = this.refs.mailTemplate;
+        var scheduleDate = this.refs.scheduleDate;
+        var startTime = this.refs.startTime.value.split(':');
+        var endTime = this.refs.endTime.value.split(':');
         var sd = new moment(scheduleDate.value, 'DD/MM/YYYY');
         var st = sd.clone();
         st.hour(startTime[0]);
@@ -391,7 +391,7 @@ ScheduleEvent = React.createClass({
 
 GooglePlaceInput = React.createClass({
     componentDidMount: function () {
-        var input = this.refs.searchField.getDOMNode();
+        var input = this.refs.searchField();
         var options = {componentRestrictions: {country: 'vn'}};
         this.autocomplete = new google.maps.places.Autocomplete(input, options);
         this.autocomplete.addListener('place_changed', this.handleChange);
@@ -402,7 +402,7 @@ GooglePlaceInput = React.createClass({
     },
 
     handleChange() {
-        this.props.onChange && this.props.onChange(this.refs.searchField.getDOMNode().value);
+        this.props.onChange && this.props.onChange(this.refs.searchField().value);
     },
 
     render: function () {

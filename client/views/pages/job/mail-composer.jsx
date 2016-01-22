@@ -14,8 +14,7 @@ MailComposer = React.createClass({
 
     componentDidMount() {
         // Initialize summernote plugin
-        var subject = React.findDOMNode(this.refs.subject);
-        var mailContent = React.findDOMNode(this.refs.mailContent);
+        const {subject, mailContent} = this.refs;
 
         subject.value = "";
         mailContent.value = "";
@@ -81,22 +80,18 @@ MailComposer = React.createClass({
 
 
     changeMailTemplate(e) {
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
+	    const {subject, mailTemplate, mailContent} = this.refs;
         var templateId = mailTemplate.value;
         var template = _.findWhere(this.props.templates, {_id: templateId});
         if(template) {
-            var subject = React.findDOMNode(this.refs.subject);
-            var mailContent = React.findDOMNode(this.refs.mailContent);
             $(subject).val(template.subject);
             $(mailContent).code(template.htmlBody);
         }
     },
 
     sendEmails(e) {
-
         var validate = false;
-        var subject = React.findDOMNode(this.refs.subject);
-        var mailContent = React.findDOMNode(this.refs.mailContent);
+	    const {subject, mailContent} = this.refs;
         var data = {
             subject: subject.value,
             body: $(mailContent).code()

@@ -29,7 +29,7 @@ JobCandidateResumeOnline = React.createClass({
 
     componentDidUpdate(prevProps, prevState) {
         if (prevState.isViewCV != this.state.isViewCV && this.state.isViewCV === true) {
-            let container = this.refs.resumeAttachment.getDOMNode();
+            let container = this.refs.resumeAttachment();
             let scrollTo = $(container).offset().top + 175;
             $('body').animate({
                 scrollTop: scrollTo

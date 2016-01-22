@@ -26,14 +26,14 @@ JobCandidateProfile = React.createClass({
     },
 
     componentDidMount() {
-        let el = this.refs.container.getDOMNode();
+        let el = this.refs.container;
         this.resize();
         $(el).bind('resize', this.resize);
         window.addEventListener('resize', this.resize);
     },
 
     componentWillUnmount: function () {
-        let el = this.refs.container.getDOMNode();
+        let el = this.refs.container;
         $(el).unbind('resize', this.resize);
         window.removeEventListener('resize', this.resize);
     },
@@ -140,8 +140,9 @@ JobCandidateProfile = React.createClass({
     },
 
     resize: function () {
-        if (this.refs.container) {
-            const width = this.refs.container.getDOMNode().offsetWidth;
+        const {container} = this.refs;
+        if (container) {
+            const width = container.offsetWidth;
             if (this.state.width != width) {
                 this.setState({width});
             }

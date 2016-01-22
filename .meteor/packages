@@ -58,7 +58,6 @@ lab:mysql-connection-manager
 http
 froatsnook:request
 izzilab:token
-izzilab:react-bootstrap@0.0.2
 stevezhu:lodash
 
 
@@ -88,3 +87,5 @@ digilord:faker
 success:mentions
 datariot:ganalytics
 manuelschoebel:ms-seo
+maazalik:highcharts
+meteor-react-modules

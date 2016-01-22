@@ -238,7 +238,7 @@ const ScoreCardNotes = React.createClass({
             notes = _.pick(this.props.notes, 'keyTakeAways', 'fitCompanyCulture');
             this.setState(notes);
             _.each(notes, (val, key) => {
-                this.refs[key] && (this.refs[key].getDOMNode().value = val);
+                this.refs[key] && (this.refs[key].value = val);
             });
         }
     },
@@ -495,13 +495,13 @@ ScoreCardCriteria = React.createClass({
 
 ScoreCardCriteriaNote = React.createClass({
     componentDidMount() {
-        const el = this.refs.note.getDOMNode();
+        const el = this.refs.note;
         el.value = this.props.note;
     },
 
     componentDidUpdate(prevProps) {
         if (!_.isEqual(prevProps.note, this.props.note)) {
-            const el = this.refs.note.getDOMNode();
+            const el = this.refs.note;
             el.value = this.props.note;
         }
     },

@@ -7,7 +7,7 @@ CommentBox = React.createClass({
         var body = $("html, body");
         let container = $("#job-candidate-content");
         let actionContainer = $('.job-candidate-actions');
-        let ip = this.refs.txt.getDOMNode();
+        let ip = this.refs.txt();
         let scrollTo = 0;
         if(actionContainer && actionContainer.hasClass('affix')) {
             scrollTo = container.offset().top - 45;

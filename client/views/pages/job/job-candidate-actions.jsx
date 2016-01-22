@@ -1,6 +1,6 @@
 let {
     Affix
-    } = ReactBootstrap;
+    } = ReactOverlays;
 
 JobCandidateProfileActions = React.createClass({
     contextTypes: {
@@ -74,11 +74,10 @@ JobCandidateProfileActions = React.createClass({
                 backgroundColor: '#fff',
                 padding: '5px 15px',
                 borderBottom: '1px solid #E0E0E0',
-                position: 'relative'
             }
         };
         return (
-            <Affix offsetTop={200} className="job-candidate-actions" style={{width: this.props.containerWidth + 'px'}}>
+            <Affix offsetTop={160} affixClassName="affix" className="job-candidate-actions" affixStyle={{width: this.props.containerWidth + 'px'}}>
                 <div className="profile-actions" style={styles.actionsContainer}>
                     <div className="row">
                         <div className="hidden-xs hidden-sm hidden-md col-lg-2">

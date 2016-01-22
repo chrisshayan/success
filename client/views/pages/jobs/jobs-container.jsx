@@ -67,7 +67,7 @@ const ActionMixin = {
 
     handle___Search(e) {
         e.preventDefault();
-        const search = this.refs.searchInput.getDOMNode();
+        const search = this.refs.searchInput();
         this.setState({q: search.value});
     }
 };

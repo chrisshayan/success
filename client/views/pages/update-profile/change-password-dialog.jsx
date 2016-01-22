@@ -40,7 +40,7 @@ ChangePasswordDialog = React.createClass({
     },
 
     componentDidMount() {
-        const el = this.refs.dialog.getDOMNode();
+        const el = this.refs.dialog();
         $(el).modal({
             backdrop: true
         });

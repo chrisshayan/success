@@ -63,7 +63,7 @@ UpdateProfileForm = React.createClass({
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.isEditing != prevState.isEditing) {
-            const editor = this.refs.editor.getDOMNode();
+            const editor = this.refs.editor();
             if (this.state.isEditing) {
                 $(editor).summernote();
             } else {
@@ -105,13 +105,13 @@ UpdateProfileForm = React.createClass({
         // if isEdit == false : start edit page, saved the  textarea into variable originContent.
         // if isEdit == true  : finish edit page, revert the originContent into textarea.
         if (this.state.isEditing) {
-            $(this.refs.editor.getDOMNode()).code(this.state.originContent);
+            $(this.refs.editor).code(this.state.originContent);
             this.refs.firstName.reset();
             this.refs.lastName.reset();
         }
         else
             this.setState({
-                originContent: $(this.refs.editor.getDOMNode()).code()
+                originContent: $(this.refs.editor).code()
             });
 
 
@@ -126,7 +126,7 @@ UpdateProfileForm = React.createClass({
         var model = new updateProfileModel({
             firstName: this.refs.firstName.value(),
             lastName: this.refs.lastName.value(),
-            signature: $(this.refs.editor.getDOMNode()).code()
+            signature: $(this.refs.editor).code()
         });
 
         if (model.validate()) {
