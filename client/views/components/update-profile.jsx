@@ -63,7 +63,7 @@ UpdateProfileForm = React.createClass({
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.isEditing != prevState.isEditing) {
-            const editor = this.refs.editor();
+            const editor = this.refs.editor;
             if (this.state.isEditing) {
                 $(editor).summernote();
             } else {

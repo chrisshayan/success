@@ -13,21 +13,21 @@ FormInput = React.createClass({
 
     value() {
         return this.refs.input
-            ? this.refs.input().value
+            ? this.refs.input.value
             : '';
     },
 
     reset(val){
-        this.refs.input().value = val || this.props.value;
+        this.refs.input.value = val || this.props.value;
     },
 
     clear() {
-        this.refs.input().value = '';
+        this.refs.input.value = '';
 
     },
 
     focus() {
-        this.refs.input().focus();
+        this.refs.input.focus();
     },
 
     render() {

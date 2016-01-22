@@ -138,7 +138,7 @@ ScheduleEvent = React.createClass({
         });
         if (templates.length > 0) {
             const templateId = templates[0]['_id'] || '';
-            $(this.refs.mailTemplate()).val(templateId);
+            $(this.refs.mailTemplate).val(templateId);
             this.selectMailTemplate(templateId);
         }
     },
@@ -391,7 +391,7 @@ ScheduleEvent = React.createClass({
 
 GooglePlaceInput = React.createClass({
     componentDidMount: function () {
-        var input = this.refs.searchField();
+        var input = this.refs.searchField;
         var options = {componentRestrictions: {country: 'vn'}};
         this.autocomplete = new google.maps.places.Autocomplete(input, options);
         this.autocomplete.addListener('place_changed', this.handleChange);
@@ -402,7 +402,7 @@ GooglePlaceInput = React.createClass({
     },
 
     handleChange() {
-        this.props.onChange && this.props.onChange(this.refs.searchField().value);
+        this.props.onChange && this.props.onChange(this.refs.searchField.value);
     },
 
     render: function () {
