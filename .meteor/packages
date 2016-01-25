@@ -38,7 +38,6 @@ aldeed:autoform
 natestrauser:select2@4.0.0_1
 aldeed:autoform-select2
 steeve:reactive-cookie
-peerlibrary:blaze-components
 raix:eventemitter
 summernote:summernote
 mpowaga:autoform-summernote
