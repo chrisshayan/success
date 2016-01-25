@@ -72,6 +72,11 @@ MentionInput = React.createClass({
 		return el ? el.value : '';
 	},
 
+	focus() {
+		const el = this.refs.content;
+		el && el.focus();
+	},
+
 	render() {
 		const styles = {
 			input: {

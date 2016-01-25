@@ -590,10 +590,17 @@ const ActionMixin = {
         });
         Meteor.call('getResumeDetails', this.state.currentAppId, this.state.currentAppType, (err, result) => {
             if (!err, result) {
+                const details = new ResumeDetails(result);
                 this.setState({
                     isResumeLoading: false,
-                    resume: initResume(result)
+                    resume: details
                 });
+
+                if(details.hasAvatar()) {
+                    Meteor.setTimeout(function() {
+                        Meteor.call('application.updateAvatar', details.appId(), details.appType() , details.avatar())
+                    }, 0);
+                }
             }
         });
     },

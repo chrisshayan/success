@@ -2,7 +2,6 @@ Avatar = React.createClass({
     mixins: [ReactMeteorData],
 
     propTypes: {
-        userId: React.PropTypes.string.isRequired,
         upload: React.PropTypes.bool,
         width: React.PropTypes.number,
         height: React.PropTypes.number,

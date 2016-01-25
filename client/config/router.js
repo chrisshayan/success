@@ -66,7 +66,6 @@ function checkAccessPermission(template) {
 	};
 	this.render('waveLoading');
 	Meteor.call('checkAccessPermission', data, (err, result) => {
-		console.log(err, result);
 		if(err || !result) {
 			Router.go('accessDenied');
 		} else {
