@@ -104,6 +104,14 @@ JobExtra = Astro.Class({
                 stage: 'applied',
                 jobId: this.jobId
             })
+        },
+
+        totalApplicants() {
+            let count = 0;
+            _.each(_.toArray(this.stage), (n) => {
+                if(n) count += n;
+            });
+            return count;
         }
     }
 });

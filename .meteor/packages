@@ -19,7 +19,7 @@ check
 underscore
 less
 email
-jquery
+jquery@1.0.0
 reactive-var
 reactive-dict
 ecmascript-runtime
@@ -28,7 +28,6 @@ iron:router@1.0.12
 #okgrow:router-autoscroll
 react
 react-template-helper
-twbs:bootstrap
 fortawesome:fontawesome
 momentjs:moment
 sgi:sprintfjs
@@ -48,23 +47,18 @@ meteorhacks:subs-manager
 #meteorhacks:kadira@2.26.3
 #meteorhacks:kadira-profiler
 #kadira:debug@2.2.4
-
 jagi:astronomy-validators
 reywood:publish-composite
 lab:vnw-apis
 lab:notifications
-
 lab:mysql-connection-manager
 http
 froatsnook:request
 izzilab:token
 stevezhu:lodash
-
-
 vnw:city
 vnw:industries
 vnw:migration
-
 vnw:job
 vnw:job-criteria
 vnw:user
@@ -77,8 +71,6 @@ maxharris9:classnames
 stuke:ics-generator
 brishin:meteor-elasticsearch
 jagi:astronomy
-
-
 success:application
 success:activities
 success:scorecard
@@ -89,3 +81,4 @@ datariot:ganalytics
 manuelschoebel:ms-seo
 maazalik:highcharts
 meteor-react-modules
+twbs:bootstrap@3.3.5

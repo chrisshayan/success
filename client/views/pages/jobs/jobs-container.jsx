@@ -402,6 +402,11 @@ Job = React.createClass({
         return Router.url('JobSettings', params);
     },
 
+    totalApplicants() {
+        const job = this.props.job;
+        return job ? job.extra.totalApplicants() : 0;
+    },
+
     render() {
 
         var style = {
@@ -444,12 +449,9 @@ Job = React.createClass({
                                 {this.title()}
                             </a>
                             <div>
-                                <span>ID: {this.props.job.jobId}</span>
+                                <span>ID: <b>{this.props.job.jobId}</b></span>
                                 &nbsp;|&nbsp;
-                                <a href={this.settingsLink()} onClick={this.handleClick} className="btn btn-xs btn-link">
-                                    <i className="fa fa-cogs"/>&nbsp;
-                                    Settings
-                                </a>
+                                Applicants: <b>{this.totalApplicants()}</b>
                             </div>
                         </div>
                         <div className="col-md-5 text-right info">
@@ -470,6 +472,7 @@ Job = React.createClass({
                         {this.state.stages.map(this.renderStage)}
                     </div>
                 </div>
+
                 <div className="tag-list">
                     <span>Job tags: </span>
                     {this.props.job.skills.map(this.renderTag)}

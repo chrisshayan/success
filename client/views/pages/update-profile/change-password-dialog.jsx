@@ -105,7 +105,7 @@ ChangePasswordDialog = React.createClass({
         const {isLoading, errors} = this.state;
 
         return (
-            <Modal ref="dialog" show={this.props.show} aria-labelledby="contained-modal-title" onHide={() => null}>
+            <Modal show={this.props.show}>
                 <Modal.Header>
                     <Modal.Title>Set new password</Modal.Title>
                 </Modal.Header>
