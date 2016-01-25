@@ -47,7 +47,7 @@ var methods = {
                     };
 
                 // Validate email if it was exist in vnw database
-                var query = "SELECT * FROM tblregistrationinfo WHERE username=\"%s\" LIMIT 1;";
+                var query = "SELECT * FROM tblregistrationinfo WHERE username=\"%s\" AND youareid = 1 LIMIT 1;";
                 var appSql = sprintf(query, email);
 
                 var rows = mysqlManager.fetchVNWData(appSql);
