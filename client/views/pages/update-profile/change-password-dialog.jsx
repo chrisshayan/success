@@ -40,7 +40,7 @@ ChangePasswordDialog = React.createClass({
     },
 
     componentDidMount() {
-        const el = this.refs.dialog();
+        const el = this.refs.dialog;
         $(el).modal({
             backdrop: true
         });
@@ -110,7 +110,7 @@ ChangePasswordDialog = React.createClass({
                     <Modal.Title>Set new password</Modal.Title>
                 </Modal.Header>
                 <Modal.Body className="clearfix">
-                    <form onSubmit={this.handleSubmit}>
+                    <form onSubmit={this.handleSubmit} className="form-horizontal">
                         <FormInput
                             ref='currentPassword'
                             label='Current password'

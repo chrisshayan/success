@@ -100,6 +100,7 @@ UpdateProfileForm = React.createClass({
     },
 
     handleToggleClick(e) {
+        e.preventDefault();
         this.setState({isLoading: false, errors: {}});
 
         // if isEdit == false : start edit page, saved the  textarea into variable originContent.
@@ -118,7 +119,6 @@ UpdateProfileForm = React.createClass({
         this.setState({
             isEditing: !this.state.isEditing
         });
-        e.preventDefault();
     },
 
     handleSaveClick(e) {
@@ -225,20 +225,22 @@ UpdateProfileForm = React.createClass({
                                         <form className="form-horizontal" onSubmit={this.handleSaveClick}>
                                             <FormInput
                                                 ref='firstName'
-                                                type='hidden'
+                                                type='text'
                                                 label="First name"
                                                 disabled={ isLoading }
                                                 value={this.firstName()}
-                                                isStatic={this.state.isEditing}
+                                                isEditable={true}
+                                                editToggle={this.state.isEditing}
                                                 error={errors.firstName}/>
 
                                             <FormInput
                                                 ref='lastName'
-                                                type='hidden'
+                                                type='text'
                                                 disabled={ isLoading }
                                                 label="Last name"
                                                 value={ this.lastName()}
-                                                isStatic={this.state.isEditing}
+                                                isEditable={true}
+                                                editToggle={this.state.isEditing}
                                                 error={errors.lastName}/>
 
 

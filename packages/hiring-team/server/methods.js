@@ -164,13 +164,19 @@ var methods = {
             var firstName = tempName.shift();
             var lastName = tempName.join(' ');
 
+            var hiringTeamProfile = Meteor.hiringTeam.findOne({_id: data.key});
+
+            if (!data.password && hiringTeamProfile.username !== data.username)
+                return false;
+
             var user = Meteor.users.findOne({'emails.address': data.email});
             var result = null;
-            //console.log('user', user);
 
             if (!user) {
-                if (Meteor.call('validateUserLoginInfo', data.username) !== 0) {
-                    return false;
+                var validLoginInfo = Meteor.call('validateUserLoginInfo', data.username);
+
+                if (validLoginInfo !== 0) {
+                    return validLoginInfo;
                 }
 
                 user = {};
@@ -186,7 +192,6 @@ var methods = {
                 result = Accounts.createUser(user);
 
             } else {
-
                 result = user._id;
 
                 user.profile = {

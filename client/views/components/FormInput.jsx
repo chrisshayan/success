@@ -30,9 +30,18 @@ FormInput = React.createClass({
         this.refs.input.focus();
     },
 
+    renderStaticForm(isEditable, editToggle, val){
+        if (isEditable)
+            return (editToggle) ? '' : <p className="form-control-static">{val}</p>;
+        else
+            return '';
+
+    },
+
     render() {
-        const {label, type, placeholder, value, error, disabled, isStatic, labelClass, inputClass} = this.props;
+        const {label, type, placeholder, value, error, disabled, isEditable, editToggle, labelClass, inputClass} = this.props;
         const containerClass = classNames('form-group', {error: !!error});
+        const self = this;
 
         return (
             <div className={containerClass}>
@@ -40,20 +49,20 @@ FormInput = React.createClass({
                     <label>{ label }</label>
                 </div>
                 <div className={inputClass || 'col-sm-9'}>
+                    {self.renderStaticForm(isEditable, editToggle, value)}
                     <input
                         ref='input'
                         className='form-control'
-                        type={ isStatic ?  'text' :  type }
+                        type={ editToggle || !isEditable ? type || 'text' : 'hidden'}
                         placeholder={ placeholder }
                         disabled={ disabled }
                         defaultValue={ value }/>
                     {error && (<p className="msg">{ error }</p>)}
-                    <p hidden={isStatic} className="form-control-static">{value}</p>
+
                 </div>
 
             </div>
 
         )
-
     }
 });
