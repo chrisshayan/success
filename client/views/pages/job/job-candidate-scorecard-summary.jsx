@@ -41,7 +41,6 @@ ScorecardOverallChart = React.createClass({
 	},
 
 	config() {
-		console.log(this.props.summary.overalls)
 		return {
 			title: {
 				text: 'OVERALL RECOMMENDATION'
