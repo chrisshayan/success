@@ -297,6 +297,9 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
     const user = Meteor.users.findOne({_id: this.userId});
     const job = JobExtra.findOne({jobId: jobId});
     var app = Application.findOne({jobId: jobId, appId: appId});
+    const candidateEmails = [];
+    const interviewerEmails = [];
+
     if (!user || !job || !app) return false;
     data = replacePlaceholder(user, job, app, data);
 
@@ -344,6 +347,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
         partStat: "NEEDS-ACTION",
         _id: null
     });
+    candidateEmails.push(app.defaultEmail());
 
     _.each(data.interviewers, function (id) {
         var u = Meteor.users.findOne({_id: id});
@@ -355,6 +359,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
                 partStat: "NEEDS-ACTION",
                 _id: id
             });
+            interviewerEmails.push(u.defaultEmail());
         }
     });
 
@@ -379,11 +384,49 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
 
     Meteor.defer(()=> {
         try {
+            // send email to candidates
             Email.send({
-                from: user.defaultEmail(),
-                to: _.pluck(attendees, 'mailTo'),
+                from: '<Success> no-reply@success.vietnamworks.com',
+                replyTo: user.defaultEmail(),
+                to: candidateEmails,
                 subject: data.subject,
                 html: data.body,
+                headers: {
+                    "Content-class": "urn:content-classes:calendarmessage"
+                },
+                attachments: [
+                    {
+                        fileName: 'invite.ics',
+                        contents: cal.toIcsString(),
+                        contentType: 'text/calendar'
+                    }
+                ]
+            });
+
+            // send email to interviewers
+            const stage = Success.APPLICATION_STAGES[app.stage];
+            SSR.compileTemplate('InterviewNotification', Assets.getText('private/interview-notification.html'));
+            var profileUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
+            profileUrl += `&utm_source=notification&utm_medium=email&utm_campaign=${job.jobTitle}`;
+
+            const start = moment(data.startTime);
+            const end = moment(data.endTime);
+
+            var html = SSR.render("InterviewNotification", {
+                position: job.jobTitle,
+                candidate: app.fullname,
+                profileUrl: profileUrl,
+                location: data.location,
+                time: start.format('MMMM Do YYYY, h:mma') + ' - ' + end.format('h:mma')
+            });
+
+
+            Email.send({
+                from: '<Success> no-reply@success.vietnamworks.com',
+                replyTo: user.defaultEmail(),
+                to: interviewerEmails,
+                subject: 'Notification: You have an interview',
+                html: html,
                 headers: {
                     "Content-class": "urn:content-classes:calendarmessage"
                 },
@@ -400,7 +443,7 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
             attendees.splice(0, 1); //remove user's email
 
             var jobdata = {
-                sender: user.defaultEmail(),
+                sender: 'no-reply@success.vietnamworks.com',
                 subject: null,
                 html: null,
                 recruiters: attendees,
@@ -408,7 +451,8 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
                 timeRange: {
                     start: data.startTime,
                     end: data.endTime
-                }
+                },
+                replyTo: user.defaultEmail()
             };
 
             var estimateDate = new moment(data.scheduleDate).subtract(1, 'day')
