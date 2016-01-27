@@ -39,7 +39,7 @@ var methods = {
 
 
                 var email = obj['request-email'];
-                var isEmail = email.match(SimpleSchema.RegEx.Email);
+                var isEmail = Validators.email().validator.validate(email);
                 if (!isEmail)
                     return {
                         status: 0,
