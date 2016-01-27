@@ -67,62 +67,6 @@ JobCandidateProfileActions = React.createClass({
         this.goActionLink(type);
     },
 
-    renderButton(isDisqualified){
-        let btnList = [];
-        btnList.push(<a className="btn btn-default btn-outline btn-sm " href='#'
-                        onClick={(e) => this.onSelectAction('comment', e)}>
-            Add comment
-        </a>);
-
-        if (!isDisqualified) {
-            btnList.push(<a className="btn btn-default btn-outline btn-sm " href='#'
-                            onClick={(e) => this.onSelectAction('message', e)}>
-                Send message
-            </a>);
-
-            btnList.push(<a className="btn btn-default btn-outline btn-sm " href='#'
-                            onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
-                Schedule interview
-            </a>);
-
-            btnList.push(<a className="btn btn-default btn-outline btn-sm " href='#'
-                            onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
-                Score candidate
-            </a>);
-
-            btnList.push(<button className="btn btn-default btn-outline btn-sm"
-                                 onClick={ this.props.actions.disqualify }>
-                Disqualify
-            </button>);
-            btnList.push(<button
-                className="btn btn-primary btn-outline btn-sm"
-                onClick={this.handleMoveNextState}>
-
-                <i className="fa fa-arrow-right"/>&nbsp;
-                {this.nextStage()}
-            </button>);
-
-            btnList.push(<button type="button" className="btn btn-primary btn-outline btn-sm dropdown-toggle"
-                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span className="caret"/>
-                </button>
-            );
-            btnList.push(this.renderMoveAbilities());
-        } else {
-            btnList.push(
-                <button
-                    className="btn btn-primary btn-outline btn-sm"
-                    onClick={ this.props.actions.revertQualify }>
-                    Revert qualify
-                </button>
-            )
-        }
-
-        return btnList;
-
-    },
-
-
     render() {
 
         let styles = {
@@ -133,8 +77,7 @@ JobCandidateProfileActions = React.createClass({
             }
         };
         return (
-            <Affix offsetTop={160} affixClassName="affix" className="job-candidate-actions"
-                   affixStyle={{width: this.props.containerWidth + 'px'}}>
+            <Affix offsetTop={160} affixClassName="affix" className="job-candidate-actions" affixStyle={{width: this.props.containerWidth + 'px'}}>
                 <div className="profile-actions" style={styles.actionsContainer}>
                     <div className="row">
                         <div className="hidden-xs hidden-sm hidden-md col-lg-2">
@@ -147,7 +90,53 @@ JobCandidateProfileActions = React.createClass({
                              style={{paddingBottom: '3px'}}>
                             <div className="job-candidate-actions">
                                 <div className="btn-group pull-right">
-                                    {this.renderButton(this.isDisqualified())}
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('comment', e)}>
+                                        Add comment
+                                    </a>
+
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('message', e)}>
+                                        Send message
+                                    </a>
+
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('scheduleInterview', e)}>
+                                        Schedule interview
+                                    </a>
+
+                                    <a className="btn btn-default btn-outline btn-sm " href='#'
+                                       onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
+                                        Score candidate
+                                    </a>
+
+                                    {this.isDisqualified() === false ? (
+                                        <button className="btn btn-default btn-outline btn-sm"
+                                                onClick={ this.props.actions.disqualify }>
+                                            Disqualify
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="btn btn-primary btn-outline btn-sm"
+                                            onClick={ this.props.actions.revertQualify }>
+                                            Revert qualify
+                                        </button>
+                                    )}
+
+                                    <button
+                                        className="btn btn-primary btn-outline btn-sm"
+                                        onClick={this.handleMoveNextState}>
+
+                                        <i className="fa fa-arrow-right"/>&nbsp;
+                                        {this.nextStage()}
+                                    </button>
+
+                                    <button type="button" className="btn btn-primary btn-outline btn-sm dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <span className="caret"/>
+                                    </button>
+                                    {this.renderMoveAbilities()}
+
                                 </div>
                             </div>
                         </div>
@@ -161,8 +150,7 @@ JobCandidateProfileActions = React.createClass({
         let stages = _.sortByOrder(_.toArray(Success.APPLICATION_STAGES), 'id', 'asc');
         let current = this.props.stage;
         let menu = [];
-        let key = 0;
-        stages.map((stage) => {
+        stages.map((stage, key) => {
             if ([0, 1].indexOf(current.id) >= 0 && [0, 1].indexOf(stage.id) >= 0) return;
 
             if (stage.id > current.id) {
@@ -186,7 +174,6 @@ JobCandidateProfileActions = React.createClass({
             } else if (stage.id == current.id) {
                 menu.push(<li key={key} role="separator" className="divider"/>);
             }
-            key++;
         });
 
         return (
