@@ -243,7 +243,7 @@ ScheduleEvent = React.createClass({
         return {
             templateId: (mailTemplate.value !== '-1') ? mailTemplate.value : null,
             interviewers: _.pluck(this.state.interviewers, '_id'),
-            location: this.state.location || null,
+            location: this.state.location || '',
             scheduleDate: sd.isValid() ? sd.toDate() : null,
             startTime: this.refs.startTime.value && st.isValid() ? st.toDate() : null,
             endTime: this.refs.endTime.value && et.isValid() ? et.toDate() : null,
