@@ -12,7 +12,7 @@ ActivityMessage = React.createClass({
     },
 
     componentDidMount() {
-        const body = this.refs.body.getDOMNode();
+        const body = this.refs.body;
         if(body.offsetHeight > 120) {
             this.setState({
                 hasMore: true,

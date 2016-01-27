@@ -6,7 +6,7 @@ CriteriaSearch = React.createClass({
     },
 
     componentDidMount() {
-        const $select = $(this.refs.q.getDOMNode());
+        const $select = $(this.refs.q);
         $select.select2({
             placeholder: this.props.placeholder || 'start typing to find',
             ajax: {

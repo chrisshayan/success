@@ -22,14 +22,17 @@ var setModifier = function (obj) {
 
 
 function generateUsername(userId) {
-    if (!userId) return null;
+    userId = userId.replace(/[-_]/g, '.');
+    var regEx = new RegExp('^' + userId + '$', 'i');
+    var similarLength = Meteor['hiringTeam'].find({username: regEx}).count();
 
-    var regEx = new RegExp('^' + userId, 'i');
-    var similarLength = Meteor.users.find({username: regEx}).count();
-    if (similarLength) {
-        userId += similarLength;
+    while (similarLength && Meteor.users.findOne({username: userId + similarLength})) {
+        similarLength++;
     }
-    return userId.toLowerCase();
+
+    var newUserId = (similarLength) ? userId + similarLength : userId;
+
+    return newUserId.toLowerCase();
 }
 
 function generateName(name) {

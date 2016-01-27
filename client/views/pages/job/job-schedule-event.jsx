@@ -1,3 +1,55 @@
+scheduleForm = Astro.Class({
+    name: 'scheduleFormSchema',
+    fields: {
+        templateId: {
+            type: 'string',
+            validator: [
+                Validators.required(null, 'Mail template is required.')
+            ]
+        },
+        interviewers: {
+            type: 'array',
+            validator: [
+                Validators.minLength(1, 'Please add at least one interviewer.')
+            ]
+        },
+        scheduleDate: {
+            type: 'date',
+            validator: [
+                Validators.date(null, 'Schedule date is required.'),
+                Validators.required(null, 'Schedule date is required.')
+            ]
+        },
+        startTime: {
+            type: 'date',
+            validator: [
+                Validators.date(null, 'Start time is required.'),
+                Validators.required(null, 'Start time is required.')
+            ]
+        },
+        endTime: {
+            type: 'date',
+            validator: [
+                Validators.date(null, 'End time is required.'),
+                Validators.required(null, 'End time is required.')
+            ]
+        },
+        subject: {
+            type: 'string',
+            validator: [
+                Validators.required(null, 'Subject is required.')
+            ]
+        },
+        body: {
+            type: 'string',
+            validator: [
+                Validators.required(null, 'Email content is required.')
+            ]
+        }
+    }
+});
+
+
 ScheduleEvent = React.createClass({
     propsType: {
         appId: React.PropTypes.number.isRequired
@@ -14,7 +66,7 @@ ScheduleEvent = React.createClass({
             isLoading: false,
             emails: [],
             templates: [],
-
+            errors: {},
             mailTemplateError: false,
             subjectError: false,
             contentError: false,
@@ -118,14 +170,16 @@ ScheduleEvent = React.createClass({
             scrollTo = container.offset().top - 50 - 45;
         }
         body.stop().animate({scrollTop: scrollTo}, '500', 'swing');
+
+
     },
 
     selectMailTemplate(templateId) {
         if (templateId) {
             var template = _.findWhere(this.state.templates, {_id: templateId});
             if (template) {
-                var mailContent = React.findDOMNode(this.refs.mailContent);
-                var subject = React.findDOMNode(this.refs.subject);
+                var mailContent = this.refs.mailContent;
+                var subject = this.refs.subject;
                 $(subject).val(template.subject);
                 $(mailContent).code(template.htmlBody);
             }
@@ -138,7 +192,7 @@ ScheduleEvent = React.createClass({
         });
         if (templates.length > 0) {
             const templateId = templates[0]['_id'] || '';
-            $(this.refs.mailTemplate.getDOMNode()).val(templateId);
+            $(this.refs.mailTemplate).val(templateId);
             this.selectMailTemplate(templateId);
         }
     },
@@ -159,18 +213,23 @@ ScheduleEvent = React.createClass({
     },
 
     changeMailTemplate(e) {
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
+        var mailTemplate = this.refs.mailTemplate;
         var templateId = mailTemplate.value;
         this.selectMailTemplate(templateId);
+
+        var errors = this.state.errors;
+        errors.templateId = false;
+        this.setState({errors: errors});
+
     },
 
     getFormData() {
-        var subject = React.findDOMNode(this.refs.subject);
-        var mailContent = React.findDOMNode(this.refs.mailContent);
-        var mailTemplate = React.findDOMNode(this.refs.mailTemplate);
-        var scheduleDate = React.findDOMNode(this.refs.scheduleDate);
-        var startTime = React.findDOMNode(this.refs.startTime).value.split(':');
-        var endTime = React.findDOMNode(this.refs.endTime).value.split(':');
+        var subject = this.refs.subject;
+        var mailContent = this.refs.mailContent;
+        var mailTemplate = this.refs.mailTemplate;
+        var scheduleDate = this.refs.scheduleDate;
+        var startTime = this.refs.startTime.value.split(':');
+        var endTime = this.refs.endTime.value.split(':');
         var sd = new moment(scheduleDate.value, 'DD/MM/YYYY');
         var st = sd.clone();
         st.hour(startTime[0]);
@@ -181,29 +240,34 @@ ScheduleEvent = React.createClass({
         et.minute(endTime[1]);
 
 
-        let data = {
-            templateId: mailTemplate.value,
+        return {
+            templateId: (mailTemplate.value !== '-1') ? mailTemplate.value : null,
             interviewers: _.pluck(this.state.interviewers, '_id'),
-            location: this.state.location,
-            scheduleDate: sd.isValid() ? sd.toDate() : false,
-            startTime: st.isValid() ? st.toDate() : false,
-            endTime: et.isValid() ? et.toDate() : false,
-            subject: subject.value,
-            body: $(mailContent).code()
+            location: this.state.location || '',
+            scheduleDate: sd.isValid() ? sd.toDate() : null,
+            startTime: this.refs.startTime.value && st.isValid() ? st.toDate() : null,
+            endTime: this.refs.endTime.value && et.isValid() ? et.toDate() : null,
+            subject: subject.value || null,
+            body: $($(mailContent).code()).text() ? $(mailContent).code() : null
         };
-
-        return data;
     },
 
-    validate() {
-        return true;
+    validate(data) {
+        var model = new scheduleForm(data);
+        var result = model.validate();
+        this.setState({errors: model.getValidationErrors()});
+        return result;
     },
 
 
     handleSelectRecruiter(user) {
         let interviewers = this.state.interviewers;
         interviewers.push(user);
+        var errors = this.state.errors;
+        errors.interviewers = false;
+
         this.setState({
+            errors: errors,
             interviewers: _.unique(interviewers)
         });
     },
@@ -219,8 +283,9 @@ ScheduleEvent = React.createClass({
 
     handleSave(e) {
         e.preventDefault();
-        if (this.validate()) {
-            let data = this.getFormData();
+        var data = this.getFormData();
+        if (this.validate(data)) {
+            //this.setState({errors: {}});
             let msg = `
                 <div class="text-left">
                     The invitation will be sent to all participants including an iCal attachment.
@@ -257,6 +322,7 @@ ScheduleEvent = React.createClass({
     },
 
     render() {
+        var errors = this.state.errors;
         return (
             <div className="mail-box" ref="container">
                 <div className="mail-body">
@@ -269,8 +335,7 @@ ScheduleEvent = React.createClass({
                                     {this.state.templates.map((t, idx) => <option value={t._id}
                                                                                   key={idx}>{t.name}</option>)}
                                 </select>
-                                {this.state.mailTemplateError ? <p className="text-danger">Please choose a mail
-                                    template</p> : null}
+                                {errors.templateId ? <p className="text-danger">{errors.templateId}</p> : null}
                             </div>
                         </div>
                         <div className="form-group">
@@ -297,6 +362,7 @@ ScheduleEvent = React.createClass({
                                 <ul className="interviewers-list">
                                     {this.state.interviewers.map(this.renderInterviewer)}
                                 </ul>
+                                {errors.interviewers ? <p className="text-danger">{errors.interviewers}</p> : null}
                             </div>
                         </div>
 
@@ -319,6 +385,7 @@ ScheduleEvent = React.createClass({
                                         <span className="fa fa-calendar"></span>
                                     </span>
                                 </div>
+                                {errors.scheduleDate ? <p className="text-danger">{errors.scheduleDate}</p> : null}
                             </div>
                             <div className="col-sm-6">
                                 <div className="input-daterange input-group">
@@ -333,6 +400,8 @@ ScheduleEvent = React.createClass({
                                                defaultValue={this.state.endTime}/>
                                     </div>
                                 </div>
+                                {errors.startTime ? <p className="text-danger">{errors.startTime}</p> : null}
+                                {errors.endTime ? <p className="text-danger">{errors.endTime}</p> : null}
                             </div>
                         </div>
 
@@ -346,17 +415,16 @@ ScheduleEvent = React.createClass({
                                     className="form-control"
                                     defaultValue={this.state.subject}
                                     onChange={(e) => this.setState({subject: e.target.value})}/>
-                                {this.state.subjectError ? <p className="text-danger">Please input mail
-                                    subject</p> : null}
+                                {errors.subject ? <p className="text-danger">{errors.subject}</p> : null}
                             </div>
                         </div>
                     </form>
                 </div>
                 <div className="mail-text h-200">
-                    {this.state.contentError ? <p className="text-danger">Please input mail content</p> : null}
                     <div className="summernote" ref="mailContent"></div>
                     <div className="clearfix"></div>
                 </div>
+                {errors.body ? <p className="text-danger">{errors.body}</p> : null}
                 <div className="mail-body text-right tooltip-demo">
                     <button className="btn btn-sm btn-primary btn-outline" data-toggle="tooltip" data-placement="top"
                             title="Send" onClick={this.handleSave}><i className="fa fa-reply"></i> Save
@@ -391,7 +459,7 @@ ScheduleEvent = React.createClass({
 
 GooglePlaceInput = React.createClass({
     componentDidMount: function () {
-        var input = this.refs.searchField.getDOMNode();
+        var input = this.refs.searchField;
         var options = {componentRestrictions: {country: 'vn'}};
         this.autocomplete = new google.maps.places.Autocomplete(input, options);
         this.autocomplete.addListener('place_changed', this.handleChange);
@@ -402,7 +470,7 @@ GooglePlaceInput = React.createClass({
     },
 
     handleChange() {
-        this.props.onChange && this.props.onChange(this.refs.searchField.getDOMNode().value);
+        this.props.onChange && this.props.onChange(this.refs.searchField.value);
     },
 
     render: function () {

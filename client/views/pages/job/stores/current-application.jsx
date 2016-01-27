@@ -41,11 +41,11 @@ JobCurrentApplication.getActions = function () {
         }
 
         const params = Router.current().params
-            , query = _.omit(params.query, 'appAction', 'appId');
+            , query = _.omit(params.query, 'appAction', 'appId', 'appType');
 
         if (nextApp) {
             query['appId'] = nextApp.appId;
-            query['appType'] = nextApp.appType;
+            query['appType'] = nextApp.type;
         }
 
         actions.scrollTop(140);

@@ -1,26 +1,26 @@
 DashboardSubs = new SubsManager({
 	cacheLimit: 100,
-	expireIn  : 2
+	expireIn: 2
 });
 
 JobDetailsSubs = new SubsManager({
 	cacheLimit: 1000,
-	expireIn  : 2
+	expireIn: 2
 });
 
 StaticSubs = new SubsManager({
 	cacheLimit: 1000,
-	expireIn  : 30
+	expireIn: 30
 });
 
 RecruiterSubs = new SubsManager({
 	cacheLimit: 100,
-	expireIn  : 30
+	expireIn: 30
 });
 
 SkillsSubs = new SubsManager({
 	cacheLimit: 1000,
-	expireIn  : 30
+	expireIn: 30
 });
 
 StaticSubs.subscribe('staticModels');
@@ -31,10 +31,11 @@ Tracker.autorun(function () {
 });
 
 Router.configure({
-	layoutTemplate  : 'mainLayout',
+	layoutTemplate: 'mainLayout',
 	notFoundTemplate: 'notFound',
-	loadingTemplate : 'waveLoading'
+	loadingTemplate: 'waveLoading'
 });
+
 /**
  * Check user login
  */
@@ -42,7 +43,7 @@ Router.onBeforeAction(function () {
 		if (!Meteor.userId() || Meteor.loggingIn()) {
 			const query = {};
 			const returnUrl = Router.current().originalUrl.toString().toLowerCase();
-			if(returnUrl.indexOf('logout') < 0) {
+			if (returnUrl.indexOf('logout') < 0) {
 				query['query'] = {
 					returnUrl: Router.current().originalUrl
 				};
@@ -55,6 +56,24 @@ Router.onBeforeAction(function () {
 	}
 	, {except: ['login', 'landing', 'activeAccount']}
 );
+
+function checkAccessPermission(template) {
+	const current = Router.current();
+	const data = {
+		routeName: current.route.getName(),
+		params: _.toPlainObject(current.params),
+		queryParams: _.toPlainObject(current.params.query)
+	};
+	this.render('waveLoading');
+	Meteor.call('checkAccessPermission', data, (err, result) => {
+		if(err || !result) {
+			Router.go('accessDenied');
+		} else {
+			this.render(template);
+		}
+	});
+}
+
 /**
  * Redirect to dashboard if user is already logged in
  */
@@ -62,7 +81,7 @@ Router.onBeforeAction(function () {
 		if (!Meteor.loggingIn() && Meteor.userId()) {
 			this.render(null);
 			const redirectUrl = Router.current().params.query['returnUrl'];
-			if(redirectUrl) {
+			if (redirectUrl) {
 				Router.go(redirectUrl);
 			} else {
 				this.redirect('dashboard');
@@ -74,11 +93,12 @@ Router.onBeforeAction(function () {
 	, {only: 'login'}
 );
 
-Router.onAfterAction(function(route) {
+
+Router.onAfterAction(function (route) {
 	const routeName = Router.current().route.getName();
 	const params = _.toPlainObject(Router.current().params);
-	Meteor.call('getSEOInfo', routeName, params, function(err, info) {
-		if(!err && info) {
+	Meteor.call('getSEOInfo', routeName, params, function (err, info) {
+		if (!err && info) {
 			SEO.set(info);
 			GAnalytics.pageview();
 		}
@@ -89,7 +109,7 @@ Router.onAfterAction(function(route) {
  * Landing page
  */
 Router.route('/', {
-	name  : "landing",
+	name: "landing",
 	action: function () {
 		this.layout('blankLayout');
 		this.render('landing');
@@ -100,7 +120,7 @@ Router.route('/', {
  * Login page
  */
 Router.route('/login', {
-	name  : "login",
+	name: "login",
 	action: function () {
 		this.layout('blankLayout');
 		this.render('login');
@@ -108,7 +128,7 @@ Router.route('/login', {
 });
 
 Router.route('/active-account/:keyid', {
-	name  : "activeAccount",
+	name: "activeAccount",
 	waitOn: function () {
 	},
 	action: function () {
@@ -119,7 +139,7 @@ Router.route('/active-account/:keyid', {
 
 
 Router.route('/logout', {
-	name  : "logout",
+	name: "logout",
 	action: function () {
 		this.render(null);
 		DashboardSubs.clear();
@@ -128,14 +148,21 @@ Router.route('/logout', {
 	}
 });
 
+Router.route('/access-denied', {
+	name: "accessDenied",
+	action: function () {
+		this.render('PermissionDenied');
+	}
+});
+
 /**
  * Dashboard -> render jobs listing
  */
 
 Router.route('/dashboard', {
-	name      : "dashboard",
+	name: "dashboard",
 	fastRender: true,
-	action    : function () {
+	action: function () {
 		this.render('JobsPage');
 	}
 });
@@ -145,38 +172,38 @@ Router.route('/dashboard', {
  * Routes for settings
  */
 Router.route('/settings/companyinfo', {
-	name      : "companyInfo",
+	name: "companyInfo",
 	fastRender: true,
-	waitOn    : function () {
+	waitOn: function () {
 		return [
 			DashboardSubs.subscribe('companyInfo')
 		];
 	},
-	action    : function () {
-		this.render('companyInfo');
+	action: function () {
+		checkAccessPermission.apply(this, ['companyInfo']);
 	},
-	data      : function () {
+	data: function () {
 		return Collections.CompanySettings.findOne();
 	}
 });
 
 
 Router.route('/settings/mailtemplates', {
-	name      : "mailTemplates",
+	name: "mailTemplates",
 	fastRender: true,
-	waitOn    : function () {
+	waitOn: function () {
 		return [
 			Meteor.subscribe('mailTemplates'),
 		];
 	},
-	action    : function () {
-		this.render('mailTemplates');
+	action: function () {
+		checkAccessPermission.apply(this, ['mailTemplates']);
 	}
 });
 
 
 Router.route('/settings/mailtemplates/create', {
-	name  : "createMailTemplate",
+	name: "createMailTemplate",
 	waitOn: function () {
 		return [
 			Meteor.subscribe('mailTemplates')
@@ -188,7 +215,7 @@ Router.route('/settings/mailtemplates/create', {
 });
 
 Router.route('/settings/mailtemplates/update/:_id', {
-	name  : "updateMailTemplate",
+	name: "updateMailTemplate",
 	waitOn: function () {
 		return [
 			Meteor.subscribe('mailTemplates'),
@@ -198,7 +225,7 @@ Router.route('/settings/mailtemplates/update/:_id', {
 	action: function () {
 		this.render('createMailTemplate');
 	},
-	data  : function () {
+	data: function () {
 		return {
 			doc: Collections.MailTemplates.findOne(this.params._id)
 		};
@@ -207,35 +234,22 @@ Router.route('/settings/mailtemplates/update/:_id', {
 
 
 Router.route('/settings/hiringTeam', {
-	name  : "hiringTeam",
+	name: "hiringTeam",
 	action: function () {
-		this.render('hiringTeam');
-	}
-});
-
-Router.route('/activites', {
-	name  : "activities",
-	waitOn: function () {
-		return [
-			Meteor.subscribe('activities'),
-			Meteor.subscribe('jobs')
-		];
-	},
-	action: function () {
-		this.render('activities');
+		checkAccessPermission.apply(this, ['hiringTeam']);
 	}
 });
 
 
 Router.route('/job-settings/:jobId', {
-	name  : 'JobSettings',
+	name: 'JobSettings',
 	action: function () {
-		this.render('JobSettings');
+		checkAccessPermission.apply(this, ['JobSettings']);
 	}
 });
 
 Router.route('/profile', {
-	name  : 'updateProfile',
+	name: 'updateProfile',
 	waitOn: function () {
 		return [];
 	},
@@ -246,14 +260,14 @@ Router.route('/profile', {
 
 
 Router.route('/job/:jobId/:stage', {
-	name  : 'Job',
+	name: 'Job',
 	waitOn: function () {
 		return [
 			Meteor.subscribe('jobDetails', +this.params.jobId)
 		];
 	},
 	action() {
-		this.render('Job');
+		checkAccessPermission.apply(this, ['Job']);
 	}
 });
 

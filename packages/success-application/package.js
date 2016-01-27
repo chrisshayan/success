@@ -25,6 +25,10 @@ Package.onUse(function (api) {
     /* methods, api */
     api.addFiles(['server/methods.js', 'server/publications.js'], ['server']);
 
+    api.addAssets([
+        'private/interview-notification.html',
+    ], 'server');
+
     /* imply changes */
     api.imply('vnw:core');
     /* export */

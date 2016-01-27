@@ -8,7 +8,4 @@ packages/*/.npm/
 /**/*.map
 /**/*.cached
 
-
-
-.meteor/versions
 .DS_Store

@@ -20,7 +20,7 @@ function replacePlaceholder(user, job, application, mail) {
     var replaces = {};
     var placeholders = mail.body.match(/\[\[(\w+)\]\]/gi);
     _.each(placeholders, function (p) {
-        p1 = p.replace(/\[\[|\]\]/g, "");
+        var p1 = p.replace(/\[\[|\]\]/g, "");
         if (_.indexOf(valid, p1) >= 0) {
             if (replaces.hasOwnProperty(p)) return;
             switch (p1) {
@@ -164,10 +164,9 @@ methods['applications.moveStage'] = function (appId, stage = null) {
                 Meteor.defer(function () {
                     // update stage counter
 
-                    jobExtra.inc({
-                        [`stage.${fromStage.alias}`]: -1,
-                        [`stage.${toStage.alias}`]: 1
-                    });
+                    jobExtra.set(`stage.${fromStage.alias}`, Math.max(jobExtra.stage[`${fromStage.alias}`] - 1, 0));
+                    jobExtra.set(`stage.${toStage.alias}`, jobExtra.stage[`${toStage.alias}`] + 1);
+
                     jobExtra.save();
                 });
                 const result = app.save();
@@ -255,183 +254,231 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
     if (!user || !job) return false;
 
     Meteor.defer(() => {
-        _.each(appIds, (appId) => {
-            var app = Application.findOne({jobId: jobId, appId: appId});
-            if (!app) return false;
-            data = replacePlaceholder(user, job, app, data);
+        _.each(appIds, function(appId) {
+	        var app = Application.findOne({jobId: jobId, appId: appId});
+	        if (!app) return false;
+	        var _data = replacePlaceholder(user, job, app, _.clone(data));
 
-            Email.send({
-                from: user.defaultEmail(),
-                to: app.defaultEmail(),
-                subject: data.subject,
-                html: data.body
-            });
+	        Email.send({
+		        from: user.defaultEmail(),
+		        to: app.defaultEmail(),
+		        subject: _data.subject,
+		        html: _data.body
+	        });
 
-            const ref = {
-                companyId: app.companyId,
-                jobId: jobId,
-                candidateId: app.candidateId,
-                appId: appId
-            };
+	        const ref = {
+		        companyId: app.companyId,
+		        jobId: jobId,
+		        candidateId: app.candidateId,
+		        appId: appId
+	        };
 
-            new Activities({
-                type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
-                ref: ref,
-                content: data,
-                createdBy: this.userId,
-                createdAt: new Date()
-            }).save();
+	        new Activities({
+		        type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
+		        ref: ref,
+		        content: _data,
+		        createdBy: user._id,
+		        createdAt: new Date()
+	        }).save();
         });
     });
     return true;
 };
 
 methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data = {}) {
-    //Meteor.defer(() => {
+    try {
+	    if (!this.userId) return false;
+	    this.unblock();
+	    check(jobId, Number);
+	    check(appId, Number);
+	    check(data, Object);
 
-    if (!this.userId) return false;
-    this.unblock();
-    check(jobId, Number);
-    check(appId, Number);
-    check(data, Object);
+	    const user = Meteor.users.findOne({_id: this.userId});
+	    const job = JobExtra.findOne({jobId: jobId});
+	    var app = Application.findOne({jobId: jobId, appId: appId});
+	    const candidateEmails = [];
+	    const interviewerEmails = [];
 
-    const user = Meteor.users.findOne({_id: this.userId});
-    const job = JobExtra.findOne({jobId: jobId});
-    var app = Application.findOne({jobId: jobId, appId: appId});
-    if (!user || !job || !app) return false;
-    data = replacePlaceholder(user, job, app, data);
+	    if (!user || !job || !app) return false;
+	    data = replacePlaceholder(user, job, app, data);
 
-    let listRecruiters = job.recruiters.manager.concat(job.recruiters.recruiter).map(function (rec) {
-        return rec.userId;
-    });
+	    let listRecruiters = job.recruiters.manager.concat(job.recruiters.recruiter).map(function (rec) {
+		    return rec.userId;
+	    });
 
-    var diff = _.unique(_.difference(data.interviewers, listRecruiters));
-    if (diff.length !== 0) {
-        diff.forEach(function (recId) {
-            let rec = Meteor.users.findOne({_id: recId});
-            if (rec) {
-                var itemInfo = {
-                    userId: rec._id,
-                    email: rec.defaultEmail(),
-                    name: rec.fullname() || rec.username || rec.defaultEmail() || ''
-                };
-                job.push('recruiters.recruiter', itemInfo);
-            }
-        });
+	    var diff = _.unique(_.difference(data.interviewers, listRecruiters));
+	    if (diff.length !== 0) {
+		    diff.forEach(function (recId) {
+			    let rec = Meteor.users.findOne({_id: recId});
+			    if (rec) {
+				    var itemInfo = {
+					    userId: rec._id,
+					    email: rec.defaultEmail(),
+					    name: rec.fullname() || rec.username || rec.defaultEmail() || ''
+				    };
+				    job.push('recruiters.recruiter', itemInfo);
+			    }
+		    });
 
-        job.save()
+		    job.save()
+	    }
+
+	    const ref = {
+		    companyId: app.companyId,
+		    jobId: jobId,
+		    candidateId: app.candidateId,
+		    appId: appId,
+		    type: app.type
+	    };
+	    console.log(112234)
+
+	    const activityId = new Activities({
+		    type: Activities.TYPE.RECRUITER_SCHEDULE,
+		    ref: ref,
+		    content: data,
+		    createdBy: this.userId,
+		    createdAt: new Date()
+	    }).save();
+
+	    var attendees = [];
+	    attendees.push({
+		    cn: app.fullname,
+		    mailTo: app.defaultEmail(),
+		    partStat: "NEEDS-ACTION",
+		    _id: null
+	    });
+	    candidateEmails.push(app.defaultEmail());
+
+	    _.each(data.interviewers, function (id) {
+		    var u = Meteor.users.findOne({_id: id});
+		    if (u) {
+			    var uName = u.fullname() || u.defaultEmail();
+			    attendees.push({
+				    cn: uName,
+				    mailTo: u.defaultEmail(),
+				    partStat: "NEEDS-ACTION",
+				    _id: id
+			    });
+			    interviewerEmails.push(u.defaultEmail());
+		    }
+	    });
+
+	    var organizerName = user.fullname() || user.defaultEmail();
+	    var calOptions = {
+		    prodId: "//Vietnamworks//Success",
+		    method: "REQUEST",
+		    events: [
+			    {
+				    uid: activityId,
+				    summary: data.subject,
+				    location: data.location || '',
+				    dtStart: data.startTime,
+				    dtEnd: data.endTime,
+				    organizer: {cn: organizerName, mailTo: user.defaultEmail()},
+				    attendees: attendees
+			    }
+		    ]
+	    };
+	    var cal = new IcsGenerator(calOptions);
+
+
+	    Meteor.defer(()=> {
+		    try {
+			    // send email to candidates
+			    Email.send({
+				    from: '<Success> no-reply@success.vietnamworks.com',
+				    replyTo: user.defaultEmail(),
+				    to: candidateEmails,
+				    subject: data.subject,
+				    html: data.body,
+				    headers: {
+					    "Content-class": "urn:content-classes:calendarmessage"
+				    },
+				    attachments: [
+					    {
+						    fileName: 'invite.ics',
+						    contents: cal.toIcsString(),
+						    contentType: 'text/calendar'
+					    }
+				    ]
+			    });
+
+			    // send email to interviewers
+			    const stage = Success.APPLICATION_STAGES[app.stage];
+			    SSR.compileTemplate('InterviewNotification', Assets.getText('private/interview-notification.html'));
+			    var profileUrl = Meteor.absoluteUrl(`job/${app.jobId}/${stage.alias}?appId=${app.appId}&appType=${app.type}`);
+			    profileUrl += `&utm_source=notification&utm_medium=email&utm_campaign=${job.jobTitle}`;
+
+			    const start = moment(data.startTime);
+			    const end = moment(data.endTime);
+
+			    var html = SSR.render("InterviewNotification", {
+				    position: job.jobTitle,
+				    candidate: app.fullname,
+				    profileUrl: profileUrl,
+				    location: data.location || '',
+				    time: start.format('MMMM Do YYYY, h:mma') + ' - ' + end.format('h:mma')
+			    });
+
+			    if(interviewerEmails.length > 0) {
+				    Email.send({
+					    from: '<Success> no-reply@success.vietnamworks.com',
+					    replyTo: user.defaultEmail(),
+					    to: interviewerEmails,
+					    subject: 'Notification: You have an interview',
+					    html: html,
+					    headers: {
+						    "Content-class": "urn:content-classes:calendarmessage"
+					    },
+					    attachments: [
+						    {
+							    fileName: 'invite.ics',
+							    contents: cal.toIcsString(),
+							    contentType: 'text/calendar'
+						    }
+					    ]
+				    });
+			    }
+
+			    //create task
+			    attendees.splice(0, 1); //remove user's email
+
+			    var jobdata = {
+				    sender: 'no-reply@success.vietnamworks.com',
+				    subject: null,
+				    html: null,
+				    recruiters: attendees,
+				    ref: ref,
+				    timeRange: {
+					    start: data.startTime,
+					    end: data.endTime
+				    },
+				    replyTo: user.defaultEmail()
+			    };
+
+			    var estimateDate = new moment(data.scheduleDate).subtract(1, 'day')
+				    , now = new moment();
+
+			    var time = (estimateDate > now) ? estimateDate.toDate() : null;
+
+			    sJobCollections.addJobtoQueue('remindInterviewJob', jobdata, null, time);
+
+		    } catch (e) {
+			    console.log('Set Schedule failed');
+			    console.trace(e);
+
+			    Activities.remove({_id: activityId});
+
+			    return false;
+		    }
+	    });
+
+	    return activityId;
+    } catch(e) {
+	    console.log("Error: schedule interview");
+	    console.trace(e);
+	    return false;
     }
-
-    const ref = {
-        companyId: app.companyId,
-        jobId: jobId,
-        candidateId: app.candidateId,
-        appId: appId,
-        type: app.type
-    };
-
-    const activityId = new Activities({
-        type: Activities.TYPE.RECRUITER_SCHEDULE,
-        ref: ref,
-        content: data,
-        createdBy: this.userId,
-        createdAt: new Date()
-    }).save();
-
-    var attendees = [];
-    attendees.push({
-        cn: app.fullname,
-        mailTo: app.defaultEmail(),
-        partStat: "NEEDS-ACTION",
-        _id: null
-    });
-
-    _.each(data.interviewers, function (id) {
-        var u = Meteor.users.findOne({_id: id});
-        if (u) {
-            var uName = u.fullname() || u.defaultEmail();
-            attendees.push({
-                cn: uName,
-                mailTo: u.defaultEmail(),
-                partStat: "NEEDS-ACTION",
-                _id: id
-            });
-        }
-    });
-
-    var organizerName = user.fullname() || user.defaultEmail();
-    var calOptions = {
-        prodId: "//Vietnamworks//Success",
-        method: "REQUEST",
-        events: [
-            {
-                uid: activityId,
-                summary: data.subject,
-                location: data.location,
-                dtStart: data.startTime,
-                dtEnd: data.endTime,
-                organizer: {cn: organizerName, mailTo: user.defaultEmail()},
-                attendees: attendees
-            }
-        ]
-    };
-    var cal = new IcsGenerator(calOptions);
-
-
-    Meteor.defer(()=> {
-        try {
-            Email.send({
-                from: user.defaultEmail(),
-                to: _.pluck(attendees, 'mailTo'),
-                subject: data.subject,
-                html: data.body,
-                headers: {
-                    "Content-class": "urn:content-classes:calendarmessage"
-                },
-                attachments: [
-                    {
-                        fileName: 'invite.ics',
-                        contents: cal.toIcsString(),
-                        contentType: 'text/calendar'
-                    }
-                ]
-            });
-
-            //create task
-            attendees.splice(0, 1); //remove user's email
-
-            var jobdata = {
-                sender: user.defaultEmail(),
-                subject: null,
-                html: null,
-                recruiters: attendees,
-                ref: ref,
-                timeRange: {
-                    start: data.startTime,
-                    end: data.endTime
-                }
-            };
-
-            var estimateDate = new moment(data.scheduleDate).subtract(1, 'day')
-                , now = new moment();
-
-            var time = (estimateDate > now) ? estimateDate.toDate() : null;
-
-            sJobCollections.addJobtoQueue('remindInterviewJob', jobdata, null, time);
-
-        } catch (e) {
-            console.log('Set Schedule failed');
-            console.trace(e);
-
-            Activities.remove({_id: activityId});
-
-            return false;
-        }
-    });
-
-    return activityId;
-    //});
-
 };
 
 methods['application.updateAvatar'] = function (appId, appType, avatar) {

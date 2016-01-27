@@ -3,7 +3,7 @@ JobCandidateCheckBox = React.createClass({
         return {};
     },
     componentDidMount() {
-        let selectEl = React.findDOMNode(this.refs.checkbox);
+        let selectEl = this.refs.checkbox;
         $(selectEl).iCheck({
             checkboxClass: 'icheckbox_square-green'
         });
@@ -24,7 +24,7 @@ JobCandidateCheckBox = React.createClass({
 
     componentWillUpdate(nextProps, nextState) {
         if (this.props.checked != nextProps.checked) {
-            let selectEl = React.findDOMNode(this.refs.checkbox);
+            let selectEl = this.refs.checkbox;
             if (nextProps.checked) {
                 $(selectEl).iCheck('check');
             } else {

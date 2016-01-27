@@ -590,10 +590,17 @@ const ActionMixin = {
         });
         Meteor.call('getResumeDetails', this.state.currentAppId, this.state.currentAppType, (err, result) => {
             if (!err, result) {
+                const details = new ResumeDetails(result);
                 this.setState({
                     isResumeLoading: false,
-                    resume: initResume(result)
+                    resume: details
                 });
+
+                if(details.hasAvatar()) {
+                    Meteor.setTimeout(function() {
+                        Meteor.call('application.updateAvatar', details.appId(), details.appType() , details.avatar())
+                    }, 0);
+                }
             }
         });
     },
@@ -642,8 +649,7 @@ const RendererMixin = {
                                 appAction={ this.state.currentAppAction }
                                 actions={ this.current__Actions() }
                                 tabState={this.state.tabState}
-                                onChangeTab={(tabState) => { this.setState({tabState}) }}
-                                />
+                                onChangeTab={(tabState) => { this.setState({tabState}) }} />
                         )}
 
                         <Modal show={this.state.apps__showSendBulkMessage} bsSize={'large'} onHide={() =>{}}>
@@ -652,6 +658,7 @@ const RendererMixin = {
                             </Modal.Header>
                             {this.state.apps__showSendBulkMessage ? (
                                 <MessageBox
+                                    actions={ this.current__Actions() }
                                     appIds={this.state.apps__selectedItems}
                                     onSave={this.apps__Actions().sendMessage}
                                     onDiscard={() => this.apps__Actions().toggleSendMessage(false) }/>

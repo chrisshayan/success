@@ -13,7 +13,7 @@ MailSignatureEditor = React.createClass({
     },
 
     componentDidMount() {
-        this.editor = this.refs.editor.getDOMNode();
+        this.editor = this.refs.editor;
         if (this.state.isEditing) {
             $(this.editor).summernote({focus: true});
         }

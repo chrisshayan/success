@@ -63,7 +63,7 @@ UpdateProfileForm = React.createClass({
 
     componentDidUpdate(prevProps, prevState) {
         if (this.state.isEditing != prevState.isEditing) {
-            const editor = this.refs.editor.getDOMNode();
+            const editor = this.refs.editor;
             if (this.state.isEditing) {
                 $(editor).summernote();
             } else {
@@ -100,25 +100,25 @@ UpdateProfileForm = React.createClass({
     },
 
     handleToggleClick(e) {
+        e.preventDefault();
         this.setState({isLoading: false, errors: {}});
 
         // if isEdit == false : start edit page, saved the  textarea into variable originContent.
         // if isEdit == true  : finish edit page, revert the originContent into textarea.
         if (this.state.isEditing) {
-            $(this.refs.editor.getDOMNode()).code(this.state.originContent);
+            $(this.refs.editor).code(this.state.originContent);
             this.refs.firstName.reset();
             this.refs.lastName.reset();
         }
         else
             this.setState({
-                originContent: $(this.refs.editor.getDOMNode()).code()
+                originContent: $(this.refs.editor).code()
             });
 
 
         this.setState({
             isEditing: !this.state.isEditing
         });
-        e.preventDefault();
     },
 
     handleSaveClick(e) {
@@ -126,7 +126,7 @@ UpdateProfileForm = React.createClass({
         var model = new updateProfileModel({
             firstName: this.refs.firstName.value(),
             lastName: this.refs.lastName.value(),
-            signature: $(this.refs.editor.getDOMNode()).code()
+            signature: $(this.refs.editor).code()
         });
 
         if (model.validate()) {
@@ -189,7 +189,7 @@ UpdateProfileForm = React.createClass({
             if (this.data.user && !this.data.user.isCompanyAdmin()) {
                 buttons.push(<a key={3} style={styles.button} className="btn btn-primary btn-outline"
                                 onClick={this.handleShowChangePassword}>Change Password</a>);
-                buttons.push(<ChangePasswordDialog onDismiss={this.handleDismissChangePassword}
+                buttons.push(<ChangePasswordDialog key={4} onDismiss={this.handleDismissChangePassword}
                                                    show={this.state.showChangePassword}/>)
             }
         }
@@ -225,20 +225,22 @@ UpdateProfileForm = React.createClass({
                                         <form className="form-horizontal" onSubmit={this.handleSaveClick}>
                                             <FormInput
                                                 ref='firstName'
-                                                type='hidden'
+                                                type='text'
                                                 label="First name"
                                                 disabled={ isLoading }
                                                 value={this.firstName()}
-                                                isStatic={this.state.isEditing}
+                                                isEditable={true}
+                                                editToggle={this.state.isEditing}
                                                 error={errors.firstName}/>
 
                                             <FormInput
                                                 ref='lastName'
-                                                type='hidden'
+                                                type='text'
                                                 disabled={ isLoading }
                                                 label="Last name"
                                                 value={ this.lastName()}
-                                                isStatic={this.state.isEditing}
+                                                isEditable={true}
+                                                editToggle={this.state.isEditing}
                                                 error={errors.lastName}/>
 
 
