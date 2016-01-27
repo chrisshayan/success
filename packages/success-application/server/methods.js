@@ -20,7 +20,7 @@ function replacePlaceholder(user, job, application, mail) {
     var replaces = {};
     var placeholders = mail.body.match(/\[\[(\w+)\]\]/gi);
     _.each(placeholders, function (p) {
-        p1 = p.replace(/\[\[|\]\]/g, "");
+        var p1 = p.replace(/\[\[|\]\]/g, "");
         if (_.indexOf(valid, p1) >= 0) {
             if (replaces.hasOwnProperty(p)) return;
             switch (p1) {
@@ -254,32 +254,32 @@ methods['application.sendMessage'] = function (jobId = 0, appIds = [], data = {}
     if (!user || !job) return false;
 
     Meteor.defer(() => {
-        _.each(appIds, (appId) => {
-            var app = Application.findOne({jobId: jobId, appId: appId});
-            if (!app) return false;
-            data = replacePlaceholder(user, job, app, data);
+        _.each(appIds, function(appId) {
+	        var app = Application.findOne({jobId: jobId, appId: appId});
+	        if (!app) return false;
+	        var _data = replacePlaceholder(user, job, app, _.clone(data));
 
-            Email.send({
-                from: user.defaultEmail(),
-                to: app.defaultEmail(),
-                subject: data.subject,
-                html: data.body
-            });
+	        Email.send({
+		        from: user.defaultEmail(),
+		        to: app.defaultEmail(),
+		        subject: _data.subject,
+		        html: _data.body
+	        });
 
-            const ref = {
-                companyId: app.companyId,
-                jobId: jobId,
-                candidateId: app.candidateId,
-                appId: appId
-            };
+	        const ref = {
+		        companyId: app.companyId,
+		        jobId: jobId,
+		        candidateId: app.candidateId,
+		        appId: appId
+	        };
 
-            new Activities({
-                type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
-                ref: ref,
-                content: data,
-                createdBy: this.userId,
-                createdAt: new Date()
-            }).save();
+	        new Activities({
+		        type: Activities.TYPE.RECRUITER_CREATE_EMAIL,
+		        ref: ref,
+		        content: _data,
+		        createdBy: user._id,
+		        createdAt: new Date()
+	        }).save();
         });
     });
     return true;
@@ -420,24 +420,25 @@ methods['application.scheduleInterview'] = function (jobId = 0, appId = 0, data 
                 time: start.format('MMMM Do YYYY, h:mma') + ' - ' + end.format('h:mma')
             });
 
-
-            Email.send({
-                from: '<Success> no-reply@success.vietnamworks.com',
-                replyTo: user.defaultEmail(),
-                to: interviewerEmails,
-                subject: 'Notification: You have an interview',
-                html: html,
-                headers: {
-                    "Content-class": "urn:content-classes:calendarmessage"
-                },
-                attachments: [
-                    {
-                        fileName: 'invite.ics',
-                        contents: cal.toIcsString(),
-                        contentType: 'text/calendar'
-                    }
-                ]
-            });
+            if(interviewerEmails.length > 0) {
+                Email.send({
+                    from: '<Success> no-reply@success.vietnamworks.com',
+                    replyTo: user.defaultEmail(),
+                    to: interviewerEmails,
+                    subject: 'Notification: You have an interview',
+                    html: html,
+                    headers: {
+                        "Content-class": "urn:content-classes:calendarmessage"
+                    },
+                    attachments: [
+                        {
+                            fileName: 'invite.ics',
+                            contents: cal.toIcsString(),
+                            contentType: 'text/calendar'
+                        }
+                    ]
+                });
+            }
 
             //create task
             attendees.splice(0, 1); //remove user's email
