@@ -85,8 +85,9 @@ ChangePasswordDialog = React.createClass({
                     this.refs.currentPassword.focus();
 
                 } else {
-                    Notification.success('Updated password');
-                    this.props.onDismiss && this.props.onDismiss();
+                    /*Notification.success('Updated password');
+                    this.props.onDismiss && this.props.onDismiss();*/
+                    Router.go('logout');
                 }
             });
         } else {
