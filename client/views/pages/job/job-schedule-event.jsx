@@ -290,7 +290,7 @@ ScheduleEvent = React.createClass({
                 <div class="text-left">
                     The invitation will be sent to all participants including an iCal attachment.
                     <br/><br/>
-                    Please ensure participants accept the invitation or re-schedule if needed
+                    iCal is standard meeting invitation format that can be used in Outlook or other well-known calendars.
                 </div>
             `;
             swal({
