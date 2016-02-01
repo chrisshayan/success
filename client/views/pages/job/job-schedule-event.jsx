@@ -24,7 +24,8 @@ scheduleForm = Astro.Class({
             type: 'date',
             validator: [
                 Validators.date(null, 'Start time is required.'),
-                Validators.required(null, 'Start time is required.')
+                Validators.required(null, 'Start time is required.'),
+	            Validators.gte(new Date(), ''),
             ]
         },
         endTime: {
@@ -150,6 +151,7 @@ ScheduleEvent = React.createClass({
         });
 
         $('.date').datepicker({
+            startDate: new Date(),
             todayBtn: "linked",
             keyboardNavigation: false,
             forceParse: false,
@@ -255,7 +257,14 @@ ScheduleEvent = React.createClass({
     validate(data) {
         var model = new scheduleForm(data);
         var result = model.validate();
-        this.setState({errors: model.getValidationErrors()});
+	    this.setState({errors: model.getValidationErrors()});
+	    if(result) {
+			if(model.endTime <= model.startTime) {
+				this.setState({errors: {endTime: 'End time must great than start time'}});
+				result = false;
+			}
+	    }
+
         return result;
     },
 
@@ -378,7 +387,7 @@ ScheduleEvent = React.createClass({
                             <label className="col-sm-2 control-label">Date:</label>
 
                             <div className="col-sm-4">
-                                <div className="input-group" data-autoclose="true">
+                                <div className={classNames("input-group", {'error': errors.scheduleDate})} data-autoclose="true">
                                     <input type="text" ref="scheduleDate" className="form-control date"
                                            placeholder="dd/mm/yyyy" defaultValue={this.state.scheduleDate}/>
                                     <span className="input-group-addon">
@@ -389,19 +398,17 @@ ScheduleEvent = React.createClass({
                             </div>
                             <div className="col-sm-6">
                                 <div className="input-daterange input-group">
-                                    <div className="input-group clockpicker" data-autoclose="true">
+                                    <div className={classNames("input-group", 'clockpicker', {'error': errors.startTime})} data-autoclose="true">
                                         <input type="text" ref="startTime" className="form-control"
                                                defaultValue={this.state.startTime}/>
                                     </div>
                                     <span className="input-group-addon">to</span>
 
-                                    <div className="input-group clockpicker" data-autoclose="true">
+                                    <div className={classNames("input-group", 'clockpicker', {'error': errors.endTime})} data-autoclose="true">
                                         <input type="text" ref="endTime" className="form-control"
                                                defaultValue={this.state.endTime}/>
                                     </div>
                                 </div>
-                                {errors.startTime ? <p className="text-danger">{errors.startTime}</p> : null}
-                                {errors.endTime ? <p className="text-danger">{errors.endTime}</p> : null}
                             </div>
                         </div>
 

@@ -809,3 +809,21 @@ pre.cover-letter {
     }
   }
 }
+
+.input-group {
+  &.error {
+    .msg {
+      font-size: 12px;
+      line-height: 12px;
+      color: #f44336;
+      transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1);
+      margin-top: 5px;
+    }
+    label {
+      color: #f44336 !important;
+    }
+    input {
+      border: 1px solid #f44336;
+    }
+  }
+}
