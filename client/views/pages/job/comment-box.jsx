@@ -1,6 +1,7 @@
 CommentBox = React.createClass({
     componentWillMount() {
         this.props.actions.changeTab(2);
+        FormTabEvents.bind();
     },
 
     componentDidMount() {
@@ -19,6 +20,10 @@ CommentBox = React.createClass({
         body.stop().animate({scrollTop: scrollTo}, '500', 'swing', function() {
             ip.focus();
         });
+    },
+
+    componentWillUnmount() {
+        FormTabEvents.unbind();
     },
 
     handleSaveClick(e) {
@@ -47,12 +52,12 @@ CommentBox = React.createClass({
                 <MentionInput ref="txt" placeholder="write your note or comment (mention someone using '@')" />
 
                 <div className="text-right" style={styles.actions}>
-                    <button className="btn btn-primary btn-outline btn-sm" onClick={this.handleSaveClick}>
+                    <button className="btn btn-primary btn-outline btn-sm tabbable" onClick={this.handleSaveClick}>
                         <i className="fa fa-paper-plane-o"/>&nbsp;
                         Save
                     </button>
                     &nbsp;&nbsp;
-                    <button className="btn btn-white btn-outline btn-sm" onClick={this.props.onDiscard}>
+                    <button className="btn btn-white btn-outline btn-sm tabbable" onClick={this.props.onDiscard}>
                         <i className="fa fa-times"/>&nbsp;
                         Discard
                     </button>

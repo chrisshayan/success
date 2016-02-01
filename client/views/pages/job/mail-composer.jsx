@@ -12,6 +12,10 @@ MailComposer = React.createClass({
         };
     },
 
+    componentWillMount() {
+        FormTabEvents.bind();
+    },
+
     componentDidMount() {
         // Initialize summernote plugin
         const {subject, mailContent} = this.refs;
@@ -78,6 +82,9 @@ MailComposer = React.createClass({
 
     },
 
+    componentWillUnmount() {
+        FormTabEvents.unbind();
+    },
 
     changeMailTemplate(e) {
 	    const {subject, mailTemplate, mailContent} = this.refs;
@@ -137,7 +144,7 @@ MailComposer = React.createClass({
                             <label className="col-sm-2 control-label">Template:</label>
 
                             <div className="col-sm-10">
-                                <select ref="mailTemplate" className="form-control" onChange={this.changeMailTemplate}>
+                                <select ref="mailTemplate" className="form-control tabbable" onChange={this.changeMailTemplate}>
                                     {this.props.templates.map( (t,idx) => <option value={t._id} key={idx}>{t.name}</option> )}
                                 </select>
                                 {this.state.mailTemplateError ? <p className="text-danger">Please choose a mail template</p> : null}
@@ -156,7 +163,7 @@ MailComposer = React.createClass({
                             <label className="col-sm-2 control-label">Subject:</label>
 
                             <div className="col-sm-10">
-                                <input type="text" ref={"subject"} className="form-control"/>
+                                <input type="text" ref={"subject"} className="form-control tabbable"/>
                                 {this.state.subjectError ? <p className="text-danger">Please input mail subject</p> : null}
                             </div>
                         </div>
@@ -164,14 +171,14 @@ MailComposer = React.createClass({
                 </div>
                 <div className="mail-text h-200">
                     {this.state.contentError ? <p className="text-danger">Please input mail content</p> : null}
-                    <div className="summernote" ref="mailContent"></div>
+                    <div className="summernote tabbable" ref="mailContent"></div>
                     <div className="clearfix"></div>
                 </div>
                 <div className="mail-body text-right tooltip-demo">
-                    <button className="btn btn-sm btn-primary btn-outline" data-toggle="tooltip" data-placement="top"
+                    <button className="btn btn-sm btn-primary btn-outline tabbable" data-toggle="tooltip" data-placement="top"
                             title="Send" onClick={this.sendEmails}><i className="fa fa-reply"></i> Send</button>
                     &nbsp;
-                    <button onClick={this.props.onDiscard} className="btn btn-white btn-sm btn-outline" data-toggle="tooltip" data-placement="top"
+                    <button onClick={this.props.onDiscard} className="btn btn-white btn-sm btn-outline tabbable" data-toggle="tooltip" data-placement="top"
                             title="Discard email"><i className="fa fa-times"></i> Discard</button>
                 </div>
                 <div className="clearfix"></div>

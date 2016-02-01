@@ -105,10 +105,12 @@ MentionInput = React.createClass({
 				value={this.props.value || ''}
 				onChange={this.props.onChange || function(){} }
 				onBlur={this.props.onBlur || function(){}}
+				className="tabbable"
 				/>;
 		} else {
 			textbox = <textarea
 				ref='content'
+				className="tabbable"
 				style={styles.input}
 				placeholder={this.props.placeholder}
 				/>;

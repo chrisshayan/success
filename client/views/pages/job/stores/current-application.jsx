@@ -149,6 +149,8 @@ JobCurrentApplication.getActions = function () {
      * @type {function(this:JobCurrentApplication)}
      */
     actions.discardActionBox = function () {
+        $.lastTabEl = null;
+
         const params = Router.current().params
             , query = _.omit(params.query, 'appAction');
 

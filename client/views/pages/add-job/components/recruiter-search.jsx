@@ -65,6 +65,9 @@ RecruiterSearch = React.createClass({
     handleKeyUp(e) {
         var k = this.state.itemActive;
         switch (e.which) {
+	        case 9:
+
+		        break;
             case 38: // move up
                 if (k === null) {
                     k = this.data.recruiters.length - 1;
@@ -104,6 +107,13 @@ RecruiterSearch = React.createClass({
             this.props.onSelect(user);
     },
 
+    // export apis
+    focus() {
+        console.log(1234567890)
+        const $el = $(this.refs.textBox);
+        $el.focus();
+    },
+
     render() {
         var styles = {
             container: {
@@ -121,6 +131,7 @@ RecruiterSearch = React.createClass({
             }
         };
         var className = classNames({
+            'tabbable': true,
             'recruiter-search': true,
             'form-control': true,
             'loading': this.data.isSearching
@@ -129,6 +140,7 @@ RecruiterSearch = React.createClass({
         return (
             <div style={ styles.container }>
                 <input
+                    ref="textBox"
                     className={className}
                     onChange={(e) => this.setState({q: e.target.value})}
                     onKeyUp={this.handleKeyUp}

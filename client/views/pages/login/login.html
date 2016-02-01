@@ -23,15 +23,15 @@
                     <h3>Login here (VietnamWorks Account)</h3>
                     <form class="m-t" role="form" id="loginForm" method="post">
                         <div class="form-group">
-                            <input type="email" class="form-control" name="email" placeholder="Username" required="">
+                            <input type="email" class="form-control tabbable" name="email" placeholder="Username" required="">
                         </div>
                         <div class="form-group">
-                            <input type="password" class="form-control" name="password" placeholder="Password" required="">
+                            <input type="password" class="form-control tabbable" name="password" placeholder="Password" required="">
                         </div>
                         {{#if isError}}
                             <div class="alert alert-danger">{{errorMsg}}</div>
                         {{/if}}
-                        <button type="submit" class="btn btn-primary block full-width m-b" id="loginBtn" data-loading-text="Loading..." >Login</button>
+                        <button type="submit" class="btn btn-primary block full-width m-b tabbable" id="loginBtn" data-loading-text="Loading..." >Login</button>
                     </form>
 
                     <p class="m-t">

@@ -1,5 +1,13 @@
 Session.setDefault('loginErrorMsg', "");
 
+Template.login.onRendered(function() {
+    FormTabEvents.bind();
+});
+
+Template.login.onDestroyed(function() {
+    FormTabEvents.unbind();
+});
+
 Template.login.helpers({
 
     /**
