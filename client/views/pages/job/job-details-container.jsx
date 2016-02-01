@@ -393,6 +393,7 @@ const HookMixin = {
     },
 
     componentWillMount() {
+	    this.checkPermission();
         this.trackers = [];
         this.trackers.push(Tracker.autorun(() => {
             const nextState = {};
@@ -545,6 +546,17 @@ const currentAppActions = function () {
 }
 
 const ActionMixin = {
+
+    checkPermission() {
+		Meteor.defer(function() {
+			checkAccessPermission({
+				onFail() {
+					Router.go('accessDenied');
+				}
+			});
+		})
+    },
+
     handle___GetJobInfo() {
         Meteor.call('getJobInfo', this.state.jobId, (err, job) => {
             const state = {

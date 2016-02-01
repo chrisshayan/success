@@ -267,7 +267,7 @@ Router.route('/job/:jobId/:stage', {
 		];
 	},
 	action() {
-		checkAccessPermission.apply(this, ['Job']);
+		this.render('Job');
 	}
 });
 
