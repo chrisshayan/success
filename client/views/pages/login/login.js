@@ -1,10 +1,12 @@
 Session.setDefault('loginErrorMsg', "");
 
-Template.login.onRendered(function() {
+Template.login.onRendered(function () {
     FormTabEvents.bind();
+    Session.set('loginErrorMsg', null);
+
 });
 
-Template.login.onDestroyed(function() {
+Template.login.onDestroyed(function () {
     FormTabEvents.unbind();
 });
 
@@ -14,7 +16,7 @@ Template.login.helpers({
      * check login status
      * return {Boolean}
      */
-    isError: function() {
+    isError: function () {
         return !!Session.get("loginErrorMsg")
     },
 
@@ -22,14 +24,14 @@ Template.login.helpers({
      * get error string
      * @returns {String}
      */
-    errorMsg: function() {
+    errorMsg: function () {
         return Session.get("loginErrorMsg");
-    },
+    }
 
 });
 
 Template.login.events({
-    'submit #loginForm': function(e, tmpl) {
+    'submit #loginForm': function (e, tmpl) {
         e.preventDefault();
 
         //change login btn state to loading
@@ -39,10 +41,10 @@ Template.login.events({
         var username = e.target.email.value,
             password = e.target.password.value;
         //
-        Meteor.setTimeout(function() {
-            Meteor.loginWithVNW(username, password, function(err, result) {
+        Meteor.setTimeout(function () {
+            Meteor.loginWithVNW(username, password, function (err, result) {
                 loginBtn.button('reset');
-                if(err) {
+                if (err) {
                     Session.set("loginErrorMsg", "Your username/password may be incorrect");
                 }
             });

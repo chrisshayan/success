@@ -73,9 +73,9 @@ pubs.ESJobs = function (type, limit, q) {
                 if (skills.length != 0) {
                     extra.set('hiringCriteria.skills.criteria', skills);
                 }
+                extra.set('isMigrated', true);
             }
 
-            extra.set('isMigrated', true);
 
             if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
                 extra.set('jobTitle', job.jobTitle);
