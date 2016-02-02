@@ -63,7 +63,7 @@ MentionInput = React.createClass({
 				]
 			});
 
-			setTimeout(() => this.refs.content.focus(), 300);
+			setTimeout(() => this.focus(), 300);
 		}
 	},
 

@@ -109,9 +109,8 @@ RecruiterSearch = React.createClass({
 
     // export apis
     focus() {
-        console.log(1234567890)
         const $el = $(this.refs.textBox);
-        $el.focus();
+	    $el && $el.focus();
     },
 
     render() {
