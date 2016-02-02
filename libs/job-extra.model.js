@@ -95,6 +95,12 @@ JobExtra = Astro.Class({
             default() {
                 return 0;
             }
+        },
+        isMigrated: {
+            type: 'boolean',
+            default(){
+                return false;
+            }
         }
     },
 
@@ -109,7 +115,7 @@ JobExtra = Astro.Class({
         totalApplicants() {
             let count = 0;
             _.each(_.toArray(this.stage), (n) => {
-                if(n) count += n;
+                if (n) count += n;
             });
             return count;
         }

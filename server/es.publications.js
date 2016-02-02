@@ -61,13 +61,21 @@ pubs.ESJobs = function (type, limit, q) {
         _.each(jobs, (j) => {
             var job = new ESJob(j);
             var extra = Collection.findOne({jobId: job.jobId});
+
             if (!extra) {
                 extra = new JobExtra();
                 extra.jobId = job.jobId;
                 extra.companyId = job.companyId;
                 extra.stage.applied = job.numOfApplications;
-                extra.save();
+
+                // update skill into skill criteria
+                var skills = _.pluck(job.skills, 'skillName');
+                if (skills.length != 0) {
+                    extra.set('hiringCriteria.skills.criteria', skills);
+                }
             }
+
+            extra.set('isMigrated', true);
 
             if (!_.isEqual(extra.jobTitle, job.jobTitle)) {
                 extra.set('jobTitle', job.jobTitle);
@@ -81,8 +89,8 @@ pubs.ESJobs = function (type, limit, q) {
             extra.save();
 
             job.extra = extra;
-            job.cities = _.filter(citiesCache, function(r) {
-                return  j.cityList.indexOf(r.vnwId) >= 0;
+            job.cities = _.filter(citiesCache, function (r) {
+                return j.cityList.indexOf(r.vnwId) >= 0;
             });
 
             job.type = type;
@@ -91,7 +99,7 @@ pubs.ESJobs = function (type, limit, q) {
 
         });
 
-        if(!_.isEmpty(jobIds)) {
+        if (!_.isEmpty(jobIds)) {
             // observe change from extra info
             var extraInfo = Collection.find({jobId: {$in: jobIds}});
             handle = extraInfo.observe({

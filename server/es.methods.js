@@ -129,11 +129,24 @@ methods.getJobInfo = function (jobId) {
                          * @type {*|{}|any}
                          */
                         var extra = JobExtra.findOne({jobId: job.jobId});
-                        if (!extra)
+                        if (!extra) {
                             extra = new JobExtra();
+                        }
+
+                        if (!extra['isMigrated']) {
+                            // update skill into skill criteria
+                            var skills = _.pluck(job.skills, 'skillName');
+                            if (skills.length != 0) {
+                                var current = extra['hiringCriteria']['skills']['criteria'] || [];
+                                extra.set('hiringCriteria.skills.criteria', _.unique(current.concat(skills)));
+                            }
+                            extra.set('isMigrated', true);
+
+                        }
 
                         extra.set('jobId', job.jobId);
                         extra.set('companyId', job.companyId);
+
 
                         if (!_.isEqual(extra.jobTitle, job.jobTitle))
                             extra.set('jobTitle', job.jobTitle);
