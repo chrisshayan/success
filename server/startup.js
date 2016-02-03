@@ -31,6 +31,12 @@ Meteor.startup(function () {
         username: Meteor.settings.mandrill.username,
         key: Meteor.settings.mandrill.key
     });
+
+
+    if (process.env.MIGRATION) {
+        Migrations.unlock();
+        Migrations.migrateTo(process.env.MIGRATION);
+    }
     //
     ///* create index */
     //var options = Meteor.settings.indexMongo._options;

@@ -1,6 +1,6 @@
 Package.describe({
     name: 'vnw:migration',
-    version: '0.0.18',
+    version: '0.0.1',
     // Brief, one-line summary of the package.
     summary: '',
     // URL to the Git repository containing the source code for this package.
@@ -17,7 +17,7 @@ var migrationDir = path.join(base, '/packages/migration/migrations');
 var migrationFiles = fs.readdirSync(migrationDir);
 
 Package.onUse(function (api) {
-    api.use(['percolate:migrations', 'lab:vnw-apis', 'mongo', 'meteorhacks:aggregate'], 'server');
+    api.use(['percolate:migrations', 'lab:vnw-apis', 'mongo', 'meteorhacks:aggregate','vnw:hiring-team'], 'server');
     api.imply(['percolate:migrations', 'meteorhacks:aggregate'], 'server');
     api.addFiles('migration.js', 'server');
     var files = [];

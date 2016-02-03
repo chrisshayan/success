@@ -23,8 +23,9 @@ var setModifier = function (obj) {
 
 function generateUsername(userId) {
     userId = userId.replace(/[-_]/g, '.');
-    var regEx = new RegExp('^' + userId + '$', 'i');
-    var similarLength = Meteor['hiringTeam'].find({username: regEx}).count();
+    var regEx = userId.replace(/[.]/g, '\\.');
+    regEx = new RegExp('^' + regEx + '$', 'i');
+    var similarLength = Meteor.users.find({username: regEx}).count();
 
     while (similarLength && Meteor.users.findOne({username: userId + similarLength})) {
         similarLength++;
@@ -32,6 +33,7 @@ function generateUsername(userId) {
 
     var newUserId = (similarLength) ? userId + similarLength : userId;
 
+    console.log('username:%s, similar : %s', newUserId, similarLength);
     return newUserId.toLowerCase();
 }
 
@@ -115,34 +117,34 @@ var methods = {
                         }
                     })
                 }
-                Meteor.defer(function () {
-                    SYNC_VNW.syncUser(vnwData);
 
-                    var user = Meteor.users.findOne({_id: _id});
+                SYNC_VNW.syncUser(vnwData);
+
+                if (!Meteor['hiringTeam'].findOne({email: email})) {
+                    user = Meteor.users.findOne({_id: _id});
 
                     var hiringTeamItem = new HiringTeam();
-                    if (!Meteor['hiringTeam'].findOne({email: email})) {
+                    hiringTeamItem.companyId = user.companyId;
+                    hiringTeamItem.email = email;
+                    hiringTeamItem.username = user.username;
+                    hiringTeamItem.roleId = 'admin';
+                    hiringTeamItem.status = 1;
+                    hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
 
-                        hiringTeamItem.companyId = user.companyId;
-                        hiringTeamItem.email = email;
-                        hiringTeamItem.username = user.username;
-                        hiringTeamItem.roleId = 'admin';
-                        hiringTeamItem.status = 1;
-                        hiringTeamItem.name = [user.profile.firstname, user.profile.lastname].join(' ').trim();
+                    if (!hiringTeamItem.name.length)
+                        hiringTeamItem.name = 'admin';
 
-                        if (!hiringTeamItem.name.length)
-                            hiringTeamItem.name = 'admin';
+                    hiringTeamItem.save();
 
-                        //hiringTeamItem.roleId = [];
-                        hiringTeamItem.save();
-                    }
+                    user.isAssigned = true;
+                    user.save();
+                }
 
-                });
-                var tokenData = {
-                    userId: vnwData.userid,
-                    companyId: vnwData.companyid,
-                    expireTime: moment(new Date()).add(5, 'day').valueOf()
-                };
+                /*var tokenData = {
+                 userId: vnwData.userid,
+                 companyId: vnwData.companyid,
+                 expireTime: moment(new Date()).add(5, 'day').valueOf()
+                 };*/
                 return result;
             }
         } else {

@@ -4,15 +4,17 @@
 
 function generateUsername(userId) {
     userId = userId.replace(/[-_]/g, '.');
-    var regEx = new RegExp('^' + userId + '$', 'i');
-    var similarLength = Meteor['hiringTeam'].find({username: regEx}).count();
+    var regEx = userId.replace(/[.]/g, '\\.');
+    regEx = new RegExp('^' + regEx + '$', 'i');
+
+    var similarLength = Meteor.users.find({username: regEx}).count();
 
     while (similarLength && Meteor.users.findOne({username: userId + similarLength})) {
         similarLength++;
     }
 
     var newUserId = (similarLength) ? userId + similarLength : userId;
-
+    console.log('username:%s, similar : %s', newUserId, similarLength);
     return newUserId.toLowerCase();
 }
 
