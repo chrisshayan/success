@@ -1173,7 +1173,7 @@ Meteor.methods({
 						// allow if current user is company admin
 						if(currentUser.isCompanyAdmin()) return true;
 						// allow if current user have any role in this job
-						const recruiters = _.pluck(_.merge(job.recruiters.manager, job.recruiters.recruiter), 'userId');
+						const recruiters = _.pluck(job.recruiters.manager.concat(job.recruiters.recruiter), 'userId');
 						if(recruiters.indexOf(currentUser._id) >= 0) return true;
 					}
 				}
