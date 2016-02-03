@@ -312,28 +312,26 @@ Router.route('/api/skill/:jobId/:alias/search', {
             }
         } else {
             if (this.params.alias === "skills") {
-                if (this.params.jobId) {
-                    const result = ESSearch({
-                        index: 'vietnamworks',
-                        type: 'job',
-                        from: 0,
-                        size: 1,
-                        body: SuccessESQuery.getJobInfo(this.params.jobId)
-                    });
-
-                    if (result && result['hits']) {
-                        const hits = result['hits']['hits'];
-                        if (hits.length > 0) {
-                            const data = hits[0]['_source'];
-                            const job = new ESJob(data);
-                            job.skills.map(function (skill) {
-                                results.push({
-                                    id: skill.skillName,
-                                    text: skill.skillName
-                                })
-                            });
+                const req = ESSuggest({
+                    index: 'suggester',
+                    body: {
+                        skill: {
+                            "text": 'a',
+                            "completion": {
+                                "field": "skillNameSuggest"
+                            }
                         }
                     }
+                });
+
+                if (req && req['skill'] && req['skill'].length > 0) {
+                    results = [];
+                    _.each(req['skill'][0]['options'], function (opt) {
+                        results.push({
+                            id: opt.text,
+                            text: opt.text
+                        })
+                    });
                 }
             } else {
                 results = JobCriteriaSuggestion.collection.find({
