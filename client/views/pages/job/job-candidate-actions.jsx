@@ -53,13 +53,17 @@ JobCandidateProfileActions = React.createClass({
         const params = Router.current().params;
         let query = _.clone(params.query);
         if (!query) query = {};
-        query['appAction'] = type;
-        return Router.go('Job', {
-            jobId: this.props.job.jobId,
-            stage: this.props.stage.alias
-        }, {
-            query: query
-        });
+        if(query['appAction'] === type) {
+            this.props.actions.changeTab(2);
+        } else {
+            query['appAction'] = type;
+            Router.go('Job', {
+                jobId: this.props.job.jobId,
+                stage: this.props.stage.alias
+            }, {
+                query: query
+            });
+        }
     },
 
     onSelectAction(type, e) {
