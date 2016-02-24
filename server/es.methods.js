@@ -112,7 +112,7 @@ methods.getJobInfo = function (jobId) {
                         const data = hits[0]['_source'];
                         job = new ESJob(data);
 
-                        const level = Meteor.job_levels.findOne({vnwId: data.jobLevelId});
+                        const level = Meteor.job_levels.findOne({vnwId: data.jobLevelId, languageId: 2});
                         job.jobLevel = level && level.name ? level.name : '';
                         job.cities = Meteor.cities.find({
                             languageId: 2,

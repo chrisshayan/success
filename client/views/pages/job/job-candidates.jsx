@@ -5,10 +5,20 @@ JobCandidates = React.createClass({
         applications: React.PropTypes.array.isRequired
     },
 
+    componentDidMount() {
+	    const $window = $(window);
+	    const $list = $(this.refs.list);
+	    console.log($window.height() - 200 - 115)
+
+	    $list.slimScroll({
+		    height: $window.height() - 115 - 200
+	    });
+    },
+
     render() {
 
         return (
-            <div>
+            <div ref="list">
                 { this.props.applications.map(this.renderApp) }
             </div>
         );

@@ -16,11 +16,13 @@
 
                             <div class="col-sm-10">
                                 {{#if isSystem}}
-                                    <div className="form-control-static">
+                                    <p class="form-control-static">
                                         {{doc.name}}
-                                    </div>
+                                    </p>
                                 {{else}}
-                                    {{> afFieldInput name='name'}}
+                                    <div class="form-control-static">
+                                        {{> afFieldInput name='name'}}
+                                    </div>
                                 {{/if}}
 
                                 {{#if afFieldIsInvalid name='name'}}
@@ -28,18 +30,7 @@
                                 {{/if}}
                             </div>
                         </div>
-                        <div class="hr-line-dashed"></div>
 
-                        <div class="form-group {{#if afFieldIsInvalid name='emailFrom'}} has-error{{/if}}">
-                            <label class="col-sm-2 control-label">From</label>
-
-                            <div class="col-sm-10">
-                                {{> afFieldInput name='emailFrom'}}
-                                {{#if afFieldIsInvalid name='emailFrom'}}
-                                    <span class="help-block">{{afFieldMessage name='emailFrom'}}</span>
-                                {{/if}}
-                            </div>
-                        </div>
                         <div class="hr-line-dashed"></div>
 
                         <div class="form-group {{#if afFieldIsInvalid name='subject'}} has-error{{/if}}">

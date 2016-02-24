@@ -72,6 +72,8 @@ JobCandidateProfileActions = React.createClass({
     },
 
     renderButton(isDisqualified){
+        const {stage} = this.props;
+
         let btnList = [];
         btnList.push(<a key={0} className="btn btn-default btn-outline btn-sm " href='#'
                         onClick={(e) => this.onSelectAction('comment', e)}>
@@ -89,10 +91,12 @@ JobCandidateProfileActions = React.createClass({
                 Schedule interview
             </a>);
 
-            btnList.push(<a key={3} className="btn btn-default btn-outline btn-sm " href='#'
-                            onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
-                Score candidate
-            </a>);
+            if(stage && stage.id > 2) {
+                btnList.push(<a key={3} className="btn btn-default btn-outline btn-sm " href='#'
+                                onClick={(e) => this.onSelectAction('scoreCandidate', e)}>
+                    Score candidate
+                </a>);
+            }
 
             btnList.push(<button key={4} className="btn btn-default btn-outline btn-sm"
                                  onClick={ this.props.actions.disqualify }>
