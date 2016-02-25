@@ -109,7 +109,8 @@ const RendererMixin = {
                         <label className="col-sm-3 control-label">
                             Requirements
                         </label>
-                        <div className="col-sm-9 form-control-static" dangerouslySetInnerHTML={{__html: this.requirements()}}>
+                        <div className="col-sm-9">
+                            <p className="col-sm-9 form-control-static" dangerouslySetInnerHTML={{__html: this.requirements()}} />
                         </div>
                     </div>
                     <div className="hr-line-dashed"/>
