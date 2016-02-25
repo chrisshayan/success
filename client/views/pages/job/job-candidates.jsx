@@ -5,6 +5,10 @@ JobCandidates = React.createClass({
         applications: React.PropTypes.array.isRequired
     },
 
+    componentDidMount() {
+
+    },
+
     render() {
 
         return (

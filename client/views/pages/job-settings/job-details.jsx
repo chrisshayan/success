@@ -102,8 +102,9 @@ const RendererMixin = {
                             Description
                         </label>
                         <div className="col-sm-9">
-                            <p className="form-control-static" dangerouslySetInnerHTML={{__html: this.description()}} />
-
+                            <p className="form-control-static"
+                               dangerouslySetInnerHTML={{__html: this.description()}}>
+                            </p>
                         </div>
                     </div>
                     <div className="hr-line-dashed"/>
@@ -112,9 +113,8 @@ const RendererMixin = {
                             Requirements
                         </label>
                         <div className="col-sm-9">
-                            <p className="form-control-static">
-                                <p className="form-control-static" dangerouslySetInnerHTML={{__html: this.requirements()}} />
-                            </p>
+                            <p className="col-sm-9 form-control-static"
+                               dangerouslySetInnerHTML={{__html: this.requirements()}}/>
                         </div>
                     </div>
                     <div className="hr-line-dashed"/>
@@ -173,7 +173,7 @@ JobDetails = React.createClass({
     },
 
     render() {
-        if(this.state.isLoading) return <WaveLoading />
+        if (this.state.isLoading) return <WaveLoading />
         return this.render__Content();
     }
 })

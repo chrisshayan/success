@@ -129,7 +129,7 @@ JobCandidatesContainer = React.createClass({
                     onBulkDisqualify={ () => this.props.actions.disqualify() }
                     onBulkRevertQualify={ () => this.props.actions.revertQualify() }
                     onBulkSendMessage={ () => this.props.actions.toggleSendMessage() }
-                />
+                    />
 
                 {content}
             </div>

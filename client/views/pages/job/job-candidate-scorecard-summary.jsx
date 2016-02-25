@@ -297,15 +297,20 @@ ScoreCardSummaryNotes = React.createClass({
 
 	},
 	renderNote(note, key) {
+		const author = Meteor.users.findOne({_id: note.recruiterId});
 		return (
 			<div key={key}>
 				<blockquote>
-					<p>{note.content}</p>
+					<p>
+						{note.content}
+						<small>{author ? author.fullname() : ''}</small>
+					</p>
 				</blockquote>
 			</div>
 		);
 	},
 	render() {
+
 		return (
 			<div className="row">
 				<div className="col-md-12">
